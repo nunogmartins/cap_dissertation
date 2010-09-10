@@ -1,13 +1,18 @@
+#ifndef MODULE
 #define MODULE
+#endif
 #include <linux/module.h>
 
+#include "filter_module.h"
+
 static int __init exp_init(void) {
-        printk(KERN_INFO "load experiment\n");
-        return 0;
+	printk(KERN_INFO "load experiment\n");
+	process_filter();
+    return 0;
 }
 
 static void __exit exp_exit(void) {
-        printk(KERN_INFO "unload experiment\n");
+	printk(KERN_INFO "unload experiment\n");
 }
 
 module_init(exp_init);
