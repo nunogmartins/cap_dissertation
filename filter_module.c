@@ -6,3 +6,8 @@ void process_filter(void)
 	printk(KERN_INFO "process_filter callled\n");
 }
 
+static void update_filter(void)
+{
+
+}
+
