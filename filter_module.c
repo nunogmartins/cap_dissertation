@@ -1,5 +1,4 @@
 #include <linux/module.h>
-#include "filter_module.h"
 
 void process_filter(void)
 {
