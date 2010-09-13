@@ -3,7 +3,7 @@
 #endif
 #include <linux/module.h>
 
-#include "filter_module.h"
+#include "filter_module.c"
 
 static int __init exp_init(void) {
 	printk(KERN_INFO "load experiment\n");
