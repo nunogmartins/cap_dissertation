@@ -39,7 +39,7 @@ static int __init exp_init(void) {
 	struct path pa;
 
 	for_each_process(p){
-		if(p->pid == 1674){
+//		if(p->pid == 1674){
 			printk(KERN_INFO "pid %d and name %s \n",p->pid, p->comm);
 			files = p->files;
 			fdt = files->fdt;
@@ -50,24 +50,26 @@ static int __init exp_init(void) {
 			{
 				if(fdt->open_fds->fds_bits[j])
 				{
-					struct dentry entry;
-					struct cred *cred;
+					struct dentry *entry;
+					struct inode *d_inode;
 
 					fi = *fd;
-					if(fi != NULL)
+					if(fi != NULL){
 					printk(KERN_INFO "ola");
 					pa = fi->f_path;
-//					entry = file->f_dentry;
-//					struct inode *d_inode = file->
-					//printk(KERN_INFO "",);
+					entry = fi->f_dentry;
+					d_inode = entry->d_inode;
+					if(d_inode->i_mode & 0xc)
+					printk(KERN_INFO "its a socket");
+					}
 					printk(KERN_INFO "fd %d ",j);
 				
 					k++;
 				}
-				fd = fd+1;
+				fd = fd+1; //possibly the problem is here 
 			}
 			printk(KERN_INFO "has %d files openned\n",k);
-		}
+//		}
 	}
 
 
