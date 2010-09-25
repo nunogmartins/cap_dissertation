@@ -1,0 +1,27 @@
+\resumo 
+
+A monitorização de aplicações é uma forma de compreender e analisar o comportamento destas. 
+É possível monitorizar apenas parte dos recursos computacionais das aplicações tais como: utilização do cpu, da memória, dos dispositivos de \textit{IO} (em que nestes se enquadra a utilização dos dispositivos de rede), etc. 
+
+De forma a monitorizar a utilização de rede de uma aplicação é habitual utilizar-se a biblioteca \textit{libPcap} especializada na monitorização de rede. Para capturar apenas os dados desejados em geral é necessário criar filtros de forma a separar os dados relevantes para a análise, daqueles que não o são. 
+
+A biblioteca \textit{libPcap} proporciona um ambiente especifico para fazer esta monitorização, mas a forma de capturar genericamente o tráfego realizado por uma aplicação tem grandes problemas a nível de performance. Estes problemas são devido à dinâmica que as aplicações apresentam e à estrutura de comunicação entre as aplicações e os dispositivos de \textit{IO}.
+
+Esta dissertação propõe-se a criar um sistema de filtragem para a biblioteca \textit{libpcap} com base no \textit{pid} (\textit{Process id}) ou no nome da aplicação, de forma a obter apenas os pacotes da aplicação especificada. Com vista a mitigar os problemas anteriormente indicados, parte do desenvolvimento irá ser efectuado dentro do núcleo de sistema de operação.
+
+
+
+
+% O texto do Resumo deverá ser escrito em fonte Palatino e não deve exceder uma página, usando um espaçamento e meio.  Note-se que a natureza do resumo depende do tipo de documento a produzir. 
+% 
+% O Resumo numa Preparação de Mestrado não pretende antecipar o resumo da dissertação após a sua elaboração. Deve, no entanto, permitir aferir que o aluno é capaz de resumir o problema a tratar e as principais contribuições previstas na sua dissertação, numa visão preliminar extraída do trabalho de preparação. 
+% 
+% O Resumo numa Tese de Mestrado deve conseguir sintetizar o problema, a solução proposta e os resultados da sua avaliação.
+% 
+% O aluno deve também apresentar este resumo em língua inglesa na página seguinte, como se indica. 
+
+% Palavras-chave do resumo em Português
+\begin{keywords}
+Monitorização, rede, aplicação, libpcap, captura de pacotes, instrumentação do núcleo de sistema, filtro
+\end{keywords}
+% to add an extra black line

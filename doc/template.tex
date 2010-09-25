@@ -1,0 +1,223 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Template for writing dissertations with ThesisDIFCTUNL
+%%  Versão 20100313 (March 2010)
+%% Departamento de Informática
+%% Faculdade de Ciências e Tecnologia
+%% Universidade Nova de Lisboa
+%%
+%% Project web page at: http://code.google.com/p/thesisdifctunl/
+%%
+%% BUGS and SUGGESTIONS: please use the "Issue" feature in the project web page
+%%
+%% Contributors:
+%%     - Adriano Lopes (Adriano.Lopes@di.fct.unl.pt)
+%%     - João Lourenço (Joao.Lourenco@di.fct.unl.pt)
+%%     - João Seco (Joao.Seco@di.fct.unl.pt)
+%%     - Luís Russo (Luis.Russo@di.fct.unl.pt)
+%%     - Ricardo Dias (rjfd@di.fct.unl.pt)
+%%     - Vitor Duarte (Vitor.Duarte@di.fct.unl.pt)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Main options (please read the manual for further details)
+%% Options marked with (*) are the values by default
+%% - Languages
+%%           pt   - português
+%%           (*)en   - english
+%% - Class of text
+%%           bsc     - BSc graduation report
+%%           (*)prepmsc - Preparation of MSc dissertation
+%%           msc     - MSc dissertation
+%%           propphd - Proposal of PhD thesis
+%%           prepphd  - Preparation of PhD thesis
+%%           phd     - PhD thesis
+%% - Single/double sided printing
+%%           oneside - single sided printing
+%%           (*)twoside - double sided printing
+%% - Font size
+%%           11pt - Use font size 11
+%%           (*)12pt - Use font size 12
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[pt,prepmsc,twoside,12pt]{thesisdifctunl}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%  BEGINING OF USER COSTUMIZATION
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%====================================================================
+% Additional package syou may ant to use (comment those not needed)
+%====================================================================
+
+\usepackage{paralist}	% Nice lists / enumerates / ...
+\usepackage{booktabs}	% Nice tables
+%\usepackage{colortbl}	% Colors in tables
+%\usepackage[sort]{cite}	% Sort citations if using "plain" style
+\usepackage{listings}	% Nice fontifying for code listings
+\usepackage{subfigure}	% To aggregate multiple figures in a single one with subfigures
+\usepackage{pdfsync}	% For sychronization with PDF viewer (if possible, use synctex instead)
+\usepackage{todonotes}	% To register TODOs in text
+\usepackage{wrapfig}	% To have text wrapping figures
+\usepackage{pdflscape}
+
+%====================================================================
+% Standard configuration for user included packages
+%====================================================================
+
+% Where to look for figures
+\graphicspath{{Logo/}{Chapters/Figures/}} 
+
+% Setup of listings, for more information check package manual
+\lstset{
+    captionpos=t,
+    basicstyle={\ttfamily\footnotesize},
+    numbers=left,
+    numberstyle={\ttfamily\tiny},
+    tabsize=2,
+    language=Java,
+    float,
+    frame=single,
+}
+
+%====================================================================
+% Some default values that you may whish to override
+%====================================================================
+%% Identification: items prefixed with (*) are the default values, as defined in "defaults.tex"
+% (*)\university{Universidade Nova de Lisboa}
+% (*)\faculty{Faculdade de Ciências e Tecnologia}
+% (*)\department{Departamento de Informática}
+% (*)\program{Mestrado em Engenharia Informática}
+% (*)\majorfield{Engenharia Informática}
+% (*)\address{Lisboa}
+% (*)\universitylogo{logounl}
+% (*)\universitylogowidth{2.2cm}
+% \universitylogo{logofctunl}  -- alternative (is it allowed?)
+% \universitylogowidth{3.7cm}  -- alternative
+
+% Use double spacing (default is one-and-half spacing) is nice
+%     for supervisor to inert revision notes and comments.
+% (*)\onehalfspacing
+% \doublespacing
+
+%%============================================================
+
+% Title of the dissertation/thesis
+\title{Captura de tráfego de rede de um processo com base no PCAP}
+
+% Autor
+\author{Nuno Miguel Galvão Martins} 
+\authornumber{29603}
+
+% Data 
+\date{2010}
+
+% Supervisor, use [f] for female and [m] for male supervisors
+\adviser[m]{Prof.\ Doutor Vítor Manuel Alves Duarte}
+
+% Co-supervisor, use [f] for female and [m] for male supervisors
+% \coadviser[m]{Prof.\ Doutor nome do co-orientador}
+
+%%------------------------------------------------------------
+%% All the names inside braces below sould correspond to a file
+%%     with extension ".tex" and located in the "Chapters" folder
+%%------------------------------------------------------------
+% Dedicatory text. Will only be considered for final documents,
+% i.e., "bsc", "msc" and "phd", otherwise, it will be silently ignored
+\dedicatoryfile{dedicatory} 
+
+% Acknowledgments text. Will only be considered for final documents,
+% i.e., "bsc", "msc" and "phd", otherwise, it will be silently ignored
+\acknowledgementsfile{acknowledgements}
+
+% Resume/summary text in Portuguese
+\ptabstractfile{resumo}
+
+% Resume/summary text in English
+\enabstractfile{abstract}
+
+% The Table of Contents is always printed. The other lists may be omited.
+
+
+% The List of Figures. Comment to omit.
+\printlistoffigures 
+
+% The List of Tables. Comment to omit.
+\printlistoftables 
+
+% The List of Code Listings. Comment to omit.
+% \printlistoflistings 
+
+
+% Text chapters
+% sintax: \chapterfile[chapternumber]{file}
+% \chapterfile[1]{chapter1} 
+% \chapterfile[2]{chapter2} 
+% \chapterfile[3]{chapter3}
+
+\chapterfile[1]{capitulo1.tex}
+\chapterfile[2]{capitulo2.tex}
+\chapterfile[3]{capitulo3.tex}
+
+% Text appendixes
+% sintax: \appendixfile[appendixnumber]{file}
+\appendixfile[1]{appendix1}
+
+% BibTeX bibiography files. Can be a comma separated list of files
+% \bibliographyfile{bibliography}
+\bibliographyfile{mybib}
+%%============================================================
+%%
+%%  END OF USER COSTUMIZAITON
+%%
+%%============================================================
+%%============================================================
+%% Please do not change below this point!!! :)
+%%============================================================
+%% Begining of document
+\begin{document}
+
+%%------------------------------------------------------------
+%% Before main text
+\frontmatter
+
+% The first front page
+\frontpage
+
+% The second front page
+\presentationpage
+
+% Dedicatory will only be printed if adequate for the document type
+\printdedicatory
+
+% Acknowledgments will only be printed if adequate for the document type
+\printacknowledgements
+
+% Abstracts/resumes/summaries in two languages. The first abstract will
+% use the document main language and second the foreign language
+\printabstract
+
+%%------------------------------------------------------------
+% Tables/lists of contents
+\tableofcontents 
+
+% Always print the table of contents
+\printotherlists 
+
+% Print other lists of contents according to instructions given above
+%%------------------------------------------------------------
+% Print document chapters
+\printchapters
+
+%%------------------------------------------------------------
+% Print the bibliography
+\printbibliography
+
+%%------------------------------------------------------------
+% Print appendixes, if any!
+\printappendixes 
+
+%% End of document
+\end{document} 
