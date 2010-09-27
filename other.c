@@ -2,14 +2,18 @@
 #define MODULE
 #endif
 #include <linux/module.h>
+#include <linux/moduleparam.h>
 
-extern int experiment(void);
+static int my_pid;
+module_param(my_pid, int , 0);
+
+extern int experiment(int pid);
 
 static int __init other_init(void){
 
 printk(KERN_INFO "load other experiment\n");
 
-	experiment();
+	experiment(my_pid);
 
 return 0;
 

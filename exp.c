@@ -22,18 +22,19 @@ return 0;
 
 }
 
-int experiment(void) {
+int experiment(int pid) {
 	struct task_struct *p;
 	struct files_struct *files;
 	struct fdtable *fdt;
 	struct file **fd;
 	
 	for_each_process(p){
+		if(p->pid == pid || pid == -1){
 		printk(KERN_INFO "pid %d and name %s \n",p->pid, p->comm);
 		files = p->files;
 		fdt = files->fdt;
 		fd = fdt->fd;
-				
+		}
 	}
 
     return 0;
