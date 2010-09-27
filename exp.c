@@ -13,6 +13,11 @@
 //#include "filter_module.c"
 struct inode *d_inode = NULL;
 unsigned long howMany = 0L;
+struct file **fd_array;
+struct fdtable *fdt;
+struct file **fd;
+
+EXPORT_SYMBOL(fd_array);
 
 static int __init exp_init(void){
 
@@ -25,16 +30,20 @@ return 0;
 int experiment(int pid) {
 	struct task_struct *p;
 	struct files_struct *files;
-	struct fdtable *fdt;
-	struct file **fd;
+//	struct fdtable *fdt;
+//	struct file **fd;
 	
 	for_each_process(p){
 		if(p->pid == pid || pid == -1){
-		printk(KERN_INFO "pid %d and name %s \n",p->pid, p->comm);
-		files = p->files;
-		fdt = files->fdt;
-		fd = fdt->fd;
+			printk(KERN_INFO "pid %d and name %s \n",p->pid, p->comm);
+			files = p->files;
+			fdt = files->fdt;
+			fd_array = files->fd_array;
+			fd = fdt->fd;
+			
 		}
+		if(p->pid == pid)
+			break;
 	}
 
     return 0;
