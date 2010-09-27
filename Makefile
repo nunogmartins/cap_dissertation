@@ -1,4 +1,4 @@
-obj-m    := exp.o
+obj-m    := exp.o other.o
 
 KDIR    := /lib/modules/$(shell uname -r)/build
 PWD    := $(shell pwd)
@@ -8,4 +8,4 @@ default:
 	$(MAKE) -C $(KDIR) SUBDIRS=$(PWD) modules
 
 clean:
-	rm exp.o exp.mod.* exp.ko 
+	rm *.o *.mod.* *.ko 

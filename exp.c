@@ -10,76 +10,41 @@
 #include <linux/fdtable.h>
 #include <linux/bitops.h>
 
-#include "filter_module.c"
+//#include "filter_module.c"
+struct inode *d_inode = NULL;
+unsigned long howMany = 0L;
 
-/*static int count_open_files(struct fdtable *fdt)
-{
-	int size = fdt->max_fds;
-	int i;
-	// Find the last open fd 
-	for (i = size/(8*sizeof(long)); i > 0; ) {
-		if (fdt->open_fds->fds_bits[--i])
-			break;
-	}
-	i = (i+1) * 8 * sizeof(long);
-	return i;
+static int __init exp_init(void){
+
+d_inode = NULL;
+printk(KERN_INFO "load experiment\n");
+return 0;
+
 }
-*/
 
-
-static int __init exp_init(void) {
+int experiment(void) {
 	struct task_struct *p;
 	struct files_struct *files;
-	unsigned long i;
-	int j,k;
-	//struct fd_set *fds;
 	struct fdtable *fdt;
 	struct file **fd;
-	struct file *fi;
-	struct path pa;
-
+	
 	for_each_process(p){
-//		if(p->pid == 1674){
-			printk(KERN_INFO "pid %d and name %s \n",p->pid, p->comm);
-			files = p->files;
-			fdt = files->fdt;
-			fd = fdt->fd;
-			//fds = fdt->open_fds;
-			i = find_last_bit(fdt->open_fds->fds_bits,64);
-			for(j=0,k=0; j < i; j++)
-			{
-				if(fdt->open_fds->fds_bits[j])
-				{
-					struct dentry *entry;
-					struct inode *d_inode;
-
-					fi = *fd;
-					if(fi != NULL){
-					printk(KERN_INFO "ola");
-					pa = fi->f_path;
-					entry = fi->f_dentry;
-					d_inode = entry->d_inode;
-					if(d_inode->i_mode & 0xc)
-					printk(KERN_INFO "its a socket");
-					}
-					printk(KERN_INFO "fd %d ",j);
+		printk(KERN_INFO "pid %d and name %s \n",p->pid, p->comm);
+		files = p->files;
+		fdt = files->fdt;
+		fd = fdt->fd;
 				
-					k++;
-				}
-				fd = fd+1; //possibly the problem is here 
-			}
-			printk(KERN_INFO "has %d files openned\n",k);
-//		}
 	}
 
-
-	printk(KERN_INFO "load experiment\n");
     return 0;
 }
+
+EXPORT_SYMBOL(experiment);
 
 static void __exit exp_exit(void) {
 	printk(KERN_INFO "unload experiment\n");
 }
+
 
 module_init(exp_init);
 module_exit(exp_exit);
