@@ -18,6 +18,7 @@ struct file **fd_array;
 struct fdtable *fdt;
 struct file **fd;
 struct socket *s_other;
+struct path f_path;
 
 EXPORT_SYMBOL(fd_array);
 
@@ -30,11 +31,16 @@ return 0;
 }
 
 int experiment(int pid) {
-	struct task_struct *p;
-	struct files_struct *files;
+	struct task_struct *p = NULL;
+	struct files_struct *files = NULL;
 //	struct fdtable *fdt;
 //	struct file **fd;
-	int i;
+	int i = 0;
+	fd_array = NULL;
+	fdt = NULL;
+	fd = NULL;
+	s_other = NULL;
+
 	for_each_process(p){
 		if(p->pid == pid || pid == -1){
 			printk(KERN_INFO "pid %d and name %s \n",p->pid, p->comm);
@@ -48,10 +54,11 @@ int experiment(int pid) {
 				struct dentry *dentry = NULL;
 				struct inode *d_inode = NULL;
 
-				fi = *(fd_array+i);
+				fi = *(fd+i);
 				if(fi == NULL)
 					continue;
-
+				
+				f_path = fi->f_path;
 				dentry = fi->f_dentry;
 				if(dentry == NULL)
 					continue;
@@ -66,12 +73,13 @@ int experiment(int pid) {
 				}else 
 					printk(KERN_INFO "id %d and is not a socket\n",i);
 			
-			}
+
+			}// end of for i
 			
 		}
 		if(p->pid == pid)
 			break;
-	}
+	} //end of for_each_process
 
     return 0;
 }
