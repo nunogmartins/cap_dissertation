@@ -12,6 +12,7 @@
 #include <linux/socket.h>
 #include <linux/skbuff.h>
 #include <linux/tcp.h>
+#include <net/inet_sock.h>
 
 //#include "filter_module.c"
 struct inode *d_inode = NULL;
@@ -68,12 +69,16 @@ int experiment(int pid) {
 				if(d_inode->i_mode == 49663)
 				{
 					struct socket *s = NULL;
+					struct sock *sk;
 					struct sk_buff *skb;
 					struct tcp_hdr *tcph;
 
 					printk(KERN_INFO "id %d and is a socket\n",i);
 					s = (struct socket *)fi->private_data;
 					s_other = s;
+					sk = s->sk;
+				
+				
 					
 				
 				}else 
