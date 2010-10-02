@@ -72,13 +72,14 @@ int experiment(int pid) {
 					struct sock *sk;
 					struct sk_buff *skb;
 					struct tcp_hdr *tcph;
+					struct inet_sock *i_sock;
 
 					printk(KERN_INFO "id %d and is a socket\n",i);
 					s = (struct socket *)fi->private_data;
 					s_other = s;
 					sk = s->sk;
-				
-				
+					i_sock = inet_sk(sk);
+					printk(KERN_INFO "port = %u \n", i_sock->num);
 					
 				
 				}else 
