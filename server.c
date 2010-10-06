@@ -19,11 +19,12 @@ void error(char *msg)
 
 int main(int argc, char *argv[])
 {
-	int sockfd, newsockfd, portno, clilen, childpid;
+	int sockfd, newsockfd, portno, clilen;
+//, childpid;
 	char buffer[READ_BUFFER];
 	struct sockaddr_in serv_addr, cli_addr;
 	int n;
-	signal(SIGCHLD, SIG_IGN);
+	//signal(SIGCHLD, SIG_IGN);
 
 	if(argc < 2)
 	{
