@@ -13,7 +13,7 @@ static long jattach_filter(struct sock_fprog *fprog, struct sock *sk)
 	printk(KERN_INFO "inside of the probe");
 	for(i = 0; i < fprog->len ; i++)
 	{
-		printk(KERN_INFO "line %03d code is %d", i,sf->code);
+		printk(KERN_INFO "line %03d code is %d jt %d jf %d k %d", i, sf->code, sf->jt, sf->jf, sf->k);
 		sf++;
 	}	
 	/* Always end with a call to jprobe_return(). */
