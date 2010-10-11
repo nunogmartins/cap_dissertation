@@ -1,4 +1,4 @@
-obj-m    := experiment.o other.o
+obj-m    := experiment.o other.o jprobe.o
 
 experiment-y	:= exp.o instrument.o
 

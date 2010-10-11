@@ -24,6 +24,8 @@ struct file **fd;
 struct socket *s_other;
 struct path f_path;
 
+int pid_to_analyze = -1;
+
 static char func_name[NAME_MAX] = "do_fork";
 module_param_string(func, func_name, NAME_MAX, S_IRUGO);
 MODULE_PARM_DESC(func, "Function to kretprobe; this module will report the"
@@ -86,19 +88,9 @@ static struct kretprobe my_kretprobe = {
 
 static int __init exp_init(void){
 
-	int ret;
 	d_inode = NULL;
 	printk(KERN_INFO "load experiment\n");
 	
-	my_kretprobe.kp.symbol_name = func_name;
-	ret = register_kretprobe(&my_kretprobe);
-	if (ret < 0) {
-		printk(KERN_INFO "register_kretprobe failed, returned %d\n",
-				ret);
-		return -1;
-	}
-	printk(KERN_INFO "Planted return probe at %s: %p\n",
-			my_kretprobe.kp.symbol_name, my_kretprobe.kp.addr);
 
 return 0;
 
@@ -110,10 +102,25 @@ int experiment(int pid) {
 //	struct fdtable *fdt;
 //	struct file **fd;
 	int i = 0;
+	int ret;
 	fd_array = NULL;
 	fdt = NULL;
 	fd = NULL;
 	s_other = NULL;
+	pid_to_analyze = pid;
+
+
+	
+	my_kretprobe.kp.symbol_name = func_name;
+	ret = register_kretprobe(&my_kretprobe);
+	if (ret < 0) {
+		printk(KERN_INFO "register_kretprobe failed, returned %d\n",
+				ret);
+		return -1;
+	}
+	printk(KERN_INFO "Planted return probe at %s: %p\n",
+			my_kretprobe.kp.symbol_name, my_kretprobe.kp.addr);
+
 
 	for_each_process(p){
 		if(p->pid == pid || pid == -1){
