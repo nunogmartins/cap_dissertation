@@ -8,7 +8,7 @@
 
 static long jattach_filter(struct sock_fprog *fprog, struct sock *sk)
 {
-	
+	printk(KERN_INFO "inside of the probe");
 	/* Always end with a call to jprobe_return(). */
 	jprobe_return();
 	return 0;
