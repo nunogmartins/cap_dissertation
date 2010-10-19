@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
 					if( n < 0)
 						perror("ERROR writing to socket");
 
-					exit(0);
+					//exit(0);
 		
 				//}
 				//exit(0);
