@@ -20,8 +20,6 @@ static int entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 	if (!current->mm)
 		return 1;	/* Skip kernel threads */
 
-	data = (struct my_data *)ri->data;
-	data->entry_stamp = ktime_get();
 	return 0;
 }
 
@@ -56,15 +54,27 @@ static int instantiationKRETProbe(struct kretprobe *kret,
 								kretprobe_handler_t entry_handler)
 {
 	int ret = -1;
-	kret->kp.symbol_name = function_name;
+	
+	struct kprobe kp = {
+	.symbol_name = function_name,
+	};
+	
+	kret->kp = kp;
 	kret->handler = handler;
 	kret->entry_handler = entry_handler;
 	kret->data_size		= 0;
 	kret->maxactive		= 20;
 
 	ret = register_kretprobe(kret);
+    if (ret < 0) {
+		printk(KERN_INFO "register_kretprobe failed, returned %d\n", ret);
+		return -1;
+	}
+		
+	printk(KERN_INFO "Planted kretprobe at %p, handler addr %p\n",
+	       kret->kp.symbol_name, kret->kp.addr);
+	
 	return ret;
-
 }
 
 
@@ -72,17 +82,18 @@ static int __init instrument_init(void)
 {
     int ret = -1;
     kretprobes = kmalloc(sizeof(*kretprobes)*2,GFP_KERNEL);
-    ret = instantiationKRETProbe(kretprobes,"sys_socket",ret_handler,ret_handler);
+	if(!kretprobes)
+		printk(KERN_INFO "problem allocating memory");
 
-    if (ret < 0) {
-		printk(KERN_INFO "register_kretprobe failed, returned %d\n", ret);
+
+    ret = instantiationKRETProbe(kretprobes,"sys_socket",ret_handler,entry_handler);
+	if(ret < 0)
 		return -1;
-	}
-
-	printk(KERN_INFO "Planted kretprobe at %p, handler addr %p\n",
-	       kretprobes->kp.addr, kretprobes->entry);
 
 
+    ret = instantiationKRETProbe(kretprobes+1,"sys_socket",ret_handler,entry_handler);
+	if(ret < 0)
+		return -1;
     //register all probes
 	return 0;
 }
