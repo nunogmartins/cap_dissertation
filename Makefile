@@ -4,7 +4,7 @@ experiment-y	:= exp.o
 
 instrumentation-y	:=instrument.o ports_table.o
 
-my_module-y	:=instrument_module.o
+my_module-y	:=instrument_module.o debugfs_support.o
 
 KDIR    := /lib/modules/$(shell uname -r)/build
 PWD    := $(shell pwd)
