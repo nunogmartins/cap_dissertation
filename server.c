@@ -88,6 +88,8 @@ int main(int argc, char *argv[])
 					if(strcmp("ola",ola) == 0)
 					{
 						printf("equal zero\n");
+						close(newsockfd);
+						break;
 
 					}else {
 						printf("not equal zero\n");
@@ -104,4 +106,6 @@ int main(int argc, char *argv[])
 			//}
 			close(newsockfd);
 	}
+	close(sockfd);
+	return 0;
 }

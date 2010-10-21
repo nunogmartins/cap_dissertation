@@ -91,7 +91,7 @@ static int __init instrument_init(void)
 		return -1;
 
 
-    ret = instantiationKRETProbe(kretprobes+1,"tcp_v4_connect",ret_handler,entry_handler);
+    ret = instantiationKRETProbe(kretprobes+1,"tcp_fin",ret_handler,entry_handler);
 	if(ret < 0)
 		return -1;
 
