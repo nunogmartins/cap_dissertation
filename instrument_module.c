@@ -86,17 +86,17 @@ static int __init instrument_init(void)
 		printk(KERN_INFO "problem allocating memory");
 
 
-    ret = instantiationKRETProbe(kretprobes,"sys_socket",ret_handler,entry_handler);
+    ret = instantiationKRETProbe(kretprobes,"inet_bind",ret_handler,entry_handler);
 	if(ret < 0)
 		return -1;
 
 
-    ret = instantiationKRETProbe(kretprobes+1,"sys_socket",ret_handler,entry_handler);
+    ret = instantiationKRETProbe(kretprobes+1,"tcp_v4_connect",ret_handler,entry_handler);
 	if(ret < 0)
 		return -1;
 
 
-    ret = instantiationKRETProbe(kretprobes+2,"sk_common_release",ret_handler,entry_handler);
+    ret = instantiationKRETProbe(kretprobes+2,"tcp_close",ret_handler,entry_handler);
 	if(ret < 0)
 		return -1;
     //register all probes
