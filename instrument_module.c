@@ -81,7 +81,7 @@ static int instantiationKRETProbe(struct kretprobe *kret,
 static int __init instrument_init(void)
 {
     int ret = -1;
-    kretprobes = kmalloc(sizeof(*kretprobes)*2,GFP_KERNEL);
+    kretprobes = kmalloc(sizeof(*kretprobes)*3,GFP_KERNEL);
 	if(!kretprobes)
 		printk(KERN_INFO "problem allocating memory");
 
@@ -94,6 +94,11 @@ static int __init instrument_init(void)
     ret = instantiationKRETProbe(kretprobes+1,"sys_socket",ret_handler,entry_handler);
 	if(ret < 0)
 		return -1;
+
+
+    ret = instantiationKRETProbe(kretprobes+2,"sk_common_release",ret_handler,entry_handler);
+	if(ret < 0)
+		return -1;
     //register all probes
 	return 0;
 }
@@ -104,7 +109,13 @@ static void __exit instrument_exit(void)
     unregister_kretprobe(kretprobes);
 	printk(KERN_INFO "kretprobe at %p unregistered\n", kretprobes->kp.addr);
 
-    if(kretprobes)
+    unregister_kretprobe(kretprobes+1);
+	printk(KERN_INFO "kretprobe at %p unregistered\n", (kretprobes+1)->kp.addr);
+    
+	unregister_kretprobe(kretprobes+2);
+	printk(KERN_INFO "kretprobe at %p unregistered\n", (kretprobes+2)->kp.addr);
+    
+	if(kretprobes)
         kfree(kretprobes);
     if(jprobes)
         kfree(jprobes);
