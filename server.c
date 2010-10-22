@@ -46,6 +46,8 @@ int main(int argc, char *argv[])
 	serv_addr.sin_addr.s_addr = INADDR_ANY;
 	serv_addr.sin_port = htons(portno);
 
+	printf("sizeof serv_addr e %d \n",sizeof(serv_addr));
+
 	if( bind(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
 	{
 		perror("ERROR on binding");
