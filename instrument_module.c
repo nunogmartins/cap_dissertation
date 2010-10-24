@@ -23,6 +23,8 @@ static int entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 
 	if (!current->mm)
 		return 1;	/* Skip kernel threads */
+	
+	dump_stack();
 
 	return 0;
 }
