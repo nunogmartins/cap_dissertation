@@ -41,16 +41,20 @@ static int bind_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 static int bind_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	struct task_struct *task = ri->task;	
-	int family = regs->cx;
-	int type = regs->dx;
-	int domain = regs->ax;
+	int fd = regs->ax;
+	struct sockaddr_in in;
 
 	if(!current->mm)
 		return 1;	
 	
 	if(strcmp(task->comm,"server")!=0)
 		return 1;
-
+	
+	memcpy(&in,regs->dx,regs->cx);
+	
+	printk(KERN_INFO "bind to port %d and fd %d",ntohs(in.sin_port),fd);
+	
+//	printk(KERN_INFO "bind entry ax=%ld bx=%ld cx=%ld dx=%p bp=%p sp=%p",regs->ax,regs->bx,regs->cx,regs->dx,regs->bp, regs->sp);
 return 0;
 }
 static int bind_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
@@ -71,6 +75,8 @@ static int connect_entry_handler(struct kretprobe_instance *ri, struct pt_regs *
 	
 	if(strcmp(task->comm,"server")!=0)
 		return 1;
+	
+	printk(KERN_INFO "connect entry ax=%ld bx=%ld cx=%ld dx=%ld bp=%p sp=%p",regs->ax,regs->bx,regs->cx,regs->dx,regs->bp, regs->sp);
 
 return 0;
 }
@@ -92,8 +98,11 @@ static int accept_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 	
 	if(strcmp(task->comm,"server")!=0)
 		return 1;
+	
+	
+	printk(KERN_INFO "accept entry ax=%ld bx=%ld cx=%p dx=%p bp=%p sp=%p",regs->ax,regs->bx,regs->cx,regs->dx,regs->bp, regs->sp);
 
-return 0;
+	return 0;
 }
 static int accept_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
@@ -124,7 +133,7 @@ static int socket_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 	int type = -1;
 	int domain = -1;
 	void *stack = regs->bp;
-	int i = -1;
+	//int i = -1;
 	memcpy(&domain,stack-36,4);
 	memcpy(&type,stack-32,4);
 	memcpy(&family,stack-28,4);
@@ -257,7 +266,7 @@ static int __init instrument_init(void)
 	if(ret < 0)
 		return -1;
 
-    ret = instantiationKRETProbe(kretprobes+3,"sys_accept",accept_ret_handler,accept_entry_handler);
+    ret = instantiationKRETProbe(kretprobes+3,"sys_accept4",accept_ret_handler,accept_entry_handler);
 	if(ret < 0)
 		return -1;
 /*
