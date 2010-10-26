@@ -16,6 +16,12 @@
 struct kretprobe *kretprobes = NULL;
 struct jprobe *jprobes = NULL;
 
+static void print_regs(const char *function, struct pt_regs *regs)
+{
+
+	printk(KERN_INFO "%s ax=%p bx=%p cx=%p dx=%p bp=%p sp=%p", function, (void *)regs->ax,(void *)regs->bx,(void *)regs->cx,(void *)regs->dx,(void*)regs->bp,(void *) regs->sp);
+}
+
 /*
 static int bind_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
@@ -38,6 +44,29 @@ static int bind_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 }
 */
 
+static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
+{
+	struct task_struct *task = ri->task;	
+	/*
+	int family = regs->cx;
+	int type = regs->dx;
+	int domain = regs->ax;
+*/
+	if(!current->mm)
+		return 1;	
+	
+	if(strcmp(task->comm,"server")!=0)
+		return 1;
+
+return 0;
+}
+
+static int close_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
+{
+	return 0;
+}
+
+
 static int bind_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	struct task_struct *task = ri->task;	
@@ -50,7 +79,7 @@ static int bind_entry_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 	if(strcmp(task->comm,"server")!=0)
 		return 1;
 	
-	memcpy(&in,regs->dx,regs->cx);
+	memcpy(&in,(void *)regs->dx,regs->cx);
 	
 	printk(KERN_INFO "bind to port %d and fd %d",ntohs(in.sin_port),fd);
 	
@@ -66,17 +95,19 @@ static int bind_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 static int connect_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	struct task_struct *task = ri->task;	
-	int family = regs->cx;
+	/*int family = regs->cx;
 	int type = regs->dx;
 	int domain = regs->ax;
-
+*/
 	if(!current->mm)
 		return 1;	
 	
 	if(strcmp(task->comm,"server")!=0)
 		return 1;
+
+	print_regs("connect", regs);
 	
-	printk(KERN_INFO "connect entry ax=%ld bx=%ld cx=%ld dx=%ld bp=%p sp=%p",regs->ax,regs->bx,regs->cx,regs->dx,regs->bp, regs->sp);
+//	printk(KERN_INFO "connect entry ax=%ld bx=%ld cx=%ld dx=%ld bp=%p sp=%p",regs->ax,regs->bx,regs->cx,regs->dx,regs->bp, regs->sp);
 
 return 0;
 }
@@ -101,8 +132,8 @@ static int accept_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 	if(strcmp(task->comm,"server")!=0)
 		return 1;
 
-	memcpy(&clilen,clilen_addr,4);
-	memcpy(&addr,sockaddr_addr,clilen);
+	memcpy(&clilen,(void *)clilen_addr,4);
+	memcpy(&addr,(void *)sockaddr_addr,clilen);
 	
 	printk(KERN_INFO "server fd %d and clilen %d ",server_fd,clilen);
 	
@@ -114,7 +145,7 @@ static int accept_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 {
 	int retval = regs_return_value(regs);
 //	int i=-1;
-	void *stack = regs->di;
+	void *stack = (void *)regs->di;
 	int server_fd = -1;
 	struct sockaddr_in addr;
 	long pointer = -1;
@@ -127,13 +158,14 @@ static int accept_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 		printk(KERN_INFO "i=%d stack value =%p ", i,value);
 	}
 */
-	memcpy(&server_fd,stack-24,4);
-	memcpy(&pointer,stack-20,4);
-	memcpy(&addr,pointer,16);
+	memcpy(&server_fd,(void *)(stack-24),4);
+	memcpy(&pointer,(void*)(stack-20),4);
+	memcpy(&addr,(void*)(pointer),16);
 
 	printk(KERN_INFO "to port %d ",htons(addr.sin_port));
 
-	printk(KERN_INFO "accept ret ax=%ld bx=%ld cx=%p dx=%p si=%ld di=%p bp=%p sp=%p stack=%p",regs->ax,regs->bx,regs->cx,regs->dx,regs->si, regs->di,regs->bp, regs->sp,ri->task->stack);
+	//printk(KERN_INFO "accept ret ax=%ld bx=%ld cx=%p dx=%p si=%ld di=%p bp=%p sp=%p stack=%p",regs->ax,regs->bx,regs->cx,regs->dx,regs->si, regs->di,regs->bp, regs->sp,ri->task->stack);
+	print_regs("accept",regs);
 	return 0;
 }
 
@@ -160,7 +192,7 @@ static int socket_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 	int family = -1;
 	int type = -1;
 	int domain = -1;
-	void *stack = regs->bp;
+	void *stack = (void *)regs->bp;
 	//int i = -1;
 	memcpy(&domain,stack-36,4);
 	memcpy(&type,stack-32,4);
@@ -297,6 +329,13 @@ static int __init instrument_init(void)
     ret = instantiationKRETProbe(kretprobes+3,"sys_accept4",accept_ret_handler,accept_entry_handler);
 	if(ret < 0)
 		return -1;
+
+	
+    ret = instantiationKRETProbe(kretprobes+4,"sys_close",close_ret_handler,close_entry_handler);
+	if(ret < 0)
+		return -1;
+
+
 /*
     ret = instantiationKRETProbe(kretprobes+4,"sys_bind",bin_ret_handler,bind_entry_handler);
 	if(ret < 0)
@@ -324,10 +363,15 @@ static void __exit instrument_exit(void)
 	printk(KERN_INFO "kretprobe at %p unregistered\n", (kretprobes+1)->kp.addr);
    
     unregister_kretprobe(kretprobes+2);
-	printk(KERN_INFO "kretprobe at %p unregistered\n", kretprobes->kp.addr);
+	printk(KERN_INFO "kretprobe at %p unregistered\n", (kretprobes+2)->kp.addr);
 
     unregister_kretprobe(kretprobes+3);
-	printk(KERN_INFO "kretprobe at %p unregistered\n", (kretprobes+1)->kp.addr);
+	printk(KERN_INFO "kretprobe at %p unregistered\n", (kretprobes+3)->kp.addr);
+    
+	unregister_kretprobe(kretprobes+4);
+	printk(KERN_INFO "kretprobe at %p unregistered\n", (kretprobes+4)->kp.addr);
+
+
 /*
 	unregister_kretprobe(kretprobes+2);
 	printk(KERN_INFO "kretprobe at %p unregistered\n", (kretprobes+2)->kp.addr);
