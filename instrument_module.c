@@ -18,15 +18,15 @@ struct jprobe *jprobes = NULL;
 
 static int entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
-	struct task_struct *task;
-	struct files_struct *files;
+//	struct task_struct *task;
+//	struct files_struct *files;
 
-	if (!current->mm)
-		return 1;	/* Skip kernel threads */
+//	if (!current->mm)
+//		return 1;	/* Skip kernel threads */
 	
 	dump_stack();
 
-	return 0;
+	return 1;
 }
 
 static int ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)

@@ -32,6 +32,7 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 
+	//sockfd = socket(AF_INET, 15, 10);
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if(sockfd < 0)
 	{
@@ -55,10 +56,10 @@ int main(int argc, char *argv[])
 	}
 
 	listen(sockfd, 5);
-	
 	while(1)
 	{
-		clilen = sizeof(cli_addr);
+	clilen = sizeof(cli_addr);
+	printf("endereco da estrutura %p and size is %d",(struct sockaddr *)&cli_addr,clilen);
 		newsockfd = accept(sockfd, (struct sockaddr *)&cli_addr, (socklen_t *)&clilen);
 
 		if(newsockfd < 0)
