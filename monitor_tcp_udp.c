@@ -89,23 +89,51 @@ static int connect_ret_handler(struct kretprobe_instance *ri, struct pt_regs *re
 static int accept_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	struct task_struct *task = ri->task;	
-	int family = regs->cx;
-	int type = regs->dx;
-	int domain = regs->ax;
+	int server_fd = regs->ax;
+	int sockaddr_addr = regs->dx;
+	struct sockaddr addr;
+	int clilen_addr = regs->cx;
+	int clilen = -1;
 
 	if(!current->mm)
 		return 1;	
 	
 	if(strcmp(task->comm,"server")!=0)
 		return 1;
+
+	memcpy(&clilen,clilen_addr,4);
+	memcpy(&addr,sockaddr_addr,clilen);
 	
+	printk(KERN_INFO "server fd %d and clilen %d ",server_fd,clilen);
 	
-	printk(KERN_INFO "accept entry ax=%ld bx=%ld cx=%p dx=%p bp=%p sp=%p",regs->ax,regs->bx,regs->cx,regs->dx,regs->bp, regs->sp);
+	//printk(KERN_INFO "accept entry ax=%ld bx=%ld cx=%p dx=%p si=%ld di=%ld bp=%p sp=%p",regs->ax,regs->bx,regs->cx,regs->dx,regs->si, regs->di,regs->bp, regs->sp);
 
 	return 0;
 }
 static int accept_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
+	int retval = regs_return_value(regs);
+//	int i=-1;
+	void *stack = regs->di;
+	int server_fd = -1;
+	struct sockaddr_in addr;
+	long pointer = -1;
+
+	printk(KERN_INFO "accept returned file descriptor %d",retval);
+	/*for(i=0;i <= 64 ; i+=4)
+	{
+		int value = -1;
+		memcpy(&value,stack-i,4);
+		printk(KERN_INFO "i=%d stack value =%p ", i,value);
+	}
+*/
+	memcpy(&server_fd,stack-24,4);
+	memcpy(&pointer,stack-20,4);
+	memcpy(&addr,pointer,16);
+
+	printk(KERN_INFO "to port %d ",htons(addr.sin_port));
+
+	printk(KERN_INFO "accept ret ax=%ld bx=%ld cx=%p dx=%p si=%ld di=%p bp=%p sp=%p stack=%p",regs->ax,regs->bx,regs->cx,regs->dx,regs->si, regs->di,regs->bp, regs->sp,ri->task->stack);
 	return 0;
 }
 
