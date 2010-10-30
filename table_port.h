@@ -1,4 +1,4 @@
-
+#defined ENOTIMPLEMENTED -255 
 struct entry {
 	unsigned short proto;
 	unsigned short port;
