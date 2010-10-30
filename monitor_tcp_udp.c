@@ -16,6 +16,9 @@
 struct kretprobe *kretprobes = NULL;
 struct jprobe *jprobes = NULL;
 
+extern int init_debug(void);
+extern void destroy_debug(void);
+
 static void print_regs(const char *function, struct pt_regs *regs)
 {
 
@@ -58,11 +61,14 @@ static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *re
 	if(strcmp(task->comm,"server")!=0)
 		return 1;
 
+	print_regs("close",regs);
+
 return 0;
 }
 
 static int close_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
+	
 	return 0;
 }
 
@@ -335,7 +341,7 @@ static int __init instrument_init(void)
 	if(ret < 0)
 		return -1;
 
-
+	init_debug();
 /*
     ret = instantiationKRETProbe(kretprobes+4,"sys_bind",bin_ret_handler,bind_entry_handler);
 	if(ret < 0)
@@ -355,6 +361,7 @@ static int __init instrument_init(void)
 
 static void __exit instrument_exit(void)
 {
+	destroy_debug();
     //unregister all probes ...
     unregister_kretprobe(kretprobes);
 	printk(KERN_INFO "kretprobe at %p unregistered\n", kretprobes->kp.addr);
