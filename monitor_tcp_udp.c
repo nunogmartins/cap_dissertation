@@ -68,6 +68,10 @@ return 0;
 
 static int close_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
+	int retval = regs_return_value(regs);
+	
+	if(retval == 0)
+		deletePort(0);
 	
 	return 0;
 }
@@ -94,6 +98,7 @@ return 0;
 }
 static int bind_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
+	int retval = regs_return_value(regs);
 	return 0;
 }
 
@@ -120,6 +125,7 @@ return 0;
 
 static int connect_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
+	int retval = regs_return_value(regs);
 	return 0;
 }
 
@@ -185,11 +191,24 @@ static int socket_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 	if(!current->mm)
 		return 1;	
 	
-	if(strcmp(task->comm,"server")!=0)
-		return 1;
+	//if(strcmp(task->comm,"server")!=0)
+	//	return 1;
 	
+	if(strcmp(domain,AF_INET)==0 || strcmp(domain,AF_INET6)==0)
+		goto monitor;
+	else
+		return -1;
+
+monitor:	
+	if(strcmp(type,SOCK_STREAM)==0 || strcmp(type,SOCK_DGRAM)==0)
+	{
+		
+	}
+
 	printk(KERN_INFO "entry domain %d type %d family %d",domain,type, family);
 	return 0;
+
+
 }
 
 static int socket_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
