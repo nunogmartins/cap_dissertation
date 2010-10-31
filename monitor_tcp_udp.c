@@ -13,6 +13,9 @@
 
 #include "table_port.h"
 
+//#define DEBUG_D 0
+
+
 struct kretprobe *kretprobes = NULL;
 struct jprobe *jprobes = NULL;
 
@@ -21,8 +24,9 @@ extern void destroy_debug(void);
 
 static void print_regs(const char *function, struct pt_regs *regs)
 {
-
+	#ifdef DEBUG_D
 	printk(KERN_INFO "%s ax=%p bx=%p cx=%p dx=%p bp=%p sp=%p", function, (void *)regs->ax,(void *)regs->bx,(void *)regs->cx,(void *)regs->dx,(void*)regs->bp,(void *) regs->sp);
+	#endif
 }
 
 /*
@@ -68,6 +72,10 @@ return 0;
 
 static int close_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
+	int retval = regs_return_value(regs);
+	
+	if(retval == 0)
+		deletePort(0);
 	
 	return 0;
 }
@@ -86,14 +94,15 @@ static int bind_entry_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 		return 1;
 	
 	memcpy(&in,(void *)regs->dx,regs->cx);
-	
+	#ifdef DEBUG_D
 	printk(KERN_INFO "bind to port %d and fd %d",ntohs(in.sin_port),fd);
-	
+	#endif
 //	printk(KERN_INFO "bind entry ax=%ld bx=%ld cx=%ld dx=%p bp=%p sp=%p",regs->ax,regs->bx,regs->cx,regs->dx,regs->bp, regs->sp);
 return 0;
 }
 static int bind_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
+	int retval = regs_return_value(regs);
 	return 0;
 }
 
@@ -111,6 +120,7 @@ static int connect_entry_handler(struct kretprobe_instance *ri, struct pt_regs *
 	if(strcmp(task->comm,"server")!=0)
 		return 1;
 
+
 	print_regs("connect", regs);
 	
 //	printk(KERN_INFO "connect entry ax=%ld bx=%ld cx=%ld dx=%ld bp=%p sp=%p",regs->ax,regs->bx,regs->cx,regs->dx,regs->bp, regs->sp);
@@ -120,6 +130,7 @@ return 0;
 
 static int connect_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
+	int retval = regs_return_value(regs);
 	return 0;
 }
 
@@ -140,9 +151,9 @@ static int accept_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 
 	memcpy(&clilen,(void *)clilen_addr,4);
 	memcpy(&addr,(void *)sockaddr_addr,clilen);
-	
+	#ifdef DEBUG_D
 	printk(KERN_INFO "server fd %d and clilen %d ",server_fd,clilen);
-	
+	#endif
 	//printk(KERN_INFO "accept entry ax=%ld bx=%ld cx=%p dx=%p si=%ld di=%ld bp=%p sp=%p",regs->ax,regs->bx,regs->cx,regs->dx,regs->si, regs->di,regs->bp, regs->sp);
 
 	return 0;
@@ -155,8 +166,9 @@ static int accept_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 	int server_fd = -1;
 	struct sockaddr_in addr;
 	long pointer = -1;
-
+#ifdef DEBUG_D
 	printk(KERN_INFO "accept returned file descriptor %d",retval);
+#endif
 	/*for(i=0;i <= 64 ; i+=4)
 	{
 		int value = -1;
@@ -167,9 +179,9 @@ static int accept_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 	memcpy(&server_fd,(void *)(stack-24),4);
 	memcpy(&pointer,(void*)(stack-20),4);
 	memcpy(&addr,(void*)(pointer),16);
-
+#ifdef DEBUG_D
 	printk(KERN_INFO "to port %d ",htons(addr.sin_port));
-
+#endif
 	//printk(KERN_INFO "accept ret ax=%ld bx=%ld cx=%p dx=%p si=%ld di=%p bp=%p sp=%p stack=%p",regs->ax,regs->bx,regs->cx,regs->dx,regs->si, regs->di,regs->bp, regs->sp,ri->task->stack);
 	print_regs("accept",regs);
 	return 0;
@@ -185,10 +197,27 @@ static int socket_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 	if(!current->mm)
 		return 1;	
 	
-	if(strcmp(task->comm,"server")!=0)
-		return 1;
+//	if(strcmp(task->comm,"server")!=0)
+//		return 1;
 	
+	if(domain==AF_INET || domain==AF_INET6)
+		goto monitor;
+	else
+		return 1;
+
+monitor:	
+	
+//	if(strcmp(task->comm,"server")!=0)
+//		return 1;
+	
+	if(type==SOCK_STREAM || type==SOCK_DGRAM)
+	{
+		
+	}
+
+#ifdef DEBUG_D
 	printk(KERN_INFO "entry domain %d type %d family %d",domain,type, family);
+#endif
 	return 0;
 }
 
@@ -211,9 +240,13 @@ static int socket_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 		printk(KERN_INFO "i=%d stack value =%d ", i,value);
 	}
 */
+#ifdef DEBUG_D
 	printk(KERN_INFO "domain %d type %d family %d",domain,type, family);
+#endif
 	//printk(KERN_INFO "ax=%ld bx=%ld cx=%ld dx=%ld bp=%p sp=%p",regs->ax,regs->bx,regs->cx,regs->dx,regs->bp, regs->sp);
+#ifdef DEBUG_D
 	printk(KERN_INFO "the file descriptor is %d", retval); 
+#endif
 	return 0;
 }
 
