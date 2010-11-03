@@ -4,7 +4,7 @@ experiment-y	:= exp.o
 
 instrumentation-y	:=instrument.o ports_table.o
 
-my_module-y	:=monitor_tcp_udp.o debugfs_support.o
+my_module-y	:=monitor_tcp_udp.o debugfs_support.o ports_table.o
 
 KDIR    := /lib/modules/$(shell uname -r)/build
 PWD    := $(shell pwd)
