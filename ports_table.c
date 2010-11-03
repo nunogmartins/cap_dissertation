@@ -5,10 +5,10 @@
 */
 int insertPort(int port)
 {
-	return ENOTIMPLEMENTED;
+	return -ENOTIMPLEMENTED;
 }
 
 int deletePort(int port)
 {
-	return ENOTIMPLEMENTED;
+	return -ENOTIMPLEMENTED;
 }
