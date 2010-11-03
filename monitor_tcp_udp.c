@@ -47,18 +47,52 @@ return 0;
 }
 static int bind_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
+	int retval = regs_return_value(regs);
 	return 0;
 }
 */
 
-static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
+static int sendto_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	struct task_struct *task = ri->task;	
-	/*
+	
+	if(strcmp(task->comm,"server")!=0)
+		return 1;
+
+	return 0;
+}
+static int sendto_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
+{
+	int retval = regs_return_value(regs);
+	return 0;
+}
+
+static int recvfrom_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
+{
+	struct task_struct *task = ri->task;	
 	int family = regs->cx;
 	int type = regs->dx;
 	int domain = regs->ax;
-*/
+
+	if(!current->mm)
+		return 1;	
+	
+	if(strcmp(task->comm,"server")!=0)
+		return 1;
+
+return 0;
+}
+static int recvfrom_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
+{
+	int retval = regs_return_value(regs);
+	return 0;
+}
+
+
+static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
+{
+	struct task_struct *task = ri->task;	
+	
 	if(!current->mm)
 		return 1;	
 	
@@ -110,22 +144,16 @@ static int bind_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 static int connect_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	struct task_struct *task = ri->task;	
-	/*int family = regs->cx;
-	int type = regs->dx;
-	int domain = regs->ax;
-*/
+
 	if(!current->mm)
 		return 1;	
 	
 	if(strcmp(task->comm,"server")!=0)
 		return 1;
 
-
 	print_regs("connect", regs);
 	
-//	printk(KERN_INFO "connect entry ax=%ld bx=%ld cx=%ld dx=%ld bp=%p sp=%p",regs->ax,regs->bx,regs->cx,regs->dx,regs->bp, regs->sp);
-
-return 0;
+	return 0;
 }
 
 static int connect_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
@@ -200,20 +228,15 @@ static int socket_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 //	if(strcmp(task->comm,"server")!=0)
 //		return 1;
 	
-	if(domain==AF_INET || domain==AF_INET6)
-		goto monitor;
+	if(domain==AF_INET || domain==AF_INET6){
+		if(type==SOCK_STREAM || type==SOCK_DGRAM)
+		{
+			if(strcmp(task->comm,"server")!=0)
+				return 1;
+		}
+	}
 	else
 		return 1;
-
-monitor:	
-	
-//	if(strcmp(task->comm,"server")!=0)
-//		return 1;
-	
-	if(type==SOCK_STREAM || type==SOCK_DGRAM)
-	{
-		
-	}
 
 #ifdef DEBUG_D
 	printk(KERN_INFO "entry domain %d type %d family %d",domain,type, family);
@@ -350,7 +373,7 @@ static int instantiationKRETProbe(struct kretprobe *kret,
 static int __init instrument_init(void)
 {
     int ret = -1;
-    kretprobes = kmalloc(sizeof(*kretprobes)*6,GFP_KERNEL);
+    kretprobes = kmalloc(sizeof(*kretprobes)*7,GFP_KERNEL);
 	if(!kretprobes)
 		printk(KERN_INFO "problem allocating memory");
 
@@ -373,6 +396,15 @@ static int __init instrument_init(void)
 
 	
     ret = instantiationKRETProbe(kretprobes+4,"sys_close",close_ret_handler,close_entry_handler);
+	if(ret < 0)
+		return -1;
+
+	ret = instantiationKRETProbe(kretprobes+5,"sys_sendto",sendto_ret_handler,sendto_entry_handler);
+	if(ret < 0)
+		return -1;
+
+	
+    ret = instantiationKRETProbe(kretprobes+6,"sys_recvfrom",recvfrom_ret_handler,recvfrom_entry_handler);
 	if(ret < 0)
 		return -1;
 
@@ -411,6 +443,12 @@ static void __exit instrument_exit(void)
 	printk(KERN_INFO "kretprobe at %p unregistered\n", (kretprobes+3)->kp.addr);
     
 	unregister_kretprobe(kretprobes+4);
+	printk(KERN_INFO "kretprobe at %p unregistered\n", (kretprobes+4)->kp.addr);
+
+	unregister_kretprobe(kretprobes+5);
+	printk(KERN_INFO "kretprobe at %p unregistered\n", (kretprobes+3)->kp.addr);
+    
+	unregister_kretprobe(kretprobes+6);
 	printk(KERN_INFO "kretprobe at %p unregistered\n", (kretprobes+4)->kp.addr);
 
 
