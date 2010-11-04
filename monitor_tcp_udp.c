@@ -107,7 +107,7 @@ static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *re
 
 	print_regs("close",regs);
 
-return 0;
+	return 0;
 }
 
 static int close_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
@@ -140,9 +140,10 @@ static int bind_entry_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 	#ifdef DEBUG_D
 	printk(KERN_INFO "bind to port %d and fd %d",ntohs(in.sin_port),fd);
 	#endif
-//	printk(KERN_INFO "bind entry ax=%ld bx=%ld cx=%ld dx=%p bp=%p sp=%p",regs->ax,regs->bx,regs->cx,regs->dx,regs->bp, regs->sp);
-return 0;
+
+	return 0;
 }
+
 static int bind_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	int retval = regs_return_value(regs);
@@ -163,9 +164,9 @@ static int connect_entry_handler(struct kretprobe_instance *ri, struct pt_regs *
 	
 	if(strcmp(task->comm,application_name)!=0)
 		return 1;
-
+#ifdef DEBUG_D
 	print_regs("connect", regs);
-	
+#endif	
 	return 0;
 }
 
@@ -195,9 +196,9 @@ static int accept_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 
 	memcpy(&clilen,(void *)clilen_addr,4);
 	memcpy(&addr,(void *)sockaddr_addr,clilen);
-	#ifdef DEBUG_D
+#ifdef DEBUG_D
 	printk(KERN_INFO "server fd %d and clilen %d ",server_fd,clilen);
-	#endif
+#endif
 
 	return 0;
 }
@@ -282,11 +283,9 @@ static int socket_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 */
 #ifdef DEBUG_D
 	printk(KERN_INFO "domain %d type %d family %d",domain,type, family);
+	printk(KERN_INFO "the file descriptor is %d", retval);
 #endif
 
-#ifdef DEBUG_D
-	printk(KERN_INFO "the file descriptor is %d", retval); 
-#endif
 	return 0;
 }
 
