@@ -455,7 +455,7 @@ static int __init instrument_init(void)
 static void removeKprobe(int index)
 {
 	printk(KERN_INFO "missed %d probes" , (kretprobes)->nmissed);
-	unregister_kretprobe(kretprobes);
+	unregister_kretprobe((kretprobes+index));
 	printk(KERN_INFO "kretprobe at %p unregistered\n", (kretprobes+index)->kp.addr);
 }
 
