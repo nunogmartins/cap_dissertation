@@ -210,9 +210,7 @@ static int accept_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 	int server_fd = -1;
 	struct sockaddr_in addr;
 	long pointer = -1;
-#ifdef DEBUG_D
-	printk(KERN_INFO "accept returned file descriptor %d",retval);
-#endif
+
 	/*for(i=0;i <= 64 ; i+=4)
 	{
 		int value = -1;
@@ -225,9 +223,11 @@ static int accept_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 	memcpy(&addr,(void*)(pointer),16);
 #ifdef DEBUG_D
 	printk(KERN_INFO "to port %d ",htons(addr.sin_port));
+	printk(KERN_INFO "accept returned file descriptor %d",retval);
+	print_regs("accept",regs);
 #endif
 
-	print_regs("accept",regs);
+
 	return 0;
 }
 
