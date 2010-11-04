@@ -24,9 +24,9 @@ extern int init_debug(void);
 extern void destroy_debug(void);
 static void print_regs(const char *function, struct pt_regs *regs)
 {
-#ifdef DEBUG_D
+
 	printk(KERN_INFO "%s ax=%p bx=%p cx=%p dx=%p bp=%p sp=%p", function, (void *)regs->ax,(void *)regs->bx,(void *)regs->cx,(void *)regs->dx,(void*)regs->bp,(void *) regs->sp);
-#endif
+
 }
 
 /*
