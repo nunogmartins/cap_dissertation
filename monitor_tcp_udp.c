@@ -23,10 +23,6 @@ struct jprobe *jprobes = NULL;
 extern int init_debug(void);
 extern void destroy_debug(void);
 
-void missesProbes(kretprobe_instance *ri)
-{
-	printk(KERN_INFO "probes missed %d" ri->);
-}
 
 static void print_regs(const char *function, struct pt_regs *regs)
 {
@@ -458,6 +454,7 @@ static int __init instrument_init(void)
 
 static void removeKprobe(int index)
 {
+	printk(KERN_INFO "missed %d probes" , (kretprobes)->nmissed);
 	unregister_kretprobe(kretprobes);
 	printk(KERN_INFO "kretprobe at %p unregistered\n", (kretprobes+index)->kp.addr);
 }
