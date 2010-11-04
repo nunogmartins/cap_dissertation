@@ -1,0 +1,36 @@
+*** pcap-linux.c	2010-10-13 23:41:52.217625314 +0100
+--- pcap-linux-new.c	2010-10-13 23:40:08.617683502 +0100
+***************
+*** 3572,3577 ****
+--- 3572,3602 ----
+  	/*
+  	 * Now attach the new filter.
+  	 */
++ 	
++ 	struct sock_filter *aux = NULL;
++ 	int old_size = sizeof(struct sock_filter) * fcode->len;
++ 
++ 	int fsize = sizeof(struct sock_filter) * (fcode->len+2);
++ 	aux = realloc(fcode->filter, fsize);
++ 	
++ 	if(aux != NULL)
++ 		fcode->filter = aux;
++ 	
++ 	if(fcode!=NULL){
++ 		fcode->len = fcode->len+2;
++ 
++ 		struct sock_filter *s_aux = fcode->filter;
++ 		int i = fcode->len - 2 ;
++ 		s_aux += (i);
++ 		if(s_aux->code != 6){
++ 			for(i=0; i < 2 ; i++){
++ 				s_aux->code = 6;
++ 				s_aux->k = 0;
++ 				s_aux +=1;
++ 			}
++ 		}
++ 	}
++ 	
+  	ret = setsockopt(handle->fd, SOL_SOCKET, SO_ATTACH_FILTER,
+  			 fcode, sizeof(*fcode));
+  	if (ret == -1 && total_filter_on) {
