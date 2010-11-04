@@ -14,7 +14,7 @@
 #include "table_port.h"
 
 //#define DEBUG_D 0
-
+#define NR_PROBES 7
 char *application_name = "server";
 
 struct kretprobe *kretprobes = NULL;
@@ -22,6 +22,12 @@ struct jprobe *jprobes = NULL;
 
 extern int init_debug(void);
 extern void destroy_debug(void);
+
+void missesProbes(kretprobe_instance *ri)
+{
+	printk(KERN_INFO "probes missed %d" ri->);
+}
+
 static void print_regs(const char *function, struct pt_regs *regs)
 {
 
@@ -450,11 +456,22 @@ static int __init instrument_init(void)
 	return 0;
 }
 
+static void removeKprobe(int index)
+{
+	unregister_kretprobe(kretprobes);
+	printk(KERN_INFO "kretprobe at %p unregistered\n", (kretprobes+index)->kp.addr);
+}
+
 static void __exit instrument_exit(void)
 {
+	int i=0;
 	destroy_debug();
     //unregister all probes ...
-    unregister_kretprobe(kretprobes);
+ 	for(i=0; i < NR_PROBES ; i++)
+	{
+		removeKprobe(i);
+	}
+/*	unregister_kretprobe(kretprobes);
 	printk(KERN_INFO "kretprobe at %p unregistered\n", kretprobes->kp.addr);
 
     unregister_kretprobe(kretprobes+1);
@@ -474,7 +491,7 @@ static void __exit instrument_exit(void)
     
 	unregister_kretprobe(kretprobes+6);
 	printk(KERN_INFO "kretprobe at %p unregistered\n", (kretprobes+6)->kp.addr);
-
+*/
 
 /*
 	unregister_kretprobe(kretprobes+2);
