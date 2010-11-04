@@ -15,13 +15,13 @@
 
 //#define DEBUG_D 0
 
+char *application_name = "server";
 
 struct kretprobe *kretprobes = NULL;
 struct jprobe *jprobes = NULL;
 
 extern int init_debug(void);
 extern void destroy_debug(void);
-
 static void print_regs(const char *function, struct pt_regs *regs)
 {
 	#ifdef DEBUG_D
@@ -54,9 +54,12 @@ static int bind_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 
 static int sendto_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
-	struct task_struct *task = ri->task;	
+	struct task_struct *task = ri->task;
+
+	if(application_name == NULL)
+		return 1;	
 	
-	if(strcmp(task->comm,"server")!=0)
+	if(strcmp(task->comm,application_name)!=0)
 		return 1;
 
 	return 0;
@@ -69,15 +72,15 @@ static int sendto_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 
 static int recvfrom_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
-	struct task_struct *task = ri->task;	
-	int family = regs->cx;
-	int type = regs->dx;
-	int domain = regs->ax;
+	struct task_struct *task = ri->task;
+
+	if(application_name == NULL)
+		return 1;
 
 	if(!current->mm)
 		return 1;	
 	
-	if(strcmp(task->comm,"server")!=0)
+	if(strcmp(task->comm,application_name)!=0)
 		return 1;
 
 return 0;
@@ -91,12 +94,15 @@ static int recvfrom_ret_handler(struct kretprobe_instance *ri, struct pt_regs *r
 
 static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
-	struct task_struct *task = ri->task;	
+	struct task_struct *task = ri->task;
 	
 	if(!current->mm)
+		return 1;
+
+	if(application_name == NULL)
 		return 1;	
 	
-	if(strcmp(task->comm,"server")!=0)
+	if(strcmp(task->comm,application_name)!=0)
 		return 1;
 
 	print_regs("close",regs);
@@ -122,9 +128,12 @@ static int bind_entry_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 	struct sockaddr_in in;
 
 	if(!current->mm)
-		return 1;	
+		return 1;
+
+	if(application_name == NULL)
+		return 1;		
 	
-	if(strcmp(task->comm,"server")!=0)
+	if(strcmp(task->comm,application_name)!=0)
 		return 1;
 	
 	memcpy(&in,(void *)regs->dx,regs->cx);
@@ -146,9 +155,13 @@ static int connect_entry_handler(struct kretprobe_instance *ri, struct pt_regs *
 	struct task_struct *task = ri->task;	
 
 	if(!current->mm)
+		return 1;
+
+	if(application_name == NULL)
 		return 1;	
 	
-	if(strcmp(task->comm,"server")!=0)
+	
+	if(strcmp(task->comm,application_name)!=0)
 		return 1;
 
 	print_regs("connect", regs);
@@ -173,8 +186,11 @@ static int accept_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 
 	if(!current->mm)
 		return 1;	
+
+	if(application_name == NULL)
+		return 1;	
 	
-	if(strcmp(task->comm,"server")!=0)
+	if(strcmp(task->comm,application_name)!=0)
 		return 1;
 
 	memcpy(&clilen,(void *)clilen_addr,4);
@@ -182,7 +198,6 @@ static int accept_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 	#ifdef DEBUG_D
 	printk(KERN_INFO "server fd %d and clilen %d ",server_fd,clilen);
 	#endif
-	//printk(KERN_INFO "accept entry ax=%ld bx=%ld cx=%p dx=%p si=%ld di=%ld bp=%p sp=%p",regs->ax,regs->bx,regs->cx,regs->dx,regs->si, regs->di,regs->bp, regs->sp);
 
 	return 0;
 }
@@ -210,7 +225,7 @@ static int accept_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 #ifdef DEBUG_D
 	printk(KERN_INFO "to port %d ",htons(addr.sin_port));
 #endif
-	//printk(KERN_INFO "accept ret ax=%ld bx=%ld cx=%p dx=%p si=%ld di=%p bp=%p sp=%p stack=%p",regs->ax,regs->bx,regs->cx,regs->dx,regs->si, regs->di,regs->bp, regs->sp,ri->task->stack);
+
 	print_regs("accept",regs);
 	return 0;
 }
@@ -225,13 +240,13 @@ static int socket_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 	if(!current->mm)
 		return 1;	
 	
-//	if(strcmp(task->comm,"server")!=0)
-//		return 1;
+	if(application_name == NULL)
+		return 1;
 	
 	if(domain==AF_INET || domain==AF_INET6){
 		if(type==SOCK_STREAM || type==SOCK_DGRAM)
 		{
-			if(strcmp(task->comm,"server")!=0)
+			if(strcmp(task->comm,application_name)!=0)
 				return 1;
 		}
 	}
@@ -268,7 +283,7 @@ static int socket_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 #ifdef DEBUG_D
 	printk(KERN_INFO "domain %d type %d family %d",domain,type, family);
 #endif
-	//printk(KERN_INFO "ax=%ld bx=%ld cx=%ld dx=%ld bp=%p sp=%p",regs->ax,regs->bx,regs->cx,regs->dx,regs->bp, regs->sp);
+
 #ifdef DEBUG_D
 	printk(KERN_INFO "the file descriptor is %d", retval); 
 #endif
@@ -369,6 +384,16 @@ static int instantiationKRETProbe(struct kretprobe *kret,
 	return ret;
 }
 
+static void changeApplicationName(const char *newname)
+{
+	/*deve ser verificado o tamanho do newname e limitado a um valor 
+		decente para o tamanho do nome da aplicacao */
+
+	if(application_name == NULL)
+		application_name = kmalloc(strlen(newname),GFP_KERNEL);
+
+		strcpy(application_name,newname);
+}
 
 static int __init instrument_init(void)
 {
@@ -446,10 +471,10 @@ static void __exit instrument_exit(void)
 	printk(KERN_INFO "kretprobe at %p unregistered\n", (kretprobes+4)->kp.addr);
 
 	unregister_kretprobe(kretprobes+5);
-	printk(KERN_INFO "kretprobe at %p unregistered\n", (kretprobes+3)->kp.addr);
+	printk(KERN_INFO "kretprobe at %p unregistered\n", (kretprobes+5)->kp.addr);
     
 	unregister_kretprobe(kretprobes+6);
-	printk(KERN_INFO "kretprobe at %p unregistered\n", (kretprobes+4)->kp.addr);
+	printk(KERN_INFO "kretprobe at %p unregistered\n", (kretprobes+6)->kp.addr);
 
 
 /*
