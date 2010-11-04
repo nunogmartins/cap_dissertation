@@ -60,54 +60,53 @@ int main(int argc, char *argv[])
 	{
 	clilen = sizeof(cli_addr);
 	printf("endereco da estrutura %p and size is %d",(struct sockaddr *)&cli_addr,clilen);
-		newsockfd = accept(sockfd, (struct sockaddr *)&cli_addr, (socklen_t *)&clilen);
+	newsockfd = accept(sockfd, (struct sockaddr *)&cli_addr, (socklen_t *)&clilen);
 
-		if(newsockfd < 0)
-		{
-			perror("ERROR on accept");
-		}
+	if(newsockfd < 0)
+	{
+		perror("ERROR on accept");
+	}
 
-		/*if((childpid = fork()) < 0 )
+	/*if((childpid = fork()) < 0 )
+	{
+		error("server: fork error");
+		exit(3);
+	}
+	else
+		if(childpid == 0)
 		{
-			error("server: fork error");
-			exit(3);
-		}
-		else
-			if(childpid == 0)
-			{
-				close(sockfd);
-				while(1)
-				{*/
-					bzero(buffer, READ_BUFFER);
-					n = read(newsockfd, buffer, READ_BUFFER-1);
-					if( n < 0)
-						perror("ERROR reading from socket");
+			close(sockfd);
+			while(1)
+			{*/
+			bzero(buffer, READ_BUFFER);
+			n = read(newsockfd, buffer, READ_BUFFER-1);
+			if( n < 0)
+				perror("ERROR reading from socket");
 
 					
-					char ola[READ_BUFFER];
-					bzero(ola,READ_BUFFER);
-					strncpy(ola,buffer,strlen(buffer)-2); // minus 2 because it has \r\n in the buffer
+			char ola[READ_BUFFER];
+			bzero(ola,READ_BUFFER);
+			strncpy(ola,buffer,strlen(buffer)-2); // minus 2 because it has \r\n in the buffer
 
-					if(strcmp("ola",ola) == 0)
-					{
-						printf("equal zero\n");
-						close(newsockfd);
-						break;
+			if(strcmp("ola",ola) == 0)
+			{
+				printf("equal zero\n");
+				close(newsockfd);
+				break;
+			}else {
+				printf("not equal zero\n");
+			}						
+			strcat(ola," telnet\n");
+			n = write(newsockfd, ola, READ_BUFFER-1);
+			if( n < 0)
+				perror("ERROR writing to socket");
 
-					}else {
-						printf("not equal zero\n");
-						}						
-					strcat(ola," telnet\n");
-					n = write(newsockfd, ola, READ_BUFFER-1);
-					if( n < 0)
-						perror("ERROR writing to socket");
-
-					//exit(0);
+			//exit(0);
 		
-				//}
-				//exit(0);
 			//}
-			close(newsockfd);
+				//exit(0);
+	//}
+	close(newsockfd);
 	}
 	close(sockfd);
 	return 0;
