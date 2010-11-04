@@ -1,8 +1,9 @@
-obj-m    := experiment.o other.o jprobe.o instrumentation.o my_module.o
+obj-m	:=my_module.o
+#obj-m    := experiment.o other.o jprobe.o instrumentation.o my_module.o
 
-experiment-y	:= exp.o
+#experiment-y	:= exp.o
 
-instrumentation-y	:=instrument.o ports_table.o
+#instrumentation-y	:=instrument.o ports_table.o
 
 my_module-y	:=monitor_tcp_udp.o debugfs_support.o ports_table.o
 
