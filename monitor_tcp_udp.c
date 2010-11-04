@@ -20,8 +20,8 @@ char *application_name = "server";
 struct kretprobe *kretprobes = NULL;
 struct jprobe *jprobes = NULL;
 
-extern int init_debug(void);
-extern void destroy_debug(void);
+//extern int init_debug(void);
+//extern void destroy_debug(void);
 static void print_regs(const char *function, struct pt_regs *regs)
 {
 
