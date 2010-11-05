@@ -97,7 +97,8 @@ static int recvfrom_ret_handler(struct kretprobe_instance *ri, struct pt_regs *r
 static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	struct task_struct *task = ri->task;
-	
+	printk(KERN_INFO "application %s",task->comm);
+	print_regs("close",regs);
 	if(!current->mm)
 		return 1;
 
@@ -107,7 +108,6 @@ static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *re
 	if(strcmp(task->comm,application_name)!=0)
 		return 1;
 
-	print_regs("close",regs);
 
 	return 0;
 }
