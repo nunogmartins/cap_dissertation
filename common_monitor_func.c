@@ -7,7 +7,7 @@
 
 #include <linux/kprobes.h>
 
-extern kretprobe kretprobes;
+extern struct kretprobe *kretprobes;
 extern int instantiationKRETProbe(struct kretprobe *kret,
 		const char *function_name,
 		kretprobe_handler_t func_handler,
@@ -88,7 +88,7 @@ int init_kretprobes_common(int *initial)
 	if(ret < 0)
 		return -1;
 
-	*ìnitial = index;
+	*initial = index;
 	return 0;
 }
 

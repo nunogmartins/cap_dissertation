@@ -6,6 +6,7 @@
  */
 
 #include <linux/module.h>
+#include <linux/kprobes.h>
 
 struct kretprobe *kretprobes = NULL;
 struct jprobe *jprobes = NULL;
@@ -32,7 +33,6 @@ void print_regs(const char *function, struct pt_regs *regs)
 static int __init monitor_init(void)
 {
 	int index = 0;
-	int ret = 0;
 	int ret = -1;
 	kretprobes = kmalloc(sizeof(*kretprobes)*NR_PROBES,GFP_KERNEL);
 	if(!kretprobes){

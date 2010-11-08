@@ -8,8 +8,7 @@
 #include <linux/kprobes.h>
 
 
-extern kretprobe kretprobes;
-static int position = 0;
+extern struct kretprobe *kretprobes;
 
 extern int instantiationKRETProbe(struct kretprobe *kret,
 		const char *function_name,
@@ -63,7 +62,8 @@ int init_kretprobes_udp(int *initial)
 	ret = instantiationKRETProbe((kretprobes+index),"ip4_datagram_connect",udp_connect_ret_handler,udp_connect_entry_handler);
 	if(ret < 0)
 		return -1;
-	*ìnitial = index;
+
+	*initial = index;
 	return 0;
 }
 
