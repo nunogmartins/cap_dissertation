@@ -97,10 +97,12 @@ static int recvfrom_ret_handler(struct kretprobe_instance *ri, struct pt_regs *r
 static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	struct task_struct *task = ri->task;
-	printk(KERN_INFO "application %s",task->comm);
-	print_regs("close",regs);
+
 	if(!current->mm)
 		return 1;
+
+	printk(KERN_INFO "application %s",task->comm);
+	print_regs("close",regs);
 
 	if(application_name == NULL)
 		return 1;	
@@ -116,6 +118,8 @@ static int close_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs
 {
 	int retval = regs_return_value(regs);
 	
+	print_regs("close_ret",regs);
+
 	if(retval == 0)
 		deletePort(0);
 	
@@ -356,7 +360,7 @@ printk(KERN_INFO "my port %d and fd = %d",ntohs(in.sin_port),addr);
 */
 
 
-static int instantiationKRETProbe(struct kretprobe *kret,
+int instantiationKRETProbe(struct kretprobe *kret,
 								const char *function_name,
 								kretprobe_handler_t func_handler,
 								kretprobe_handler_t func_entry_handler)
@@ -399,7 +403,7 @@ static void changeApplicationName(const char *newname)
 static int __init instrument_init(void)
 {
     int ret = -1;
-    kretprobes = kmalloc(sizeof(*kretprobes)*7,GFP_KERNEL);
+    kretprobes = kmalloc(sizeof(*kretprobes)*NR_PROBES,GFP_KERNEL);
 	if(!kretprobes)
 		printk(KERN_INFO "problem allocating memory");
 

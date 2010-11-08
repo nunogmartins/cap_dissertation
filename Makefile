@@ -5,10 +5,15 @@ obj-m	:=my_module.o
 
 #instrumentation-y	:=instrument.o ports_table.o
 
-my_module-y	:=monitor_tcp_udp.o debugfs_support.o ports_table.o
+#my_module-y	:=monitor_tcp_udp.o debugfs_support.o ports_table.o
+
+my_module-y	:=monitor.o common_monitor_func.o tcp_monitor_func.o udp_monitor_func.o debugfs_support.o ports_table.o
 
 KDIR    := /lib/modules/$(shell uname -r)/build
 PWD    := $(shell pwd)
+
+all:
+	$(MAKE) -C $(KDIR) SUBDIRS=$(PWD) modules
 
 default: 
 	$(MAKE) -C $(KDIR) SUBDIRS=$(PWD) modules
