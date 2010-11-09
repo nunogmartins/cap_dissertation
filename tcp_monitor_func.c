@@ -59,12 +59,17 @@ int init_kretprobes_tcp(int *initial)
 	ret = instantiationKRETProbe((kretprobes+index),"tcp_v4_connect",tcp_connect_ret_handler,tcp_connect_entry_handler);
 	index +=1;
 	if(ret < 0)
+	{	
+		printk(KERN_INFO "tcp_connect");
 		return -1;
-
+	}
 	ret = instantiationKRETProbe((kretprobes+index),"tcp_close",tcp_close_ret_handler,tcp_close_entry_handler);
 	index +=1;
 	if(ret < 0)
+	{	
+		printk(KERN_INFO "tcp_close");
 		return -1;
+	}
 
 	*initial = index;
 	return 0;

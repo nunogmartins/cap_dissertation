@@ -41,23 +41,30 @@ static int __init monitor_init(void)
 	}
 
 	ret = init_kretprobes_common(&index);
-	if(!ret)
+	if(ret < 0)
 	{
-		//problem ...
+		printk(KERN_INFO "problem in common");
+		goto problem;
 	}
 
 	ret = init_kretprobes_tcp(&index);
-	if(!ret)
+	if(ret < 0)
 	{
-		//problem ...
+		printk(KERN_INFO "problem in tcp");
+		goto problem;
 	}
 
 	ret = init_kretprobes_udp(&index);
-	if(!ret)
+	if(ret < 0)
 	{
-		//problem ...
+		printk(KERN_INFO "problem in udp");
+		goto problem;
 	}
 
+	return 0;
+
+problem:
+	kfree(kretprobes);
 	return 0;
 }
 
