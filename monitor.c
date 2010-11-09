@@ -62,7 +62,7 @@ static int __init monitor_init(void)
 	int index = 0;
 	int ret = -1;
 	kretprobes = kmalloc(sizeof(*kretprobes)*NR_PROBES,GFP_KERNEL);
-	if(!lsm){
+	if(!kretprobes){
 		printk(KERN_INFO "problem allocating memory");
 		return -1;
 	}
