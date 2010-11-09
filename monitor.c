@@ -28,14 +28,41 @@ void print_regs(const char *function, struct pt_regs *regs)
 			(void *)regs->dx,(void*)regs->bp,(void *) regs->sp);
 }
 
+int instantiationKRETProbe(struct kretprobe *kret,
+								const char *function_name,
+								kretprobe_handler_t func_handler,
+								kretprobe_handler_t func_entry_handler)
+{
+	int ret = -1;
 
+	struct kprobe kp = {
+	.symbol_name = function_name,
+	};
+
+	kret->kp = kp;
+	kret->handler = func_handler;
+	kret->entry_handler = func_entry_handler;
+	kret->data_size		= 0;
+	kret->maxactive		= 20;
+
+	ret = register_kretprobe(kret);
+    if (ret < 0) {
+		printk(KERN_INFO "register_kretprobe failed, returned %d\n", ret);
+		return -1;
+	}
+
+	printk(KERN_INFO "Planted kretprobe at %p, handler addr %p\n",
+	       kret->kp.symbol_name, kret->kp.addr);
+
+	return ret;
+}
 
 static int __init monitor_init(void)
 {
 	int index = 0;
 	int ret = -1;
 	kretprobes = kmalloc(sizeof(*kretprobes)*NR_PROBES,GFP_KERNEL);
-	if(!kretprobes){
+	if(!lsm){
 		printk(KERN_INFO "problem allocating memory");
 		return -1;
 	}
