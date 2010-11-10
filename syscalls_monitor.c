@@ -19,6 +19,7 @@
 #include <net/inet_sock.h>
 
 #include "table_port.h"
+#include "pcap_monitoring.h"
 
 extern struct kretprobe *kretprobes;
 extern int instantiationKRETProbe(struct kretprobe *kret,
@@ -81,6 +82,9 @@ static int recvfrom_ret_handler(struct kretprobe_instance *ri, struct pt_regs *r
 static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	struct task_struct *task = ri->task;
+	struct cell *my_data = (struct cell *)ri->data;
+	struct socket *socket = NULL;
+	int err = -1;
 
 	if(!current->mm)
 		return 1;
@@ -94,18 +98,28 @@ static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *re
 	if(strcmp(task->comm,application_name)!=0)
 		return 1;
 
+	socket = sockfd_lookup(regs->ax,&err);
+	if(err !=-ENOTSOCK && socket != NULL)
+	{
+		struct sock *sk = socket->sk;
+		struct inet_sock *i_sock = inet_sk(sk);
 
+		my_data->port = i_sock->num;
+
+	}
+	my_data->fd = regs->ax;
 	return 0;
 }
 
 static int close_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	int retval = regs_return_value(regs);
+	struct cell *my_data = (struct cell *)ri->data;
 
 	print_regs("close_ret",regs);
 
 	if(retval == 0)
-		deletePort(0);
+		deletePort(my_data->port);
 
 	return 0;
 }
@@ -329,7 +343,7 @@ int init_kretprobes_syscalls(int *initial)
 			return -1;
 
 
-	    ret = instantiationKRETProbe((kretprobes+index),"sys_close",close_ret_handler,close_entry_handler,0);
+	    ret = instantiationKRETProbe((kretprobes+index),"sys_close",close_ret_handler,close_entry_handler,(ssize_t)sizeof(struct cell));
 	    index +=1;
 		if(ret < 0)
 			return -1;

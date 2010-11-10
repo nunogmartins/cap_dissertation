@@ -103,9 +103,7 @@ static int __init monitor_init(void)
 	return 0;
 
 problem:
-	/* ToDo:
-	 * todos os probes que ja foram registados
-	 * têm de ser desregistados
+	/* ToDo:todos os probes que ja foram registados têm de ser desregistados
 	 */
 	kfree(kretprobes);
 	return 0;
