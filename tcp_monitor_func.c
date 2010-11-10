@@ -11,7 +11,8 @@ extern struct kretprobe *kretprobes;
 extern int instantiationKRETProbe(struct kretprobe *kret,
 								const char *function_name,
 								kretprobe_handler_t func_handler,
-								kretprobe_handler_t func_entry_handler);
+								kretprobe_handler_t func_entry_handler,
+								ssize_t data_size);
 
 
 /*
@@ -56,14 +57,14 @@ int init_kretprobes_tcp(int *initial)
 	int ret = 0;
 	int index = *initial;
 
-	ret = instantiationKRETProbe((kretprobes+index),"tcp_v4_connect",tcp_connect_ret_handler,tcp_connect_entry_handler);
+	ret = instantiationKRETProbe((kretprobes+index),"tcp_v4_connect",tcp_connect_ret_handler,tcp_connect_entry_handler,0);
 	index +=1;
 	if(ret < 0)
 	{	
 		printk(KERN_INFO "tcp_connect");
 		return -1;
 	}
-	ret = instantiationKRETProbe((kretprobes+index),"tcp_close",tcp_close_ret_handler,tcp_close_entry_handler);
+	ret = instantiationKRETProbe((kretprobes+index),"tcp_close",tcp_close_ret_handler,tcp_close_entry_handler,0);
 	index +=1;
 	if(ret < 0)
 	{	

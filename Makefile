@@ -1,4 +1,4 @@
-obj-m	:=my_module.o
+obj-m	:=monitoring_syscalls.o monitoring_calls.o
 #obj-m    := experiment.o other.o jprobe.o instrumentation.o my_module.o
 
 #experiment-y	:= exp.o
@@ -7,7 +7,11 @@ obj-m	:=my_module.o
 
 #my_module-y	:=monitor_tcp_udp.o debugfs_support.o ports_table.o
 
-my_module-y	:=monitor.o common_monitor_func.o tcp_monitor_func.o udp_monitor_func.o debugfs_support.o ports_table.o
+#my_module-y	:=monitor.o common_monitor_func.o tcp_monitor_func.o udp_monitor_func.o debugfs_support.o ports_table.o
+
+monitoring_syscalls-y	:=monitor.o syscalls_monitor.o debugfs_support.o ports_table.o
+
+monitoring_calls-y	:=monitor.o common_monitor_func.o tcp_monitor_func.o udp_monitor_func.o debugfs_support.o ports_table.o
 
 KDIR    := /lib/modules/$(shell uname -r)/build
 PWD    := $(shell pwd)

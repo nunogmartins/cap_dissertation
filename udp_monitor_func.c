@@ -13,7 +13,8 @@ extern struct kretprobe *kretprobes;
 extern int instantiationKRETProbe(struct kretprobe *kret,
 		const char *function_name,
 		kretprobe_handler_t func_handler,
-		kretprobe_handler_t func_entry_handler);
+		kretprobe_handler_t func_entry_handler,
+		ssize_t data_size);
 
 /*
  * monitor function ip4_datagram_connect
@@ -59,7 +60,7 @@ int init_kretprobes_udp(int *initial)
 	int ret = 0;
 	int index = *initial;
 
-	ret = instantiationKRETProbe((kretprobes+index),"ip4_datagram_connect",udp_connect_ret_handler,udp_connect_entry_handler);
+	ret = instantiationKRETProbe((kretprobes+index),"ip4_datagram_connect",udp_connect_ret_handler,udp_connect_entry_handler,0);
 	if(ret < 0)
 		return -1;
 
