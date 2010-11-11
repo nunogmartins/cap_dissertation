@@ -111,7 +111,7 @@ problem:
 
 static void removeKprobe(int index)
 {
-	printk(KERN_INFO "missed %d probes" , (kretprobes)->nmissed);
+	printk(KERN_INFO "missed %d probes" , (kretprobes+index)->nmissed);
 	unregister_kretprobe((kretprobes+index));
 	printk(KERN_INFO "kretprobe at %p unregistered\n", (kretprobes+index)->kp.addr);
 }
