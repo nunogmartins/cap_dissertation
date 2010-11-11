@@ -130,6 +130,7 @@ static int bind_entry_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 	struct task_struct *task = ri->task;
 	int fd = regs->ax;
 	struct sockaddr_in in;
+	struct cell *my_data = (struct cell *)ri->data;
 
 	if(!current->mm)
 		return 1;
@@ -142,6 +143,9 @@ static int bind_entry_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 
 	memcpy(&in,(void *)regs->dx,regs->cx);
 
+	my_data->fd = fd;
+	my_data->port = ntohs(in.sin_port);
+
 #ifdef DEBUG_D
 	printk(KERN_INFO "bind to port %d and fd %d",ntohs(in.sin_port),fd);
 #endif
@@ -152,10 +156,11 @@ static int bind_entry_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 static int bind_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	int retval = regs_return_value(regs);
+	struct cell *my_data = (struct cell *)ri->data;
 	if(retval > 0)
 	{
 	//TODO: get the port from the data and insert
-		insertPort(0);
+		insertPort(my_data->port);
 	}
 	return 0;
 }
@@ -199,6 +204,8 @@ static int accept_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 	void * clilen_addr = (void *)regs->cx;
 	size_t clilen = 0;
 
+	struct cell *my_data = (struct cell *)ri->data;
+
 	if(!current->mm)
 		return 1;
 
@@ -214,6 +221,7 @@ static int accept_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 	printk(KERN_INFO "server fd %d and clilen %d ",server_fd,clilen);
 #endif
 
+
 	return 0;
 }
 static int accept_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
@@ -224,6 +232,8 @@ static int accept_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 	int server_fd = -1;
 	struct sockaddr_in addr;
 	long pointer = -1;
+	struct socket *socket = NULL;
+	int err;
 
 	/*for(i=0;i <= 64 ; i+=4)
 	{
@@ -235,9 +245,19 @@ static int accept_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 	memcpy(&server_fd,(void *)(stack-24),4);
 	memcpy(&pointer,(void*)(stack-20),4);
 	memcpy(&addr,(void*)(pointer),16);
+
 	if(retval > 0)
 	{
+		socket = sockfd_lookup(retval,&err);
+		if(err !=-ENOTSOCK && socket != NULL)
+		{
+			struct sock *sk = socket->sk;
+			struct inet_sock *i_sock = inet_sk(sk);
+			insertPort(i_sock->num);
+
+		}
 		insertPort(htons(addr.sin_port));
+
 	}
 #ifdef DEBUG_D
 	printk(KERN_INFO "to port %d ",htons(addr.sin_port));
