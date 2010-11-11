@@ -7,6 +7,7 @@
 
 #include <linux/module.h>
 #include <linux/kprobes.h>
+#include <linux/types.h>
 
 struct kretprobe *kretprobes = NULL;
 struct jprobe *jprobes = NULL;
@@ -15,11 +16,13 @@ char *application_name = "server";
 extern int init_debug(void);
 extern void destroy_debug(void);
 
-extern int init_kretprobes_common(int *initial);
+/*extern int init_kretprobes_common(int *initial);
 extern int init_kretprobes_tcp(int *initial);
 extern int init_kretprobes_udp(int *initial);
+*/
+extern int init_kretprobes_syscalls(int *index);
 
-#define NR_PROBES 6
+#define NR_PROBES 7
 
 void print_regs(const char *function, struct pt_regs *regs)
 {
@@ -31,7 +34,8 @@ void print_regs(const char *function, struct pt_regs *regs)
 int instantiationKRETProbe(struct kretprobe *kret,
 								const char *function_name,
 								kretprobe_handler_t func_handler,
-								kretprobe_handler_t func_entry_handler)
+								kretprobe_handler_t func_entry_handler,
+								ssize_t data_size)
 {
 	int ret = -1;
 
@@ -42,7 +46,7 @@ int instantiationKRETProbe(struct kretprobe *kret,
 	kret->kp = kp;
 	kret->handler = func_handler;
 	kret->entry_handler = func_entry_handler;
-	kret->data_size		= 0;
+	kret->data_size		= data_size;
 	kret->maxactive		= 20;
 
 	ret = register_kretprobe(kret);
@@ -66,7 +70,7 @@ static int __init monitor_init(void)
 		printk(KERN_INFO "problem allocating memory");
 		return -1;
 	}
-
+/*
 	ret = init_kretprobes_common(&index);
 	if(ret < 0)
 	{
@@ -87,10 +91,20 @@ static int __init monitor_init(void)
 		printk(KERN_INFO "problem in udp");
 		goto problem;
 	}
+*/
+	ret = init_kretprobes_syscalls(&index);
+	if(ret < 0)
+	{
+		printk(KERN_INFO "problem in syscalls");
+		goto problem;
+	}
 
+	init_debug();
 	return 0;
 
 problem:
+	/* ToDo:todos os probes que ja foram registados têm de ser desregistados
+	 */
 	kfree(kretprobes);
 	return 0;
 }

@@ -5,10 +5,12 @@
 */
 int insertPort(int port)
 {
+	printk(KERN_INFO "inserting port %d", port);
 	return -ENOTIMPLEMENTED;
 }
 
 int deletePort(int port)
 {
-	return -ENOTIMPLEMENTED;
+	printk(KERN_INFO "deleting port %d",port);
+	return 0;
 }

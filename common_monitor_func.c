@@ -11,7 +11,8 @@ extern struct kretprobe *kretprobes;
 extern int instantiationKRETProbe(struct kretprobe *kret,
 		const char *function_name,
 		kretprobe_handler_t func_handler,
-		kretprobe_handler_t func_entry_handler);
+		kretprobe_handler_t func_entry_handler,
+		ssize_t data_size);
 
 /*
  * monitor function inet_csk_accept
@@ -73,17 +74,17 @@ int init_kretprobes_common(int *initial)
 	int ret = 0;
 	int index = *initial;
 
-	ret = instantiationKRETProbe((kretprobes+index),"inet_csk_accept",accept_ret_handler,accept_entry_handler);
+	ret = instantiationKRETProbe((kretprobes+index),"inet_csk_accept",accept_ret_handler,accept_entry_handler,0);
 	index +=1;
 	if(ret < 0)
 		return -1;
 
-	ret = instantiationKRETProbe((kretprobes+index),"inet_bind",bind_ret_handler,bind_entry_handler);
+	ret = instantiationKRETProbe((kretprobes+index),"inet_bind",bind_ret_handler,bind_entry_handler,0);
 	index +=1;
 	if(ret < 0)
 		return -1;
 
-	ret = instantiationKRETProbe((kretprobes+index),"inet_create",socket_ret_handler,socket_entry_handler);
+	ret = instantiationKRETProbe((kretprobes+index),"inet_create",socket_ret_handler,socket_entry_handler,0);
 	index +=1;
 	if(ret < 0)
 		return -1;
