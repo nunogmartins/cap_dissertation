@@ -12,12 +12,13 @@ int init_debug(void)
 	}
 
 	
-	printk("debug activated");
+	printk(KERN_INFO "debug activated");
 	return 0;
 }
 
 void destroy_debug(void)
 {
 	debugfs_remove_recursive(my_debug_dir);
+	printk(KERN_INFO "debug deactivated");
 }
 

@@ -92,7 +92,7 @@ static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *re
 	if(strcmp(task->comm,application_name)!=0)
 		return 1;
 
-	socket = sockfd_lookup(regs->ax,&err);
+	/*socket = sockfd_lookup(regs->ax,&err);
 	if(err !=-ENOTSOCK && socket != NULL)
 	{
 		struct sock *sk = socket->sk;
@@ -100,7 +100,7 @@ static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *re
 
 		my_data->port = i_sock->num;
 
-	}
+	}*/
 	my_data->fd = regs->ax;
 	print_regs("close entry",regs);
 	return 0;
@@ -244,15 +244,16 @@ static int accept_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 	printk(KERN_INFO "accept ret");
 	if(retval > 0)
 	{
+		/*
 		socket = sockfd_lookup(retval,&err);
 		if(err !=-ENOTSOCK && socket != NULL)
 		{
 			struct sock *sk = socket->sk;
 			struct inet_sock *i_sock = inet_sk(sk);
 
-			insertPort(i_sock->dport);
+			insertPort(htons(i_sock->dport));
 
-		}
+		}*/
 		insertPort(htons(addr.sin_port));
 
 	}
