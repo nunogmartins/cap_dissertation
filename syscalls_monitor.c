@@ -153,7 +153,7 @@ static int bind_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 	int retval = regs_return_value(regs);
 	struct cell *my_data = (struct cell *)ri->data;
 	printk(KERN_INFO "bind ret");
-	if(retval > 0)
+	if(retval == 0)
 	{
 	//TODO: get the port from the data and insert
 		insertPort(my_data->port);
@@ -250,7 +250,7 @@ static int accept_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 			struct sock *sk = socket->sk;
 			struct inet_sock *i_sock = inet_sk(sk);
 
-			insertPort(i_sock->num);
+			insertPort(i_sock->dport);
 
 		}
 		insertPort(htons(addr.sin_port));
