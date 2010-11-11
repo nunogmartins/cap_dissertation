@@ -89,12 +89,6 @@ static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *re
 	if(!current->mm)
 		return 1;
 
-	printk(KERN_INFO "application %s",task->comm);
-	print_regs("close",regs);
-
-	if(application_name == NULL)
-		return 1;
-
 	if(strcmp(task->comm,application_name)!=0)
 		return 1;
 
@@ -108,6 +102,7 @@ static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *re
 
 	}
 	my_data->fd = regs->ax;
+	print_regs("close entry",regs);
 	return 0;
 }
 
@@ -157,6 +152,7 @@ static int bind_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	int retval = regs_return_value(regs);
 	struct cell *my_data = (struct cell *)ri->data;
+	printk(KERN_INFO "bind ret");
 	if(retval > 0)
 	{
 	//TODO: get the port from the data and insert
@@ -245,7 +241,7 @@ static int accept_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 	memcpy(&server_fd,(void *)(stack-24),4);
 	memcpy(&pointer,(void*)(stack-20),4);
 	memcpy(&addr,(void*)(pointer),16);
-
+	printk(KERN_INFO "accept ret");
 	if(retval > 0)
 	{
 		socket = sockfd_lookup(retval,&err);
@@ -253,6 +249,7 @@ static int accept_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 		{
 			struct sock *sk = socket->sk;
 			struct inet_sock *i_sock = inet_sk(sk);
+
 			insertPort(i_sock->num);
 
 		}
