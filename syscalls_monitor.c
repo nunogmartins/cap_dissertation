@@ -342,22 +342,22 @@ int init_kretprobes_syscalls(int *initial)
 
 
 
-	    ret = instantiationKRETProbe((kretprobes+index),"sys_socket",socket_ret_handler,socket_entry_handler,0);
+	    ret = instantiationKRETProbe((kretprobes+index),"sys_socket",socket_ret_handler,socket_entry_handler,(ssize_t)sizeof(struct cell));
 	    index +=1;
 		if(ret < 0)
 			return -1;
 
-	    ret = instantiationKRETProbe((kretprobes+index),"sys_bind",bind_ret_handler,bind_entry_handler,0);
+	    ret = instantiationKRETProbe((kretprobes+index),"sys_bind",bind_ret_handler,bind_entry_handler,(ssize_t)sizeof(struct cell));
 	    index +=1;
 		if(ret < 0)
 			return -1;
 
-	    ret = instantiationKRETProbe((kretprobes+index),"sys_connect",connect_ret_handler,connect_entry_handler,0);
+	    ret = instantiationKRETProbe((kretprobes+index),"sys_connect",connect_ret_handler,connect_entry_handler,(ssize_t)sizeof(struct cell));
 	    index +=1;
 		if(ret < 0)
 			return -1;
 
-	    ret = instantiationKRETProbe((kretprobes+index),"sys_accept4",accept_ret_handler,accept_entry_handler,0);
+	    ret = instantiationKRETProbe((kretprobes+index),"sys_accept4",accept_ret_handler,accept_entry_handler,(ssize_t)sizeof(struct cell));
 	    index +=1;
 		if(ret < 0)
 			return -1;
@@ -368,13 +368,13 @@ int init_kretprobes_syscalls(int *initial)
 		if(ret < 0)
 			return -1;
 
-		ret = instantiationKRETProbe((kretprobes+index),"sys_sendto",sendto_ret_handler,sendto_entry_handler,0);
+		ret = instantiationKRETProbe((kretprobes+index),"sys_sendto",sendto_ret_handler,sendto_entry_handler,(ssize_t)sizeof(struct cell));
 		index +=1;
 		if(ret < 0)
 			return -1;
 
 
-	    ret = instantiationKRETProbe((kretprobes+index),"sys_recvfrom",recvfrom_ret_handler,recvfrom_entry_handler,0);
+	    ret = instantiationKRETProbe((kretprobes+index),"sys_recvfrom",recvfrom_ret_handler,recvfrom_entry_handler,(ssize_t)sizeof(struct cell));
 	    index +=1;
 		if(ret < 0)
 			return -1;
