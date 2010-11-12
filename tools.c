@@ -16,13 +16,19 @@
 
 #include "pcap_monitoring.h"
 
-unsigned short getPort(unsigned int fd, struct task_struct *ts){
+/*
+ * unsigned int fd
+ * int direction
+ */
+
+unsigned short getPort(unsigned int fd,int direction)
+{
 	struct file *f = NULL;
 	//int fput_needed;
 	struct socket *socket = NULL;
 	/*struct sock *sock = NULL;
-	struct inet_sock *i_sock = NULL;
-*/
+struct inet_sock *i_sock = NULL;
+	 */
 	f = fget(fd);
 
 	if(f!=NULL)
@@ -44,5 +50,5 @@ unsigned short getPort(unsigned int fd, struct task_struct *ts){
 	if(socket == NULL)
 		return 0;
 
-	return ntohs(inet_sk(socket->sk)->sport);
+	return direction == 0 ? ntohs(inet_sk(socket->sk)->sport) : ntohs(inet_sk(socket->sk)->dport);
 }

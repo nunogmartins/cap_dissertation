@@ -83,12 +83,11 @@ static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *re
 {
 	struct task_struct *task = ri->task;
 	struct cell *my_data = (struct cell *)ri->data;
-	struct socket *socket = NULL;
-	int err = -1;
 
+	/*
 	if(!current->mm)
 		return 1;
-
+*/
 	if(strcmp(task->comm,application_name)!=0)
 		return 1;
 
@@ -101,6 +100,7 @@ static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *re
 		my_data->port = i_sock->num;
 
 	}*/
+
 	my_data->fd = regs->ax;
 	print_regs("close entry",regs);
 	return 0;
@@ -115,7 +115,7 @@ static int close_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs
 
 
 	if(retval == 0)
-		deletePort(getPort(my_data->fd,NULL));
+		deletePort(getPort(my_data->fd,my_data->direction));
 
 	return 0;
 }
@@ -157,7 +157,7 @@ static int bind_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 	if(retval == 0)
 	{
 	//TODO: get the port from the data and insert
-		insertPort(getPort(my_data->fd,NULL));
+		insertPort(getPort(my_data->fd,0));
 		//insertPort(my_data->port);
 	}
 	return 0;
@@ -196,13 +196,13 @@ static int connect_ret_handler(struct kretprobe_instance *ri, struct pt_regs *re
 static int accept_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	struct task_struct *task = ri->task;
-	int server_fd = regs->ax;
+	//int server_fd = regs->ax;
 	void * sockaddr_addr = (void *)regs->dx;
 	struct sockaddr addr;
 	void * clilen_addr = (void *)regs->cx;
 	size_t clilen = 0;
 
-	struct cell *my_data = (struct cell *)ri->data;
+	//struct cell *my_data = (struct cell *)ri->data;
 
 	if(!current->mm)
 		return 1;
@@ -230,8 +230,8 @@ static int accept_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 	int server_fd = -1;
 	struct sockaddr_in addr;
 	long pointer = -1;
-	struct socket *socket = NULL;
-	int err;
+	//struct socket *socket = NULL;
+	//int err;
 
 	/*for(i=0;i <= 64 ; i+=4)
 	{
@@ -257,7 +257,7 @@ static int accept_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 
 		}*/
 		//insertPort(htons(addr.sin_port));
-		insertPort(getPort(retval,NULL));
+		insertPort(getPort(retval,1));
 
 	}
 #ifdef DEBUG_D
@@ -273,7 +273,7 @@ static int accept_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 static int socket_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	struct task_struct *task = ri->task;
-	int family = regs->cx;
+	//int family = regs->cx;
 	int type = regs->dx;
 	int domain = regs->ax;
 

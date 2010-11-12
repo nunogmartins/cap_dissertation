@@ -13,10 +13,10 @@ struct cell{
 	int type;
 	int port;
 	int status;
+	int direction;
 };
-struct task_struct;
 
 extern struct socket *sockfd_lookup(int fd, int *err);
-extern unsigned short getPort(unsigned int fd, struct task_struct *ts);
+unsigned short getPort(unsigned int fd,int direction);
 
 #endif /* PCAP_MONITORING_H_ */
