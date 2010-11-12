@@ -44,5 +44,5 @@ unsigned short getPort(unsigned int fd, struct task_struct *ts){
 	if(socket == NULL)
 		return 0;
 
-	return ntohs(inet_sk(socket->sk)->dport);
+	return ntohs(inet_sk(socket->sk)->sport);
 }
