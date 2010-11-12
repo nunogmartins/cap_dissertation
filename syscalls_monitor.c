@@ -113,10 +113,10 @@ static int close_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs
 
 	print_regs("close_ret",regs);
 
-
+/*
 	if(retval == 0)
 		deletePort(getPort(my_data->fd,my_data->direction));
-
+*/
 	return 0;
 }
 
@@ -363,9 +363,15 @@ int init_kretprobes_syscalls(int *initial)
 		if(ret < 0)
 			return -1;
 
-
+/*
 	    ret = instantiationKRETProbe((kretprobes+index),"sys_close",close_ret_handler,close_entry_handler,(ssize_t)sizeof(struct cell));
 	    index +=1;
+		if(ret < 0)
+			return -1;
+*/
+
+		ret = instantiationKRETProbe((kretprobes+index),"inet_release",close_ret_handler,close_entry_handler,(ssize_t)sizeof(struct cell));
+		index +=1;
 		if(ret < 0)
 			return -1;
 
