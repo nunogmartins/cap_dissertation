@@ -18,12 +18,12 @@
 
 unsigned short getPort(unsigned int fd, struct task_struct *ts){
 	struct file *f = NULL;
-	int fput_needed;
+	//int fput_needed;
 	struct socket *socket = NULL;
 	/*struct sock *sock = NULL;
 	struct inet_sock *i_sock = NULL;
 */
-	f = fget_light(fd,&fput_needed);
+	f = fget(fd);
 	if(f!=NULL)
 	{
 		struct dentry *dentry;
