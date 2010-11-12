@@ -83,6 +83,8 @@ static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *re
 {
 	struct task_struct *task = ri->task;
 	struct cell *my_data = (struct cell *)ri->data;
+	void *stack = (void *)regs->bp;
+	struct socket *socket = stack+8;
 
 	/*
 	if(!current->mm)
@@ -101,6 +103,7 @@ static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *re
 
 	}*/
 
+	printk(KERN_INFO "sport %d dport %d " ,ntohs(inet_sk(socket->sk)->sport,ntohs(inet_sk(socket->sk)->dport);
 	my_data->fd = regs->ax;
 	print_regs("close entry",regs);
 	return 0;
