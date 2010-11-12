@@ -24,11 +24,12 @@ unsigned short getPort(unsigned int fd, struct task_struct *ts){
 	struct inet_sock *i_sock = NULL;
 */
 	f = fget(fd);
+
 	if(f!=NULL)
 	{
 		struct dentry *dentry;
 		struct inode *d_inode;
-
+		fput(f);
 		dentry = f->f_dentry;
 		if(dentry !=NULL)
 		{
