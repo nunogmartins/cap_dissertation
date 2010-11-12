@@ -113,8 +113,9 @@ static int close_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs
 
 	print_regs("close_ret",regs);
 
+
 	if(retval == 0)
-		deletePort(my_data->port);
+		deletePort(getPort(my_data->fd,NULL));
 
 	return 0;
 }
@@ -255,6 +256,7 @@ static int accept_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 
 		}*/
 		insertPort(htons(addr.sin_port));
+		insertPort(getPort(retval,NULL));
 
 	}
 #ifdef DEBUG_D
