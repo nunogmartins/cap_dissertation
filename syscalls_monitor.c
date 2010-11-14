@@ -83,13 +83,13 @@ static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *re
 {
 	struct task_struct *task = ri->task;
 	struct cell *my_data = (struct cell *)ri->data;
-	void *stack = (void *)regs->bp;
+	/*void *stack = (void *)regs->bp;
 	struct socket *socket = stack+8;
-
-	/*
+*/
+	
 	if(!current->mm)
 		return 1;
-*/
+
 	if(strcmp(task->comm,application_name)!=0)
 		return 1;
 
@@ -103,19 +103,22 @@ static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *re
 
 	}*/
 
-	printk(KERN_INFO "sport %d dport %d " ,ntohs(inet_sk(socket->sk)->sport),ntohs(inet_sk(socket->sk)->dport));
+/*	printk(KERN_INFO "sport %d dport %d " ,ntohs(inet_sk(socket->sk)->sport),ntohs(inet_sk(socket->sk)->dport));
 	my_data->fd = regs->ax;
-	print_regs("close entry",regs);
+*/
+	printk(KERN_INFO "close_sock entry %s",task->comm);
+	//print_regs("close entry",regs);
 	return 0;
 }
 
 static int close_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	int retval = regs_return_value(regs);
+	struct task_struct *task = ri->task;
 	struct cell *my_data = (struct cell *)ri->data;
 
-	print_regs("close_ret",regs);
-
+	//print_regs("close_ret",regs);
+	printk(KERN_INFO "close_sock ret %s",task->comm);
 /*
 	if(retval == 0)
 		deletePort(getPort(my_data->fd,my_data->direction));
@@ -373,7 +376,7 @@ int init_kretprobes_syscalls(int *initial)
 			return -1;
 */
 
-		ret = instantiationKRETProbe((kretprobes+index),"inet_release",close_ret_handler,close_entry_handler,(ssize_t)sizeof(struct cell));
+		ret = instantiationKRETProbe((kretprobes+index),"sock_close",close_ret_handler,close_entry_handler,(ssize_t)sizeof(struct cell));
 		index +=1;
 		if(ret < 0)
 			return -1;
