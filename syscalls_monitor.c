@@ -123,9 +123,15 @@ static int close_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs
 	int retval = regs_return_value(regs);
 	struct task_struct *task = ri->task;
 	struct cell *my_data = (struct cell *)ri->data;
+	struct file *filp = regs->bx;
+	struct inode *inode = regs->ax;
+	struct socket *socket = NULL;
 
 	//print_regs("close_ret",regs);
 	printk(KERN_INFO "close_sock ret %s",task->comm);
+
+	socket = (struct socket *)filp->private_data;
+	printk(KERN_INFO "src port %d and dst port %d",ntohs(inet_sk(socket->sk)->sport),ntohs(inet_sk(socket->sk)->dport));
 /*
 	if(retval == 0)
 		deletePort(getPort(my_data->fd,my_data->direction));
