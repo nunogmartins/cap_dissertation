@@ -86,6 +86,9 @@ static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *re
 	/*void *stack = (void *)regs->bp;
 	struct socket *socket = stack+8;
 */
+	struct file *filp = regs->bx;
+	struct inode *inode = regs->ax;
+	struct socket *socket = NULL;
 	
 	if(!current->mm)
 		return 1;
@@ -106,7 +109,11 @@ static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *re
 /*	printk(KERN_INFO "sport %d dport %d " ,ntohs(inet_sk(socket->sk)->sport),ntohs(inet_sk(socket->sk)->dport));
 	my_data->fd = regs->ax;
 */
+
+	socket = (struct socket *)filp->private_data;
 	printk(KERN_INFO "close_sock entry %s",task->comm);
+	printk(KERN_INFO "src port %d and dst port %d",ntohs(inet_sk(socket->sk)->sport),ntohs(inet_sk(socket->sk)->dport));
+
 	//print_regs("close entry",regs);
 	return 0;
 }
