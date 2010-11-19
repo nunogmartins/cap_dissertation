@@ -10,6 +10,8 @@
 
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <strings.h>
+#include <string.h>
 #include <stdio.h>
 
 int main(int argc, char**argv)
@@ -22,7 +24,7 @@ int main(int argc, char**argv)
    if (argc != 2)
    {
       printf("usage:  udp_client <IP address>\n");
-      exit(1);
+      return 0;
    }
 
    sockfd=socket(AF_INET,SOCK_DGRAM,0);

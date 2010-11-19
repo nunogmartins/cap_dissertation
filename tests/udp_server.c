@@ -11,6 +11,7 @@
 
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <strings.h>
 #include <stdio.h>
 
 int main(int argc, char**argv)
