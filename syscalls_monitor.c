@@ -46,11 +46,12 @@ static int sendto_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 	if(strcmp(task->comm,application_name)!=0)
 		return 1;
 
-	fd = *stack;
+	memcpy(&fd,*stack,4);
 	printk(KERN_INFO "fd = %d", fd);
 
 	if(size == 24){
-		addr = *(stack+size-4);
+		memcpy(&size_addr,*(stack+size),4);
+		memcpy(addr,*(stack+size-4),size_addr);
 		printk(KERN_INFO "port = %d",ntohs(addr->sin_port));
 	}
 
@@ -81,11 +82,12 @@ static int recvfrom_entry_handler(struct kretprobe_instance *ri, struct pt_regs 
 	if(strcmp(task->comm,application_name)!=0)
 		return 1;
 
-	fd = *stack;
+	memcpy(&fd,*stack,4);
 	printk(KERN_INFO "fd = %d", fd);
 
 	if(size == 24){
-		addr = *(stack+size-4);
+		memcpy(&size_addr,*(stack+size),4);
+		memcpy(addr,*(stack+size-4),size_addr);
 		printk(KERN_INFO "port = %d",ntohs(addr->sin_port));
 	}
 
