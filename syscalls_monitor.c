@@ -34,12 +34,25 @@ extern void print_regs(const char *function, struct pt_regs *regs);
 static int sendto_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	struct task_struct *task = ri->task;
+	void *stack = regs->di;
+	int size = regs->si;
+	int fd;
+	struct sockaddr_in *addr;
+	int size_addr;
 
 	if(application_name == NULL)
 		return 1;
 
 	if(strcmp(task->comm,application_name)!=0)
 		return 1;
+
+	fd = *stack;
+	printk(KERN_INFO "fd = %d", fd);
+
+	if(size == 24){
+		addr = *(stack+size-4);
+		printk(KERN_INFO "port = %d",ntohs(addr->sin_port));
+	}
 
 	return 0;
 }
@@ -56,17 +69,27 @@ static int sendto_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 static int recvfrom_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	struct task_struct *task = ri->task;
+	void *stack = regs->di;
+	int size = regs->si;
+	int fd;
+	struct sockaddr_in *addr;
+	int size_addr;
 
 	if(application_name == NULL)
-		return 1;
-
-	if(!current->mm)
 		return 1;
 
 	if(strcmp(task->comm,application_name)!=0)
 		return 1;
 
-return 0;
+	fd = *stack;
+	printk(KERN_INFO "fd = %d", fd);
+
+	if(size == 24){
+		addr = *(stack+size-4);
+		printk(KERN_INFO "port = %d",ntohs(addr->sin_port));
+	}
+
+	return 0;
 }
 static int recvfrom_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
