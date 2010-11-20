@@ -39,22 +39,23 @@ static int sendto_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 	int fd;
 	struct sockaddr_in *addr;
 	int size_addr;
+	int *address = regs->di;
 
 	if(application_name == NULL)
 		return 1;
 
-	if(strcmp(task->comm,application_name)!=0)
+	if(strcmp(task->comm,"udp_client")!=0)
 		return 1;
 
-	memcpy(&fd,*stack,4);
+	memcpy(&fd,*address,4);
 	printk(KERN_INFO "fd = %d", fd);
-
+/*
 	if(size == 24){
 		memcpy(&size_addr,*(stack+size),4);
 		memcpy(addr,*(stack+size-4),size_addr);
 		printk(KERN_INFO "port = %d",ntohs(addr->sin_port));
 	}
-
+*/
 	return 0;
 }
 static int sendto_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
@@ -75,22 +76,23 @@ static int recvfrom_entry_handler(struct kretprobe_instance *ri, struct pt_regs 
 	int fd;
 	struct sockaddr_in *addr;
 	int size_addr;
+	int *address = regs->di;
 
 	if(application_name == NULL)
 		return 1;
 
-	if(strcmp(task->comm,application_name)!=0)
+	if(strcmp(task->comm,"udp_client")!=0)
 		return 1;
 
-	memcpy(&fd,*stack,4);
+	memcpy(&fd,*address,4);
 	printk(KERN_INFO "fd = %d", fd);
-
+/*
 	if(size == 24){
 		memcpy(&size_addr,*(stack+size),4);
 		memcpy(addr,*(stack+size-4),size_addr);
 		printk(KERN_INFO "port = %d",ntohs(addr->sin_port));
 	}
-
+*/
 	return 0;
 }
 static int recvfrom_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
