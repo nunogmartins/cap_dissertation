@@ -37,9 +37,8 @@ static int sendto_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 	//void *stack = regs->di;
 	int size = regs->si;
 	int *fd;
-	struct sockaddr_in addr;
+	struct sockaddr_in *addr;
 	int *size_addr;
-	int i=0;
 	//int *address = regs->di;
 
 	if(application_name == NULL)
@@ -48,20 +47,15 @@ static int sendto_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 	if(strcmp(task->comm,"udp_client")!=0)
 		return 1;
 
-	//memcpy(&fd,address,4);
 	fd = regs->di;
 	printk(KERN_INFO "address of fd %p and value of fd %d",fd,*fd);
-	printk(KERN_INFO "address of di %p",regs->di);
-	//printk(KERN_INFO "fd = %d", fd);
 	printk(KERN_INFO "size = %d ", size);
 	
 	if(size == 24){
-		int *from_addr = regs->di + 16;
+		const int *from_addr = regs->di + 16;
 		size_addr = (regs->di + size - 4);
-		printk(KERN_INFO "size_addr value %d ", *size_addr);
-		memcpy(&addr,*from_addr,*size_addr);
-		printk(KERN_INFO "family %hu",addr.sin_family);
-		printk(KERN_INFO "port = %hu",ntohs(addr.sin_port));
+		addr = *from_addr;
+		insertPort(ntohs(addr->sin_port));
 	}
 
 	return 0;
