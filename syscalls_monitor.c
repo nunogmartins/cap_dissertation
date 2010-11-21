@@ -34,12 +34,10 @@ extern void print_regs(const char *function, struct pt_regs *regs);
 static int sendto_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	struct task_struct *task = ri->task;
-	//void *stack = regs->di;
 	int size = regs->si;
-	int *fd;
+	//int *fd;
 	struct sockaddr_in *addr;
-	int *size_addr;
-	//int *address = regs->di;
+	//int *size_addr;
 
 	if(application_name == NULL)
 		return 1;
@@ -47,13 +45,13 @@ static int sendto_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 	if(strcmp(task->comm,"udp_client")!=0)
 		return 1;
 
-	fd = regs->di;
-	printk(KERN_INFO "address of fd %p and value of fd %d",fd,*fd);
-	printk(KERN_INFO "size = %d ", size);
-	
+	//fd = regs->di;
+	//printk(KERN_INFO "address of fd %p and value of fd %d",fd,*fd);
+	//printk(KERN_INFO "size = %d ", size);
+	printk(KERN_INFO "sendto entry point");
 	if(size == 24){
 		const int *from_addr = regs->di + 16;
-		size_addr = (regs->di + size - 4);
+		//size_addr = (regs->di + size - 4);
 		addr = *from_addr;
 		insertPort(ntohs(addr->sin_port));
 	}
@@ -73,14 +71,13 @@ static int sendto_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 }
 
 static int recvfrom_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
-{	/*
+{	
 	struct task_struct *task = ri->task;
-	void *stack = regs->di;
 	int size = regs->si;
-	int fd;
+	int *fd;
 	struct sockaddr_in *addr;
-	int size_addr;
-	int *address = regs->di;
+	int *size_addr;
+	int *address = NULL;
 
 	if(application_name == NULL)
 		return 1;
@@ -88,16 +85,17 @@ static int recvfrom_entry_handler(struct kretprobe_instance *ri, struct pt_regs 
 	if(strcmp(task->comm,"udp_client")!=0)
 		return 1;
 
-	memcpy(&fd,*address,4);
-	printk(KERN_INFO "fd = %d", fd);
-	*/
-/*
+	printk(KERN_INFO "recvfrom entry point");
+	fd = regs->di;
+	printk(KERN_INFO "fd = %d", *fd);
+	
+
 	if(size == 24){
-		memcpy(&size_addr,*(stack+size),4);
-		memcpy(addr,*(stack+size-4),size_addr);
-		printk(KERN_INFO "port = %d",ntohs(addr->sin_port));
+		address = regs->di + 16;
+		addr = *address;
+		printk(KERN_INFO "port = %hu",ntohs(addr->sin_port));
 	}
-*/
+
 	return 0;
 }
 static int recvfrom_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)

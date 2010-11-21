@@ -38,6 +38,7 @@ int main(int argc, char**argv)
       mesg[n] = 0;
       printf("Received the following:\n");
       printf("%s",mesg);
+	  printf("from port %d ",ntohs(cliaddr.sin_port));
       printf("-------------------------------------------------------\n");
    }
 
