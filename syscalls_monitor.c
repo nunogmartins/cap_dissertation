@@ -34,12 +34,13 @@ extern void print_regs(const char *function, struct pt_regs *regs);
 static int sendto_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	struct task_struct *task = ri->task;
-	void *stack = regs->di;
+	//void *stack = regs->di;
 	int size = regs->si;
-	int fd;
-	struct sockaddr_in *addr;
-	int size_addr;
-	int *address = regs->di;
+	int *fd;
+	struct sockaddr_in addr;
+	int *size_addr;
+	int i=0;
+	//int *address = regs->di;
 
 	if(application_name == NULL)
 		return 1;
@@ -47,29 +48,38 @@ static int sendto_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 	if(strcmp(task->comm,"udp_client")!=0)
 		return 1;
 
-	memcpy(&fd,*address,4);
-	printk(KERN_INFO "fd = %d", fd);
-/*
+	//memcpy(&fd,address,4);
+	fd = regs->di;
+	printk(KERN_INFO "address of fd %p and value of fd %d",fd,*fd);
+	printk(KERN_INFO "address of di %p",regs->di);
+	//printk(KERN_INFO "fd = %d", fd);
+	printk(KERN_INFO "size = %d ", size);
+	
 	if(size == 24){
-		memcpy(&size_addr,*(stack+size),4);
-		memcpy(addr,*(stack+size-4),size_addr);
-		printk(KERN_INFO "port = %d",ntohs(addr->sin_port));
+		int *from_addr = regs->di + 16;
+		size_addr = (regs->di + size - 4);
+		printk(KERN_INFO "size_addr value %d ", *size_addr);
+		memcpy(&addr,*from_addr,*size_addr);
+		printk(KERN_INFO "family %hu",addr.sin_family);
+		printk(KERN_INFO "port = %hu",ntohs(addr.sin_port));
 	}
-*/
+
 	return 0;
 }
 static int sendto_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
+	/*
 	int retval = regs_return_value(regs);
 	if(retval > 0)
 	{
 
-	}
+	}*/
+
 	return 0;
 }
 
 static int recvfrom_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
-{
+{	/*
 	struct task_struct *task = ri->task;
 	void *stack = regs->di;
 	int size = regs->si;
@@ -86,6 +96,7 @@ static int recvfrom_entry_handler(struct kretprobe_instance *ri, struct pt_regs 
 
 	memcpy(&fd,*address,4);
 	printk(KERN_INFO "fd = %d", fd);
+	*/
 /*
 	if(size == 24){
 		memcpy(&size_addr,*(stack+size),4);
@@ -96,23 +107,24 @@ static int recvfrom_entry_handler(struct kretprobe_instance *ri, struct pt_regs 
 	return 0;
 }
 static int recvfrom_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
-{
+{	/*
 	int retval = regs_return_value(regs);
 	if(retval > 0)
 	{
 
 	}
+*/
 	return 0;
 }
 
 
 static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
-{
+{/*
 	struct task_struct *task = ri->task;
 	struct cell *my_data = (struct cell *)ri->data;
-	/*void *stack = (void *)regs->bp;
+	void *stack = (void *)regs->bp;
 	struct socket *socket = stack+8;
-*/
+
 	struct file *filp = regs->bx;
 	struct inode *inode = regs->ax;
 	struct socket *socket = NULL;
@@ -122,7 +134,7 @@ static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *re
 
 	if(strcmp(task->comm,application_name)!=0)
 		return 1;
-
+*/
 	/*socket = sockfd_lookup(regs->ax,&err);
 	if(err !=-ENOTSOCK && socket != NULL)
 	{
@@ -136,23 +148,26 @@ static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *re
 /*	printk(KERN_INFO "sport %d dport %d " ,ntohs(inet_sk(socket->sk)->sport),ntohs(inet_sk(socket->sk)->dport));
 	my_data->fd = regs->ax;
 */
-
+/*
 	socket = (struct socket *)filp->private_data;
 	printk(KERN_INFO "close_sock entry %s",task->comm);
 	printk(KERN_INFO "src port %d and dst port %d",ntohs(inet_sk(socket->sk)->sport),ntohs(inet_sk(socket->sk)->dport));
 
 	//print_regs("close entry",regs);
+*/
 	return 0;
 }
 
 static int close_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
-	int retval = regs_return_value(regs);
+/*	int retval = regs_return_value(regs);
 	struct task_struct *task = ri->task;
 	struct cell *my_data = (struct cell *)ri->data;
 
 	//print_regs("close_ret",regs);
+
 	printk(KERN_INFO "close_sock ret %s",task->comm);
+*/
 /*
 	if(retval == 0)
 		deletePort(getPort(my_data->fd,my_data->direction));
