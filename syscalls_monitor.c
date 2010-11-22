@@ -35,8 +35,9 @@ static int sendto_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 {
 	struct task_struct *task = ri->task;
 	int size = regs->si;
-	//int *fd;
+	int *fd;
 	struct sockaddr_in *addr;
+	struct cell *my_data = ri->data;
 	//int *size_addr;
 
 	if(application_name == NULL)
@@ -45,27 +46,30 @@ static int sendto_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 	if(strcmp(task->comm,"udp_client")!=0)
 		return 1;
 
-	//fd = regs->di;
+	fd = regs->di;
 	//printk(KERN_INFO "address of fd %p and value of fd %d",fd,*fd);
 	//printk(KERN_INFO "size = %d ", size);
-	printk(KERN_INFO "sendto entry point");
+	//printk(KERN_INFO "sendto entry point");
 	if(size == 24){
 		const int *from_addr = regs->di + 16;
 		//size_addr = (regs->di + size - 4);
 		addr = *from_addr;
-		insertPort(ntohs(addr->sin_port));
+		//insertPort(ntohs(addr->sin_port));
+		//insertPort(getPort(*fd,0));
+		my_data->fd = *fd;
 	}
 
 	return 0;
 }
 static int sendto_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
-	/*
+	
 	int retval = regs_return_value(regs);
+	struct cell *my_data = ri->data;
 	if(retval > 0)
 	{
-
-	}*/
+		insertPort(getPort(my_data->fd,0));
+	}
 
 	return 0;
 }
@@ -73,6 +77,7 @@ static int sendto_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 static int recvfrom_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {	
 	struct task_struct *task = ri->task;
+	struct cell *my_data = ri->data;
 	int size = regs->si;
 	int *fd;
 	struct sockaddr_in *addr;
@@ -87,25 +92,28 @@ static int recvfrom_entry_handler(struct kretprobe_instance *ri, struct pt_regs 
 
 	printk(KERN_INFO "recvfrom entry point");
 	fd = regs->di;
-	printk(KERN_INFO "fd = %d", *fd);
+//	printk(KERN_INFO "fd = %d", *fd);
 	
 
 	if(size == 24){
 		address = regs->di + 16;
 		addr = *address;
-		printk(KERN_INFO "port = %hu",ntohs(addr->sin_port));
+		//printk(KERN_INFO "port = %hu",ntohs(addr->sin_port));
+		my_data->fd = *fd;
+		//insertPort(getPort(*fd,0));
 	}
 
 	return 0;
 }
 static int recvfrom_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
-{	/*
+{	
 	int retval = regs_return_value(regs);
+	struct cell *my_data = ri->data;
 	if(retval > 0)
 	{
-
+		insertPort(getPort(my_data->fd,0));
 	}
-*/
+
 	return 0;
 }
 
@@ -214,6 +222,8 @@ static int bind_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 static int connect_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	struct task_struct *task = ri->task;
+	struct cell *my_data = ri->data;
+	int fd = regs->ax;
 
 	if(!current->mm)
 		return 1;
@@ -224,18 +234,21 @@ static int connect_entry_handler(struct kretprobe_instance *ri, struct pt_regs *
 
 	if(strcmp(task->comm,application_name)!=0)
 		return 1;
-#ifdef DEBUG_D
-	print_regs("connect", regs);
-#endif
+
+	my_data->fd = fd;
+
 	return 0;
 }
 
 static int connect_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	int retval = regs_return_value(regs);
+	struct cell *my_data = ri->data;
+	int fd = my_data->fd;
+
 	if(retval > 0)
 	{
-		//TODO: get the data and insert it into the list
+		insertPort(getPort(fd,0));
 	}
 	return 0;
 }
