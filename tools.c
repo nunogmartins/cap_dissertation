@@ -39,9 +39,8 @@ struct inode getInodeFromFd(unsigned int fd)
 }
 
 
-struct short getPortFromInode()
+short getPortFromInode()
 {
-	
 	return -1;
 }
 
