@@ -16,7 +16,7 @@
 
 #include "pcap_monitoring.h"
 
-struct inode getInodeFromFd(unsigned int fd)
+struct inode *getInodeFromFd(unsigned int fd)
 {
 	struct inode *d_inode = NULL;
 	struct file *f = NULL;
