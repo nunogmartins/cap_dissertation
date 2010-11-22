@@ -122,12 +122,12 @@ static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *re
 {
 	struct task_struct *task = ri->task;
 	struct cell *my_data = (struct cell *)ri->data;
-	void *stack = (void *)regs->bp;
-	struct socket *socket = stack+8;
+	//void *stack = (void *)regs->bp;
+	//struct socket *socket = stack+8;
 
-	struct file *filp = regs->bx;
-	struct inode *inode = regs->ax;
-	struct socket *socket = NULL;
+//	struct file *filp = regs->bx;
+//	struct inode *inode = regs->ax;
+//	struct socket *socket = NULL;
 	
 	if(!current->mm)
 		return 1;
@@ -335,7 +335,7 @@ static int socket_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 	//int family = regs->cx;
 	int type = regs->dx;
 	int domain = regs->ax;
-	struct cell *my_data = (struct cell *)ri->data;
+	//struct cell *my_data = (struct cell *)ri->data;
 
 	if(!current->mm)
 		return 1;
@@ -372,7 +372,7 @@ static int socket_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 static int socket_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	int retval = regs_return_value(regs);
-	struct cell *my_cell = (struct cell *)ri->data;
+	//struct cell *my_data = (struct cell *)ri->data;
 	/*int family = -1;
 	int type = -1;
 	int domain = -1;
