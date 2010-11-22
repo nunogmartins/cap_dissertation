@@ -257,10 +257,10 @@ static int accept_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 {
 	struct task_struct *task = ri->task;
 	//int server_fd = regs->ax;
-	void * sockaddr_addr = (void *)regs->dx;
-	struct sockaddr addr;
-	void * clilen_addr = (void *)regs->cx;
-	size_t clilen = 0;
+	//void * sockaddr_addr = (void *)regs->dx;
+	//struct sockaddr addr;
+	//void * clilen_addr = (void *)regs->cx;
+	//size_t clilen = 0;
 
 	//struct cell *my_data = (struct cell *)ri->data;
 
@@ -273,12 +273,10 @@ static int accept_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 	if(strcmp(task->comm,application_name)!=0)
 		return 1;
 
-	memcpy(&clilen,clilen_addr,(size_t)4);
+/*	memcpy(&clilen,clilen_addr,(size_t)4);
 	memcpy(&addr,sockaddr_addr,(size_t)clilen);
-#ifdef DEBUG_D
 	printk(KERN_INFO "server fd %d and clilen %d ",server_fd,clilen);
-#endif
-
+*/
 
 	return 0;
 }
@@ -286,10 +284,10 @@ static int accept_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 {
 	int retval = regs_return_value(regs);
 //	int i=-1;
-	void *stack = (void *)regs->di;
-	int server_fd = -1;
-	struct sockaddr_in addr;
-	long pointer = -1;
+//	void *stack = (void *)regs->di;
+//	int server_fd = -1;
+//	struct sockaddr_in addr;
+//	long pointer = -1;
 	//struct socket *socket = NULL;
 	//int err;
 
@@ -300,10 +298,11 @@ static int accept_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 		printk(KERN_INFO "i=%d stack value =%p ", i,value);
 	}
 */
-	memcpy(&server_fd,(void *)(stack-24),4);
-	memcpy(&pointer,(void*)(stack-20),4);
-	memcpy(&addr,(void*)(pointer),16);
-	printk(KERN_INFO "accept ret");
+//	memcpy(&server_fd,(void *)(stack-24),4);
+//	memcpy(&pointer,(void*)(stack-20),4);
+//	memcpy(&addr,(void*)(pointer),16);
+//	printk(KERN_INFO "accept ret");
+
 	if(retval > 0)
 	{
 		/*
@@ -317,15 +316,14 @@ static int accept_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 
 		}*/
 		//insertPort(htons(addr.sin_port));
-		insertPort(getPort(retval,1));
+		insertPort(getPort(retval,0));
 
 	}
-#ifdef DEBUG_D
+/*
 	printk(KERN_INFO "to port %d ",htons(addr.sin_port));
 	printk(KERN_INFO "accept returned file descriptor %d",retval);
 	print_regs("accept",regs);
-#endif
-
+*/
 
 	return 0;
 }
@@ -336,6 +334,7 @@ static int socket_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 	//int family = regs->cx;
 	int type = regs->dx;
 	int domain = regs->ax;
+	struct cell *my_data = ri->data;
 
 	if(!current->mm)
 		return 1;
@@ -348,6 +347,13 @@ static int socket_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 		{
 			if(strcmp(task->comm,application_name)!=0)
 				return 1;
+			else
+				{
+					//ToDo: add a socket to cell with tcp
+					//and which version so that ret can 
+					// use it 
+					//my_data->
+				}
 		}else
 			return 1;
 	}
@@ -365,7 +371,8 @@ static int socket_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 static int socket_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	int retval = regs_return_value(regs);
-	int family = -1;
+	struct cell *my_cell = ri->data;
+	/*int family = -1;
 	int type = -1;
 	int domain = -1;
 	void *stack = (void *)regs->bp;
@@ -373,7 +380,7 @@ static int socket_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 	memcpy(&domain,stack-36,4);
 	memcpy(&type,stack-32,4);
 	memcpy(&family,stack-28,4);
-
+*/
 	/*for(i=0;i <= 36 ; i+=4)
 	{
 		int value = -1;
@@ -384,6 +391,7 @@ static int socket_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 	if(retval > 0)
 	{
 		//TODO: add this file descriptor to the system
+		//my_data-> ... something
 	}
 #ifdef DEBUG_D
 	printk(KERN_INFO "domain %d type %d family %d",domain,type, family);
