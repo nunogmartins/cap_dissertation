@@ -37,7 +37,7 @@ static int sendto_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 	int size = regs->si;
 	int *fd;
 	struct sockaddr_in *addr;
-	struct cell *my_data = ri->data;
+	struct cell *my_data = (struct cell *)ri->data;
 	//int *size_addr;
 
 	if(application_name == NULL)
@@ -65,7 +65,7 @@ static int sendto_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 {
 	
 	int retval = regs_return_value(regs);
-	struct cell *my_data = ri->data;
+	struct cell *my_data = (struct cell *)ri->data;
 	if(retval > 0)
 	{
 		insertPort(getPort(my_data->fd,0));
@@ -77,7 +77,7 @@ static int sendto_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 static int recvfrom_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {	
 	struct task_struct *task = ri->task;
-	struct cell *my_data = ri->data;
+	struct cell *my_data = (struct cell *)ri->data;
 	int size = regs->si;
 	int *fd;
 	struct sockaddr_in *addr;
@@ -108,7 +108,7 @@ static int recvfrom_entry_handler(struct kretprobe_instance *ri, struct pt_regs 
 static int recvfrom_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {	
 	int retval = regs_return_value(regs);
-	struct cell *my_data = ri->data;
+	struct cell *my_data = (struct cell*)ri->data;
 	if(retval > 0)
 	{
 		insertPort(getPort(my_data->fd,0));
@@ -119,7 +119,7 @@ static int recvfrom_ret_handler(struct kretprobe_instance *ri, struct pt_regs *r
 
 
 static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
-{/*
+{
 	struct task_struct *task = ri->task;
 	struct cell *my_data = (struct cell *)ri->data;
 	void *stack = (void *)regs->bp;
@@ -134,7 +134,7 @@ static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *re
 
 	if(strcmp(task->comm,application_name)!=0)
 		return 1;
-*/
+
 	/*socket = sockfd_lookup(regs->ax,&err);
 	if(err !=-ENOTSOCK && socket != NULL)
 	{
@@ -160,14 +160,14 @@ static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *re
 
 static int close_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
-/*	int retval = regs_return_value(regs);
+	int retval = regs_return_value(regs);
 	struct task_struct *task = ri->task;
 	struct cell *my_data = (struct cell *)ri->data;
 
 	//print_regs("close_ret",regs);
 
 	printk(KERN_INFO "close_sock ret %s",task->comm);
-*/
+
 /*
 	if(retval == 0)
 		deletePort(getPort(my_data->fd,my_data->direction));
@@ -222,7 +222,7 @@ static int bind_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 static int connect_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	struct task_struct *task = ri->task;
-	struct cell *my_data = ri->data;
+	struct cell *my_data =(struct cell *) ri->data;
 	int fd = regs->ax;
 
 	if(!current->mm)
@@ -243,7 +243,7 @@ static int connect_entry_handler(struct kretprobe_instance *ri, struct pt_regs *
 static int connect_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	int retval = regs_return_value(regs);
-	struct cell *my_data = ri->data;
+	struct cell *my_data = (struct cell*)ri->data;
 	int fd = my_data->fd;
 
 	if(retval > 0)
@@ -262,7 +262,7 @@ static int accept_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 	//void * clilen_addr = (void *)regs->cx;
 	//size_t clilen = 0;
 
-	//struct cell *my_data = (struct cell *)ri->data;
+	struct cell *my_data = (struct cell *)ri->data;
 
 	if(!current->mm)
 		return 1;
@@ -283,6 +283,7 @@ static int accept_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 static int accept_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	int retval = regs_return_value(regs);
+	struct cell *my_data = (struct cell *)ri->data;
 //	int i=-1;
 //	void *stack = (void *)regs->di;
 //	int server_fd = -1;
@@ -334,7 +335,7 @@ static int socket_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 	//int family = regs->cx;
 	int type = regs->dx;
 	int domain = regs->ax;
-	struct cell *my_data = ri->data;
+	struct cell *my_data = (struct cell *)ri->data;
 
 	if(!current->mm)
 		return 1;
@@ -371,7 +372,7 @@ static int socket_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 static int socket_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	int retval = regs_return_value(regs);
-	struct cell *my_cell = ri->data;
+	struct cell *my_cell = (struct cell *)ri->data;
 	/*int family = -1;
 	int type = -1;
 	int domain = -1;
