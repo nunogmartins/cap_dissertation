@@ -39,7 +39,7 @@ struct inode *getInodeFromFd(unsigned int fd)
 }
 
 
-short getPortFromInode()
+short getPortFromInode(void)
 {
 	return -1;
 }
