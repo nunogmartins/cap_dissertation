@@ -1,4 +1,5 @@
 #include <linux/kernel.h>
+#include <linux/module.h>
 #include <linux/rbtree.h>
 #include "table_port.h"
 #include "portsDB.h"
@@ -10,8 +11,14 @@ extern struct rb_root db;
 
 int insertPort(int port)
 {
+	int ret;
+	struct portInfo *p = NULL;
 	printk(KERN_INFO "inserting port %d", port);
-	my_insert(&db,port);
+
+	p = kmalloc(sizeof(*p),GFP_KERNEL);
+	p->port = port;
+
+	ret = my_insert(&db,p);
 	return -ENOTIMPLEMENTED;
 }
 

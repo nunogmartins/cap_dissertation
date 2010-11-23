@@ -6,13 +6,10 @@
  */
 #include <linux/kernel.h>
 #include <linux/rbtree.h>
+#include "portsDB.h"
 
 struct rb_root db = RB_ROOT;
 
-struct portInfo{
-	struct rb_node node;
-	int port;
-};
 /*
  * returns NULL if there isn't that port int the tree
  */

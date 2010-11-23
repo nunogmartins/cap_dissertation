@@ -8,6 +8,11 @@
 #ifndef PORTSDB_H_
 #define PORTSDB_H_
 
+struct portInfo{
+	struct rb_node node;
+	int port;
+};
+
 struct portInfo *my_search(struct rb_root *root,int port);
 int my_insert(struct rb_root *root, struct portInfo *port);
 void my_erase(struct rb_root *root, int port);
