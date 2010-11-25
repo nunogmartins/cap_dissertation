@@ -1,1 +1,5 @@
 This is going to be the main branch of the modules i will develop for my dissertation.
+
+Knowing that in inet_sock structure, the field num is the local port, i can put everything in for of my local port that is what i am interested in.
+
+So what i want to do is to monitor the application monitoring what localports that application is using, for that i use dynamic instrumentation of the linux kernel. This instrumentation is made possible using KProbes.
