@@ -39,9 +39,21 @@ struct inode *getInodeFromFd(unsigned int fd)
 }
 
 
-short getPortFromInode(void)
+unsigned short getPortFromInode(struct file *f,struct inode *inode)
 {
-	return -1;
+	struct socket *socket = NULL;
+	if(inode)
+	{
+		if(S_ISSOCK(inode->i_mode))
+		{
+			socket = f->private_data;
+			return ntohs(inet_sk(socket->sk)->sport) ;
+		}
+	}
+	else
+		return 0;
+
+	return 0;
 }
 
 /*
