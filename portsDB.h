@@ -16,5 +16,5 @@ struct portInfo{
 struct portInfo *my_search(struct rb_root *root,int port);
 int my_insert(struct rb_root *root, struct portInfo *port);
 void my_erase(struct rb_root *root, int port);
-
+void printAll(struct rb_root *tree);
 #endif /* PORTSDB_H_ */

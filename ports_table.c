@@ -19,6 +19,7 @@ int insertPort(int port)
 	p->port = port;
 
 	ret = my_insert(&db,p);
+	printAll(&db);
 	return -ENOTIMPLEMENTED;
 }
 

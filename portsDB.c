@@ -71,3 +71,12 @@ void my_erase(struct rb_root *root, int port)
 		rb_erase(&data->node,root);
 	}
 }
+
+void printAll(struct rb_root *tree)
+{
+	struct rb_node *node;
+	for(node = rb_first(tree); node ; node = rb_next(node))
+	{
+		printk(KERN_INFO "port = %d", rb_entry(node,struct portInfo, node)->port);
+	}
+}

@@ -90,5 +90,6 @@ struct inet_sock *i_sock = NULL;
 	if(socket == NULL)
 		return 0;
 
-	return direction == 0 ? ntohs(inet_sk(socket->sk)->sport) : ntohs(inet_sk(socket->sk)->dport);
+	return inet_sk(socket->sk)->num;
+	//return direction == 0 ? ntohs(inet_sk(socket->sk)->sport) : ntohs(inet_sk(socket->sk)->dport);
 }
