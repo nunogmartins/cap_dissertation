@@ -6,11 +6,20 @@
 static struct dentry *my_debug_dir = NULL;
 extern pid_t monitor_pid;
 
-
+extern void initializeTreeWithTaskInfo(pid_t pid);
 
 static ssize_t pid_write(struct file *file, const char __user *user_buf,size_t size, loff_t *ppos)
 {
-	printk(KERN_INFO "heypidddddddddddddd");
+	printk(KERN_INFO "pid_write function called");
+
+	/*
+	 * ToDo: actualizar todas as estruturas necessárias ao funcionamento da monitorização inclusivé
+	 * o pid
+	 * Esta função irá fazer o parsing do pid
+	 * Se for -1 irá limpar todas as estruturas, se for diferente de -1 reinicia o processo de
+	 * monitorização
+	 *
+	 */
 	return size;
 }
 

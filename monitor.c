@@ -15,6 +15,8 @@ char *application_name = "server";
 
 pid_t monitor_pid;
 
+extern struct rb_root db;
+
 extern int init_debug(void);
 extern void destroy_debug(void);
 
@@ -132,15 +134,17 @@ static void __exit monitor_exit(void)
 		kfree(kretprobes);
 }
 
-void initializeTreeWithTaskInfo(struct task_struct *task, pid_t pid)
+void initializeTreeWithTaskInfo(pid_t new_pid)
 {
 	struct task_struct *t;
+	pid = new_pid;
 
 	for_each_process(t)
 	{
-		if (t->pid == pid)
+		if (t->pid == new_pid)
 		{
-			//ToDo:
+			//ToDo: change all structures according to pid
+			//ToDo: get all ports from the task that has new_pid
 
 			break;
 		}
