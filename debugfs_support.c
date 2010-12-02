@@ -11,7 +11,7 @@ extern pid_t monitor_pid;
 static ssize_t pid_write(struct file *file, const char __user *user_buf,size_t size, loff_t *ppos)
 {
 	printk(KERN_INFO "heypidddddddddddddd");
-	return 0;
+	return size;
 }
 
 
