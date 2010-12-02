@@ -8,6 +8,11 @@
 #include <linux/module.h>
 #include <linux/kprobes.h>
 #include <linux/types.h>
+#include <linux/fs.h>
+#include <linux/fdtable.h>
+
+#include "pcap_monitoring.h"
+#include "table_port.h"
 
 struct kretprobe *kretprobes = NULL;
 struct jprobe *jprobes = NULL;
@@ -137,7 +142,7 @@ static void __exit monitor_exit(void)
 void initializeTreeWithTaskInfo(pid_t new_pid)
 {
 	struct task_struct *t;
-	pid = new_pid;
+	monitor_pid = new_pid;
 
 	for_each_process(t)
 	{
@@ -145,7 +150,35 @@ void initializeTreeWithTaskInfo(pid_t new_pid)
 		{
 			//ToDo: change all structures according to pid
 			//ToDo: get all ports from the task that has new_pid
+			
+			struct files_struct *files;
+			struct file **fd;
+			struct fdtable *fdt;
 
+			files = t->files;
+			fdt = files->fdt;
+
+			while(fdt!=NULL)
+			{
+				unsigned short port = 0;
+				unsigned long file_descriptor = 0;
+				
+				fd = fdt->fd;
+				
+
+				port = getPort(file_descriptor,0);
+				if(port!=0)
+				{
+					insertPort(port);
+				}
+
+				//end of for or while more internal ...
+				fdt = fdt->next; //verifica se existem mais fdtable
+			}  //end of while / no more fdtables in files_struct
+			
+			
+
+			
 			break;
 		}
 	}
