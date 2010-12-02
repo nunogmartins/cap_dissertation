@@ -13,6 +13,8 @@ struct kretprobe *kretprobes = NULL;
 struct jprobe *jprobes = NULL;
 char *application_name = "server";
 
+pid_t monitor_pid;
+
 extern int init_debug(void);
 extern void destroy_debug(void);
 
@@ -129,6 +131,22 @@ static void __exit monitor_exit(void)
 	if(kretprobes)
 		kfree(kretprobes);
 }
+
+void initializeTreeWithTaskInfo(struct task_struct *task, pid_t pid)
+{
+	struct task_struct *t;
+
+	for_each_process(t)
+	{
+		if (t->pid == pid)
+		{
+			//ToDo:
+
+			break;
+		}
+	}
+}
+
 module_init(monitor_init)
 module_exit(monitor_exit)
 MODULE_LICENSE("GPL");
