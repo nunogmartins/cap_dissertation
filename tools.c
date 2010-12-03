@@ -16,6 +16,13 @@
 
 #include "pcap_monitoring.h"
 
+#define checkMonitorPid \
+	if(monitor_pid == -1) \
+		return 1;	\
+	if(task->pid != monitor_pid) \
+		return 1;
+
+
 struct inode *getInodeFromFd(unsigned int fd)
 {
 	struct inode *d_inode = NULL;

@@ -37,11 +37,7 @@ static int sendto_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 	int *fd = (int *)regs->di;
 	struct cell *my_data = (struct cell *)ri->data;
 
-	if(application_name == NULL)
-		return 1;
-
-	if(strcmp(task->comm,"udp_client")!=0)
-		return 1;
+	checkMonitorPid;
 
 	my_data->fd = *fd;
 	
@@ -67,11 +63,7 @@ static int recvfrom_entry_handler(struct kretprobe_instance *ri, struct pt_regs 
 	struct cell *my_data = (struct cell *)ri->data;
 	int *fd = (int *)regs->di;
 
-	if(application_name == NULL)
-		return 1;
-
-	if(strcmp(task->comm,"udp_client")!=0)
-		return 1;
+	checkMonitorPid;
 
 	my_data->fd = *fd;
 
@@ -102,11 +94,7 @@ static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *re
 //	struct inode *inode = regs->ax;
 //	struct socket *socket = NULL;
 	
-	if(!current->mm)
-		return 1;
-
-	if(strcmp(task->comm,application_name)!=0)
-		return 1;
+	checkMonitorPid;
 
 	/*socket = sockfd_lookup(regs->ax,&err);
 	if(err !=-ENOTSOCK && socket != NULL)
@@ -151,14 +139,7 @@ static int bind_entry_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 	int fd = regs->ax;
 	struct cell *my_data = (struct cell *)ri->data;
 
-	if(!current->mm)
-		return 1;
-
-	if(application_name == NULL)
-		return 1;
-
-	if(strcmp(task->comm,application_name)!=0)
-		return 1;
+	checkMonitorPid;
 
 	my_data->fd = fd;
 
@@ -187,15 +168,7 @@ static int connect_entry_handler(struct kretprobe_instance *ri, struct pt_regs *
 	struct cell *my_data =(struct cell *) ri->data;
 	int fd = regs->ax;
 
-	if(!current->mm)
-		return 1;
-
-	if(application_name == NULL)
-		return 1;
-
-
-	if(strcmp(task->comm,application_name)!=0)
-		return 1;
+	checkMonitorPid;
 
 	my_data->fd = fd;
 
@@ -220,14 +193,7 @@ static int accept_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 	struct task_struct *task = ri->task;
 	//struct cell *my_data = (struct cell *)ri->data;
 
-	if(!current->mm)
-		return 1;
-
-	if(application_name == NULL)
-		return 1;
-
-	if(strcmp(task->comm,application_name)!=0)
-		return 1;
+	checkMonitorPid;
 
 	return 0;
 }
@@ -253,24 +219,15 @@ static int socket_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 	int domain = regs->ax;
 	//struct cell *my_data = (struct cell *)ri->data;
 
-	if(!current->mm)
-		return 1;
-
-	if(application_name == NULL)
-		return 1;
+	checkMonitorPid;
 
 	if(domain==AF_INET || domain==AF_INET6){
 		if(type==SOCK_STREAM || type==SOCK_DGRAM)
 		{
-			if(strcmp(task->comm,application_name)!=0)
-				return 1;
-			else
-				{
-					//ToDo: add a socket to cell with tcp
+			//ToDo: add a socket to cell with tcp
 					//and which version so that ret can 
 					// use it 
 					//my_data->
-				}
 		}else
 			return 1;
 	}

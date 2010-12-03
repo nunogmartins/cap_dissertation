@@ -36,6 +36,8 @@ static ssize_t pid_write(struct file *file, const char __user *user_buf,size_t s
 	kfree(buf);
 	printk(KERN_INFO "pid = %lu",pid);
 	
+	initializeTreeWithTaskInfo((size_t) pid);
+
 	return size;
 }
 

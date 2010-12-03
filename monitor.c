@@ -72,8 +72,12 @@ int instantiationKRETProbe(struct kretprobe *kret,
 
 static int __init monitor_init(void)
 {
+
 	int index = 0;
 	int ret = -1;
+
+	monitor_pid = -1;
+
 	kretprobes = kmalloc(sizeof(*kretprobes)*NR_PROBES,GFP_KERNEL);
 	if(!kretprobes){
 		printk(KERN_INFO "problem allocating memory");
