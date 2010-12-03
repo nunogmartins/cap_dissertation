@@ -30,6 +30,7 @@ extern int instantiationKRETProbe(struct kretprobe *kret,
 
 extern char *application_name;
 extern void print_regs(const char *function, struct pt_regs *regs);
+extern pid_t monitor_pid;
 
 static int sendto_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
@@ -37,7 +38,7 @@ static int sendto_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 	int *fd = (int *)regs->di;
 	struct cell *my_data = (struct cell *)ri->data;
 
-	checkMonitorPid;
+	CHECK_MONITOR_PID;
 
 	my_data->fd = *fd;
 	
@@ -63,7 +64,7 @@ static int recvfrom_entry_handler(struct kretprobe_instance *ri, struct pt_regs 
 	struct cell *my_data = (struct cell *)ri->data;
 	int *fd = (int *)regs->di;
 
-	checkMonitorPid;
+	CHECK_MONITOR_PID;
 
 	my_data->fd = *fd;
 
@@ -94,7 +95,7 @@ static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *re
 //	struct inode *inode = regs->ax;
 //	struct socket *socket = NULL;
 	
-	checkMonitorPid;
+	CHECK_MONITOR_PID;
 
 	/*socket = sockfd_lookup(regs->ax,&err);
 	if(err !=-ENOTSOCK && socket != NULL)
@@ -139,7 +140,7 @@ static int bind_entry_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 	int fd = regs->ax;
 	struct cell *my_data = (struct cell *)ri->data;
 
-	checkMonitorPid;
+	CHECK_MONITOR_PID;
 
 	my_data->fd = fd;
 
@@ -168,7 +169,7 @@ static int connect_entry_handler(struct kretprobe_instance *ri, struct pt_regs *
 	struct cell *my_data =(struct cell *) ri->data;
 	int fd = regs->ax;
 
-	checkMonitorPid;
+	CHECK_MONITOR_PID;
 
 	my_data->fd = fd;
 
@@ -193,7 +194,7 @@ static int accept_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 	struct task_struct *task = ri->task;
 	//struct cell *my_data = (struct cell *)ri->data;
 
-	checkMonitorPid;
+	CHECK_MONITOR_PID;
 
 	return 0;
 }
@@ -219,7 +220,7 @@ static int socket_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 	int domain = regs->ax;
 	//struct cell *my_data = (struct cell *)ri->data;
 
-	checkMonitorPid;
+	CHECK_MONITOR_PID;
 
 	if(domain==AF_INET || domain==AF_INET6){
 		if(type==SOCK_STREAM || type==SOCK_DGRAM)
