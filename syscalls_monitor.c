@@ -52,9 +52,10 @@ static int sendto_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 	
 	if(retval > 0)
 	{
+		printk(KERN_INFO "sendto retval > 0");
 		insertPort(getPort(my_data->fd,0));
-	}
-
+	}else
+		printk(KERN_INFO "sendto retval < 0");
 	return 0;
 }
 
@@ -77,8 +78,10 @@ static int recvfrom_ret_handler(struct kretprobe_instance *ri, struct pt_regs *r
 	
 	if(retval > 0)
 	{
+		printk(KERN_INFO"recvfrom retval > 0");
 		insertPort(getPort(my_data->fd,0));
-	}
+	}else
+		printk(KERN_INFO"recvfrom retval < 0");
 
 	return 0;
 }
