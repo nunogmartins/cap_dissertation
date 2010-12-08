@@ -47,7 +47,7 @@ unsigned short getPortFromInode(struct file *f,struct inode *inode)
 		if(S_ISSOCK(inode->i_mode))
 		{
 			socket = f->private_data;
-			return ntohs(inet_sk(socket->sk)->sport) ;
+			return ntohs(inet_sk(socket->sk)->inet_num) ;
 		}
 	}
 	else
@@ -90,6 +90,6 @@ struct inet_sock *i_sock = NULL;
 	if(socket == NULL)
 		return 0;
 
-	return inet_sk(socket->sk)->num;
+	return inet_sk(socket->sk)->inet_num;
 	//return direction == 0 ? ntohs(inet_sk(socket->sk)->sport) : ntohs(inet_sk(socket->sk)->dport);
 }

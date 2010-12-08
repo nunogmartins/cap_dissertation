@@ -4,12 +4,13 @@
  *  Created on: Nov 8, 2010
  *      Author: nuno
  */
-
+#include <linux/slab.h>
 #include <linux/module.h>
 #include <linux/kprobes.h>
 #include <linux/types.h>
 #include <linux/fs.h>
 #include <linux/fdtable.h>
+#include <linux/skbuff.h>
 
 #include "pcap_monitoring.h"
 #include "table_port.h"
@@ -20,16 +21,25 @@ char *application_name = "server";
 
 pid_t monitor_pid;
 
+/*
+* extern from linux kernel
+* net/core/filter.c
+*/
+
+extern unsigned int (*portExists)(u16 port, u32 address, u8 protocol); 
+unsigned int (*Backup_portExists)(u16 port, u32 address, u8 protocol); 
+
 extern struct rb_root db;
 
 extern int init_debug(void);
 extern void destroy_debug(void);
 
+extern int init_kretprobes_syscalls(int *index);
+
 /*extern int init_kretprobes_common(int *initial);
 extern int init_kretprobes_tcp(int *initial);
 extern int init_kretprobes_udp(int *initial);
 */
-extern int init_kretprobes_syscalls(int *index);
 
 #define NR_PROBES 7
 
@@ -68,6 +78,11 @@ int instantiationKRETProbe(struct kretprobe *kret,
 	       kret->kp.symbol_name, kret->kp.addr);
 
 	return ret;
+}
+
+unsigned int my_portExists(u16 port, u32 address, u8 protocol)
+{
+	return 1;
 }
 
 static int __init monitor_init(void)
@@ -113,6 +128,10 @@ static int __init monitor_init(void)
 	}
 
 	init_debug();
+	
+	Backup_portExists = portExists;
+	portExists = my_portExists;
+
 	return 0;
 
 problem:
@@ -141,6 +160,8 @@ static void __exit monitor_exit(void)
 
 	if(kretprobes)
 		kfree(kretprobes);
+
+	portExists = Backup_portExists;
 }
 
 void initializeTreeWithTaskInfo(pid_t new_pid)
