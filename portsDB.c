@@ -6,6 +6,8 @@
  */
 #include <linux/kernel.h>
 #include <linux/rbtree.h>
+#include <linux/types.h>
+
 #include "portsDB.h"
 
 struct rb_root db = RB_ROOT;
@@ -13,7 +15,7 @@ struct rb_root db = RB_ROOT;
 /*
  * returns NULL if there isn't that port int the tree
  */
-struct portInfo *my_search(struct rb_root *root,int port)
+struct portInfo *my_search(struct rb_root *root,u16 port)
 {
 	struct rb_node *node = root->rb_node;
 	struct portInfo *data = NULL;
@@ -62,7 +64,7 @@ int my_insert(struct rb_root *root, struct portInfo *port)
 }
 
 
-void my_erase(struct rb_root *root, int port)
+void my_erase(struct rb_root *root, u16 port)
 {
 	struct portInfo *data = my_search(root,port);
 
@@ -77,6 +79,6 @@ void printAll(struct rb_root *tree)
 	struct rb_node *node;
 	for(node = rb_first(tree); node ; node = rb_next(node))
 	{
-		printk(KERN_INFO "port = %d", rb_entry(node,struct portInfo, node)->port);
+		printk(KERN_INFO "port = %hu", rb_entry(node,struct portInfo, node)->port);
 	}
 }

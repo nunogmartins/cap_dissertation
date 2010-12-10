@@ -14,6 +14,7 @@
 
 #include "pcap_monitoring.h"
 #include "table_port.h"
+#include "portsDB.h"
 
 struct kretprobe *kretprobes = NULL;
 struct jprobe *jprobes = NULL;
@@ -82,7 +83,8 @@ int instantiationKRETProbe(struct kretprobe *kret,
 
 unsigned int my_portExists(u16 port, u32 address, u8 protocol)
 {
-	return 1;
+	printk(KERN_INFO "protocol %hu", protocol);
+	return 96;
 }
 
 static int __init monitor_init(void)

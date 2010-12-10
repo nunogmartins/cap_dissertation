@@ -8,13 +8,17 @@
 #ifndef PORTSDB_H_
 #define PORTSDB_H_
 
+#include <linux/types.h>
+
 struct portInfo{
 	struct rb_node node;
-	int port;
+	u16 port;
+	u32 address;
+	u8 protocol;
 };
 
-struct portInfo *my_search(struct rb_root *root,int port);
+struct portInfo *my_search(struct rb_root *root,u16 port);
 int my_insert(struct rb_root *root, struct portInfo *port);
-void my_erase(struct rb_root *root, int port);
+void my_erase(struct rb_root *root, u16 port);
 void printAll(struct rb_root *tree);
 #endif /* PORTSDB_H_ */
