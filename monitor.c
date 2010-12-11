@@ -96,10 +96,26 @@ unsigned int my_portExists(struct packetInfo *pi)
 
 	sentinel_src = my_search(&db,pi->srcPort);
 
+	if(sentinel_src != NULL)
+	{
+		if(sentinel_src->address == pi->srcAddr && sentinel_src->protocol == pi->proto)
+		{
+			return 1;
+		}
+	}
+
+	sentinel_dst = my_search(&db,pi->dstPort);
+
+	if(sentinel_dst != NULL)
+	{
+		if(sentinel_dst->address == pi->dstAddr && sentinel_dst->protocol == pi->proto)
+		{
+			return 1;
+		}
+	}
 
 
-
-	return 1;
+	return 0;
 
 
 /*
