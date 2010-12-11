@@ -13,6 +13,7 @@
 #include <linux/skbuff.h>
 #include <linux/tcp.h>
 #include <net/inet_sock.h>
+#include <linux/types.h>
 
 #include "pcap_monitoring.h"
 
@@ -39,7 +40,7 @@ struct inode *getInodeFromFd(unsigned int fd)
 }
 
 
-unsigned short getPortFromInode(struct file *f,struct inode *inode)
+u16 getPortFromInode(struct file *f,struct inode *inode)
 {
 	struct socket *socket = NULL;
 	if(inode)
@@ -61,7 +62,7 @@ unsigned short getPortFromInode(struct file *f,struct inode *inode)
  * int direction
  */
 
-unsigned short getPort(unsigned int fd,int direction)
+u16 getPort(unsigned int fd,int direction)
 {
 	struct file *f = NULL;
 	//int fput_needed;

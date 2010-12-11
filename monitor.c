@@ -89,8 +89,38 @@ int instantiationKRETProbe(struct kretprobe *kret,
 
 unsigned int my_portExists(struct packetInfo *pi)
 {
+	struct portInfo *sentinel_src = NULL;
+	struct portInfo *sentinel_dst = NULL;
+
 	printk(KERN_INFO "proto %hu src address %du dst address %du src port %hu dst port %hu", pi->proto,pi->srcAddr, pi->dstAddr,pi->srcPort, pi->dstPort );
+
+	sentinel_src = my_search(&db,pi->srcPort);
+
+
+
+
 	return 1;
+
+
+/*
+
+
+		if(sentinel != NULL)
+		{
+			if(address == sentinel->address && protocol == sentinel->protocol)
+			{
+				printk(KERN_INFO "porta %hu endereço %du protocolo %hu",port,address,protocol);
+			}
+			else
+				goto out;
+		}
+		else goto out;
+
+		return 65535;
+
+	out:
+		return 0;
+*/
 }
 
 static int __init monitor_init(void)
