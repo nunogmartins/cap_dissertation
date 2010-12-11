@@ -27,8 +27,14 @@ pid_t monitor_pid;
 * net/core/filter.c
 */
 
-extern unsigned int (*portExists)(u16 port, u32 address, u8 protocol); 
-unsigned int (*Backup_portExists)(u16 port, u32 address, u8 protocol); 
+struct packetInfo {
+	u8 proto;
+	u16 srcPort, dstPort;
+	u32 srcAddr, dstAddr;
+};
+
+extern unsigned int (*portExists)(struct packetInfo *pi); 
+unsigned int (*Backup_portExists)(struct packetInfo *pi); 
 
 extern struct rb_root db;
 
@@ -81,10 +87,10 @@ int instantiationKRETProbe(struct kretprobe *kret,
 	return ret;
 }
 
-unsigned int my_portExists(u16 port, u32 address, u8 protocol)
+unsigned int my_portExists(struct packetInfo *pi)
 {
-	printk(KERN_INFO "protocol %hu", protocol);
-	return 96;
+	printk(KERN_INFO "proto %hu src address %du dst address %du src port %hu dst port %hu", pi->proto,pi->srcAddr, pi->dstAddr,pi->srcPort, pi->dstPort );
+	return 1;
 }
 
 static int __init monitor_init(void)

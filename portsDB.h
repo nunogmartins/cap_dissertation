@@ -9,6 +9,7 @@
 #define PORTSDB_H_
 
 #include <linux/types.h>
+#include <linux/rbtree.h>
 
 struct portInfo{
 	struct rb_node node;
