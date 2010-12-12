@@ -8,6 +8,8 @@
 #ifndef PCAP_MONITORING_H_
 #define PCAP_MONITORING_H_
 
+#include <linux/types.h>
+
 #define CHECK_MONITOR_PID \
 	if(monitor_pid == -1) \
 		return 1;	\
@@ -22,7 +24,20 @@ struct cell{
 	int direction;
 };
 
+struct localPacketInfo{
+	u8 proto;
+	u16 port;
+	u32 address;
+};
+
+struct packetInfo {
+	u8 proto;
+	u16 srcPort, dstPort;
+	u32 srcAddr, dstAddr;
+};
+
 extern struct socket *sockfd_lookup(int fd, int *err);
 unsigned short getPort(unsigned int fd,int direction);
+struct localPacketInfo * getLocalPacketInfoFromFd(unsigned int fd);
 
 #endif /* PCAP_MONITORING_H_ */

@@ -94,3 +94,36 @@ struct inet_sock *i_sock = NULL;
 	return inet_sk(socket->sk)->inet_num;
 	//return direction == 0 ? ntohs(inet_sk(socket->sk)->sport) : ntohs(inet_sk(socket->sk)->dport);
 }
+
+
+struct localPacketInfo * getLocalPacketInfoFromFd(unsigned int fd)
+{
+	struct file *f = NULL;
+	struct socket *socket = NULL;
+	struct localPacketInfo *ret = NULL;
+
+	f = fget(fd);
+
+	if(f!=NULL)
+	{
+		struct dentry *dentry;
+		struct inode *d_inode;
+		fput(f);
+		dentry = f->f_dentry;
+		if(dentry !=NULL)
+		{
+			d_inode = dentry->d_inode;
+			if(S_ISSOCK(d_inode->i_mode))
+			{
+				socket = f->private_data;
+				ret = kmalloc(sizeof(struct localPacketInfo),GFP_KERNEL);
+				ret->port = inet_sk(socket->sk)->inet_num;
+				ret->address = inet_sk(socket->sk)->cork.addr;
+				ret->proto = inet_sk(socket_sk)->tos;
+				printk(KERN_INFO "local port %hu address %xu proto %hu",ret->port, ret->address, ret->proto);
+			}
+		}
+	}
+
+	return ret;
+}

@@ -1,6 +1,8 @@
 #ifndef TABLE_PORT_H
 #define TABLE_PORT_H
 
+#include "pcap_monitoring.h"
+
 #define ENOTIMPLEMENTED 255 
 /*struct entry {
 	unsigned short proto;
@@ -8,7 +10,7 @@
 	unsigned int fd;
 };
 */
-int insertPort(u16 port);
+int insertPort(struct localPacketInfo *lpi);
 int deletePort(u16 port);
 
 #endif
