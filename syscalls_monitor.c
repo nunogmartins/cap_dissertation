@@ -53,7 +53,7 @@ static int sendto_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 	if(retval > 0)
 	{
 		printk(KERN_INFO "sendto retval > 0");
-		insertPort(getPort(my_data->fd,0));
+		insertPort(getLocalPacketInfoFromFd(my_data->fd));
 	}else
 		printk(KERN_INFO "sendto retval < 0");
 	return 0;
@@ -79,7 +79,7 @@ static int recvfrom_ret_handler(struct kretprobe_instance *ri, struct pt_regs *r
 	if(retval > 0)
 	{
 		printk(KERN_INFO"recvfrom retval > 0");
-		insertPort(getPort(my_data->fd,0));
+		insertPort(getLocalPacketInfoFromFd(my_data->fd));
 	}else
 		printk(KERN_INFO"recvfrom retval < 0");
 
@@ -158,7 +158,7 @@ static int bind_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 	if(retval == 0)
 	{
 	//TODO: get the port from the data and insert
-		insertPort(getPort(my_data->fd,0));
+		insertPort(getLocalPacketInfoFromFd(my_data->fd));
 		//insertPort(my_data->port);
 	}
 
@@ -187,7 +187,7 @@ static int connect_ret_handler(struct kretprobe_instance *ri, struct pt_regs *re
 
 	if(retval > 0)
 	{
-		insertPort(getPort(fd,0));
+		insertPort(getLocalPacketInfoFromFd(fd));
 	}
 	return 0;
 }
@@ -209,7 +209,7 @@ static int accept_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 	if(retval > 0)
 	{
 		printk(KERN_INFO "acceptretval");
-		insertPort(getPort(retval,1));
+		insertPort(getLocalPacketInfoFromFd(retval));
 
 	}
 

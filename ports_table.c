@@ -6,20 +6,24 @@
 
 #include "table_port.h"
 #include "portsDB.h"
+#include "pcap_monitoring.h"
+
 /*
 * need to create a list with all ports in use
 */
 
 extern struct rb_root db;
 
-int insertPort(u16 port)
+int insertPort(struct localPacketInfo *lpi)
 {
 	int ret;
 	struct portInfo *p = NULL;
 	printk(KERN_INFO "inserting port %hu", port);
 
 	p = kmalloc(sizeof(*p),GFP_KERNEL);
-	p->port = port;
+	p->port = lpi->port;
+	p->address = lpi->address;
+	p->protocol = lpi->proto;
 
 	ret = my_insert(&db,p);
 	printAll(&db);
