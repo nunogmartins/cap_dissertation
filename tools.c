@@ -161,13 +161,16 @@ struct localPacketInfo * getLocalPacketInfoFromFile(struct file *f)
 				ret->port = inet_sk(socket->sk)->inet_num;
 				if(ret->port == inet_sk(socket->sk)->inet_sport)
 				{
-				ret->address = inet_sk(socket->sk)->inet_saddr;
-				ret->proto = inet_sk(socket->sk)->tos;
+					if(!inet_sk(socket_sk)->rcv_saddr)
+						ret->address = inet_sk(socket->sk)->inet_saddr;
+					else
+						ret->address = inet_sk(socket_sk)->rcv_saddr;
+
 				}else
 				{
-				ret->address = inet_sk(socket->sk)->inet_daddr;
-				ret->proto = inet_sk(socket->sk)->tos;
+					ret->address = inet_sk(socket->sk)->inet_daddr;
 				}
+				ret->proto = inet_sk(socket->sk)->tos;
 				printk(KERN_INFO "local port %hu addr 0x%x proto %hu",ret->port, ret->address, ret->proto);
 			}
 		}
