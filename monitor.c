@@ -237,7 +237,7 @@ void initializeTreeWithTaskInfo(pid_t new_pid)
 
 	for_each_process(t)
 	{
-		if (t->pid == new_pid)
+		if (t->pid == monitor_pid || t->real_parent->pid == monitor_pid)
 		{
 			//ToDo: change all structures according to pid
 			//ToDo: get all ports from the task that has new_pid
@@ -259,21 +259,18 @@ void initializeTreeWithTaskInfo(pid_t new_pid)
 				for(file_descriptor;file_descriptor < fdt->max_fds; file_descriptor++)
 				{
 					if(fd[file_descriptor] != NULL){
-						port = getPort(file_descriptor,0);
-						if(port!=0)
+						struct localPacketInfo *p = getLocalPacketInfoFromFd(file_descriptor);
+						if(p!=NULL)
 						{
-							//insertPort(port);
+							insertPort(p);
+							kfree(p); //it was allocated in localPacketInfo
 						}
 					}
 				}
 				//end of for or while more internal ...
 				fdt = fdt->next; //verifica se existem mais fdtable
 			}  //end of while / no more fdtables in files_struct
-			
-			
 
-			
-			break;
 		}
 	}
 }

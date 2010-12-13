@@ -18,7 +18,7 @@ int insertPort(struct localPacketInfo *lpi)
 {
 	int ret;
 	struct portInfo *p = NULL;
-	printk(KERN_INFO "inserting port %hu with address %du being %hu", lpi->port, lpi->address, lpi->proto);
+	printk(KERN_INFO "inserting port %hu with address 0x%x being %hu", lpi->port, lpi->address, lpi->proto);
 
 	p = kmalloc(sizeof(*p),GFP_KERNEL);
 	p->port = lpi->port;
