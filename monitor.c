@@ -96,16 +96,18 @@ unsigned int my_portExists(struct packetInfo *pi)
 	struct portInfo *sentinel_src = NULL;
 	struct portInfo *sentinel_dst = NULL;
 
-	printk(KERN_INFO "proto %hu src address %du dst address %du src port %hu dst port %hu", pi->proto,pi->srcAddr, pi->dstAddr,pi->srcPort, pi->dstPort );
+	printk(KERN_INFO "proto 0x%x srcadd 0x%x dstaddr 0x%x srcP %hu dstP %hu", pi->proto,pi->srcAddr, pi->dstAddr,pi->srcPort, pi->dstPort );
 
 	sentinel_src = my_search(&db,pi->srcPort);
 
 	if(sentinel_src != NULL)
 	{
+		printk(KERN_INFO "found port %hu",pi->srcPort);
 		if(sentinel_src->address == pi->srcAddr && sentinel_src->protocol == pi->proto)
 		{
 			return 1;
-		}
+		}else
+			return 1;
 	}
 
 	sentinel_dst = my_search(&db,pi->dstPort);
@@ -115,7 +117,8 @@ unsigned int my_portExists(struct packetInfo *pi)
 		if(sentinel_dst->address == pi->dstAddr && sentinel_dst->protocol == pi->proto)
 		{
 			return 1;
-		}
+		}else
+		return 1;
 	}
 
 

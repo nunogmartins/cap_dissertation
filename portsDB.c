@@ -37,7 +37,7 @@ struct portInfo *my_search(struct rb_root *root,u16 port)
 					return NULL;
 	}
 
-	return data;
+	return NULL;
 }
 
 int my_insert(struct rb_root *root, struct portInfo *port)
