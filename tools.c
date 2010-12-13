@@ -118,8 +118,15 @@ struct localPacketInfo * getLocalPacketInfoFromFd(unsigned int fd)
 				socket = f->private_data;
 				ret = kmalloc(sizeof(struct localPacketInfo),GFP_KERNEL);
 				ret->port = inet_sk(socket->sk)->inet_num;
-				ret->address = inet_sk(socket->sk)->cork.addr;
-				ret->proto = inet_sk(socket_sk)->tos;
+				if(ret->port == inet_sk(socket->sk)->inet_sport)
+				{
+				ret->address = inet_sk(socket->sk)->inet_saddr;
+				ret->proto = inet_sk(socket->sk)->tos;
+				}else
+				{
+				ret->address = inet_sk(socket->sk)->inet_daddr;
+				ret->proto = inet_sk(socket->sk)->tos;
+				}
 				printk(KERN_INFO "local port %hu address %xu proto %hu",ret->port, ret->address, ret->proto);
 			}
 		}
