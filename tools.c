@@ -104,6 +104,7 @@ struct localPacketInfo * getLocalPacketInfoFromFd(unsigned int fd)
 
 	f = fget(fd);
 
+	printk(KERN_INFO "f is null ? %s ", f == NULL ? "yes": "no");
 	if(f!=NULL)
 	{
 		struct dentry *dentry;
@@ -115,6 +116,7 @@ struct localPacketInfo * getLocalPacketInfoFromFd(unsigned int fd)
 			d_inode = dentry->d_inode;
 			if(S_ISSOCK(d_inode->i_mode))
 			{
+				printk(KERN_INFO "is a socket");
 				socket = f->private_data;
 				ret = kmalloc(sizeof(struct localPacketInfo),GFP_KERNEL);
 				ret->port = inet_sk(socket->sk)->inet_num;
@@ -127,7 +129,7 @@ struct localPacketInfo * getLocalPacketInfoFromFd(unsigned int fd)
 				ret->address = inet_sk(socket->sk)->inet_daddr;
 				ret->proto = inet_sk(socket->sk)->tos;
 				}
-				printk(KERN_INFO "local port %hu address %xu proto %hu",ret->port, ret->address, ret->proto);
+				printk(KERN_INFO "local port %hu addr 0x%x proto %hu",ret->port, ret->address, ret->proto);
 			}
 		}
 	}

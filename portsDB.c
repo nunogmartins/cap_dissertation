@@ -48,11 +48,15 @@ int my_insert(struct rb_root *root, struct portInfo *port)
 		struct portInfo *this = container_of(*new,struct portInfo, node);
 
 		parent = *new;
-		if(port->port < this->port)
+		if(port->port < this->port){
 			new = &((*new)->rb_left);
+			printk(KERN_INFO "inserted port %hu",port->port);
+		}
 		else
-			if(port->port > this->port)
+			if(port->port > this->port){
 				new = &((*new)->rb_right);
+				printk(KERN_INFO "inserted port %hu",port->port);
+			}
 			else
 				return 0;
 	}
