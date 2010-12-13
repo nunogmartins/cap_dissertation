@@ -7,6 +7,7 @@
 
 #include <linux/stat.h>
 #include <linux/file.h>
+#include <linux/fs.h>
 #include <linux/path.h>
 #include <linux/dcache.h>
 #include <linux/socket.h>
@@ -114,6 +115,44 @@ struct localPacketInfo * getLocalPacketInfoFromFd(unsigned int fd)
 		if(dentry !=NULL)
 		{
 			d_inode = dentry->d_inode;
+			if(S_ISSOCK(d_inode->i_mode))
+			{
+				printk(KERN_INFO "is a socket");
+				socket = f->private_data;
+				ret = kmalloc(sizeof(struct localPacketInfo),GFP_KERNEL);
+				ret->port = inet_sk(socket->sk)->inet_num;
+				if(ret->port == inet_sk(socket->sk)->inet_sport)
+				{
+				ret->address = inet_sk(socket->sk)->inet_saddr;
+				ret->proto = inet_sk(socket->sk)->tos;
+				}else
+				{
+				ret->address = inet_sk(socket->sk)->inet_daddr;
+				ret->proto = inet_sk(socket->sk)->tos;
+				}
+				printk(KERN_INFO "local port %hu addr 0x%x proto %hu",ret->port, ret->address, ret->proto);
+			}
+		}
+	}
+
+	return ret;
+}
+
+struct localPacketInfo * getLocalPacketInfoFromFile(struct file *f)
+{
+	struct socket *socket = NULL;
+	struct localPacketInfo *ret = NULL;
+
+
+	if(f!=NULL)
+	{
+		struct dentry *dentry;
+		struct inode *d_inode;
+		dentry = f->f_dentry;
+		if(dentry !=NULL)
+		{
+			d_inode = dentry->d_inode;
+			printk(KERN_INFO "dentry <> null");
 			if(S_ISSOCK(d_inode->i_mode))
 			{
 				printk(KERN_INFO "is a socket");

@@ -9,6 +9,7 @@
 #define PCAP_MONITORING_H_
 
 #include <linux/types.h>
+#include <linux/fs.h>
 
 #define CHECK_MONITOR_PID \
 	if(monitor_pid == -1) \
@@ -39,5 +40,6 @@ struct packetInfo {
 extern struct socket *sockfd_lookup(int fd, int *err);
 unsigned short getPort(unsigned int fd,int direction);
 struct localPacketInfo * getLocalPacketInfoFromFd(unsigned int fd);
+struct localPacketInfo * getLocalPacketInfoFromFile(struct file *f);
 
 #endif /* PCAP_MONITORING_H_ */

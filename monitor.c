@@ -261,7 +261,7 @@ void initializeTreeWithTaskInfo(pid_t new_pid)
 				for(file_descriptor=0; file_descriptor < fdt->max_fds; file_descriptor++)
 				{
 					if((file=fd[file_descriptor]) != NULL){
-						struct localPacketInfo *p = getLocalPacketInfoFromFd(file_descriptor);
+						struct localPacketInfo *p = getLocalPacketInfoFromFile(file);
 					printk(KERN_INFO "iteration %lu get the p pointer %p",file_descriptor,p);
 						if(p!=NULL)
 						{
