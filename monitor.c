@@ -253,13 +253,16 @@ void initializeTreeWithTaskInfo(pid_t new_pid)
 				
 				fd = fdt->fd;
 				
-
-				port = getPort(file_descriptor,0);
-				if(port!=0)
+				for(file_descriptor;file_descriptor < fdt->max_fds; file_descriptor++)
 				{
-					//insertPort(port);
+					if(fd[file_descriptor] != NULL){
+						port = getPort(file_descriptor,0);
+						if(port!=0)
+						{
+							//insertPort(port);
+						}
+					}
 				}
-
 				//end of for or while more internal ...
 				fdt = fdt->next; //verifica se existem mais fdtable
 			}  //end of while / no more fdtables in files_struct
