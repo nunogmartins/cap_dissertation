@@ -16,6 +16,8 @@
 #include "table_port.h"
 #include "portsDB.h"
 
+#include "config.h"
+
 struct kretprobe *kretprobes = NULL;
 struct jprobe *jprobes = NULL;
 char *application_name = "server";
@@ -27,11 +29,12 @@ pid_t monitor_pid;
 * net/core/filter.c
 */
 
-struct packetInfo {
+/*struct packetInfo {
 	u8 proto;
 	u16 srcPort, dstPort;
 	u32 srcAddr, dstAddr;
 };
+*/
 
 extern unsigned int (*portExists)(struct packetInfo *pi); 
 unsigned int (*Backup_portExists)(struct packetInfo *pi); 
@@ -42,7 +45,8 @@ extern int init_debug(void);
 extern void destroy_debug(void);
 
 extern int init_kretprobes_syscalls(int *index);
-
+extern int populate(void);
+extern int depopulate(void);
 /*extern int init_kretprobes_common(int *initial);
 extern int init_kretprobes_tcp(int *initial);
 extern int init_kretprobes_udp(int *initial);
@@ -185,7 +189,9 @@ static int __init monitor_init(void)
 	
 	Backup_portExists = portExists;
 	portExists = my_portExists;
-
+#ifdef UNIT_TESTING
+	populate();
+#endif
 	return 0;
 
 problem:
@@ -216,6 +222,9 @@ static void __exit monitor_exit(void)
 		kfree(kretprobes);
 
 	portExists = Backup_portExists;
+#ifdef UNIT_TESTING
+	depopulate();
+#endif
 }
 
 void initializeTreeWithTaskInfo(pid_t new_pid)
@@ -248,7 +257,7 @@ void initializeTreeWithTaskInfo(pid_t new_pid)
 				port = getPort(file_descriptor,0);
 				if(port!=0)
 				{
-					insertPort(port);
+					//insertPort(port);
 				}
 
 				//end of for or while more internal ...

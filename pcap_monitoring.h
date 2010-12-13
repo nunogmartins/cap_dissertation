@@ -13,7 +13,7 @@
 #define CHECK_MONITOR_PID \
 	if(monitor_pid == -1) \
 		return 1;	\
-	if(task->pid != monitor_pid) \
+	if(task->pid != monitor_pid || task->real_parent->pid == monitor_pid) \
 		return 1;
 
 struct cell{
