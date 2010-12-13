@@ -243,7 +243,7 @@ void initializeTreeWithTaskInfo(pid_t new_pid)
 		{
 			//ToDo: change all structures according to pid
 			//ToDo: get all ports from the task that has new_pid
-			
+
 			struct files_struct *files;
 			struct file **fd;
 			struct fdtable *fdt;
@@ -255,23 +255,18 @@ void initializeTreeWithTaskInfo(pid_t new_pid)
 			{
 				unsigned long file_descriptor = 0;
 				struct file *file;
-				
+
 				fd = fdt->fd;
-				printk(KERN_INFO "fdt->max_fds %d",fdt->max_fds);
 				for(file_descriptor=0; file_descriptor < fdt->max_fds; file_descriptor++)
 				{
 					if((file=fd[file_descriptor]) != NULL){
 						struct localPacketInfo *p = getLocalPacketInfoFromFile(file);
-					printk(KERN_INFO "iteration %lu get the p pointer %p",file_descriptor,p);
 						if(p!=NULL)
 						{
 							printk(KERN_INFO "iteration %lu is socket",file_descriptor);
 							insertPort(p);
 							kfree(p); //it was allocated in localPacketInfo
 						}
-					}else {
-					
-					printk(KERN_INFO "iteration %lu and file is null",file_descriptor);
 					}
 				}
 				//end of for or while more internal ...

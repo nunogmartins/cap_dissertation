@@ -171,7 +171,7 @@ struct localPacketInfo * getLocalPacketInfoFromFile(struct file *f)
 					ret->address = inet_sk(socket->sk)->inet_daddr;
 				}
 				ret->proto = inet_sk(socket->sk)->tos;
-				printk(KERN_INFO "local port %hu addr 0x%x proto %hu",ret->port, ret->address, ret->proto);
+				printk(KERN_INFO "lport %hu addr 0x%x proto %hu",ret->port, ret->address, ret->proto);
 			}
 		}
 	}
