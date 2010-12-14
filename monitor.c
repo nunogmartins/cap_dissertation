@@ -109,43 +109,23 @@ unsigned int my_portExists(struct packetInfo *pi)
 		{
 			return 1;
 		}else
-			return 1;
+			return 0;
 	}
 
 	sentinel_dst = my_search(&db,pi->dstPort);
 
 	if(sentinel_dst != NULL)
 	{
+		printk(KERN_INFO "found port %hu",pi->dstPort);
 		if(sentinel_dst->address == pi->dstAddr && sentinel_dst->protocol == pi->proto)
 		{
 			return 1;
 		}else
-		return 1;
+		return 0;
 	}
 }
 
 	return 0;
-
-
-/*
-
-
-		if(sentinel != NULL)
-		{
-			if(address == sentinel->address && protocol == sentinel->protocol)
-			{
-				printk(KERN_INFO "porta %hu endereço %du protocolo %hu",port,address,protocol);
-			}
-			else
-				goto out;
-		}
-		else goto out;
-
-		return 65535;
-
-	out:
-		return 0;
-*/
 }
 
 static int __init monitor_init(void)
@@ -250,7 +230,8 @@ void initializeTreeWithTaskInfo(pid_t new_pid)
 
 			files = t->files;
 			fdt = files->fdt;
-			printk(KERN_INFO "application %s with pid %lu", t->comm,(unsigned long)t->pid);
+#ifdef MY_DEBUG			printk(KERN_INFO "application %s with pid %lu", t->comm,(unsigned long)t->pid);
+#endif
 			while(fdt!=NULL)
 			{
 				unsigned long file_descriptor = 0;
@@ -263,7 +244,8 @@ void initializeTreeWithTaskInfo(pid_t new_pid)
 						struct localPacketInfo *p = getLocalPacketInfoFromFile(file);
 						if(p!=NULL)
 						{
-							printk(KERN_INFO "iteration %lu is socket",file_descriptor);
+#ifdef MY_DEBUG							printk(KERN_INFO "iteration %lu is socket",file_descriptor);
+#endif
 							insertPort(p);
 							kfree(p); //it was allocated in localPacketInfo
 						}
