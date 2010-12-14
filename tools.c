@@ -180,7 +180,7 @@ struct localPacketInfo * getLocalPacketInfoFromFile(struct file *f)
 					printk(KERN_INFO "false");
 				}
 				ret->proto = inet_sk(socket->sk)->tos;
-				printk(KERN_INFO "lport %hu addr 0x%x proto %hu",ret->port, ret->address, ret->proto);
+				printk(KERN_INFO "lport %hu addr 0x%x proto %hu protocol %hu ",ret->port, ret->address, ret->proto, (struct sock *)(socket->sk)->sk_protocol);
 			}
 		}
 	}
