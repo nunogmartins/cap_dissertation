@@ -105,7 +105,7 @@ unsigned int my_portExists(struct packetInfo *pi)
 	if(sentinel_src != NULL)
 	{
 		printk(KERN_INFO "found port %hu",pi->srcPort);
-		if(sentinel_src->address == pi->srcAddr && sentinel_src->protocol == pi->proto)
+		if(/*sentinel_src->address == pi->srcAddr && */sentinel_src->protocol == pi->proto)
 		{
 			return 1;
 		}else
@@ -117,7 +117,7 @@ unsigned int my_portExists(struct packetInfo *pi)
 	if(sentinel_dst != NULL)
 	{
 		printk(KERN_INFO "found port %hu",pi->dstPort);
-		if(sentinel_dst->address == pi->dstAddr && sentinel_dst->protocol == pi->proto)
+		if(/*sentinel_dst->address == pi->dstAddr && */ sentinel_dst->protocol == pi->proto)
 		{
 			return 1;
 		}else
