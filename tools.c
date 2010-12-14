@@ -159,9 +159,10 @@ struct localPacketInfo * getLocalPacketInfoFromFile(struct file *f)
 				socket = f->private_data;
 				ret = kmalloc(sizeof(struct localPacketInfo),GFP_KERNEL);
 				ret->port = inet_sk(socket->sk)->inet_num;
+				printk(KERN_INFO "rcv is ox%x",inet_sk(socket->sk)->inet_rcv_saddr);
 				if(ret->port == inet_sk(socket->sk)->inet_sport)
 				{
-					printk(KERN_INFO "rcv is ox%x",inet_sk(socket->sk)->inet_rcv_saddr);
+
 					if(!inet_sk(socket->sk)->inet_rcv_saddr){
 						ret->address = inet_sk(socket->sk)->inet_saddr;
 
