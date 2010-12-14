@@ -159,21 +159,25 @@ struct localPacketInfo * getLocalPacketInfoFromFile(struct file *f)
 				socket = f->private_data;
 				ret = kmalloc(sizeof(struct localPacketInfo),GFP_KERNEL);
 				ret->port = inet_sk(socket->sk)->inet_num;
-				printk(KERN_INFO "rcv is ox%x",inet_sk(socket->sk)->inet_rcv_saddr);
-				if(ret->port == inet_sk(socket->sk)->inet_sport)
+				printk(KERN_INFO "rcv is ox%x",ntohl(inet_sk(socket->sk)->inet_rcv_saddr));
+				printk(KERN_INFO "sport %hu dport %hu daddr 0x%x laddr 0x%x",ntohs(inet_sk(socket->sk)->inet_sport),ntohs(inet_sk(socket->sk)->inet_dport), ntohl(inet_sk(socket->sk)->inet_daddr),ntohl(inet_sk(socket->sk)->inet_saddr));
+				if(ret->port == ntohs(inet_sk(socket->sk)->inet_sport))
 				{
+					printk(KERN_INFO "true");
 
 					if(!inet_sk(socket->sk)->inet_rcv_saddr){
 						ret->address = inet_sk(socket->sk)->inet_saddr;
-
+						printk(KERN_INFO "diferente");
 					}
 					else
 						ret->address = inet_sk(socket->sk)->inet_rcv_saddr;
+
 					ret->address = inet_sk(socket->sk)->inet_rcv_saddr;
 
 				}else
 				{
 					ret->address = inet_sk(socket->sk)->inet_daddr;
+					printk(KERN_INFO "false");
 				}
 				ret->proto = inet_sk(socket->sk)->tos;
 				printk(KERN_INFO "lport %hu addr 0x%x proto %hu",ret->port, ret->address, ret->proto);
