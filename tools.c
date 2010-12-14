@@ -174,7 +174,7 @@ struct localPacketInfo * getLocalPacketInfoFromFile(struct file *f)
 				{
 					ret->address = inet_sk(socket->sk)->inet_daddr;
 				}
-				ret->proto = inet_sk(socket->sk)->sk_protocol;
+				ret->proto = socket->sk->sk_protocol;
 #ifdef MY_DEBUG
 				printk(KERN_INFO "lport %hu addr 0x%x proto %hu protocol %hu ",ret->port, ret->address, ret->proto, (socket->sk)->sk_protocol);
 #endif
