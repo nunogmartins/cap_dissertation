@@ -152,10 +152,8 @@ struct localPacketInfo * getLocalPacketInfoFromFile(struct file *f)
 		if(dentry !=NULL)
 		{
 			d_inode = dentry->d_inode;
-			printk(KERN_INFO "dentry <> null");
 			if(S_ISSOCK(d_inode->i_mode))
 			{
-				printk(KERN_INFO "is a socket");
 				socket = f->private_data;
 				ret = kmalloc(sizeof(struct localPacketInfo),GFP_KERNEL);
 				ret->port = inet_sk(socket->sk)->inet_num;
@@ -163,24 +161,18 @@ struct localPacketInfo * getLocalPacketInfoFromFile(struct file *f)
 				printk(KERN_INFO "sport %hu dport %hu daddr 0x%x laddr 0x%x",ntohs(inet_sk(socket->sk)->inet_sport),ntohs(inet_sk(socket->sk)->inet_dport), ntohl(inet_sk(socket->sk)->inet_daddr),ntohl(inet_sk(socket->sk)->inet_saddr));
 				if(ret->port == ntohs(inet_sk(socket->sk)->inet_sport))
 				{
-					printk(KERN_INFO "true");
-
 					if(!inet_sk(socket->sk)->inet_rcv_saddr){
 						ret->address = inet_sk(socket->sk)->inet_saddr;
-						printk(KERN_INFO "diferente");
 					}
 					else
 						ret->address = inet_sk(socket->sk)->inet_rcv_saddr;
 
-					ret->address = inet_sk(socket->sk)->inet_rcv_saddr;
-
 				}else
 				{
 					ret->address = inet_sk(socket->sk)->inet_daddr;
-					printk(KERN_INFO "false");
 				}
-				ret->proto = inet_sk(socket->sk)->tos;
-				printk(KERN_INFO "lport %hu addr 0x%x proto %hu protocol %hu ",ret->port, ret->address, ret->proto, (struct sock *)(socket->sk)->sk_protocol);
+				ret->proto = inet_sk(socket->sk)->sk_protocol;
+				printk(KERN_INFO "lport %hu addr 0x%x proto %hu protocol %hu ",ret->port, ret->address, ret->proto, (socket->sk)->sk_protocol);
 			}
 		}
 	}
