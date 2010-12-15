@@ -163,17 +163,19 @@ static int __init monitor_init(void)
 		goto problem;
 	}
 */
+#ifdef MY_KPROBES
 	ret = init_kretprobes_syscalls(&index);
 	if(ret < 0)
 	{
 		printk(KERN_INFO "problem in syscalls");
 		goto problem;
 	}
+#endif
 
 	init_debug();
 	
 	Backup_portExists = portExists;
-	portExists = my_portExists;
+
 #ifdef UNIT_TESTING
 	populate();
 #endif
@@ -198,11 +200,12 @@ static void __exit monitor_exit(void)
 	int i=0;
 	destroy_debug();
 	//unregister all probes ...
+#ifdef MY_KPROBES
 	for(i=0; i < NR_PROBES ; i++)
 	{
 		removeKprobe(i);
 	}
-
+#endif
 	if(kretprobes)
 		kfree(kretprobes);
 
@@ -216,6 +219,8 @@ void initializeTreeWithTaskInfo(pid_t new_pid)
 {
 	struct task_struct *t;
 	monitor_pid = new_pid;
+
+	portExists = my_portExists;
 
 	for_each_process(t)
 	{

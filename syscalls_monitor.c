@@ -21,6 +21,8 @@
 #include "table_port.h"
 #include "pcap_monitoring.h"
 
+#ifdef MY_KPROBES
+
 extern struct kretprobe *kretprobes;
 extern int instantiationKRETProbe(struct kretprobe *kret,
 		const char *function_name,
@@ -316,3 +318,4 @@ int destroy_kretprobes_syscalls(int *initial)
 	return 0;
 }
 
+#endif
