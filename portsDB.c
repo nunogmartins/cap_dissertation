@@ -50,13 +50,15 @@ int my_insert(struct rb_root *root, struct portInfo *port)
 		parent = *new;
 		if(port->port < this->port){
 			new = &((*new)->rb_left);
-#ifdef MY_DEBUG 			printk(KERN_INFO "port = %hu addr 0x%d proto %hu", port->port, port->address, port->protocol);
+#ifdef MY_DEBUG 			
+			printk(KERN_INFO "port = %hu addr 0x%d proto %hu", port->port, port->address, port->protocol);
 #endif
 		}
 		else
 			if(port->port > this->port){
 				new = &((*new)->rb_right);
-#ifdef MY_DEBUG 			printk(KERN_INFO "port = %hu addr 0x%d proto %hu", port->port, port->address, port->protocol);
+#ifdef MY_DEBUG
+	 			printk(KERN_INFO "port = %hu addr 0x%d proto %hu", port->port, port->address, port->protocol);
 #endif
 
 			}

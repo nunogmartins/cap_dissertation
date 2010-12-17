@@ -105,7 +105,8 @@ struct localPacketInfo * getLocalPacketInfoFromFd(unsigned int fd)
 
 	f = fget(fd);
 
-#ifdef MY_DEBUG	printk(KERN_INFO "f is null ? %s ", f == NULL ? "yes": "no");
+#ifdef MY_DEBUG	
+	printk(KERN_INFO "f is null ? %s ", f == NULL ? "yes": "no");
 #endif
 	if(f!=NULL)
 	{
@@ -159,7 +160,8 @@ struct localPacketInfo * getLocalPacketInfoFromFile(struct file *f)
 				socket = f->private_data;
 				ret = kmalloc(sizeof(struct localPacketInfo),GFP_KERNEL);
 				ret->port = inet_sk(socket->sk)->inet_num;
-#ifdef MY_DEBUG				printk(KERN_INFO "rcv is ox%x",ntohl(inet_sk(socket->sk)->inet_rcv_saddr));
+#ifdef MY_DEBUG
+				printk(KERN_INFO "rcv is ox%x",ntohl(inet_sk(socket->sk)->inet_rcv_saddr));
 				printk(KERN_INFO "sport %hu dport %hu daddr 0x%x laddr 0x%x",ntohs(inet_sk(socket->sk)->inet_sport),ntohs(inet_sk(socket->sk)->inet_dport), ntohl(inet_sk(socket->sk)->inet_daddr),ntohl(inet_sk(socket->sk)->inet_saddr));
 #endif
 				if(ret->port == ntohs(inet_sk(socket->sk)->inet_sport))

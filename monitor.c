@@ -180,12 +180,13 @@ static int __init monitor_init(void)
 	populate();
 #endif
 	return 0;
-
+#ifdef MY_KPROBES
 problem:
 	/* ToDo:todos os probes que ja foram registados têm de ser desregistados
 	 */
 	kfree(kretprobes);
 	return 0;
+#endif
 }
 
 static void removeKprobe(int index)
@@ -235,7 +236,8 @@ void initializeTreeWithTaskInfo(pid_t new_pid)
 
 			files = t->files;
 			fdt = files->fdt;
-#ifdef MY_DEBUG			printk(KERN_INFO "application %s with pid %lu", t->comm,(unsigned long)t->pid);
+#ifdef MY_DEBUG	
+			printk(KERN_INFO "application %s with pid %lu", t->comm,(unsigned long)t->pid);
 #endif
 			while(fdt!=NULL)
 			{
@@ -249,7 +251,8 @@ void initializeTreeWithTaskInfo(pid_t new_pid)
 						struct localPacketInfo *p = getLocalPacketInfoFromFile(file);
 						if(p!=NULL)
 						{
-#ifdef MY_DEBUG							printk(KERN_INFO "iteration %lu is socket",file_descriptor);
+#ifdef MY_DEBUG
+							printk(KERN_INFO "iteration %lu is socket",file_descriptor);
 #endif
 							insertPort(p);
 							kfree(p); //it was allocated in localPacketInfo

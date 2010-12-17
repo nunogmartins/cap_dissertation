@@ -2,4 +2,4 @@
 #undef UNIT_TESTING
 
 //#define MY_KPROBES
-#endif MY_KPROBES
+#undef MY_KPROBES
