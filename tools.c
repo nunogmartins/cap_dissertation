@@ -17,6 +17,7 @@
 #include <linux/types.h>
 #include <linux/netdevice.h>
 #include <net/net_namespace.h>
+#include <linux/inetdevice.h>
 
 #include "pcap_monitoring.h"
 
@@ -196,14 +197,17 @@ void listAllDevicesAddress(void)
 
 	for_each_netdev(net,dev)
 	{
-		unsigned char *mac = dev->dev_addr;
-		int i=0;
+		printk(KERN_INFO "device %s",dev->name);
 
-		printk(KERN_INFO "device %s ipaddress %du",dev->name, 0);
-
-		for (i = 0; i < 6; i++)
-			printk(KERN_INFO "%02X%c", mac[i], (i<5)?':':' ' );
-
+		if(dev->ip_ptr)
+		{
+			struct in_device *in4 = dev->ip_ptr;
+			struct in_ifaddr *addr;
+			for(addr = in4->ifa_list ; addr; addr = addr->ifa_next)
+			{
+				printk(KERN_INFO "ip address 0x%x", ntohl(addr->ifa_address));
+			}
+		}
 	}
 
 }
