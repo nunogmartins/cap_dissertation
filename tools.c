@@ -4,6 +4,7 @@
  *  Created on: Nov 12, 2010
  *      Author: nuno
  */
+#include "config.h"
 
 #include <linux/stat.h>
 #include <linux/file.h>

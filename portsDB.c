@@ -4,6 +4,9 @@
  *  Created on: Nov 22, 2010
  *      Author: nuno
  */
+
+#include "config.h"
+
 #include <linux/kernel.h>
 #include <linux/rbtree.h>
 #include <linux/types.h>
@@ -63,7 +66,10 @@ int my_insert(struct rb_root *root, struct portInfo *port)
 
 			}
 			else
+			{
+				//ToDo: verify what this has and what port has to update this variables
 				return 0;
+			}
 	}
 
 	rb_link_node(&port->node,parent,new);

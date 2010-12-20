@@ -1,6 +1,8 @@
 #ifndef TABLE_PORT_H
 #define TABLE_PORT_H
 
+#include "config.h"
+
 #include "pcap_monitoring.h"
 
 #define ENOTIMPLEMENTED 255 

@@ -4,6 +4,7 @@
  *  Created on: Nov 9, 2010
  *      Author: nuno
  */
+#include "config.h"
 
 #include <linux/module.h>
 #include <linux/kprobes.h>

@@ -8,6 +8,8 @@
 #ifndef PORTSDB_H_
 #define PORTSDB_H_
 
+#include "config.h"
+
 #include <linux/types.h>
 #include <linux/rbtree.h>
 

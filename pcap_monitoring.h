@@ -4,6 +4,8 @@
  *  Created on: Nov 10, 2010
  *      Author: nuno
  */
+#include "config.h"
+
 
 #ifndef PCAP_MONITORING_H_
 #define PCAP_MONITORING_H_

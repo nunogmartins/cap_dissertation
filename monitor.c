@@ -4,6 +4,9 @@
  *  Created on: Nov 8, 2010
  *      Author: nuno
  */
+
+#include "config.h"
+
 #include <linux/slab.h>
 #include <linux/module.h>
 #include <linux/kprobes.h>
@@ -15,8 +18,6 @@
 #include "pcap_monitoring.h"
 #include "table_port.h"
 #include "portsDB.h"
-
-#include "config.h"
 
 struct kretprobe *kretprobes = NULL;
 struct jprobe *jprobes = NULL;
