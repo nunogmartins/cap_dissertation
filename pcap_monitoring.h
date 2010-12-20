@@ -41,5 +41,6 @@ extern struct socket *sockfd_lookup(int fd, int *err);
 unsigned short getPort(unsigned int fd,int direction);
 struct localPacketInfo * getLocalPacketInfoFromFd(unsigned int fd);
 struct localPacketInfo * getLocalPacketInfoFromFile(struct file *f);
+void listAllDevicesAddress();
 
 #endif /* PCAP_MONITORING_H_ */

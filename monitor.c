@@ -175,6 +175,7 @@ static int __init monitor_init(void)
 	init_debug();
 	
 	Backup_portExists = portExists;
+	listAllDevicesAddress();
 
 #ifdef UNIT_TESTING
 	populate();

@@ -72,6 +72,18 @@ int my_insert(struct rb_root *root, struct portInfo *port)
 	return 1;
 }
 
+int my_update(struct rb_root *root, struct portInfo *port)
+{
+	struct portInfo *update = NULL;
+	update = my_search(root,port->port);
+	if(update != NULL)
+	{
+
+		return 1;
+	}
+	else return 0;
+
+}
 
 void my_erase(struct rb_root *root, u16 port)
 {

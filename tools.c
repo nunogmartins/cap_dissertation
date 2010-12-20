@@ -15,6 +15,7 @@
 #include <linux/tcp.h>
 #include <net/inet_sock.h>
 #include <linux/types.h>
+#include <linux/netdevice.h>
 
 #include "pcap_monitoring.h"
 
@@ -185,4 +186,21 @@ struct localPacketInfo * getLocalPacketInfoFromFile(struct file *f)
 	}
 
 	return ret;
+}
+
+void listAllDevicesAddress()
+{
+	struct net_device *dev;
+	for_each_netdev( dev )
+	{
+		unsigned char *mac = dev->dev_addr;
+		int i=0;
+
+		printk(KERN_INFO "device %s ipaddress %du",dev->name, 0);
+
+		for (i = 0; i < 6; i++)
+			printk(KERN_INFO "%02X%c", mac[i], (i<5)?':':' ' );
+
+	}
+
 }
