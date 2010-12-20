@@ -16,6 +16,7 @@
 #include <net/inet_sock.h>
 #include <linux/types.h>
 #include <linux/netdevice.h>
+#include <net/net_namespace.h>
 
 #include "pcap_monitoring.h"
 
@@ -188,10 +189,12 @@ struct localPacketInfo * getLocalPacketInfoFromFile(struct file *f)
 	return ret;
 }
 
-void listAllDevicesAddress()
+void listAllDevicesAddress(void)
 {
 	struct net_device *dev;
-	for_each_netdev( dev )
+	struct net *net = &init_net;
+
+	for_each_netdev(net,dev)
 	{
 		unsigned char *mac = dev->dev_addr;
 		int i=0;
