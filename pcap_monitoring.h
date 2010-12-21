@@ -40,11 +40,15 @@ struct packetInfo {
 	u32 srcAddr, dstAddr;
 };
 
+struct lista_enderecos {
+
+};
+
 extern struct socket *sockfd_lookup(int fd, int *err);
 unsigned short getPort(unsigned int fd,int direction);
 struct localPacketInfo * getLocalPacketInfoFromFd(unsigned int fd);
 struct localPacketInfo * getLocalPacketInfoFromFile(struct file *f);
-void listAllDevicesAddress(void);
+struct lista_enderecos* listAllDevicesAddress(void);
 
 extern struct net inet;
 

@@ -196,7 +196,7 @@ struct localPacketInfo * getLocalPacketInfoFromFile(struct file *f)
 	return ret;
 }
 
-void listAllDevicesAddress(void)
+struct lista_enderecos* listAllDevicesAddress(void)
 {
 	struct net_device *dev;
 	struct net *net = &init_net;
@@ -215,5 +215,7 @@ void listAllDevicesAddress(void)
 			}
 		}
 	}
+
+	return NULL;
 
 }
