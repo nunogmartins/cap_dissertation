@@ -187,11 +187,16 @@ static int connect_ret_handler(struct kretprobe_instance *ri, struct pt_regs *re
 	int retval = regs_return_value(regs);
 	struct cell *my_data = (struct cell*)ri->data;
 	int fd = my_data->fd;
+	
+	#ifdef MY_DEBUG
+	printk(KERN_INFO "on connect ret handler with fd %d and retval %d",fd,retval);
+	#endif
 
-	if(retval > 0)
+	if(retval == 0)
 	{
 		insertPort(getLocalPacketInfoFromFd(fd));
 	}
+		
 	return 0;
 }
 

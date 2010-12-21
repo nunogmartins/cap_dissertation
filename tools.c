@@ -110,7 +110,7 @@ struct localPacketInfo * getLocalPacketInfoFromFd(unsigned int fd)
 	f = fget(fd);
 
 #ifdef MY_DEBUG	
-	printk(KERN_INFO "f is null ? %s ", f == NULL ? "yes": "no");
+	printk(KERN_INFO "fd is %d f is null ? %s ", fd ,f == NULL ? "yes": "no");
 #endif
 	if(f!=NULL)
 	{
@@ -129,18 +129,23 @@ struct localPacketInfo * getLocalPacketInfoFromFd(unsigned int fd)
 				if(ret->port == inet_sk(socket->sk)->inet_sport)
 				{
 				ret->address = inet_sk(socket->sk)->inet_saddr;
-				ret->proto = inet_sk(socket->sk)->tos;
 				}else
 				{
 				ret->address = inet_sk(socket->sk)->inet_daddr;
-				ret->proto = inet_sk(socket->sk)->tos;
 				}
+				ret->proto = socket->sk->sk_protocol;
 #ifdef MY_DEBUG
 				printk(KERN_INFO "local port %hu addr 0x%x proto %hu",ret->port, ret->address, ret->proto);
 #endif
 			}
 		}
 	}
+#ifdef MY_DEBUG
+else
+{
+printk(KERN_INFO "f is null");
+}
+#endif
 
 	return ret;
 }
