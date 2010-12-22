@@ -13,4 +13,10 @@
 //#define NEW_DEBUG
 #undef NEW_DEBUG
 
+#define TCP_PROBES
+//#undef TCP_PROBES
+
+#define UDP_PROBES
+//#undef UDP_PROBES
+
 #endif

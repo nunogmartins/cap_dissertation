@@ -38,12 +38,13 @@ extern pid_t monitor_pid;
 static int sendto_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	struct task_struct *task = ri->task;
-	int *fd = (int *)regs->di;
+	//int *fd = (int *)regs->di;
+	int fd = regs->ax;
 	struct cell *my_data = (struct cell *)ri->data;
 
 	CHECK_MONITOR_PID;
 
-	my_data->fd = *fd;
+	my_data->fd = fd;
 	
 	return 0;
 }
@@ -52,13 +53,18 @@ static int sendto_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 	
 	int retval = regs_return_value(regs);
 	struct cell *my_data = (struct cell *)ri->data;
-	
+
+	printk(KERN_INFO "fd in sendto is %d in application %s", my_data->fd, ri->task->comm);
+/*	
 	if(retval > 0)
 	{
 		printk(KERN_INFO "sendto retval > 0");
 		insertPort(getLocalPacketInfoFromFd(my_data->fd));
 	}else
 		printk(KERN_INFO "sendto retval < 0");
+
+*/
+
 	return 0;
 }
 
@@ -66,11 +72,12 @@ static int recvfrom_entry_handler(struct kretprobe_instance *ri, struct pt_regs 
 {	
 	struct task_struct *task = ri->task;
 	struct cell *my_data = (struct cell *)ri->data;
-	int *fd = (int *)regs->di;
+	//int *fd = (int *)regs->di;
+	int fd = regs->ax;
 
 	CHECK_MONITOR_PID;
 
-	my_data->fd = *fd;
+	my_data->fd = fd;
 
 	return 0;
 }
@@ -78,13 +85,16 @@ static int recvfrom_ret_handler(struct kretprobe_instance *ri, struct pt_regs *r
 {	
 	int retval = regs_return_value(regs);
 	struct cell *my_data = (struct cell*)ri->data;
-	
+
+	printk(KERN_INFO "fd = %d with application %s ", my_data->fd, ri->task->comm);	
+/*
 	if(retval > 0)
 	{
 		printk(KERN_INFO"recvfrom retval > 0");
 		insertPort(getLocalPacketInfoFromFd(my_data->fd));
 	}else
 		printk(KERN_INFO"recvfrom retval < 0");
+*/
 
 	return 0;
 }
@@ -175,7 +185,7 @@ static int connect_entry_handler(struct kretprobe_instance *ri, struct pt_regs *
 	struct cell *my_data =(struct cell *) ri->data;
 	int fd = regs->ax;
 
-#ifdef NEW_DEBUG
+#ifdef MY_DEBUG
 	printk(KERN_INFO "connect from application %s ", task->comm);
 #endif
 
