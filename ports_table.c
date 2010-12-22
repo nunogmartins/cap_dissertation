@@ -20,7 +20,13 @@ int insertPort(struct localPacketInfo *lpi)
 {
 	int ret;
 	struct portInfo *p = NULL;
-	
+
+	if(lpi == NULL){
+#ifdef MY_DEBUG
+	printk(KERN_INFO "in insert lpi is null");
+#endif
+		return 	-1;
+	}
 	printk(KERN_INFO "inserting port %hu with address 0x%x being %hu", lpi->port, lpi->address, lpi->proto);
 	
 	if(lpi->port == 0 || lpi->address == 0 || lpi->proto == 0)

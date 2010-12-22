@@ -106,7 +106,9 @@ struct localPacketInfo * getLocalPacketInfoFromFd(unsigned int fd)
 	struct file *f = NULL;
 	struct socket *socket = NULL;
 	struct localPacketInfo *ret = NULL;
-
+#ifdef NEW_DEBUG
+	return NULL;
+#endif
 	f = fget(fd);
 
 #ifdef MY_DEBUG	
@@ -185,9 +187,10 @@ struct localPacketInfo * getLocalPacketInfoFromFile(struct file *f)
 				{
 					ret->address = inet_sk(socket->sk)->inet_daddr;
 				}
+				ret->address = ntohl(ret->address);
 				ret->proto = socket->sk->sk_protocol;
 #ifdef MY_DEBUG
-				printk(KERN_INFO "lport %hu addr 0x%x proto %hu protocol %hu ",ret->port, ret->address, ret->proto, (socket->sk)->sk_protocol);
+				printk(KERN_INFO "lport %hu addr 0x%x proto %hu",ret->port, ret->address, ret->proto);
 #endif
 			}
 		}
