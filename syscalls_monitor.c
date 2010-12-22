@@ -175,6 +175,10 @@ static int connect_entry_handler(struct kretprobe_instance *ri, struct pt_regs *
 	struct cell *my_data =(struct cell *) ri->data;
 	int fd = regs->ax;
 
+#ifdef NEW_DEBUG
+	printk(KERN_INFO "connect from application %s ", task->comm);
+#endif
+
 	CHECK_MONITOR_PID;
 
 	my_data->fd = fd;
@@ -187,9 +191,10 @@ static int connect_ret_handler(struct kretprobe_instance *ri, struct pt_regs *re
 	int retval = regs_return_value(regs);
 	struct cell *my_data = (struct cell*)ri->data;
 	int fd = my_data->fd;
+	struct task_struct *task = ri->task;
 	
 	#ifdef MY_DEBUG
-	printk(KERN_INFO "on connect ret handler with fd %d and retval %d",fd,retval);
+	printk(KERN_INFO "on connect from %s ret handler with fd %d and retval %d",task->comm,fd,retval);
 	#endif
 
 	if(retval == 0)
@@ -271,7 +276,7 @@ int init_kretprobes_syscalls(int *initial)
 	int index = *initial;
 
 
-
+#ifdef TCP_PROBES
 	    ret = instantiationKRETProbe((kretprobes+index),"sys_socket",socket_ret_handler,socket_entry_handler,(ssize_t)sizeof(struct cell));
 	    index +=1;
 		if(ret < 0)
@@ -303,7 +308,8 @@ int init_kretprobes_syscalls(int *initial)
 		index +=1;
 		if(ret < 0)
 			return -1;
-
+#endif
+#ifdef UDP_PROBES
 		ret = instantiationKRETProbe((kretprobes+index),"sys_sendto",sendto_ret_handler,sendto_entry_handler,(ssize_t)sizeof(struct cell));
 		index +=1;
 		if(ret < 0)
@@ -314,7 +320,7 @@ int init_kretprobes_syscalls(int *initial)
 	    index +=1;
 		if(ret < 0)
 			return -1;
-
+#endif
 		return 0;
 }
 

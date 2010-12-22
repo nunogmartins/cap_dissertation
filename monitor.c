@@ -97,35 +97,38 @@ unsigned int my_portExists(struct packetInfo *pi)
 	struct portInfo *sentinel_src = NULL;
 	struct portInfo *sentinel_dst = NULL;
 
-	if(/*pi->proto == 0x11 ||*/ pi->proto == 0x06){
-
-	printk(KERN_INFO "proto 0x%x srcadd 0x%x dstaddr 0x%x srcP %hu dstP %hu", pi->proto,pi->srcAddr, pi->dstAddr,pi->srcPort, pi->dstPort );
-
-	sentinel_src = my_search(&db,pi->srcPort);
-	printAll(&db);
-
-	if(sentinel_src != NULL)
+	if(pi!=NULL)
 	{
-		printk(KERN_INFO "found port %hu",pi->srcPort);
-		if(/*sentinel_src->address == pi->srcAddr && */sentinel_src->protocol == pi->proto)
-		{
-			return 1;
+		if(/*pi->proto == 0x11 ||*/ pi->proto == 0x06){
+
+			printk(KERN_INFO "proto 0x%x srcadd 0x%x dstaddr 0x%x srcP %hu dstP %hu", pi->proto,pi->srcAddr, pi->dstAddr,pi->srcPort, pi->dstPort );
+
+			sentinel_src = my_search(&db,pi->srcPort);
+			printAll(&db);
+
+			if(sentinel_src != NULL)
+			{
+				printk(KERN_INFO "found port %hu",pi->srcPort);
+				if(/*sentinel_src->address == pi->srcAddr && */sentinel_src->protocol == pi->proto)
+				{
+					return 1;
+				}
+			}
+
+			sentinel_dst = my_search(&db,pi->dstPort);
+
+			if(sentinel_dst != NULL)
+			{
+				printk(KERN_INFO "found port %hu",pi->dstPort);
+				if(/*sentinel_dst->address == pi->dstAddr && */ sentinel_dst->protocol == pi->proto)
+				{
+					return 1;
+				}else
+					return 0;
+			}
+
 		}
 	}
-
-	sentinel_dst = my_search(&db,pi->dstPort);
-
-	if(sentinel_dst != NULL)
-	{
-		printk(KERN_INFO "found port %hu",pi->dstPort);
-		if(/*sentinel_dst->address == pi->dstAddr && */ sentinel_dst->protocol == pi->proto)
-		{
-			return 1;
-		}else
-		return 0;
-	}
-
-}
 
 	return 0;
 }
@@ -194,9 +197,11 @@ problem:
 
 static void removeKprobe(int index)
 {
-	printk(KERN_INFO "missed %d probes" , (kretprobes+index)->nmissed);
-	unregister_kretprobe((kretprobes+index));
-	printk(KERN_INFO "kretprobe at %p unregistered\n", (kretprobes+index)->kp.addr);
+	if((kretprobes+index)!=NULL){
+		printk(KERN_INFO "in index %d missed %d probes" , index,(kretprobes+index)->nmissed);
+		unregister_kretprobe((kretprobes+index));
+		printk(KERN_INFO "kretprobe at %p unregistered\n", (kretprobes+index)->kp.addr);
+	}
 }
 
 static void __exit monitor_exit(void)
