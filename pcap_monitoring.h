@@ -14,8 +14,10 @@
 #include <linux/fs.h>
 #include <net/net_namespace.h>
 
-#define CHECK_MONITOR_PID \
-	if(monitor_pid == -1) \
+#define CHECK_MONITOR_PID	\
+	if(!current->mm)	\
+		return 1;	\
+	if(monitor_pid == -1) 	\
 		return 1;	\
 	if(task->pid != monitor_pid || task->real_parent->pid == monitor_pid) \
 		return 1;

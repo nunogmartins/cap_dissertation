@@ -55,7 +55,7 @@ static int sendto_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 	struct cell *my_data = (struct cell *)ri->data;
 
 	printk(KERN_INFO "fd in sendto is %d in application %s", my_data->fd, ri->task->comm);
-/*	
+	
 	if(retval > 0)
 	{
 		printk(KERN_INFO "sendto retval > 0");
@@ -63,7 +63,7 @@ static int sendto_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 	}else
 		printk(KERN_INFO "sendto retval < 0");
 
-*/
+
 
 	return 0;
 }
@@ -87,14 +87,14 @@ static int recvfrom_ret_handler(struct kretprobe_instance *ri, struct pt_regs *r
 	struct cell *my_data = (struct cell*)ri->data;
 
 	printk(KERN_INFO "fd = %d with application %s ", my_data->fd, ri->task->comm);	
-/*
+
 	if(retval > 0)
 	{
 		printk(KERN_INFO"recvfrom retval > 0");
 		insertPort(getLocalPacketInfoFromFd(my_data->fd));
 	}else
 		printk(KERN_INFO"recvfrom retval < 0");
-*/
+
 
 	return 0;
 }
