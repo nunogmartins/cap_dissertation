@@ -10,4 +10,7 @@
 #define MY_DEBUG
 //#undef MY_DEBUG
 
+//#define NEW_DEBUG
+#undef NEW_DEBUG
+
 #endif
