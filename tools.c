@@ -209,7 +209,7 @@ struct local_addresses_list* listAllDevicesAddress(void)
 	struct local_addresses_list *tmp = NULL;
 
 	list = kmalloc(sizeof(*list),GFP_KERNEL);
-	INIT_LIST_HEAD(list->list);
+	INIT_LIST_HEAD(&(list->list));
 
 	for_each_netdev(net,dev)
 	{
@@ -230,4 +230,17 @@ struct local_addresses_list* listAllDevicesAddress(void)
 	}
 
 	return list;
+}
+
+int remove_local_addresses_list(struct local_addresses_list *list)
+{
+	struct local_addresses_list *tmp;
+	list_for_each_safe(pos,q,&(list->list))
+	{
+		tmp = list_entry(pos,struct local_addresses_list,list);
+		list_del(pos);
+		kfree(tmp);
+	}
+
+	return 0;
 }

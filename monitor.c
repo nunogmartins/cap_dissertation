@@ -210,6 +210,8 @@ static void removeKprobe(int index)
 static void __exit monitor_exit(void)
 {
 	int i=0;
+	int ret = -1;
+
 	destroy_debug();
 	//unregister all probes ...
 #ifdef MY_KPROBES
@@ -225,6 +227,11 @@ static void __exit monitor_exit(void)
 #ifdef UNIT_TESTING
 	depopulate();
 #endif
+
+	ret = remove_local_addresses_list(local_list);
+	if(ret == 0)
+		kfree(local_list);
+
 }
 
 void initializeTreeWithTaskInfo(pid_t new_pid)
