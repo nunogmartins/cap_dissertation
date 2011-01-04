@@ -13,6 +13,7 @@
 #include <linux/types.h>
 #include <linux/fs.h>
 #include <net/net_namespace.h>
+#include <linux/list.h>
 
 #define CHECK_MONITOR_PID	\
 	if(!current->mm)	\
@@ -42,15 +43,16 @@ struct packetInfo {
 	u32 srcAddr, dstAddr;
 };
 
-struct lista_enderecos {
-
+struct local_addresses_list {
+	struct list_head list;
+	u32 address;
 };
 
 extern struct socket *sockfd_lookup(int fd, int *err);
 unsigned short getPort(unsigned int fd,int direction);
 struct localPacketInfo * getLocalPacketInfoFromFd(unsigned int fd);
 struct localPacketInfo * getLocalPacketInfoFromFile(struct file *f);
-struct lista_enderecos* listAllDevicesAddress(void);
+struct local_addresses_list* listAllDevicesAddress(void);
 
 extern struct net inet;
 

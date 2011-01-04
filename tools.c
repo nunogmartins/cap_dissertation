@@ -6,6 +6,7 @@
  */
 #include "config.h"
 
+#include <linux/list.h>
 #include <linux/stat.h>
 #include <linux/file.h>
 #include <linux/fs.h>
@@ -19,6 +20,7 @@
 #include <linux/netdevice.h>
 #include <net/net_namespace.h>
 #include <linux/inetdevice.h>
+
 
 #include "pcap_monitoring.h"
 
@@ -199,10 +201,15 @@ struct localPacketInfo * getLocalPacketInfoFromFile(struct file *f)
 	return ret;
 }
 
-struct lista_enderecos* listAllDevicesAddress(void)
+struct local_addresses_list* listAllDevicesAddress(void)
 {
 	struct net_device *dev;
 	struct net *net = &init_net;
+	struct local_addresses_list *list = NULL;
+	struct local_addresses_list *tmp = NULL;
+
+	list = kmalloc(sizeof(*list),GFP_KERNEL);
+	INIT_LIST_HEAD(list->list);
 
 	for_each_netdev(net,dev)
 	{
@@ -215,10 +222,12 @@ struct lista_enderecos* listAllDevicesAddress(void)
 			for(addr = in4->ifa_list ; addr; addr = addr->ifa_next)
 			{
 				printk(KERN_INFO "ip address 0x%x", ntohl(addr->ifa_address));
+				tmp = kmalloc(sizeof(*tmp),GFP_KERNEL);
+				tmp->address = ntohl(addr->ifa_address);
+				list_add(&(tmp->list),&(list->list));
 			}
 		}
 	}
 
-	return NULL;
-
+	return list;
 }

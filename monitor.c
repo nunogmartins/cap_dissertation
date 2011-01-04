@@ -14,6 +14,7 @@
 #include <linux/fs.h>
 #include <linux/fdtable.h>
 #include <linux/skbuff.h>
+#include <linux/list.h>
 
 #include "pcap_monitoring.h"
 #include "table_port.h"
@@ -22,6 +23,8 @@
 struct kretprobe *kretprobes = NULL;
 struct jprobe *jprobes = NULL;
 char *application_name = "server";
+struct local_addresses_list *local_list;
+
 
 pid_t monitor_pid;
 
@@ -180,7 +183,7 @@ static int __init monitor_init(void)
 	init_debug();
 	
 	Backup_portExists = portExists;
-	listAllDevicesAddress();
+	local_list = listAllDevicesAddress();
 
 #ifdef UNIT_TESTING
 	populate();

@@ -35,8 +35,17 @@ int insertPort(struct localPacketInfo *lpi)
 	printk(KERN_INFO "are not zero ...");
 	p = kmalloc(sizeof(*p),GFP_KERNEL);
 	p->port = lpi->port;
-	p->address = lpi->address;
+
 	p->protocol = lpi->proto;
+
+	if(lpi->address == 0)
+	{
+		//ToDo: point the global addresses to this value in p structure
+	}else
+	{
+		//ToDo: add to a list of addresses
+				p->address = lpi->address;
+	}
 
 	ret = my_insert(&db,p);
 	printAll(&db);

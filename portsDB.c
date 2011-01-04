@@ -61,7 +61,7 @@ int my_insert(struct rb_root *root, struct portInfo *port)
 			if(port->port > this->port){
 				new = &((*new)->rb_right);
 #ifdef MY_DEBUG
-	 			printk(KERN_INFO "port = %hu addr 0x%x proto %hu", port->port, port->address, port->protocol);
+	 		printk(KERN_INFO "port = %hu addr 0x%x proto %hu", port->port, port->address, port->protocol);
 #endif
 
 			}
@@ -77,17 +77,34 @@ int my_insert(struct rb_root *root, struct portInfo *port)
 
 	return 1;
 }
-
+/*
+ * ToDo: implementation for updating the tree
+ */
 int my_update(struct rb_root *root, struct portInfo *port)
 {
-	struct portInfo *update = NULL;
-	update = my_search(root,port->port);
-	if(update != NULL)
+	struct rb_node **new = &(root->rb_node), *parent = NULL;
+	while(*new)
 	{
+		struct portInfo *this = container_of(*new,struct portInfo, node);
 
-		return 1;
+		parent = *new;
+		if(port->port < this->port){
+			new = &((*new)->rb_left);
+		}
+		else
+			if(port->port > this->port){
+				new = &((*new)->rb_right);
+			}
+			else
+			{
+				//ToDo: verify what this has and what port has to update this variables
+				return 0;
+			}
 	}
-	else return 0;
+
+	rb_link_node(&port->node,parent,new);
+	rb_insert_color(&port->node,root);
+	return 1;
 
 }
 
@@ -99,6 +116,9 @@ void my_erase(struct rb_root *root, u16 port)
 	{
 		rb_erase(&data->node,root);
 	}
+
+	//ToDo: possibly here to kfree data memory ...
+	//@here ... allocated in ports_table::insertPort ...
 }
 
 void printAll(struct rb_root *tree)
