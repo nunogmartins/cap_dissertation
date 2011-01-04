@@ -235,9 +235,11 @@ struct local_addresses_list* listAllDevicesAddress(void)
 int remove_local_addresses_list(struct local_addresses_list *list)
 {
 	struct local_addresses_list *tmp;
+	struct list_head *pos = NULL, *q = NULL;
 	list_for_each_safe(pos,q,&(list->list))
 	{
 		tmp = list_entry(pos,struct local_addresses_list,list);
+		printk(KERN_INFO "removing address 0x%x",tmp->address);
 		list_del(pos);
 		kfree(tmp);
 	}

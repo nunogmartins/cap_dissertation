@@ -53,7 +53,7 @@ unsigned short getPort(unsigned int fd,int direction);
 struct localPacketInfo * getLocalPacketInfoFromFd(unsigned int fd);
 struct localPacketInfo * getLocalPacketInfoFromFile(struct file *f);
 struct local_addresses_list* listAllDevicesAddress(void);
-int remove_local_addresses_list(struct local_list *list);
+int remove_local_addresses_list(struct local_addresses_list *list);
 
 extern struct net inet;
 
