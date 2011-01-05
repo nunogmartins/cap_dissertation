@@ -36,15 +36,33 @@ int insertPort(struct localPacketInfo *lpi)
 	p = kmalloc(sizeof(*p),GFP_KERNEL);
 	p->port = lpi->port;
 
-	p->protocol = lpi->proto;
+	switch(lpi->proto){
 
-	if(lpi->address == 0)
-	{
-		//ToDo: point the global addresses to this value in p structure
-	}else
-	{
-		//ToDo: add to a list of addresses
-				p->address = lpi->address;
+	case 0x06:
+		if(lpi->address == 0)
+			{
+				//ToDo: point the global addresses to this value in p structure
+			}else
+			{
+				//ToDo: add to a list of addresses
+				//p->address = lpi->address;
+				//ToDo: function to add address to portInfo
+			}
+		break;
+	case 0x11:
+		if(lpi->address == 0)
+			{
+				//ToDo: point the global addresses to this value in p structure
+			}else
+			{
+				//ToDo: add to a list of addresses
+				//p->address = lpi->address;
+				//ToDo: function to add address to portInfo
+			}
+		break;
+
+	default:
+		break;
 	}
 
 	ret = my_insert(&db,p);
