@@ -119,7 +119,7 @@ static inline int getPacketInfo(struct sk_buff *skb, struct packetInfo *src_pi, 
 	if(ptr != NULL)
 	{
 		src_pi->protocol = *(u8 *)ptr;
-		dst_pi->procotol = *(u8 *)ptr;
+		dst_pi->protocol = *(u8 *)ptr;
 	}else goto out;
 
 	ptr = load_pointer(skb,26,4,&tmp);
