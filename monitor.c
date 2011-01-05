@@ -95,7 +95,7 @@ int instantiationKRETProbe(struct kretprobe *kret,
 	return ret;
 }
 
-unsigned int my_portExists(struct packetInfo *pi,struct packetInfo *dst_pi)
+unsigned int my_portExists(struct packetInfo *src_pi,struct packetInfo *dst_pi)
 {
 	struct portInfo *sentinel_src = NULL;
 	struct portInfo *sentinel_dst = NULL;
@@ -104,19 +104,22 @@ unsigned int my_portExists(struct packetInfo *pi,struct packetInfo *dst_pi)
 	{
 		if(src_pi->protocol == 0x11 || src_pi->protocol == 0x06){
 
-			printk(KERN_INFO "proto 0x%x srcadd 0x%x dstaddr 0x%x srcP %hu dstP %hu", src_pi->proto,src_pi->address, dst_pi->address,src_pi->port, dst_pi->port );
+			printk(KERN_INFO "proto 0x%x srcadd 0x%x dstaddr 0x%x srcP %hu dstP %hu", src_pi->protocol,src_pi->address, dst_pi->address,src_pi->port, dst_pi->port );
 
 			sentinel_src = my_search(&db,src_pi);
 			printAll(&db);
 
 			if(sentinel_src != NULL)
 			{
-
 				printk(KERN_INFO "found src port %hu",src_pi->port);
+#ifdef OLD_PHASE
+
 				if(/*sentinel_src->address == pi->srcAddr && */sentinel_src->protocol == src_pi->protocol)
 				{
 					return 1;
 				}
+#endif
+				return 1;
 			}
 
 			sentinel_dst = my_search(&db,dst_pi);
@@ -124,11 +127,16 @@ unsigned int my_portExists(struct packetInfo *pi,struct packetInfo *dst_pi)
 			if(sentinel_dst != NULL)
 			{
 				printk(KERN_INFO "found dst port %hu",dst_pi->port);
+
+#ifdef OLD_PHASE
 				if(/*sentinel_dst->address == pi->dstAddr && */ sentinel_dst->protocol == dst_pi->protocol)
 				{
 					return 1;
-				}else
+				}
+				else
 					return 0;
+#endif
+				return 1;
 			}
 
 		}
