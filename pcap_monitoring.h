@@ -38,9 +38,9 @@ struct localPacketInfo{
 };
 
 struct packetInfo {
-	u8 proto;
-	u16 srcPort, dstPort;
-	u32 srcAddr, dstAddr;
+	u8 protocol;
+	u16 port;
+	u32 address;
 };
 
 struct local_addresses_list {

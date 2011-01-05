@@ -11,6 +11,7 @@
 #include <linux/rbtree.h>
 #include <linux/types.h>
 
+#include "pcap_monitoring.h"
 #include "portsDB.h"
 
 struct rb_root db = RB_ROOT;
@@ -18,7 +19,7 @@ struct rb_root db = RB_ROOT;
 /*
  * returns NULL if there isn't that port int the tree
  */
-struct portInfo *my_search(struct rb_root *root,u16 port)
+struct portInfo *my_search(struct rb_root *root,struct packetInfo *pi)
 {
 	struct rb_node *node = root->rb_node;
 	struct portInfo *data = NULL;
@@ -28,14 +29,17 @@ struct portInfo *my_search(struct rb_root *root,u16 port)
 	{
 		data = container_of(node,struct portInfo,node);
 
-		if(port < data->port)
+		if(pi->port < data->port)
 			node = node->rb_left;
 		else
-			if(port > data->port)
+			if(pi->port > data->port)
 				node = node->rb_right;
 			else
-				if(port == data->port)
+				if(pi->port == data->port){
+					//ToDo: have to search for address on procotol
 					return data; //its my port ...
+				}
+
 				else
 					return NULL;
 	}

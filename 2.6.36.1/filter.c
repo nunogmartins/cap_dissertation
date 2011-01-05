@@ -100,16 +100,16 @@ int sk_filter(struct sock *sk, struct sk_buff *skb)
 EXPORT_SYMBOL(sk_filter);
 
 struct packetInfo{
-	u8 proto;
-	u16 srcPort, dstPort;
-	u32 srcAddr, dstAddr;
+	u8 protocol;
+	u16 port;
+	u32 address;
 };
 
 /*
  * @pi must be allocated previously
  * @skb is the buffer passed to the filter
  */
-static inline int getPacketInfo(struct sk_buff *skb, struct packetInfo *pi)
+static inline int getPacketInfo(struct sk_buff *skb, struct packetInfo *src_pi, struct packetInfo *dst_pi)
 {
 	u32 tmp;
 	void *ptr;
@@ -118,19 +118,20 @@ static inline int getPacketInfo(struct sk_buff *skb, struct packetInfo *pi)
 	ptr = load_pointer(skb,23,1,&tmp);
 	if(ptr != NULL)
 	{
-		pi->proto = *(u8 *)ptr;
+		src_pi->protocol = *(u8 *)ptr;
+		dst_pi->procotol = *(u8 *)ptr;
 	}else goto out;
 
 	ptr = load_pointer(skb,26,4,&tmp);
 	if(ptr !=NULL)
 	{
-		pi->srcAddr = get_unaligned_be32(ptr);
+		src_pi->address = get_unaligned_be32(ptr);
 	}else goto out;
 
 	ptr = load_pointer(skb,30,4,&tmp);
 	if(ptr != NULL)
 	{
-		pi->dstAddr = get_unaligned_be32(ptr);
+		dst_pi->address = get_unaligned_be32(ptr);
 	}else goto out;
 
 	ptr = load_pointer(skb,14,1,&tmp);
@@ -141,14 +142,14 @@ static inline int getPacketInfo(struct sk_buff *skb, struct packetInfo *pi)
 		ptr = load_pointer(skb,X,2,&tmp);
 		if(ptr != NULL)
 		{
-			pi->srcPort = get_unaligned_be16(ptr);
+			src_pi->port = get_unaligned_be16(ptr);
 		}else goto out;
 
 		X+=2;
 		ptr = load_pointer(skb,X,2,&tmp);
 		if(ptr != NULL)
 		{
-			pi->dstPort = get_unaligned_be16(ptr);
+			dst_pi->port = get_unaligned_be16(ptr);
 		}else goto out;
 	}else goto out;
 
@@ -158,7 +159,7 @@ out:
 	return -1;
 }
 
-unsigned int (*portExists)(struct packetInfo *pi);
+unsigned int (*portExists)(struct packetInfo *src_pi,struct packetInfo *dst_pi);
 
 EXPORT_SYMBOL(portExists);
 
@@ -175,12 +176,13 @@ unsigned int dynamic_filter(struct sk_buff *skb, unsigned int r_size)
 		A = get_unaligned_be16(ptr);
 		if(A == 0x800)
 		{
-			struct packetInfo pi;
+			struct packetInfo dst_pi;
+			struct packetInfo src_pi;
 			int rpi;
-			rpi = getPacketInfo(skb,&pi);
+			rpi = getPacketInfo(skb,&src_pi,&dst_pi);
 			if(rpi == 0)
 			{
-				int exists = portExists(&pi);
+				int exists = portExists(&src_pi, &dst_pi);
 				if(exists == 1)
 				return 65535;
 				else
@@ -382,14 +384,14 @@ load_b:
 			A = X;
 			continue;
 		case BPF_S_RET_K:
-			if(fentry->k == 0) // mudar para com and
+			/*if(fentry->k == 0) // mudar para com and
 			return dynamic_filter(skb,65535); // hand coded 
-			else
+			else*/
 			return fentry->k;
 		case BPF_S_RET_A:
-			if(A == 0)
+			/*if(A == 0)
 			return dynamic_filter(skb, 65535); // hand coded
-			else
+			else*/
 			return A;
 		case BPF_S_ST:
 			mem[fentry->k] = A;

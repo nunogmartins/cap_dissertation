@@ -23,7 +23,7 @@
 struct kretprobe *kretprobes = NULL;
 struct jprobe *jprobes = NULL;
 char *application_name = "server";
-struct local_addresses_list *local_list;
+struct local_addresses_list *local_list = NULL;
 
 
 pid_t monitor_pid;
@@ -40,8 +40,8 @@ pid_t monitor_pid;
 };
 */
 
-extern unsigned int (*portExists)(struct packetInfo *pi); 
-unsigned int (*Backup_portExists)(struct packetInfo *pi); 
+extern unsigned int (*portExists)(struct packetInfo *src_pi,struct packetInfo *dst_pi);
+unsigned int (*Backup_portExists)(struct packetInfo *pi,struct packetInfo *dst_pi);
 
 extern struct rb_root db;
 
@@ -95,35 +95,36 @@ int instantiationKRETProbe(struct kretprobe *kret,
 	return ret;
 }
 
-unsigned int my_portExists(struct packetInfo *pi)
+unsigned int my_portExists(struct packetInfo *pi,struct packetInfo *dst_pi)
 {
 	struct portInfo *sentinel_src = NULL;
 	struct portInfo *sentinel_dst = NULL;
 
-	if(pi!=NULL)
+	if(src_pi!=NULL && dst_pi!=NULL)
 	{
-		if(/*pi->proto == 0x11 ||*/ pi->proto == 0x06){
+		if(src_pi->protocol == 0x11 || src_pi->protocol == 0x06){
 
-			printk(KERN_INFO "proto 0x%x srcadd 0x%x dstaddr 0x%x srcP %hu dstP %hu", pi->proto,pi->srcAddr, pi->dstAddr,pi->srcPort, pi->dstPort );
+			printk(KERN_INFO "proto 0x%x srcadd 0x%x dstaddr 0x%x srcP %hu dstP %hu", src_pi->proto,src_pi->address, dst_pi->address,src_pi->port, dst_pi->port );
 
-			sentinel_src = my_search(&db,pi->srcPort);
+			sentinel_src = my_search(&db,src_pi);
 			printAll(&db);
 
 			if(sentinel_src != NULL)
 			{
-				printk(KERN_INFO "found port %hu",pi->srcPort);
-				if(/*sentinel_src->address == pi->srcAddr && */sentinel_src->protocol == pi->proto)
+
+				printk(KERN_INFO "found src port %hu",src_pi->port);
+				if(/*sentinel_src->address == pi->srcAddr && */sentinel_src->protocol == src_pi->protocol)
 				{
 					return 1;
 				}
 			}
 
-			sentinel_dst = my_search(&db,pi->dstPort);
+			sentinel_dst = my_search(&db,dst_pi);
 
 			if(sentinel_dst != NULL)
 			{
-				printk(KERN_INFO "found port %hu",pi->dstPort);
-				if(/*sentinel_dst->address == pi->dstAddr && */ sentinel_dst->protocol == pi->proto)
+				printk(KERN_INFO "found dst port %hu",dst_pi->port);
+				if(/*sentinel_dst->address == pi->dstAddr && */ sentinel_dst->protocol == dst_pi->protocol)
 				{
 					return 1;
 				}else
