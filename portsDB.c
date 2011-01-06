@@ -15,6 +15,7 @@
 #include "portsDB.h"
 
 struct rb_root db = RB_ROOT;
+extern struct local_addresses_list *local_list;
 
 /*
  * returns NULL if there isn't that port int the tree
@@ -50,6 +51,11 @@ struct portInfo *my_search(struct rb_root *root,struct packetInfo *pi)
 int my_insert(struct rb_root *root, struct portInfo *port)
 {
 	struct rb_node **new = &(root->rb_node), *parent = NULL;
+
+#ifdef MY_DEBUG
+			printk(KERN_INFO "port = %hu", port->port);
+#endif
+
 	while(*new)
 	{
 		struct portInfo *this = container_of(*new,struct portInfo, node);
@@ -57,21 +63,15 @@ int my_insert(struct rb_root *root, struct portInfo *port)
 		parent = *new;
 		if(port->port < this->port){
 			new = &((*new)->rb_left);
-#ifdef MY_DEBUG 			
-			printk(KERN_INFO "port = %hu addr 0x%x proto %hu", port->port, port->address, port->protocol);
-#endif
 		}
 		else
 			if(port->port > this->port){
 				new = &((*new)->rb_right);
-#ifdef MY_DEBUG
-	 		printk(KERN_INFO "port = %hu addr 0x%x proto %hu", port->port, port->address, port->protocol);
-#endif
-
 			}
 			else
 			{
 				//ToDo: verify what this has and what port has to update this variables
+				//ToDo: kfree(port) because it was allocated a portInfo and now it is not used anywhere
 				return 0;
 			}
 	}
@@ -102,6 +102,7 @@ int my_update(struct rb_root *root, struct portInfo *port)
 			else
 			{
 				//ToDo: verify what this has and what port has to update this variables
+				//ToDo: kfree(port) because it was allocated a portInfo and now it is not used anywhere
 				return 0;
 			}
 	}
@@ -131,7 +132,7 @@ void printAll(struct rb_root *tree)
 	for(node = rb_first(tree); node ; node = rb_next(node))
 	{
 
-		printk(KERN_INFO "port = %hu addr 0x%x proto %hu", rb_entry(node,struct portInfo, node)->port,
-				rb_entry(node,struct portInfo, node)->address,rb_entry(node,struct portInfo, node)->protocol);
+		printk(KERN_INFO "port = %hu ", rb_entry(node,struct portInfo, node)->port);
+		//ToDo: iterate over tcp and udp lists
 	}
 }
