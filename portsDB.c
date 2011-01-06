@@ -115,12 +115,15 @@ int my_update(struct rb_root *root, struct portInfo *port)
 
 void my_erase(struct rb_root *root, u16 port)
 {
-	struct portInfo *data = my_search(root,port);
+	//ToDo: completly ...
+
+	/*struct portInfo *data = my_search(root,port);
 
 	if(data)
 	{
 		rb_erase(&data->node,root);
 	}
+	*/
 
 	//ToDo: possibly here to kfree data memory ...
 	//@here ... allocated in ports_table::insertPort ...
