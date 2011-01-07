@@ -47,10 +47,10 @@ int insertPort(struct localPacketInfo *lpi)
 	return -ENOTIMPLEMENTED;
 }
 
-int deletePort(u16 port)
+int deletePort(struct packetInfo *pi)
 {
-	printk(KERN_INFO "deleting port %hu",port);
-	my_erase(&db,port);
+	printk(KERN_INFO "deleting port %hu",pi->port);
+	my_erase(&db,pi);
 	return 0;
 }
 

@@ -13,6 +13,6 @@
 };
 */
 int insertPort(struct localPacketInfo *lpi);
-int deletePort(u16 port);
+int deletePort(struct packetInfo *pi);
 
 #endif

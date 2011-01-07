@@ -86,7 +86,7 @@ static int addAddress(struct localPacketInfo *lpi, struct portInfo *port_info)
 		INIT_LIST_HEAD(&(tmp->list));
 	}
 
-	node = kmalloc(sizeof(*node),GPF_KERNEL);
+	node = kmalloc(sizeof(*node),GFP_KERNEL);
 
 	if(!node)
 		return -1;
