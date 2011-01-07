@@ -29,8 +29,8 @@ struct portInfo{
 #endif
 };
 
-struct portInfo *my_search(struct rb_root *root,struct localPacketInfo *lpi);
-int my_insert(struct rb_root *root, struct portInfo *port);
-void my_erase(struct rb_root *root, u16 port);
+struct portInfo *my_search(struct rb_root *root,struct packetInfo *pi);
+int my_insert(struct rb_root *root, struct localPacketInfo *lpi);
+void my_erase(struct rb_root *root, struct packetInfo *pi);
 void printAll(struct rb_root *tree);
 #endif /* PORTSDB_H_ */

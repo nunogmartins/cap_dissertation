@@ -138,7 +138,6 @@ int my_insert(struct rb_root *root, struct localPacketInfo *lpi)
 			}
 			else
 			{
-				//ToDo: verify what this has and what port has to update this variables
 				//ToDo: need to verify that address is not already on the list ..
 				addAddress(lpi,this);
 				return 0;
@@ -155,17 +154,17 @@ int my_insert(struct rb_root *root, struct localPacketInfo *lpi)
 	return 1;
 }
 
-void my_erase(struct rb_root *root, u16 port)
+void my_erase(struct rb_root *root, struct packetInfo *pi)
 {
 	//ToDo: completly ...
 
-	/*struct portInfo *data = my_search(root,port);
+	struct portInfo *data = my_search(root,pi);
 
 	if(data)
 	{
 		rb_erase(&data->node,root);
 	}
-	*/
+
 
 	//ToDo: possibly here to kfree data memory ...
 	//@here ... allocated in ports_table::insertPort ...

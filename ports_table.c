@@ -23,7 +23,6 @@ extern struct local_addresses_list *local_list;
 int insertPort(struct localPacketInfo *lpi)
 {
 	int ret;
-	struct portInfo *p = NULL;
 
 	if(lpi == NULL){
 
