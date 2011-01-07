@@ -18,39 +18,7 @@
 extern struct rb_root db;
 extern struct local_addresses_list *local_list;
 
-static int addAddress(struct localPacketInfo *lpi, struct portInfo *port_info)
-{
 
-	struct local_addresses_list *tmp = NULL;
-
-	switch(lpi->proto){
-
-	case 0x06:
-		if(lpi->address == 0)
-			port_info->tcp = local_list;
-		else
-		{
-			//ToDo: add to a list of addresses
-			//p->address = lpi->address;
-			//ToDo: function to add address to portInfo
-		}
-		break;
-	case 0x11:
-		if(lpi->address == 0)
-			port_info->udp = local_list;
-		else
-		{
-			//ToDo: add to a list of addresses
-			//p->address = lpi->address;
-			//ToDo: function to add address to portInfo
-		}
-		break;
-
-	default:
-		break;
-	}
-	return 1;
-}
 
 int insertPort(struct localPacketInfo *lpi)
 {
@@ -72,11 +40,7 @@ int insertPort(struct localPacketInfo *lpi)
 	if(lpi->port == 0 || lpi->address == 0 || lpi->proto == 0)
 		return -1;
 
-	p = kmalloc(sizeof(*p),GFP_KERNEL);
-	p->port = lpi->port;
-
-	if(addAddress(lpi,p))
-		ret = my_insert(&db,p);
+	ret = my_insert(&db,lpi);
 
 #ifdef MY_DEBUG
 	printAll(&db);

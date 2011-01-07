@@ -29,7 +29,7 @@ struct portInfo{
 #endif
 };
 
-struct portInfo *my_search(struct rb_root *root,struct packetInfo *pi);
+struct portInfo *my_search(struct rb_root *root,struct localPacketInfo *lpi);
 int my_insert(struct rb_root *root, struct portInfo *port);
 void my_erase(struct rb_root *root, u16 port);
 void printAll(struct rb_root *tree);

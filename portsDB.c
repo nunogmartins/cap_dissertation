@@ -48,12 +48,80 @@ struct portInfo *my_search(struct rb_root *root,struct packetInfo *pi)
 	return NULL;
 }
 
-int my_insert(struct rb_root *root, struct portInfo *port)
+static int addAddress(struct localPacketInfo *lpi, struct portInfo *port_info)
+{
+	struct local_addresses_list *tmp = NULL;
+
+	struct local_addresses_list *node = NULL;
+
+	switch(lpi->proto){
+	case 0x06:
+		if(lpi->address == 0){
+			port_info->tcp = local_list;
+			return 1;
+		}
+		else
+			tmp = port_info->tcp;
+		break;
+
+	case 0x11:
+		if(lpi->address == 0){
+			port_info->tcp = local_list;
+			return 1;
+		}
+		else
+			tmp = port_info->udp;
+		break;
+
+	default:
+		break;
+	}
+
+	if(!tmp){
+		tmp = kmalloc(sizeof(*tmp),GFP_KERNEL);
+
+		if(!tmp)
+			return -1;
+
+		INIT_LIST_HEAD(&(tmp->list));
+	}
+
+	node = kmalloc(sizeof(*node),GPF_KERNEL);
+
+	if(!node)
+		return -1;
+
+	node->address = lpi->address;
+	list_add(&(tmp->list),&(node->list));
+
+	return 1;
+}
+
+struct portInfo * createPacketInfo(struct localPacketInfo *lpi)
+{
+	struct portInfo *pi = NULL;
+	pi = kmalloc(sizeof(struct portInfo),GFP_KERNEL);
+
+	if(!pi)
+		return NULL;
+
+	pi->port = lpi->port;
+
+	pi->tcp = NULL;
+	pi->udp = NULL;
+
+	addAddress(lpi,pi);
+
+	return pi;
+}
+
+int my_insert(struct rb_root *root, struct localPacketInfo *lpi)
 {
 	struct rb_node **new = &(root->rb_node), *parent = NULL;
+	struct portInfo *port = NULL;
 
 #ifdef MY_DEBUG
-			printk(KERN_INFO "port = %hu", port->port);
+			printk(KERN_INFO "port = %hu", lpi->port);
 #endif
 
 	while(*new)
@@ -61,56 +129,30 @@ int my_insert(struct rb_root *root, struct portInfo *port)
 		struct portInfo *this = container_of(*new,struct portInfo, node);
 
 		parent = *new;
-		if(port->port < this->port){
+		if(lpi->port < this->port){
 			new = &((*new)->rb_left);
 		}
 		else
-			if(port->port > this->port){
+			if(lpi->port > this->port){
 				new = &((*new)->rb_right);
 			}
 			else
 			{
 				//ToDo: verify what this has and what port has to update this variables
-				//ToDo: kfree(port) because it was allocated a portInfo and now it is not used anywhere
+				//ToDo: need to verify that address is not already on the list ..
+				addAddress(lpi,this);
 				return 0;
 			}
 	}
+
+	port = createPacketInfo(lpi);
+	if(!port)
+		return -1;
 
 	rb_link_node(&port->node,parent,new);
 	rb_insert_color(&port->node,root);
 
 	return 1;
-}
-/*
- * ToDo: implementation for updating the tree
- */
-int my_update(struct rb_root *root, struct portInfo *port)
-{
-	struct rb_node **new = &(root->rb_node), *parent = NULL;
-	while(*new)
-	{
-		struct portInfo *this = container_of(*new,struct portInfo, node);
-
-		parent = *new;
-		if(port->port < this->port){
-			new = &((*new)->rb_left);
-		}
-		else
-			if(port->port > this->port){
-				new = &((*new)->rb_right);
-			}
-			else
-			{
-				//ToDo: verify what this has and what port has to update this variables
-				//ToDo: kfree(port) because it was allocated a portInfo and now it is not used anywhere
-				return 0;
-			}
-	}
-
-	rb_link_node(&port->node,parent,new);
-	rb_insert_color(&port->node,root);
-	return 1;
-
 }
 
 void my_erase(struct rb_root *root, u16 port)
