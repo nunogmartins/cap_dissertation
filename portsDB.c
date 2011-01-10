@@ -31,8 +31,15 @@ static inline int isEqualPacketInfo(struct packetInfo *pi, struct portInfo *info
 	switch(pi->protocol){
 
 	case 0x06:
-		if(info->tcp)
+#ifdef MY_DEBUG
+		pr_info("is equal to tcp");
+#endif
+		if(info->tcp){
 			tmp = info->tcp;
+#ifdef MY_DEBUG
+			pr_info("tcp is different from null");
+#endif
+		}
 		break;
 
 	case 0x11:
@@ -50,8 +57,15 @@ static inline int isEqualPacketInfo(struct packetInfo *pi, struct portInfo *info
 	list_for_each(pos,&(tmp->list))
 	{
 		address = list_entry(pos,local_addresses_list,list);
-		if(pi->address == address->address)
+#ifdef MY_DEBUG
+		pr_info("iteration address 0x%x",address->address);
+#endif
+		if(pi->address == address->address){
+#ifdef MY_DEBUG
+			pr_info("found equal 0x%x",address->address);
+#endif
 			return 1;
+		}
 	}
 
 	return 0;
@@ -100,8 +114,12 @@ static int addAddress(struct packetInfo *lpi, struct portInfo *port_info)
 			port_info->tcp = local_list;
 			return 1;
 		}
-		else
+		else{
 			tmp = port_info->tcp;
+#ifdef MY_DEBUG
+			pr_info("is tcp and tmp is now ... %p",tmp);
+#endif
+		}
 		break;
 
 	case 0x11:
@@ -132,8 +150,14 @@ static int addAddress(struct packetInfo *lpi, struct portInfo *port_info)
 		return -1;
 
 	node->address = lpi->address;
-	list_add(&(tmp->list),&(node->list));
+#ifdef MY_DEBUG
+	pr_info("going to list add");
+#endif
 
+	list_add(&(tmp->list),&(node->list));
+#ifdef MY_DEBUG
+	pr_info("node added to the list");
+#endif
 	return 1;
 }
 
