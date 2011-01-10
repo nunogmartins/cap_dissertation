@@ -220,22 +220,36 @@ void my_erase(struct rb_root *root, struct packetInfo *pi)
 
 }
 
+static void iterateList(struct local_addresses_list *tmp)
+{
+	struct list_head *pos = NULL;
+	struct local_addresses_list *address = NULL;
+
+	list_for_each(pos,&(tmp->list))
+	{
+		address = list_entry(pos,local_addresses_list,list);
+		pr_info("address 0x%x",address->address);
+	}
+}
+
 void printAll(struct rb_root *tree)
 {
 	struct rb_node *node;
+	struct portInfo *p = NULL;
+	struct local_addresses_list *tmp = NULL;
+
 	for(node = rb_first(tree); node ; node = rb_next(node))
 	{
+		p = rb_entry(node,portInfo, node);
+		pr_info( "port = %hu ", p->port);
 
-		pr_info( "port = %hu ", rb_entry(node,portInfo, node)->port);
 		pr_info( "tcp addresses");
-		/*
-		 *
-		 */
-		pr_info( "udp addresses");
-		/*
-		 *
-		 */
+		if(p->tcp)
+			iterateList(p->tcp);
 
-		//ToDo: iterate over tcp and udp lists
+		pr_info( "udp addresses");
+		if(p->udp)
+			iterateList(p->udp);
+
 	}
 }
