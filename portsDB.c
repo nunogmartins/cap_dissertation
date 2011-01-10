@@ -181,7 +181,7 @@ int my_insert(struct rb_root *root, struct packetInfo *lpi)
 				//ToDo: need to verify that address is not already on the list ..
 				//if(isEqualPacketInfo())
 				addAddress(lpi,this);
-				return 0;
+				return 1;
 			}
 	}
 

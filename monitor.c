@@ -284,7 +284,11 @@ void initializeTreeWithTaskInfo(pid_t new_pid)
 #ifdef MY_DEBUG
 							pr_info( "iteration %lu is socket",file_descriptor);
 #endif
-							insertPort(p);
+							if(insertPort(p) > 0)
+								pr_info("insertion was ok");
+							else
+								pr_info("something was wrong with the insertion");
+
 							kfree(p); //it was allocated in localPacketInfo
 						}
 					}
