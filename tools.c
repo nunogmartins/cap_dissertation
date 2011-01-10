@@ -6,7 +6,7 @@
  */
 #include "config.h"
 
-#include <linux/printk.h>
+#include <linux/kernel.h>
 #include <linux/list.h>
 #include <linux/stat.h>
 #include <linux/file.h>

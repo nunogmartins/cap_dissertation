@@ -9,7 +9,6 @@
 #include <linux/init.h>
 #include <linux/kernel.h>
 #include <linux/module.h>
-#include <linux/printk.h>
 #include <linux/slab.h>
 #include <linux/kprobes.h>
 #include <linux/types.h>
@@ -279,7 +278,7 @@ void initializeTreeWithTaskInfo(pid_t new_pid)
 				for(file_descriptor=0; file_descriptor < fdt->max_fds; file_descriptor++)
 				{
 					if((file=fd[file_descriptor]) != NULL){
-						struct localPacketInfo *p = getLocalPacketInfoFromFile(file);
+						struct packetInfo *p = getLocalPacketInfoFromFile(file);
 						if(p!=NULL)
 						{
 #ifdef MY_DEBUG

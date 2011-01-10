@@ -2,7 +2,6 @@
 
 #include <linux/slab.h>
 #include <linux/kernel.h>
-#include <linux/printk.h>
 #include <linux/module.h>
 #include <linux/list.h>
 #include <linux/rbtree.h>

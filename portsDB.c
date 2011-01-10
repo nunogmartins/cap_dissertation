@@ -8,7 +8,6 @@
 #include "config.h"
 
 #include <linux/kernel.h>
-#include <linux/printk.h>
 #include <linux/list.h>
 #include <linux/rbtree.h>
 #include <linux/types.h>
