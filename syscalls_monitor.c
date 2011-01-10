@@ -228,6 +228,9 @@ static int accept_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 {
 	int retval = regs_return_value(regs);
 	//struct cell *my_data = (struct cell *)ri->data;
+#ifdef MY_DEBUG
+	pr_info("retval in accept is %d for application %s",retval,ri->task->comm);
+#endif
 
 	if(retval > 0)
 	{

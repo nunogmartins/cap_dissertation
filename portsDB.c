@@ -242,7 +242,6 @@ void printAll(struct rb_root *tree)
 {
 	struct rb_node *node;
 	struct portInfo *p = NULL;
-	struct local_addresses_list *tmp = NULL;
 
 	for(node = rb_first(tree); node ; node = rb_next(node))
 	{
