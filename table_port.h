@@ -12,7 +12,7 @@
 	unsigned int fd;
 };
 */
-int insertPort(struct localPacketInfo *lpi);
+int insertPort(struct packetInfo *lpi);
 int deletePort(struct packetInfo *pi);
 
 #endif

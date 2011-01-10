@@ -2,6 +2,7 @@
 
 #include <linux/slab.h>
 #include <linux/kernel.h>
+#include <linux/printk.h>
 #include <linux/module.h>
 #include <linux/list.h>
 #include <linux/rbtree.h>
@@ -20,23 +21,23 @@ extern struct local_addresses_list *local_list;
 
 
 
-int insertPort(struct localPacketInfo *lpi)
+int insertPort(struct packetInfo *lpi)
 {
 	int ret;
 
 	if(lpi == NULL){
 
 #ifdef MY_DEBUG
-		printk(KERN_INFO "in insert lpi is null");
+		pr_info( "in insert lpi is null");
 #endif
 		return 	-1;
 	}
 
 #ifdef MY_DEBUG
-	printk(KERN_INFO "inserting port %hu with address 0x%x being %hu", lpi->port, lpi->address, lpi->proto);
+	pr_info( "inserting port %hu with address 0x%x being %hu", lpi->port, lpi->address, lpi->protocol);
 #endif
 
-	if(lpi->port == 0 || lpi->address == 0 || lpi->proto == 0)
+	if(lpi->port == 0 || lpi->address == 0 || lpi->protocol == 0)
 		return -1;
 
 	ret = my_insert(&db,lpi);
@@ -49,7 +50,7 @@ int insertPort(struct localPacketInfo *lpi)
 
 int deletePort(struct packetInfo *pi)
 {
-	printk(KERN_INFO "deleting port %hu",pi->port);
+	pr_info( "deleting port %hu",pi->port);
 	my_erase(&db,pi);
 	return 0;
 }

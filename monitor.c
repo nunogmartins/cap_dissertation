@@ -4,18 +4,20 @@
  *  Created on: Nov 8, 2010
  *      Author: nuno
  */
-
 #include "config.h"
 
-#include <linux/slab.h>
+#include <linux/init.h>
+#include <linux/kernel.h>
 #include <linux/module.h>
+#include <linux/printk.h>
+#include <linux/slab.h>
 #include <linux/kprobes.h>
 #include <linux/types.h>
 #include <linux/fs.h>
 #include <linux/fdtable.h>
 #include <linux/skbuff.h>
 #include <linux/list.h>
-
+#include <linux/sched.h>
 #include "pcap_monitoring.h"
 #include "table_port.h"
 #include "portsDB.h"
@@ -60,7 +62,7 @@ extern int init_kretprobes_udp(int *initial);
 
 void print_regs(const char *function, struct pt_regs *regs)
 {
-	printk(KERN_INFO "%s ax=%p bx=%p cx=%p dx=%p bp=%p sp=%p",
+	pr_info( "%s ax=%p bx=%p cx=%p dx=%p bp=%p sp=%p",
 			function, (void *)regs->ax,(void *)regs->bx,(void *)regs->cx,
 			(void *)regs->dx,(void*)regs->bp,(void *) regs->sp);
 }
@@ -85,11 +87,11 @@ int instantiationKRETProbe(struct kretprobe *kret,
 
 	ret = register_kretprobe(kret);
     if (ret < 0) {
-		printk(KERN_INFO "register_kretprobe failed, returned %d\n", ret);
+		pr_info( "register_kretprobe failed, returned %d\n", ret);
 		return -1;
 	}
 
-	printk(KERN_INFO "Planted kretprobe at %p, handler addr %p\n",
+	pr_info( "Planted kretprobe at %p, handler addr %p\n",
 	       kret->kp.symbol_name, kret->kp.addr);
 
 	return ret;
@@ -104,14 +106,14 @@ unsigned int my_portExists(struct packetInfo *src_pi,struct packetInfo *dst_pi)
 	{
 		if(src_pi->protocol == 0x11 || src_pi->protocol == 0x06){
 
-			printk(KERN_INFO "proto 0x%x srcadd 0x%x dstaddr 0x%x srcP %hu dstP %hu", src_pi->protocol,src_pi->address, dst_pi->address,src_pi->port, dst_pi->port );
+			pr_info( "proto 0x%x srcadd 0x%x dstaddr 0x%x srcP %hu dstP %hu", src_pi->protocol,src_pi->address, dst_pi->address,src_pi->port, dst_pi->port );
 
 			sentinel_src = my_search(&db,src_pi);
 			printAll(&db);
 
 			if(sentinel_src != NULL)
 			{
-				printk(KERN_INFO "found src port %hu",src_pi->port);
+				pr_info( "found src port %hu",src_pi->port);
 #ifdef OLD_PHASE
 
 				if(/*sentinel_src->address == pi->srcAddr && */sentinel_src->protocol == src_pi->protocol)
@@ -126,7 +128,7 @@ unsigned int my_portExists(struct packetInfo *src_pi,struct packetInfo *dst_pi)
 
 			if(sentinel_dst != NULL)
 			{
-				printk(KERN_INFO "found dst port %hu",dst_pi->port);
+				pr_info( "found dst port %hu",dst_pi->port);
 
 #ifdef OLD_PHASE
 				if(/*sentinel_dst->address == pi->dstAddr && */ sentinel_dst->protocol == dst_pi->protocol)
@@ -155,28 +157,28 @@ static int __init monitor_init(void)
 
 	kretprobes = kmalloc(sizeof(*kretprobes)*NR_PROBES,GFP_KERNEL);
 	if(!kretprobes){
-		printk(KERN_INFO "problem allocating memory");
+		pr_info( "problem allocating memory");
 		return -1;
 	}
 /*
 	ret = init_kretprobes_common(&index);
 	if(ret < 0)
 	{
-		printk(KERN_INFO "problem in common");
+		pr_info( "problem in common");
 		goto problem;
 	}
 
 	ret = init_kretprobes_tcp(&index);
 	if(ret < 0)
 	{
-		printk(KERN_INFO "problem in tcp");
+		pr_info( "problem in tcp");
 		goto problem;
 	}
 
 	ret = init_kretprobes_udp(&index);
 	if(ret < 0)
 	{
-		printk(KERN_INFO "problem in udp");
+		pr_info( "problem in udp");
 		goto problem;
 	}
 */
@@ -184,7 +186,7 @@ static int __init monitor_init(void)
 	ret = init_kretprobes_syscalls(&index);
 	if(ret < 0)
 	{
-		printk(KERN_INFO "problem in syscalls");
+		pr_info( "problem in syscalls");
 		goto problem;
 	}
 #endif
@@ -207,14 +209,16 @@ problem:
 #endif
 }
 
+#ifdef MY_KPROBES
 static void removeKprobe(int index)
 {
 	if((kretprobes+index)!=NULL){
-		printk(KERN_INFO "in index %d missed %d probes" , index,(kretprobes+index)->nmissed);
+		pr_info( "in index %d missed %d probes" , index,(kretprobes+index)->nmissed);
 		unregister_kretprobe((kretprobes+index));
-		printk(KERN_INFO "kretprobe at %p unregistered\n", (kretprobes+index)->kp.addr);
+		pr_info( "kretprobe at %p unregistered\n", (kretprobes+index)->kp.addr);
 	}
 }
+#endif
 
 static void __exit monitor_exit(void)
 {
@@ -264,7 +268,7 @@ void initializeTreeWithTaskInfo(pid_t new_pid)
 			files = t->files;
 			fdt = files->fdt;
 #ifdef MY_DEBUG	
-			printk(KERN_INFO "application %s with pid %lu", t->comm,(unsigned long)t->pid);
+			pr_info( "application %s with pid %lu", t->comm,(unsigned long)t->pid);
 #endif
 			while(fdt!=NULL)
 			{
@@ -279,7 +283,7 @@ void initializeTreeWithTaskInfo(pid_t new_pid)
 						if(p!=NULL)
 						{
 #ifdef MY_DEBUG
-							printk(KERN_INFO "iteration %lu is socket",file_descriptor);
+							pr_info( "iteration %lu is socket",file_descriptor);
 #endif
 							insertPort(p);
 							kfree(p); //it was allocated in localPacketInfo
@@ -294,6 +298,7 @@ void initializeTreeWithTaskInfo(pid_t new_pid)
 	}
 }
 
-module_init(monitor_init)
-module_exit(monitor_exit)
+module_init(monitor_init);
+module_exit(monitor_exit);
 MODULE_LICENSE("GPL");
+

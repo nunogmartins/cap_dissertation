@@ -1,0 +1,7 @@
+NOT -- For bind, verify the backlog that is going to be registered on the listen syscall
+
+Check for Listen in sock structure in the field sk_state
+
+   sk->sk_state == TCP_LISTEN 
+   
+   sk is a pointer to a sock variable

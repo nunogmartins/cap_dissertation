@@ -16,7 +16,7 @@
 
 #include "pcap_monitoring.h"
 
-struct portInfo{
+typedef struct portInfo{
 	struct rb_node node;
 	u16 port;
 #ifdef OLD_PHASE
@@ -27,10 +27,10 @@ struct portInfo{
 	struct local_addresses_list *udp;
 	struct local_addresses_list *tcp;
 #endif
-};
+}portInfo;
 
 struct portInfo *my_search(struct rb_root *root,struct packetInfo *pi);
-int my_insert(struct rb_root *root, struct localPacketInfo *lpi);
+int my_insert(struct rb_root *root, struct packetInfo *lpi);
 void my_erase(struct rb_root *root, struct packetInfo *pi);
 void printAll(struct rb_root *tree);
 #endif /* PORTSDB_H_ */

@@ -6,6 +6,7 @@
  */
 #include "config.h"
 
+#include <linux/printk.h>
 #include <linux/list.h>
 #include <linux/stat.h>
 #include <linux/file.h>
@@ -103,18 +104,18 @@ struct inet_sock *i_sock = NULL;
 }
 
 
-struct localPacketInfo * getLocalPacketInfoFromFd(unsigned int fd)
-{
+struct packetInfo * getLocalPacketInfoFromFd(unsigned int fd)
+		{
 	struct file *f = NULL;
 	struct socket *socket = NULL;
-	struct localPacketInfo *ret = NULL;
+	struct packetInfo *ret = NULL;
 #ifdef NEW_DEBUG
 	return NULL;
 #endif
 	f = fget(fd);
 
 #ifdef MY_DEBUG	
-	printk(KERN_INFO "fd is %d f is null ? %s ", fd ,f == NULL ? "yes": "no");
+	pr_info( "fd is %d f is null ? %s ", fd ,f == NULL ? "yes": "no");
 #endif
 	if(f!=NULL)
 	{
@@ -128,36 +129,36 @@ struct localPacketInfo * getLocalPacketInfoFromFd(unsigned int fd)
 			if(S_ISSOCK(d_inode->i_mode))
 			{
 				socket = f->private_data;
-				ret = kmalloc(sizeof(struct localPacketInfo),GFP_KERNEL);
+				ret = kmalloc(sizeof(struct packetInfo),GFP_KERNEL);
 				ret->port = inet_sk(socket->sk)->inet_num;
 				if(ret->port == inet_sk(socket->sk)->inet_sport)
 				{
-				ret->address = inet_sk(socket->sk)->inet_saddr;
+					ret->address = inet_sk(socket->sk)->inet_saddr;
 				}else
 				{
-				ret->address = inet_sk(socket->sk)->inet_daddr;
+					ret->address = inet_sk(socket->sk)->inet_daddr;
 				}
-				ret->proto = socket->sk->sk_protocol;
+				ret->protocol = socket->sk->sk_protocol;
 #ifdef MY_DEBUG
-				printk(KERN_INFO "local port %hu addr 0x%x proto %hu",ret->port, ret->address, ret->proto);
+				pr_info("local port %hu addr 0x%x proto %hu",ret->port, ret->address, ret->protocol);
 #endif
 			}
 		}
 	}
 #ifdef MY_DEBUG
-else
-{
-printk(KERN_INFO "f is null");
-}
+	else
+	{
+		pr_info( "f is null");
+	}
 #endif
 
 	return ret;
-}
+		}
 
-struct localPacketInfo * getLocalPacketInfoFromFile(struct file *f)
+struct packetInfo * getLocalPacketInfoFromFile(struct file *f)
 {
 	struct socket *socket = NULL;
-	struct localPacketInfo *ret = NULL;
+	struct packetInfo *ret = NULL;
 
 
 	if(f!=NULL)
@@ -171,11 +172,11 @@ struct localPacketInfo * getLocalPacketInfoFromFile(struct file *f)
 			if(S_ISSOCK(d_inode->i_mode))
 			{
 				socket = f->private_data;
-				ret = kmalloc(sizeof(struct localPacketInfo),GFP_KERNEL);
+				ret = kmalloc(sizeof(struct packetInfo),GFP_KERNEL);
 				ret->port = inet_sk(socket->sk)->inet_num;
 #ifdef MY_DEBUG
-				printk(KERN_INFO "rcv is ox%x",ntohl(inet_sk(socket->sk)->inet_rcv_saddr));
-				printk(KERN_INFO "sport %hu dport %hu daddr 0x%x laddr 0x%x",ntohs(inet_sk(socket->sk)->inet_sport),ntohs(inet_sk(socket->sk)->inet_dport), ntohl(inet_sk(socket->sk)->inet_daddr),ntohl(inet_sk(socket->sk)->inet_saddr));
+				pr_info( "rcv is ox%x",ntohl(inet_sk(socket->sk)->inet_rcv_saddr));
+				pr_info( "sport %hu dport %hu daddr 0x%x laddr 0x%x",ntohs(inet_sk(socket->sk)->inet_sport),ntohs(inet_sk(socket->sk)->inet_dport), ntohl(inet_sk(socket->sk)->inet_daddr),ntohl(inet_sk(socket->sk)->inet_saddr));
 #endif
 				if(ret->port == ntohs(inet_sk(socket->sk)->inet_sport))
 				{
@@ -190,9 +191,9 @@ struct localPacketInfo * getLocalPacketInfoFromFile(struct file *f)
 					ret->address = inet_sk(socket->sk)->inet_daddr;
 				}
 				ret->address = ntohl(ret->address);
-				ret->proto = socket->sk->sk_protocol;
+				ret->protocol = socket->sk->sk_protocol;
 #ifdef MY_DEBUG
-				printk(KERN_INFO "lport %hu addr 0x%x proto %hu",ret->port, ret->address, ret->proto);
+				pr_info( "lport %hu addr 0x%x proto %hu",ret->port, ret->address, ret->protocol);
 #endif
 			}
 		}
@@ -213,7 +214,7 @@ struct local_addresses_list* listAllDevicesAddress(void)
 
 	for_each_netdev(net,dev)
 	{
-		printk(KERN_INFO "device %s",dev->name);
+		pr_info( "device %s",dev->name);
 
 		if(dev->ip_ptr)
 		{
@@ -221,7 +222,7 @@ struct local_addresses_list* listAllDevicesAddress(void)
 			struct in_ifaddr *addr;
 			for(addr = in4->ifa_list ; addr; addr = addr->ifa_next)
 			{
-				printk(KERN_INFO "ip address 0x%x", ntohl(addr->ifa_address));
+				pr_info( "ip address 0x%x", ntohl(addr->ifa_address));
 				tmp = kmalloc(sizeof(*tmp),GFP_KERNEL);
 				tmp->address = ntohl(addr->ifa_address);
 				list_add(&(tmp->list),&(list->list));
@@ -238,11 +239,12 @@ int remove_local_addresses_list(struct local_addresses_list *list)
 	struct list_head *pos = NULL, *q = NULL;
 	list_for_each_safe(pos,q,&(list->list))
 	{
-		tmp = list_entry(pos,struct local_addresses_list,list);
-		printk(KERN_INFO "removing address 0x%x",tmp->address);
+		tmp = list_entry(pos,local_addresses_list, list);//(pos,struct local_addresses_list,list);
+		pr_info( "removing address 0x%x",tmp->address);
 		list_del(pos);
 		kfree(tmp);
 	}
 
 	return 0;
 }
+
