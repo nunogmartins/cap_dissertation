@@ -139,6 +139,7 @@ struct packetInfo * getLocalPacketInfoFromFd(unsigned int fd)
 					ret->address = inet_sk(socket->sk)->inet_daddr;
 				}
 				ret->protocol = socket->sk->sk_protocol;
+				ret->address = ntohl(ret->address);
 #ifdef MY_DEBUG
 				pr_info("local port %hu addr 0x%x proto %hu",ret->port, ret->address, ret->protocol);
 #endif
