@@ -26,7 +26,7 @@ static inline int isEqualPacketInfo(struct packetInfo *pi, struct portInfo *info
 
 	struct local_addresses_list *tmp = NULL;
 	local_addresses_list *address = NULL;
-	list_head *pos = NULL;
+	struct list_head *pos = NULL;
 
 	switch(pi->protocol){
 
