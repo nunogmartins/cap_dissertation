@@ -175,7 +175,7 @@ struct packetInfo * getLocalPacketInfoFromFile(struct file *f)
 				ret = kmalloc(sizeof(struct packetInfo),GFP_KERNEL);
 				ret->port = inet_sk(socket->sk)->inet_num;
 #ifdef MY_DEBUG
-				pr_info( "rcv is ox%x",ntohl(inet_sk(socket->sk)->inet_rcv_saddr));
+				pr_info( "rcv is 0x%x",ntohl(inet_sk(socket->sk)->inet_rcv_saddr));
 				pr_info( "sport %hu dport %hu daddr 0x%x laddr 0x%x",ntohs(inet_sk(socket->sk)->inet_sport),ntohs(inet_sk(socket->sk)->inet_dport), ntohl(inet_sk(socket->sk)->inet_daddr),ntohl(inet_sk(socket->sk)->inet_saddr));
 #endif
 				if(ret->port == ntohs(inet_sk(socket->sk)->inet_sport))
