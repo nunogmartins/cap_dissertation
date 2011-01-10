@@ -178,9 +178,11 @@ int my_insert(struct rb_root *root, struct packetInfo *lpi)
 			}
 			else
 			{
-				//ToDo: need to verify that address is not already on the list ..
-				//if(isEqualPacketInfo())
-				addAddress(lpi,this);
+				if(!isEqualPacketInfo(lpi,port))
+					addAddress(lpi,this);
+				else
+					return 0;
+
 				return 1;
 			}
 	}
@@ -207,11 +209,15 @@ void my_erase(struct rb_root *root, struct packetInfo *pi)
 	if(toRemove)
 		if(data)
 		{
-			rb_erase(&data->node,root);
+			if((!data->tcp) && !(data->udp)){
+				rb_erase(&data->node,root);
 			/*
 			 * ToDo: taking care of the information of the node
 			 */
-			kfree(data);
+				kfree(data);
+			}else{
+				//ToDo: remove only the address it needs to remove ...
+			}
 			//ToDo: possibly here to kfree data memory ...
 			//@here ... allocated in ports_table::insertPort ...
 
@@ -243,13 +249,15 @@ void printAll(struct rb_root *tree)
 		p = rb_entry(node,portInfo, node);
 		pr_info( "port = %hu ", p->port);
 
-		pr_info( "tcp addresses");
-		if(p->tcp)
+
+		if(p->tcp){
+			pr_info( "tcp addresses");
 			iterateList(p->tcp);
+		}
 
-		pr_info( "udp addresses");
-		if(p->udp)
+		if(p->udp){
+			pr_info( "udp addresses");
 			iterateList(p->udp);
-
+		}
 	}
 }

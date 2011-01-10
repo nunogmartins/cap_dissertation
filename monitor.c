@@ -244,6 +244,8 @@ static void __exit monitor_exit(void)
 	if(ret == 0)
 		kfree(local_list);
 
+	//ToDo: need to destroy the portTree ....
+
 }
 
 void initializeTreeWithTaskInfo(pid_t new_pid)
