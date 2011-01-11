@@ -39,7 +39,7 @@ static int sendto_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 {
 	struct task_struct *task = ri->task;
 	//int *fd = (int *)regs->di;
-	int fd = regs->ax;
+	int fd = regs->di;
 	struct cell *my_data = (struct cell *)ri->data;
 
 	CHECK_MONITOR_PID;
@@ -73,7 +73,7 @@ static int recvfrom_entry_handler(struct kretprobe_instance *ri, struct pt_regs 
 	struct task_struct *task = ri->task;
 	struct cell *my_data = (struct cell *)ri->data;
 	//int *fd = (int *)regs->di;
-	int fd = regs->ax;
+	int fd = regs->di;
 
 	CHECK_MONITOR_PID;
 
@@ -153,7 +153,7 @@ static int close_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs
 static int bind_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	struct task_struct *task = ri->task;
-	int fd = regs->ax;
+	int fd = regs->di;
 	struct cell *my_data = (struct cell *)ri->data;
 
 	CHECK_MONITOR_PID;
@@ -183,7 +183,7 @@ static int connect_entry_handler(struct kretprobe_instance *ri, struct pt_regs *
 {
 	struct task_struct *task = ri->task;
 	struct cell *my_data =(struct cell *) ri->data;
-	int fd = regs->ax;
+	int fd = regs->di;
 
 #ifdef MY_DEBUG
 	printk(KERN_INFO "connect from application %s ", task->comm);
@@ -192,6 +192,8 @@ static int connect_entry_handler(struct kretprobe_instance *ri, struct pt_regs *
 	CHECK_MONITOR_PID;
 
 	my_data->fd = fd;
+	
+	print_regs("connect entry",regs);
 
 	return 0;
 }
@@ -212,6 +214,7 @@ static int connect_ret_handler(struct kretprobe_instance *ri, struct pt_regs *re
 		insertPort(getLocalPacketInfoFromFd(fd));
 	}
 		
+	print_regs("connect out",regs);
 	return 0;
 }
 
@@ -235,6 +238,7 @@ static int accept_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 	if(retval > 0)
 	{
 		printk(KERN_INFO "acceptretval");
+		//getLocalPacketInfoFromFd(retval);
 		insertPort(getLocalPacketInfoFromFd(retval));
 
 	}
