@@ -202,7 +202,7 @@ int my_insert(struct rb_root *root, struct packetInfo *lpi)
 			}
 			else
 			{
-				if(!isEqualPacketInfo(lpi,port))
+				if(!isEqualPacketInfo(lpi,this))
 					addAddress(lpi,this);
 				else
 					return 0;
