@@ -28,6 +28,17 @@ static inline int isEqualPacketInfo(struct packetInfo *pi, struct portInfo *info
 	local_addresses_list *address = NULL;
 	struct list_head *pos = NULL;
 
+#ifdef MY_DEBUG
+	if(!info)
+	{
+		pr_warning("my info is null");
+		
+		if(!pi)
+			pr_warning("pi is null");
+		BUG();
+	}
+#endif
+
 	switch(pi->protocol){
 
 	case 0x06:
@@ -76,6 +87,7 @@ struct portInfo *my_search(struct rb_root *root,struct packetInfo *pi)
 	struct rb_node *node = root->rb_node;
 	struct portInfo *data = NULL;
 
+	pr_info("in search");
 
 	while(node)
 	{
@@ -115,6 +127,15 @@ static int addAddress(struct packetInfo *lpi, struct portInfo *port_info)
 			return 1;
 		}
 		else{
+			if(!port_info->tcp)
+			{
+				port_info->tcp = kmalloc(sizeof(*tmp),GFP_KERNEL);
+
+				if(!port_info->tcp)
+					return -1;
+
+				INIT_LIST_HEAD(&((port_info->tcp)->list));
+			}
 			tmp = port_info->tcp;
 #ifdef MY_DEBUG
 			pr_info("is tcp and tmp is now ... %p",tmp);
@@ -127,23 +148,31 @@ static int addAddress(struct packetInfo *lpi, struct portInfo *port_info)
 			port_info->tcp = local_list;
 			return 1;
 		}
-		else
+		else{
+			if(!port_info->udp)
+			{
+				
+				port_info->udp = kmalloc(sizeof(*tmp),GFP_KERNEL);
+			
+				if(!port_info->udp)
+					return -1;
+
+				INIT_LIST_HEAD(&((port_info->udp)->list));
+			}
 			tmp = port_info->udp;
+		}
 		break;
 
 	default:
 		break;
 	}
 
-	if(!tmp){
-		tmp = kmalloc(sizeof(*tmp),GFP_KERNEL);
-
-		if(!tmp)
-			return -1;
-
-		INIT_LIST_HEAD(&(tmp->list));
+	if(tmp)
+		pr_info("tmp is not null");
+	else{
+		pr_info("tmp is null ...");
+		BUG();
 	}
-
 	node = kmalloc(sizeof(*node),GFP_KERNEL);
 
 	if(!node)
@@ -158,6 +187,9 @@ static int addAddress(struct packetInfo *lpi, struct portInfo *port_info)
 #ifdef MY_DEBUG
 	pr_info("node added to the list");
 #endif
+
+	printAll(&db);
+
 	return 1;
 }
 
@@ -185,7 +217,7 @@ int my_insert(struct rb_root *root, struct packetInfo *lpi)
 	struct portInfo *port = NULL;
 
 #ifdef MY_DEBUG
-			pr_info( "port = %hu", lpi->port);
+			pr_info( "in insert for port = %hu", lpi->port);
 #endif
 
 	while(*new)
@@ -202,7 +234,7 @@ int my_insert(struct rb_root *root, struct packetInfo *lpi)
 			}
 			else
 			{
-				if(!isEqualPacketInfo(lpi,port))
+				if(!isEqualPacketInfo(lpi,this))
 					addAddress(lpi,this);
 				else
 					return 0;
