@@ -6,6 +6,8 @@
  */
 #include "config.h"
 
+#include <asm/ptrace.h>
+
 #include <linux/module.h>
 #include <linux/kprobes.h>
 #include <linux/socket.h>
@@ -18,6 +20,7 @@
 #include <net/sock.h>
 #include <linux/string.h>
 #include <net/inet_sock.h>
+
 
 #include "table_port.h"
 #include "pcap_monitoring.h"
@@ -34,7 +37,7 @@ extern int instantiationKRETProbe(struct kretprobe *kret,
 extern char *application_name;
 extern void print_regs(const char *function, struct pt_regs *regs);
 extern pid_t monitor_pid;
-
+#ifdef UDP_PROBES
 static int sendto_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	struct task_struct *task = ri->task;
@@ -98,8 +101,9 @@ static int recvfrom_ret_handler(struct kretprobe_instance *ri, struct pt_regs *r
 
 	return 0;
 }
+#endif
 
-
+#ifdef TCP_PROBES
 static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	struct task_struct *task = ri->task;
@@ -186,7 +190,7 @@ static int connect_entry_handler(struct kretprobe_instance *ri, struct pt_regs *
 	int fd = regs->di;
 
 #ifdef MY_DEBUG
-	printk(KERN_INFO "connect from application %s ", task->comm);
+	pr_info(KERN_INFO "connect from application %s pid %d and parent %d", task->comm, task->pid, task->real_parent->pid);
 #endif
 
 	CHECK_MONITOR_PID;
@@ -206,15 +210,18 @@ static int connect_ret_handler(struct kretprobe_instance *ri, struct pt_regs *re
 	struct task_struct *task = ri->task;
 	
 	#ifdef MY_DEBUG
-	printk(KERN_INFO "on connect from %s ret handler with fd %d and retval %d",task->comm,fd,retval);
+	pr_emerg("on connect from %s ret handler with fd %d and retval %d",task->comm,fd,retval);
 	#endif
 
-	if(retval == 0)
+	print_regs("connect out",regs);
+
+	//BUG();
+
+	if(retval == 0 || retval == -115)
 	{
 		insertPort(getLocalPacketInfoFromFd(fd));
 	}
-		
-	print_regs("connect out",regs);
+	
 	return 0;
 }
 
@@ -286,6 +293,7 @@ static int socket_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 /*
  * function called on module init to initialize kretprobes common to tcp and udp
  */
+#endif
 
 int init_kretprobes_syscalls(int *initial)
 {

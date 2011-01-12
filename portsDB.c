@@ -32,10 +32,12 @@ static inline int isEqualPacketInfo(struct packetInfo *pi, struct portInfo *info
 	if(!info)
 	{
 		pr_warning("my info is null");
-		
-		if(!pi)
-			pr_warning("pi is null");
 		BUG();
+	}
+
+	if(!pi){
+			pr_warning("pi is null");
+			BUG();
 	}
 #endif
 
@@ -65,15 +67,20 @@ static inline int isEqualPacketInfo(struct packetInfo *pi, struct portInfo *info
 	if(!tmp)
 		return 0;
 
+	pr_emerg("going to iterate on equalPacketInfo");
+
 	list_for_each(pos,&(tmp->list))
 	{
 		address = list_entry(pos,local_addresses_list,list);
+		if(!address)
+			BUG();
+
 #ifdef MY_DEBUG
-		pr_info("iteration address 0x%x",address->address);
+		pr_emerg("iteration address 0x%x",address->address);
 #endif
 		if(pi->address == address->address){
 #ifdef MY_DEBUG
-			pr_info("found equal 0x%x",address->address);
+			pr_emerg("found equal 0x%x",address->address);
 #endif
 			return 1;
 		}
@@ -164,15 +171,16 @@ static int addAddress(struct packetInfo *lpi, struct portInfo *port_info)
 		break;
 
 	default:
-		break;
+		return -1;
 	}
 
 	if(tmp)
-		pr_info("tmp is not null");
+		pr_warning("tmp is not null");
 	else{
-		pr_info("tmp is null ...");
+		pr_warning("tmp is null ...");
 		BUG();
 	}
+
 	node = kmalloc(sizeof(*node),GFP_KERNEL);
 
 	if(!node)
@@ -180,15 +188,13 @@ static int addAddress(struct packetInfo *lpi, struct portInfo *port_info)
 
 	node->address = lpi->address;
 #ifdef MY_DEBUG
-	pr_info("going to list add");
+	pr_warning("going to list add");
 #endif
 
 	list_add(&(tmp->list),&(node->list));
 #ifdef MY_DEBUG
-	pr_info("node added to the list");
+	pr_warning("node added to the list");
 #endif
-
-	printAll(&db);
 
 	return 1;
 }
@@ -242,7 +248,8 @@ int my_insert(struct rb_root *root, struct packetInfo *lpi)
 				return 1;
 			}
 	}
-
+	
+	pr_info("vou criar um novo");
 	port = createPacketInfo(lpi);
 	if(!port)
 		return -1;
@@ -304,7 +311,7 @@ void printAll(struct rb_root *tree)
 		p = rb_entry(node,portInfo, node);
 		pr_info( "port = %hu ", p->port);
 
-
+#ifdef NOT
 		if(p->tcp){
 			pr_info( "tcp addresses");
 			iterateList(p->tcp);
@@ -314,5 +321,6 @@ void printAll(struct rb_root *tree)
 			pr_info( "udp addresses");
 			iterateList(p->udp);
 		}
+#endif
 	}
 }

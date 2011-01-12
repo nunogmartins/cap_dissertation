@@ -48,8 +48,13 @@ int insertPort(struct packetInfo *lpi)
 	ret = my_insert(&db,lpi);
 
 #ifdef MY_DEBUG
-	printAll(&db);
+	if(ret > 0){
+		pr_info("adicionado");
+		//printAll(&db);
+	}else
+		pr_info("nada alterado");
 #endif
+
 	return ret;
 }
 
