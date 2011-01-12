@@ -27,6 +27,7 @@ static inline int isEqualPacketInfo(struct packetInfo *pi, struct portInfo *info
 	struct local_addresses_list *tmp = NULL;
 	local_addresses_list *address = NULL;
 	struct list_head *pos = NULL;
+	int i=0;
 
 #ifdef MY_DEBUG
 	if(!info)
@@ -71,6 +72,8 @@ static inline int isEqualPacketInfo(struct packetInfo *pi, struct portInfo *info
 
 	list_for_each(pos,&(tmp->list))
 	{
+		i++;
+		pr_emerg("i is %d",i);
 		if(!pos){
 			pr_emerg("pos is null");
 			BUG();
