@@ -61,8 +61,7 @@ extern int init_kretprobes_udp(int *initial);
 
 void print_regs(const char *function, struct pt_regs *regs)
 {
-	pr_info( "%s ax=%p bx=%p cx=%p dx=%p bp=%p sp=%p",
-			function, (void *)regs->di,(void *)regs->si,(void *)regs->dx,(void *)regs->cx,(void*)regs->r8,(void *) regs->r9);
+	pr_emerg( "%s ax=%p bx=%p cx=%p dx=%p di=%p si=%p r8=%p r9=%p",function, (void *)regs->ax,(void *)regs->bx,(void *)regs->cx,(void *)regs->dx,(void*)regs->di,(void *) regs->si,(void *)regs->r8,(void *)regs->r9);
 }
 
 int instantiationKRETProbe(struct kretprobe *kret,
@@ -102,7 +101,13 @@ unsigned int my_portExists(struct packetInfo *src_pi,struct packetInfo *dst_pi)
 
 	if(src_pi!=NULL && dst_pi!=NULL)
 	{
-		if(src_pi->protocol == 0x11 || src_pi->protocol == 0x06){
+		if(src_pi->port == 22)
+			return 0;
+
+		if(dst_pi->port == 22)
+			return 0; 
+
+		if((src_pi->protocol == 0x11 || src_pi->protocol == 0x06)){
 
 			pr_info( "proto 0x%x srcadd 0x%x dstaddr 0x%x srcP %hu dstP %hu", src_pi->protocol,src_pi->address, dst_pi->address,src_pi->port, dst_pi->port );
 
@@ -112,13 +117,6 @@ unsigned int my_portExists(struct packetInfo *src_pi,struct packetInfo *dst_pi)
 			if(sentinel_src != NULL)
 			{
 				pr_info( "found src port %hu",src_pi->port);
-#ifdef OLD_PHASE
-
-				if(/*sentinel_src->address == pi->srcAddr && */sentinel_src->protocol == src_pi->protocol)
-				{
-					return 1;
-				}
-#endif
 				return 1;
 			}
 
@@ -127,15 +125,6 @@ unsigned int my_portExists(struct packetInfo *src_pi,struct packetInfo *dst_pi)
 			if(sentinel_dst != NULL)
 			{
 				pr_info( "found dst port %hu",dst_pi->port);
-
-#ifdef OLD_PHASE
-				if(/*sentinel_dst->address == pi->dstAddr && */ sentinel_dst->protocol == dst_pi->protocol)
-				{
-					return 1;
-				}
-				else
-					return 0;
-#endif
 				return 1;
 			}
 
