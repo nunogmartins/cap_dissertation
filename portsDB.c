@@ -71,9 +71,23 @@ static inline int isEqualPacketInfo(struct packetInfo *pi, struct portInfo *info
 
 	list_for_each(pos,&(tmp->list))
 	{
-		address = list_entry(pos,local_addresses_list,list);
-		if(!address)
+		if(!pos){
+			pr_emerg("pos is null");
 			BUG();
+		}
+		if(!tmp){
+			pr_emerg("tmp is null");
+			BUG();
+		}
+		if(!(&(tmp->list))){
+			pr_emerg("tmp->list is null");
+			BUG();
+		}
+		address = list_entry(pos,local_addresses_list,list);
+		if(!address){
+			pr_emerg();
+			BUG();
+		}
 
 #ifdef MY_DEBUG
 		pr_emerg("iteration address 0x%x",address->address);
