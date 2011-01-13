@@ -208,7 +208,7 @@ static int addAddress(struct packetInfo *lpi, struct portInfo *port_info)
 	pr_warning("going to list add");
 #endif
 
-	list_add(&(tmp->list),&(node->list));
+	list_add(&(node->list),&(tmp->list));
 #ifdef MY_DEBUG
 	pr_warning("node added to the list");
 #endif
