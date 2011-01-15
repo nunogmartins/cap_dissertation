@@ -19,10 +19,17 @@ extern struct rb_root db;
 extern struct local_addresses_list *local_list;
 
 
+void debugFunc(struct packetInfo *lpi)
+{
+	pr_emerg("port %hu",lpi->port);
+	pr_emerg("protocol %hu",lpi->protocol);
+	pr_emerg("address 0x%x",lpi->address);
+}
+
 
 int insertPort(struct packetInfo *lpi)
 {
-	int ret;
+	int ret=1;
 
 	if(lpi == NULL){
 
@@ -31,6 +38,10 @@ int insertPort(struct packetInfo *lpi)
 #endif
 		return 	-1;
 	}
+
+	debugFunc(lpi);
+
+#ifdef NOT
 
 #ifdef MY_DEBUG
 	pr_info( "inserting port %hu with address 0x%x being %hu", lpi->port, lpi->address, lpi->protocol);
@@ -55,6 +66,7 @@ int insertPort(struct packetInfo *lpi)
 		pr_info("nada alterado");
 #endif
 
+#endif //NOT
 	return ret;
 }
 

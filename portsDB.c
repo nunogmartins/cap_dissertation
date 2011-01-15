@@ -328,7 +328,6 @@ void printAll(struct rb_root *tree)
 		p = rb_entry(node,portInfo, node);
 		pr_info( "port = %hu ", p->port);
 
-#ifdef NOT
 		if(p->tcp){
 			pr_info( "tcp addresses");
 			iterateList(p->tcp);
@@ -338,6 +337,5 @@ void printAll(struct rb_root *tree)
 			pr_info( "udp addresses");
 			iterateList(p->udp);
 		}
-#endif
 	}
 }
