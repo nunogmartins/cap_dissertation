@@ -131,6 +131,31 @@ struct packetInfo * getLocalPacketInfoFromFd(unsigned int fd)
 				socket = f->private_data;
 				ret = kmalloc(sizeof(struct packetInfo),GFP_KERNEL);
 				ret->port = inet_sk(socket->sk)->inet_num;
+#ifdef MY_DEBUG
+				pr_emerg( "rcv is 0x%x",ntohl(inet_sk(socket->sk)->inet_rcv_saddr));
+				pr_emerg( "sport %hu dport %hu daddr 0x%x laddr 0x%x",ntohs(inet_sk(socket->sk)->inet_sport),ntohs(inet_sk(socket->sk)->inet_dport), ntohl(inet_sk(socket->sk)->inet_daddr),ntohl(inet_sk(socket->sk)->inet_saddr));
+#endif
+				if(ret->port == ntohs(inet_sk(socket->sk)->inet_sport))
+				{
+					if(!inet_sk(socket->sk)->inet_rcv_saddr){
+						ret->address = inet_sk(socket->sk)->inet_saddr;
+					}
+					else
+						ret->address = inet_sk(socket->sk)->inet_rcv_saddr;
+
+				}else
+				{
+					ret->address = inet_sk(socket->sk)->inet_daddr;
+				}
+				ret->address = ntohl(ret->address);
+				ret->protocol = socket->sk->sk_protocol;
+
+/*
+
+
+
+
+				ret->port = inet_sk(socket->sk)->inet_num;
 				if(ret->port == inet_sk(socket->sk)->inet_sport)
 				{
 					ret->address = inet_sk(socket->sk)->inet_saddr;
@@ -140,8 +165,9 @@ struct packetInfo * getLocalPacketInfoFromFd(unsigned int fd)
 				}
 				ret->protocol = socket->sk->sk_protocol;
 				ret->address = ntohl(ret->address);
+				*/
 #ifdef MY_DEBUG
-				pr_info("local port %hu addr 0x%x proto %hu",ret->port, ret->address, ret->protocol);
+				pr_emerg("local port %hu addr 0x%x proto %hu",ret->port, ret->address, ret->protocol);
 #endif
 			}
 		}
