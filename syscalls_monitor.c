@@ -56,17 +56,17 @@ static int sendto_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 	
 	int retval = regs_return_value(regs);
 	struct cell *my_data = (struct cell *)ri->data;
-
-	printk(KERN_INFO "fd in sendto is %d in application %s", my_data->fd, ri->task->comm);
+	int fd = my_data->fd;
+	struct packetInfo pi;
+	int err;
 	
 	if(retval > 0)
 	{
-		printk(KERN_INFO "sendto retval > 0");
-		insertPort(getLocalPacketInfoFromFd(my_data->fd));
+		getLocalPacketInfoFromFd(fd,&pi,&err);
+		if(err == 0)
+			insertPort(&pi);
 	}else
-		printk(KERN_INFO "sendto retval < 0");
-
-
+		pr_info("sendto retval < 0");
 
 	return 0;
 }
@@ -88,15 +88,17 @@ static int recvfrom_ret_handler(struct kretprobe_instance *ri, struct pt_regs *r
 {	
 	int retval = regs_return_value(regs);
 	struct cell *my_data = (struct cell*)ri->data;
-
-	printk(KERN_INFO "fd = %d with application %s ", my_data->fd, ri->task->comm);	
+	struct packetInfo pi;
+	int fd = my_data->fd;
+	int err;
 
 	if(retval > 0)
 	{
-		printk(KERN_INFO"recvfrom retval > 0");
-		insertPort(getLocalPacketInfoFromFd(my_data->fd));
+		getLocalPacketInfoFromFd(fd,&pi,&err);
+		if(err == 0)
+			insertPort(&pi);
 	}else
-		printk(KERN_INFO"recvfrom retval < 0");
+		pr_info("recvfrom retval < 0");
 
 
 	return 0;
@@ -171,12 +173,14 @@ static int bind_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	int retval = regs_return_value(regs);
 	struct cell *my_data = (struct cell *)ri->data;
+	struct packetInfo pi;
+	int err;
 	
 	if(retval == 0)
 	{
-	//TODO: get the port from the data and insert
-		insertPort(getLocalPacketInfoFromFd(my_data->fd));
-		//insertPort(my_data->port);
+		getLocalPacketInfoFromFd(my_data->fd, &pi,&err);
+		if(err == 0)
+			insertPort(&pi);
 	}
 
 	return 0;
@@ -189,15 +193,9 @@ static int connect_entry_handler(struct kretprobe_instance *ri, struct pt_regs *
 	struct cell *my_data =(struct cell *) ri->data;
 	int fd = regs->di;
 
-#ifdef MY_DEBUG
-	pr_info(KERN_INFO "connect from application %s pid %d and parent %d", task->comm, task->pid, task->real_parent->pid);
-#endif
-
 	CHECK_MONITOR_PID;
 
 	my_data->fd = fd;
-	
-	print_regs("connect entry",regs);
 
 	return 0;
 }
@@ -207,19 +205,14 @@ static int connect_ret_handler(struct kretprobe_instance *ri, struct pt_regs *re
 	int retval = regs_return_value(regs);
 	struct cell *my_data = (struct cell*)ri->data;
 	int fd = my_data->fd;
-	struct task_struct *task = ri->task;
+	struct packetInfo pi;
+	int err;
 	
-	#ifdef MY_DEBUG
-	pr_info("on connect from %s ret handler with fd %d and retval %d",task->comm,fd,retval);
-	#endif
-
-	print_regs("connect out",regs);
-
-	//BUG();
-
 	if(retval == 0 || retval == -115)
 	{
-		insertPort(getLocalPacketInfoFromFd(fd));
+		getLocalPacketInfoFromFd(fd,&pi,&err);
+		if(err == 0)
+			insertPort(&pi);
 	}
 	
 	return 0;
@@ -228,7 +221,6 @@ static int connect_ret_handler(struct kretprobe_instance *ri, struct pt_regs *re
 static int accept_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	struct task_struct *task = ri->task;
-	//struct cell *my_data = (struct cell *)ri->data;
 
 	CHECK_MONITOR_PID;
 
@@ -237,17 +229,14 @@ static int accept_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 static int accept_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	int retval = regs_return_value(regs);
-	//struct cell *my_data = (struct cell *)ri->data;
-#ifdef MY_DEBUG
-	pr_info("retval in accept is %d for application %s",retval,ri->task->comm);
-#endif
+	struct packetInfo pi;
+	int err;
 
 	if(retval > 0)
 	{
-		printk(KERN_INFO "acceptretval");
-		//getLocalPacketInfoFromFd(retval);
-		insertPort(getLocalPacketInfoFromFd(retval));
-
+		getLocalPacketInfoFromFd(retval,&pi,&err);
+		if(err == 0)
+			insertPort(&pi);
 	}
 
 	return 0;

@@ -4,11 +4,15 @@
  *  Created on: Nov 8, 2010
  *      Author: nuno
  */
+#ifndef MODULE
+#define MODULE
+#endif
+
 #include "config.h"
 
+#include <linux/module.h>
 #include <linux/init.h>
 #include <linux/kernel.h>
-#include <linux/module.h>
 #include <linux/slab.h>
 #include <linux/kprobes.h>
 #include <linux/types.h>
@@ -25,6 +29,14 @@ struct kretprobe *kretprobes = NULL;
 struct jprobe *jprobes = NULL;
 char *application_name = "server";
 struct local_addresses_list *local_list = NULL;
+
+static void __exit monitor_exit(void);
+static int __init monitor_init(void);
+
+module_init(monitor_init);
+module_exit(monitor_exit);
+MODULE_LICENSE("GPL");
+
 
 
 pid_t monitor_pid;
@@ -96,9 +108,10 @@ int instantiationKRETProbe(struct kretprobe *kret,
 
 unsigned int my_portExists(struct packetInfo *src_pi,struct packetInfo *dst_pi)
 {
+#ifdef DFILTER
 	struct portInfo *sentinel_src = NULL;
 	struct portInfo *sentinel_dst = NULL;
-#ifdef DFILTER
+
 	if(src_pi!=NULL && dst_pi!=NULL)
 	{
 		if(src_pi->port == 22)
@@ -233,6 +246,7 @@ static void __exit monitor_exit(void)
 		kfree(local_list);
 
 	//ToDo: need to destroy the portTree ....
+	//ToDo: clear the memory leak ...
 
 }
 
@@ -268,18 +282,18 @@ void initializeTreeWithTaskInfo(pid_t new_pid)
 				for(file_descriptor=0; file_descriptor < fdt->max_fds; file_descriptor++)
 				{
 					if((file=fd[file_descriptor]) != NULL){
-						struct packetInfo *p = getLocalPacketInfoFromFile(file);
-						if(p!=NULL)
+						struct packetInfo p;
+						int err;
+						getLocalPacketInfoFromFile(file,&p,&err);
+						if(err == 0)
 						{
 #ifdef MY_DEBUG
 							pr_info( "iteration %lu is socket",file_descriptor);
 #endif
-							if(insertPort(p) > 0)
+							if(insertPort(&p) > 0)
 								pr_info("insertion was ok");
 							else
 								pr_info("something was wrong with the insertion");
-
-							kfree(p); //it was allocated in localPacketInfo
 						}
 					}
 				}
@@ -291,7 +305,5 @@ void initializeTreeWithTaskInfo(pid_t new_pid)
 	}
 }
 
-module_init(monitor_init);
-module_exit(monitor_exit);
-MODULE_LICENSE("GPL");
+
 

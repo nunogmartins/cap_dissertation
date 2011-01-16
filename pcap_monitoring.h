@@ -44,8 +44,8 @@ typedef struct local_addresses_list {
 
 extern struct socket *sockfd_lookup(int fd, int *err);
 unsigned short getPort(unsigned int fd,int direction);
-struct packetInfo * getLocalPacketInfoFromFd(unsigned int fd);
-struct packetInfo * getLocalPacketInfoFromFile(struct file *f);
+void getLocalPacketInfoFromFd(unsigned int fd,struct packetInfo *,int *err);
+void getLocalPacketInfoFromFile(struct file *f,struct packetInfo *,int *err);
 struct local_addresses_list* listAllDevicesAddress(void);
 int remove_local_addresses_list(struct local_addresses_list *list);
 

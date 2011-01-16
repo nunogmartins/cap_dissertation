@@ -124,9 +124,8 @@ struct portInfo *my_search(struct rb_root *root,struct packetInfo *pi)
 				node = node->rb_right;
 			else
 				if(pi->port == data->port){
-					//ToDo: have to search for address on procotol
 					if(isEqualPacketInfo(pi,data)!=0)
-						return data; //its my port ...
+						return data;
 					else
 						return NULL;
 				}
@@ -161,9 +160,6 @@ static int addAddress(struct packetInfo *lpi, struct portInfo *port_info)
 				INIT_LIST_HEAD(&((port_info->tcp)->list));
 			}
 			tmp = port_info->tcp;
-#ifdef MY_DEBUG
-			pr_info("is tcp and tmp is now ... %p",tmp);
-#endif
 		}
 		break;
 
@@ -191,27 +187,14 @@ static int addAddress(struct packetInfo *lpi, struct portInfo *port_info)
 		return -1;
 	}
 
-	if(tmp)
-		pr_warning("tmp is not null");
-	else{
-		pr_warning("tmp is null ...");
-		BUG();
-	}
-
 	node = kmalloc(sizeof(*node),GFP_KERNEL);
 
 	if(!node)
 		return -1;
 
 	node->address = lpi->address;
-#ifdef MY_DEBUG
-	pr_warning("going to list add");
-#endif
 
 	list_add(&(node->list),&(tmp->list));
-#ifdef MY_DEBUG
-	pr_warning("node added to the list");
-#endif
 
 	return 1;
 }
@@ -299,7 +282,7 @@ void my_erase(struct rb_root *root, struct packetInfo *pi)
 				//ToDo: remove only the address it needs to remove ...
 			}
 			//ToDo: possibly here to kfree data memory ...
-			//@here ... allocated in ports_table::insertPort ...
+			//@here ... allocated in createPacketInfo
 
 		}
 

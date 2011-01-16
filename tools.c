@@ -103,15 +103,37 @@ struct inet_sock *i_sock = NULL;
 	//return direction == 0 ? ntohs(inet_sk(socket->sk)->sport) : ntohs(inet_sk(socket->sk)->dport);
 }
 
+void getInetSockParameters(struct inet_sock *inetsock,struct packetInfo *ret)
+{
+	ret->port = inetsock->inet_num;
+#ifdef MY_DEBUG
+	pr_emerg( "rcv is 0x%x",ntohl(inetsock->inet_rcv_saddr));
+	pr_emerg( "sport %hu dport %hu daddr 0x%x laddr 0x%x",ntohs(inetsock->inet_sport),ntohs(inetsock->inet_dport), ntohl(inetsock->inet_daddr),ntohl(inetsock->inet_saddr));
+#endif
+	if(ret->port == ntohs(inetsock->inet_sport))
+	{
+		if(!inetsock->inet_rcv_saddr){
+			ret->address = inetsock->inet_saddr;
+		}
+		else
+			ret->address = inetsock->inet_rcv_saddr;
 
-struct packetInfo * getLocalPacketInfoFromFd(unsigned int fd)
-		{
+	}else
+	{
+		ret->address = inetsock->inet_daddr;
+	}
+	ret->address = ntohl(ret->address);
+	ret->protocol = ((struct sock *)inetsock)->sk_protocol;
+
+}
+
+
+void getLocalPacketInfoFromFd(unsigned int fd, struct packetInfo *ret, int *err)
+{
 	struct file *f = NULL;
 	struct socket *socket = NULL;
-	struct packetInfo *ret = NULL;
-#ifdef NEW_DEBUG
-	return NULL;
-#endif
+
+	*err = 0;
 	f = fget(fd);
 
 #ifdef MY_DEBUG	
@@ -129,64 +151,34 @@ struct packetInfo * getLocalPacketInfoFromFd(unsigned int fd)
 			if(S_ISSOCK(d_inode->i_mode))
 			{
 				socket = f->private_data;
-				ret = kmalloc(sizeof(struct packetInfo),GFP_KERNEL);
-				ret->port = inet_sk(socket->sk)->inet_num;
-#ifdef MY_DEBUG
-				pr_emerg( "rcv is 0x%x",ntohl(inet_sk(socket->sk)->inet_rcv_saddr));
-				pr_emerg( "sport %hu dport %hu daddr 0x%x laddr 0x%x",ntohs(inet_sk(socket->sk)->inet_sport),ntohs(inet_sk(socket->sk)->inet_dport), ntohl(inet_sk(socket->sk)->inet_daddr),ntohl(inet_sk(socket->sk)->inet_saddr));
-#endif
-				if(ret->port == ntohs(inet_sk(socket->sk)->inet_sport))
-				{
-					if(!inet_sk(socket->sk)->inet_rcv_saddr){
-						ret->address = inet_sk(socket->sk)->inet_saddr;
-					}
-					else
-						ret->address = inet_sk(socket->sk)->inet_rcv_saddr;
-
-				}else
-				{
-					ret->address = inet_sk(socket->sk)->inet_daddr;
-				}
-				ret->address = ntohl(ret->address);
-				ret->protocol = socket->sk->sk_protocol;
-
-/*
-
-
-
-
-				ret->port = inet_sk(socket->sk)->inet_num;
-				if(ret->port == inet_sk(socket->sk)->inet_sport)
-				{
-					ret->address = inet_sk(socket->sk)->inet_saddr;
-				}else
-				{
-					ret->address = inet_sk(socket->sk)->inet_daddr;
-				}
-				ret->protocol = socket->sk->sk_protocol;
-				ret->address = ntohl(ret->address);
-				*/
+				getInetSockParameters((struct inet_sock *)(socket->sk),ret);
 #ifdef MY_DEBUG
 				pr_emerg("local port %hu addr 0x%x proto %hu",ret->port, ret->address, ret->protocol);
 #endif
+			}else
+			{
+				*err = -1;
 			}
+		}else
+		{
+			*err = -2;
 		}
 	}
 #ifdef MY_DEBUG
 	else
 	{
 		pr_info( "f is null");
+		*err = -3;
 	}
 #endif
 
-	return ret;
-		}
+}
 
-struct packetInfo * getLocalPacketInfoFromFile(struct file *f)
+void getLocalPacketInfoFromFile(struct file *f, struct packetInfo *ret, int *err)
 {
 	struct socket *socket = NULL;
-	struct packetInfo *ret = NULL;
 
+	*err = 0;
 
 	if(f!=NULL)
 	{
@@ -199,34 +191,24 @@ struct packetInfo * getLocalPacketInfoFromFile(struct file *f)
 			if(S_ISSOCK(d_inode->i_mode))
 			{
 				socket = f->private_data;
-				ret = kmalloc(sizeof(struct packetInfo),GFP_KERNEL);
-				ret->port = inet_sk(socket->sk)->inet_num;
-#ifdef MY_DEBUG
-				pr_info( "rcv is 0x%x",ntohl(inet_sk(socket->sk)->inet_rcv_saddr));
-				pr_info( "sport %hu dport %hu daddr 0x%x laddr 0x%x",ntohs(inet_sk(socket->sk)->inet_sport),ntohs(inet_sk(socket->sk)->inet_dport), ntohl(inet_sk(socket->sk)->inet_daddr),ntohl(inet_sk(socket->sk)->inet_saddr));
-#endif
-				if(ret->port == ntohs(inet_sk(socket->sk)->inet_sport))
-				{
-					if(!inet_sk(socket->sk)->inet_rcv_saddr){
-						ret->address = inet_sk(socket->sk)->inet_saddr;
-					}
-					else
-						ret->address = inet_sk(socket->sk)->inet_rcv_saddr;
+				getInetSockParameters((struct inet_sock *)(socket->sk),ret);
 
-				}else
-				{
-					ret->address = inet_sk(socket->sk)->inet_daddr;
-				}
-				ret->address = ntohl(ret->address);
-				ret->protocol = socket->sk->sk_protocol;
 #ifdef MY_DEBUG
 				pr_info( "lport %hu addr 0x%x proto %hu",ret->port, ret->address, ret->protocol);
 #endif
+			}else
+			{
+				*err = -1;
 			}
+		}else
+		{
+			*err = -2;
 		}
+	}else
+	{
+		*err = -3;
 	}
 
-	return ret;
 }
 
 struct local_addresses_list* listAllDevicesAddress(void)
