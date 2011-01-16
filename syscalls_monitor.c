@@ -210,7 +210,7 @@ static int connect_ret_handler(struct kretprobe_instance *ri, struct pt_regs *re
 	struct task_struct *task = ri->task;
 	
 	#ifdef MY_DEBUG
-	pr_emerg("on connect from %s ret handler with fd %d and retval %d",task->comm,fd,retval);
+	pr_info("on connect from %s ret handler with fd %d and retval %d",task->comm,fd,retval);
 	#endif
 
 	print_regs("connect out",regs);

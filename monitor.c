@@ -98,7 +98,7 @@ unsigned int my_portExists(struct packetInfo *src_pi,struct packetInfo *dst_pi)
 {
 	struct portInfo *sentinel_src = NULL;
 	struct portInfo *sentinel_dst = NULL;
-
+#ifdef DFILTER
 	if(src_pi!=NULL && dst_pi!=NULL)
 	{
 		if(src_pi->port == 22)
@@ -116,7 +116,7 @@ unsigned int my_portExists(struct packetInfo *src_pi,struct packetInfo *dst_pi)
 
 			if(sentinel_src != NULL)
 			{
-				pr_info( "found src port %hu",src_pi->port);
+				pr_emerg( "found src port %hu",src_pi->port);
 				return 1;
 			}
 
@@ -124,13 +124,13 @@ unsigned int my_portExists(struct packetInfo *src_pi,struct packetInfo *dst_pi)
 
 			if(sentinel_dst != NULL)
 			{
-				pr_info( "found dst port %hu",dst_pi->port);
+				pr_emerg( "found dst port %hu",dst_pi->port);
 				return 1;
 			}
 
 		}
 	}
-
+#endif
 	return 0;
 }
 
