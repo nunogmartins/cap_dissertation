@@ -262,8 +262,8 @@ int my_insert(struct rb_root *root, struct packetInfo *lpi)
 
 static void removeAddressFromNode(struct portInfo *pi,struct packetInfo *lpi)
 {
-	struct local_addresses_list *list = NULL;
-	struct list_head *q = NULL, pos = NULL;
+	struct local_addresses_list *list = NULL, *tmp = NULL;
+	struct list_head *q = NULL, *pos = NULL;
 
 	switch(lpi->protocol)
 	{
