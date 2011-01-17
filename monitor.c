@@ -227,8 +227,8 @@ static void __exit monitor_exit(void)
 {
 #ifdef MY_KPROBES
 	int i=0;
-#endif
 	int ret = -1;
+#endif
 
 #ifndef UNIT_TESTING
 	destroy_debug();
@@ -248,10 +248,11 @@ static void __exit monitor_exit(void)
 	depopulate();
 #endif
 
+#ifndef UNIT_TESTING
 	ret = remove_local_addresses_list(local_list);
 	if(ret == 0)
 		kfree(local_list);
-
+#endif
 	//ToDo: need to destroy the portTree ....
 	//ToDo: clear the memory leak ...
 

@@ -14,6 +14,6 @@
 */
 int insertPort(struct packetInfo *lpi);
 int deletePort(struct packetInfo *pi);
-void printTree();
+void printTree(void);
 
 #endif
