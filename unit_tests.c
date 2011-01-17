@@ -23,7 +23,6 @@ int populate(void)
 
 	for(i=INITIAL_PORT;i < FINAL_PORT; i+=10,iteration++)
 	{
-		//create port to use in my_insert
 		struct packetInfo *sentinel = (ports)+iteration;
 		sentinel->port = (u16)i;
 		sentinel->address = 0x7f000001;

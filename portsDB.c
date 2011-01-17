@@ -260,6 +260,46 @@ int my_insert(struct rb_root *root, struct packetInfo *lpi)
 	return 1;
 }
 
+static void removeAddressFromNode(struct portInfo *pi,struct packetInfo *lpi)
+{
+	struct local_addresses_list *list = NULL;
+	struct list_head *q = NULL, pos = NULL;
+
+	switch(lpi->protocol)
+	{
+	case 0x6:
+		tmp = pi->tcp;
+		break;
+	case 0x11:
+		tmp = pi->udp;
+		break;
+	default:
+		return;
+	}
+
+	if(lpi->address == 0)
+	{
+		return;
+	}
+
+	if(!tmp)
+		return;
+
+	/*
+	 * ToDo: verify if tmp is not local_addresses
+	 */
+
+	list_for_each_safe(pos,q,&(tmp->list))
+	{
+		list = list_entry(pos,local_addresses_list,list);
+		if(lpi->address == list->address){
+			list_del(pos);
+			kfree(list);
+			return;
+		}
+	}
+}
+
 void my_erase(struct rb_root *root, struct packetInfo *pi)
 {
 #ifdef NOT
@@ -284,6 +324,11 @@ void my_erase(struct rb_root *root, struct packetInfo *pi)
 			}else{
 				//ToDo: remove only the address it needs to remove ...
 				pr_emerg("removing only the address");
+				removeAddressFromNode(data,pi);
+				if((!data->tcp) && (!data->udp))
+				{
+					pr_emerg("needing to remove the node");
+				}
 			}
 			//ToDo: possibly here to kfree data memory ...
 			//@here ... allocated in createPacketInfo

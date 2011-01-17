@@ -20,8 +20,9 @@
 		return 1;	\
 	if(monitor_pid == -1) 	\
 		return 1;	\
-	if(task->pid != monitor_pid || task->real_parent->pid == monitor_pid) \
+	if(task->pid != monitor_pid || task->real_parent->pid != monitor_pid) \
 		return 1;
+//ToDo: isto esta mal feito o ||
 
 struct cell{
 	int fd;
