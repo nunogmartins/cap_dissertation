@@ -47,8 +47,6 @@ int insertPort(struct packetInfo *lpi)
 
 	debugFunc(lpi);
 
-#ifdef NOT
-
 #ifdef MY_DEBUG
 	pr_info( "inserting port %hu with address 0x%x being %hu", lpi->port, lpi->address, lpi->protocol);
 #endif
@@ -71,8 +69,6 @@ int insertPort(struct packetInfo *lpi)
 	}else
 		pr_info("nada alterado");
 #endif
-
-#endif //NOT
 	return ret;
 }
 

@@ -262,24 +262,28 @@ int my_insert(struct rb_root *root, struct packetInfo *lpi)
 
 void my_erase(struct rb_root *root, struct packetInfo *pi)
 {
+#ifdef NOT
 	short int toRemove = 0;
-
+#endif
 	//ToDo: completly ...
 
 	struct portInfo *data = my_search(root,pi);
 
-
+#ifdef NOT
 	if(toRemove)
+#endif
 		if(data)
 		{
 			if((!data->tcp) && !(data->udp)){
-				rb_erase(&data->node,root);
+				/* rb_erase(&data->node,root);
+					kfree(data); */
 			/*
 			 * ToDo: taking care of the information of the node
 			 */
-				kfree(data);
+				pr_emerg("removing the node");
 			}else{
 				//ToDo: remove only the address it needs to remove ...
+				pr_emerg("removing only the address");
 			}
 			//ToDo: possibly here to kfree data memory ...
 			//@here ... allocated in createPacketInfo
