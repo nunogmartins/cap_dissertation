@@ -149,7 +149,7 @@ unsigned int my_portExists(struct packetInfo *src_pi,struct packetInfo *dst_pi)
 
 static int __init monitor_init(void)
 {
-
+#ifdef MY_KPROBES
 	int index = 0;
 	int ret = -1;
 
@@ -160,6 +160,7 @@ static int __init monitor_init(void)
 		pr_info( "problem allocating memory");
 		return -1;
 	}
+#endif
 /*
 	ret = init_kretprobes_common(&index);
 	if(ret < 0)
@@ -191,10 +192,12 @@ static int __init monitor_init(void)
 	}
 #endif
 
+#ifndef UNIT_TESTING
 	init_debug();
 	
 	Backup_portExists = portExists;
 	local_list = listAllDevicesAddress();
+#endif
 
 #ifdef UNIT_TESTING
 	populate();
@@ -222,10 +225,14 @@ static void removeKprobe(int index)
 
 static void __exit monitor_exit(void)
 {
+#ifdef MY_KPROBES
 	int i=0;
+#endif
 	int ret = -1;
 
+#ifndef UNIT_TESTING
 	destroy_debug();
+#endif
 	//unregister all probes ...
 #ifdef MY_KPROBES
 	for(i=0; i < NR_PROBES ; i++)

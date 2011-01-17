@@ -83,3 +83,6 @@ int deletePort(struct packetInfo *pi)
 	return 0;
 }
 
+void printTree(){
+	printAll(&db);
+}
