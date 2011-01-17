@@ -66,7 +66,7 @@ static int sendto_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 		if(err == 0)
 			insertPort(&pi);
 	}else
-		pr_info("sendto retval < 0");
+		pr_info("sendto retval < 0 which is %d ",retval);
 
 	return 0;
 }
@@ -98,7 +98,7 @@ static int recvfrom_ret_handler(struct kretprobe_instance *ri, struct pt_regs *r
 		if(err == 0)
 			insertPort(&pi);
 	}else
-		pr_info("recvfrom retval < 0");
+		pr_info("recvfrom retval < 0 which is %d", retval);
 
 
 	return 0;
@@ -193,7 +193,7 @@ static int connect_entry_handler(struct kretprobe_instance *ri, struct pt_regs *
 	struct cell *my_data =(struct cell *) ri->data;
 	int fd = regs->di;
 
-	CHECK_MONITOR_PID;
+	//CHECK_MONITOR_PID;
 
 	my_data->fd = fd;
 
@@ -208,6 +208,9 @@ static int connect_ret_handler(struct kretprobe_instance *ri, struct pt_regs *re
 	struct packetInfo pi;
 	int err;
 	
+
+	pr_emerg("sys connect ret from %s with pid %d",ri->task->comm, ri->task->pid);
+
 	if(retval == 0 || retval == -115)
 	{
 		getLocalPacketInfoFromFd(fd,&pi,&err);
