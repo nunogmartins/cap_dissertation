@@ -225,10 +225,41 @@ unsigned int sk_run_filter(struct sk_buff *skb, struct sock_filter *filter, int 
 	u32 tmp;
 	int k;
 	int pc;
+	__u32 rettrue = -1;
+	__u32 retfalse = -1;
 
-	if(portExists != NULL){
-		return dynamic_filter(skb,65535);
+	if(flen > 1)
+	{
+		fentry = &filter[flen-1];
+		switch(fentry->code)
+		{
+		case BPF_S_RET_K:{
+			if(fentry->k != 0)
+				rettrue = fentry->K;
+			else{
+				fentry = &filter[flen-2];
+				rettrue = fentry->k;
+			}
+		}
+		break;
+		case BPF_S_RET_A:{ // dificil de prever ...
+						// necessita de melhor analise
+			if(A != 0)
+			rettrue = A;
+			else
+			retfalse = A;
+		}
+
+		break;
+		}
+
 	}else
+	{
+		fentry = &filter[0];
+		rettrue = fentry->k;
+		retfalse = fentry->k;
+	}
+
 	/*
 	 * Process array of filter instructions.
 	 */
@@ -387,11 +418,15 @@ load_b:
 			/*if(fentry->k == 0) // mudar para com and
 			return dynamic_filter(skb,65535); // hand coded 
 			else*/
-			return fentry->k;
+			/*
+			if(portExists != NULL)
+					return dynamic_filter(skb,rettrue);
+			*/
+			return fentry->K == rettrue ? dynamic_filter(skb,rettrue) : 0;
 		case BPF_S_RET_A:
-			/*if(A == 0)
-			return dynamic_filter(skb, 65535); // hand coded
-			else*/
+			/*
+			 * alterativa de ret A ainda nao correcta
+			 */
 			return A;
 		case BPF_S_ST:
 			mem[fentry->k] = A;
