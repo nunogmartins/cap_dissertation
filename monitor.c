@@ -108,7 +108,7 @@ int instantiationKRETProbe(struct kretprobe *kret,
 
 unsigned int my_portExists(struct packetInfo *src_pi,struct packetInfo *dst_pi)
 {
-#ifdef DFILTER
+
 	struct portInfo *sentinel_src = NULL;
 	struct portInfo *sentinel_dst = NULL;
 
@@ -122,10 +122,9 @@ unsigned int my_portExists(struct packetInfo *src_pi,struct packetInfo *dst_pi)
 
 		if((src_pi->protocol == 0x11 || src_pi->protocol == 0x06)){
 
-			pr_info( "proto 0x%x srcadd 0x%x dstaddr 0x%x srcP %hu dstP %hu", src_pi->protocol,src_pi->address, dst_pi->address,src_pi->port, dst_pi->port );
+			//pr_emerg( "proto 0x%x srcadd 0x%x dstaddr 0x%x srcP %hu dstP %hu", src_pi->protocol,src_pi->address, dst_pi->address,src_pi->port, dst_pi->port );
 
 			sentinel_src = my_search(&db,src_pi);
-			printAll(&db);
 
 			if(sentinel_src != NULL)
 			{
@@ -143,7 +142,7 @@ unsigned int my_portExists(struct packetInfo *src_pi,struct packetInfo *dst_pi)
 
 		}
 	}
-#endif
+
 	return 0;
 }
 

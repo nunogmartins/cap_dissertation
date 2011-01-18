@@ -193,7 +193,7 @@ static int connect_entry_handler(struct kretprobe_instance *ri, struct pt_regs *
 	struct cell *my_data =(struct cell *) ri->data;
 	int fd = regs->di;
 
-	//CHECK_MONITOR_PID;
+	CHECK_MONITOR_PID;
 
 	my_data->fd = fd;
 

@@ -235,7 +235,7 @@ unsigned int sk_run_filter(struct sk_buff *skb, struct sock_filter *filter, int 
 		{
 		case BPF_S_RET_K:{
 			if(fentry->k != 0)
-				rettrue = fentry->K;
+				rettrue = fentry->k;
 			else{
 				fentry = &filter[flen-2];
 				rettrue = fentry->k;
@@ -422,7 +422,7 @@ load_b:
 			if(portExists != NULL)
 					return dynamic_filter(skb,rettrue);
 			*/
-			return fentry->K == rettrue ? dynamic_filter(skb,rettrue) : 0;
+			return fentry->k == rettrue ? dynamic_filter(skb,rettrue) : 0;
 		case BPF_S_RET_A:
 			/*
 			 * alterativa de ret A ainda nao correcta
