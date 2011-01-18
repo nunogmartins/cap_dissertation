@@ -307,12 +307,12 @@ void printAll(struct rb_root *tree)
 		pr_emerg( "port = %hu ", p->port);
 
 		if(p->tcp){
-			pr_info( "tcp addresses");
+			pr_emerg( "tcp addresses");
 			iterateList(p->tcp);
 		}
 
 		if(p->udp){
-			pr_info( "udp addresses");
+			pr_emerg( "udp addresses");
 			iterateList(p->udp);
 		}
 	}
