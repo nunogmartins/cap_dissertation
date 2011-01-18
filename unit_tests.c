@@ -18,21 +18,26 @@ int populate(void)
 {
 	int i=0, j=0;
 	int iteration = 0;
+	struct packetInfo pi;
 
 	ports = kmalloc(MAX_DATA*sizeof(*ports),GFP_KERNEL);
 
-	for(j=0;j < 10; j++){
-		for(i=INITIAL_PORT;i < FINAL_PORT; i+=10,iteration++)
-		{
-			struct packetInfo *sentinel = (ports)+iteration;
-			sentinel->port = (u16)i;
-			sentinel->address = 0x7f000001+(j);
-			sentinel->protocol = 0x06;
-			insertPort(sentinel);
-		}
-
-
+	for(i=INITIAL_PORT,iteration=0;i < FINAL_PORT; i+=10,iteration++)
+	{
+		struct packetInfo *sentinel = (ports)+iteration;
+		sentinel->port = (u16)i;
+		sentinel->address = 0x7f000001;
+		sentinel->protocol = 0x06;
+		insertPort(sentinel);
 	}
+
+	for(j=0; j < 10 ; j++ )
+	{
+		pi = *ports;
+		pi.address = pi.address + j;
+		insertPort(&pi);
+	}
+
 	printTree();
 	return 0;	
 }
@@ -46,8 +51,9 @@ int depopulate(void)
 	for(i=INITIAL_PORT;i < FINAL_PORT; i+=10,iteration++)
 	{
 		deletePort((ports+iteration));
-		printTree();
+
 	}
+	printTree();
 
 	kfree(ports);
 	ports = NULL;
