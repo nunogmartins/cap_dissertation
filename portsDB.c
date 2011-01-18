@@ -29,31 +29,11 @@ static inline int isEqualPacketInfo(struct packetInfo *pi, struct portInfo *info
 	struct list_head *pos = NULL;
 	int i=0;
 
-#ifdef MY_DEBUG
-	if(!info)
-	{
-		pr_warning("my info is null");
-		BUG();
-	}
-
-	if(!pi){
-			pr_warning("pi is null");
-			BUG();
-	}
-#endif
-
 	switch(pi->protocol){
 
 	case 0x06:
-#ifdef MY_DEBUG
-		pr_info("is equal to tcp");
-#endif
-		if(info->tcp){
+		if(info->tcp)
 			tmp = info->tcp;
-#ifdef MY_DEBUG
-			pr_info("tcp is different from null");
-#endif
-		}
 		break;
 
 	case 0x11:
@@ -68,37 +48,10 @@ static inline int isEqualPacketInfo(struct packetInfo *pi, struct portInfo *info
 	if(!tmp)
 		return 0;
 
-	pr_emerg("going to iterate on equalPacketInfo");
-
 	list_for_each(pos,&(tmp->list))
 	{
-		i++;
-		pr_emerg("i is %d",i);
-		if(!pos){
-			pr_emerg("pos is null");
-			BUG();
-		}
-		if(!tmp){
-			pr_emerg("tmp is null");
-			BUG();
-		}
-		if(!(&(tmp->list))){
-			pr_emerg("tmp->list is null");
-			BUG();
-		}
 		address = list_entry(pos,local_addresses_list,list);
-		if(!address){
-			pr_emerg();
-			BUG();
-		}
-
-#ifdef MY_DEBUG
-		pr_emerg("iteration address 0x%x",address->address);
-#endif
 		if(pi->address == address->address){
-#ifdef MY_DEBUG
-			pr_emerg("found equal 0x%x",address->address);
-#endif
 			return 1;
 		}
 	}
@@ -110,8 +63,6 @@ struct portInfo *my_search(struct rb_root *root,struct packetInfo *pi)
 {
 	struct rb_node *node = root->rb_node;
 	struct portInfo *data = NULL;
-
-	pr_info("in search");
 
 	while(node)
 	{
@@ -222,10 +173,6 @@ int my_insert(struct rb_root *root, struct packetInfo *lpi)
 	struct rb_node **new = &(root->rb_node), *parent = NULL;
 	struct portInfo *port = NULL;
 
-#ifdef MY_DEBUG
-			pr_info( "in insert for port = %hu", lpi->port);
-#endif
-
 	while(*new)
 	{
 		struct portInfo *this = container_of(*new,portInfo, node);
@@ -249,7 +196,6 @@ int my_insert(struct rb_root *root, struct packetInfo *lpi)
 			}
 	}
 	
-	pr_info("vou criar um novo");
 	port = createPacketInfo(lpi);
 	if(!port)
 		return -1;
@@ -346,7 +292,7 @@ static void iterateList(struct local_addresses_list *tmp)
 	list_for_each(pos,&(tmp->list))
 	{
 		address = list_entry(pos,local_addresses_list,list);
-		pr_info("address 0x%x",address->address);
+		pr_emerg("address 0x%x",address->address);
 	}
 }
 
@@ -358,7 +304,7 @@ void printAll(struct rb_root *tree)
 	for(node = rb_first(tree); node ; node = rb_next(node))
 	{
 		p = rb_entry(node,portInfo, node);
-		pr_info( "port = %hu ", p->port);
+		pr_emerg( "port = %hu ", p->port);
 
 		if(p->tcp){
 			pr_info( "tcp addresses");

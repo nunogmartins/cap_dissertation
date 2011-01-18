@@ -27,6 +27,7 @@ extern struct local_addresses_list *local_list;
 
 void debugFunc(struct packetInfo *lpi)
 {
+	pr_emerg("insert port");
 	pr_emerg("port %hu",lpi->port);
 	pr_emerg("protocol %hu",lpi->protocol);	
 	pr_emerg("address %d.%d.%d.%d",NIPQUAD(lpi->address));
@@ -38,18 +39,10 @@ int insertPort(struct packetInfo *lpi)
 	int ret=1;
 
 	if(lpi == NULL){
-
-#ifdef MY_DEBUG
-		pr_info( "in insert lpi is null");
-#endif
 		return 	-1;
 	}
 
 	debugFunc(lpi);
-
-#ifdef MY_DEBUG
-	pr_info( "inserting port %hu with address 0x%x being %hu", lpi->port, lpi->address, lpi->protocol);
-#endif
 
 	if(lpi->port == 0 || lpi->protocol == 0)
 	{
@@ -62,19 +55,12 @@ int insertPort(struct packetInfo *lpi)
 
 	ret = my_insert(&db,lpi);
 
-#ifdef MY_DEBUG
-	if(ret > 0){
-		pr_info("adicionado");
-		//printAll(&db);
-	}else
-		pr_info("nada alterado");
-#endif
 	return ret;
 }
 
 int deletePort(struct packetInfo *pi)
 {
-	pr_info( "deleting port %hu",pi->port);
+	pr_emerg( "deleting port %hu",pi->port);
 	my_erase(&db,pi);
 	return 0;
 }
