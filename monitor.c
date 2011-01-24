@@ -73,7 +73,9 @@ extern int init_kretprobes_udp(int *initial);
 
 void print_regs(const char *function, struct pt_regs *regs)
 {
+#ifdef CONFIG_X86_64
 	pr_emerg( "%s ax=%p bx=%p cx=%p dx=%p di=%p si=%p r8=%p r9=%p",function, (void *)regs->ax,(void *)regs->bx,(void *)regs->cx,(void *)regs->dx,(void*)regs->di,(void *) regs->si,(void *)regs->r8,(void *)regs->r9);
+#endif
 }
 
 int instantiationKRETProbe(struct kretprobe *kret,

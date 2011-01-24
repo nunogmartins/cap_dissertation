@@ -42,7 +42,11 @@ static int sendto_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 {
 	struct task_struct *task = ri->task;
 	//int *fd = (int *)regs->di;
+#ifdef CONFIG_X86_32
+	int fd = regs->ax;
+#else
 	int fd = regs->di;
+#endif
 	struct cell *my_data = (struct cell *)ri->data;
 
 	CHECK_MONITOR_PID;
@@ -56,8 +60,8 @@ static int sendto_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 	
 	int retval = regs_return_value(regs);
 	struct cell *my_data = (struct cell *)ri->data;
-	int fd = my_data->fd;
 	struct packetInfo pi;
+	int fd = my_data->fd;
 	int err;
 	
 	if(retval > 0)
@@ -76,7 +80,12 @@ static int recvfrom_entry_handler(struct kretprobe_instance *ri, struct pt_regs 
 	struct task_struct *task = ri->task;
 	struct cell *my_data = (struct cell *)ri->data;
 	//int *fd = (int *)regs->di;
+	//int fd = regs->di;
+#ifdef CONFIG_X86_32
+	int fd = regs->ax;
+#else
 	int fd = regs->di;
+#endif
 
 	CHECK_MONITOR_PID;
 
@@ -159,7 +168,12 @@ static int close_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs
 static int bind_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	struct task_struct *task = ri->task;
+	//int fd = regs->di;
+#ifdef CONFIG_X86_32
+	int fd = regs->ax;
+#else
 	int fd = regs->di;
+#endif
 	struct cell *my_data = (struct cell *)ri->data;
 
 	CHECK_MONITOR_PID;
@@ -191,7 +205,12 @@ static int connect_entry_handler(struct kretprobe_instance *ri, struct pt_regs *
 {
 	struct task_struct *task = ri->task;
 	struct cell *my_data =(struct cell *) ri->data;
+	//int fd = regs->di;
+#ifdef CONFIG_X86_32
+	int fd = regs->ax;
+#else
 	int fd = regs->di;
+#endif
 
 	CHECK_MONITOR_PID;
 
