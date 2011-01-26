@@ -31,7 +31,7 @@ int main(int argc, char **argv)
 		serv_addr.sin_port = htons(PORT+i);
 		sockfds[i] = socket(AF_INET, SOCK_STREAM, 0);
 		bind(sockfds[i], (struct sockaddr *)&serv_addr, sizeof(serv_addr));
-		listen(sockfd, 5);
+		listen(sockfds[i], 5);
 	}
 
 	for(i;i >= 0; --i)
