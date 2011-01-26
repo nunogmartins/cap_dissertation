@@ -41,8 +41,9 @@ int insertPort(struct packetInfo *lpi)
 	if(lpi == NULL){
 		return 	-1;
 	}
-
+#ifdef MY_DEBUG
 	debugFunc(lpi);
+#endif
 
 	if(lpi->port == 0 || lpi->protocol == 0)
 	{
@@ -60,7 +61,9 @@ int insertPort(struct packetInfo *lpi)
 
 int deletePort(struct packetInfo *pi)
 {
+#ifdef MY_DEBUG
 	pr_emerg( "deleting port %hu",pi->port);
+#endif
 	my_erase(&db,pi);
 	return 0;
 }

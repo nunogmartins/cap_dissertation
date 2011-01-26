@@ -7,8 +7,8 @@
 #define MY_KPROBES
 //#undef MY_KPROBES
 
-#define MY_DEBUG
-//#undef MY_DEBUG
+//#define MY_DEBUG
+#undef MY_DEBUG
 
 //#define NEW_DEBUG
 #undef NEW_DEBUG
@@ -27,5 +27,8 @@
 
 #define DFITLER
 //#undef DFILTER
+
+//#define DEBUG_INFO
+#undef DEBUG_INFO
 
 #endif

@@ -116,21 +116,16 @@ unsigned int my_portExists(struct packetInfo *src_pi,struct packetInfo *dst_pi)
 
 	if(src_pi!=NULL && dst_pi!=NULL)
 	{
-		if(src_pi->port == 22)
-			return 0;
-
-		if(dst_pi->port == 22)
-			return 0; 
 
 		if((src_pi->protocol == 0x11 || src_pi->protocol == 0x06)){
-
-			//pr_emerg( "proto 0x%x srcadd 0x%x dstaddr 0x%x srcP %hu dstP %hu", src_pi->protocol,src_pi->address, dst_pi->address,src_pi->port, dst_pi->port );
 
 			sentinel_src = my_search(&db,src_pi);
 
 			if(sentinel_src != NULL)
 			{
+#ifdef MY_DEBUG
 				pr_emerg( "found src port %hu",src_pi->port);
+#endif
 				return 1;
 			}
 
@@ -138,7 +133,9 @@ unsigned int my_portExists(struct packetInfo *src_pi,struct packetInfo *dst_pi)
 
 			if(sentinel_dst != NULL)
 			{
+#ifdef MY_DEBUG
 				pr_emerg( "found dst port %hu",dst_pi->port);
+#endif
 				return 1;
 			}
 
@@ -298,10 +295,18 @@ void initializeTreeWithTaskInfo(pid_t new_pid)
 #ifdef MY_DEBUG
 							pr_info( "iteration %lu is socket",file_descriptor);
 #endif
-							if(insertPort(&p) > 0)
+							if(insertPort(&p) > 0){
+#ifdef MY_DEBUG
 								pr_info("insertion was ok");
-							else
+#endif
+							}
+
+							else{
+#ifdef MY_DEBUG
 								pr_info("something was wrong with the insertion");
+#endif
+							}
+
 						}
 					}
 				}

@@ -223,15 +223,18 @@ struct local_addresses_list* listAllDevicesAddress(void)
 
 	for_each_netdev(net,dev)
 	{
+#ifdef MY_DEBUG
 		pr_info( "device %s",dev->name);
-
+#endif
 		if(dev->ip_ptr)
 		{
 			struct in_device *in4 = dev->ip_ptr;
 			struct in_ifaddr *addr;
 			for(addr = in4->ifa_list ; addr; addr = addr->ifa_next)
 			{
+#ifdef MY_DEBUG
 				pr_info( "ip address 0x%x", ntohl(addr->ifa_address));
+#endif
 				tmp = kmalloc(sizeof(*tmp),GFP_KERNEL);
 				tmp->address = ntohl(addr->ifa_address);
 				list_add(&(tmp->list),&(list->list));
@@ -249,7 +252,9 @@ int remove_local_addresses_list(struct local_addresses_list *list)
 	list_for_each_safe(pos,q,&(list->list))
 	{
 		tmp = list_entry(pos,local_addresses_list, list);//(pos,struct local_addresses_list,list);
+#ifdef MY_DEBUG
 		pr_info( "removing address 0x%x",tmp->address);
+#endif
 		list_del(pos);
 		kfree(tmp);
 	}

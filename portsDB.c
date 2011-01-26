@@ -248,16 +248,10 @@ static void removeAddressFromNode(struct portInfo *pi,struct packetInfo *lpi)
 
 void my_erase(struct rb_root *root, struct packetInfo *pi)
 {
-#ifdef NOT
-	short int toRemove = 0;
-#endif
 	//ToDo: completly ...
 
 	struct portInfo *data = my_search(root,pi);
 
-#ifdef NOT
-	if(toRemove)
-#endif
 		if(data)
 		{
 			if((!data->tcp) && !(data->udp)){
@@ -266,14 +260,20 @@ void my_erase(struct rb_root *root, struct packetInfo *pi)
 			/*
 			 * ToDo: taking care of the information of the node
 			 */
+#ifdef MY_DEBUG
 				pr_emerg("removing the node");
+#endif
 			}else{
 				//ToDo: remove only the address it needs to remove ...
+#ifdef MY_DEBUG
 				pr_emerg("removing only the address");
+#endif
 				removeAddressFromNode(data,pi);
 				if((!data->tcp) && (!data->udp))
 				{
+#ifdef MY_DEBUG
 					pr_emerg("needing to remove the node");
+#endif
 				}
 			}
 			//ToDo: possibly here to kfree data memory ...
@@ -284,6 +284,8 @@ void my_erase(struct rb_root *root, struct packetInfo *pi)
 
 }
 
+#ifdef DEBUG_INFO
+
 static void iterateList(struct local_addresses_list *tmp)
 {
 	struct list_head *pos = NULL;
@@ -292,7 +294,9 @@ static void iterateList(struct local_addresses_list *tmp)
 	list_for_each(pos,&(tmp->list))
 	{
 		address = list_entry(pos,local_addresses_list,list);
+#ifdef MY_DEBUG
 		pr_emerg("address 0x%x",address->address);
+#endif
 	}
 }
 
@@ -307,13 +311,19 @@ void printAll(struct rb_root *tree)
 		pr_emerg( "port = %hu ", p->port);
 
 		if(p->tcp){
+#ifdef MY_DEBUG
 			pr_emerg( "tcp addresses");
+#endif
 			iterateList(p->tcp);
 		}
 
 		if(p->udp){
+#ifdef MY_DEBUG
 			pr_emerg( "udp addresses");
+#endif
 			iterateList(p->udp);
 		}
 	}
 }
+
+#endif
