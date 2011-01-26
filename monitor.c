@@ -30,8 +30,8 @@ struct jprobe *jprobes = NULL;
 char *application_name = "server";
 struct local_addresses_list *local_list = NULL;
 
-static void __exit monitor_exit(void);
-static int __init monitor_init(void);
+static void monitor_exit(void);
+static int  monitor_init(void);
 
 module_init(monitor_init);
 module_exit(monitor_exit);
@@ -146,7 +146,7 @@ unsigned int my_portExists(struct packetInfo *src_pi,struct packetInfo *dst_pi)
 	return 0;
 }
 
-static int __init monitor_init(void)
+static int monitor_init(void)
 {
 #ifdef MY_KPROBES
 	int index = 0;
@@ -222,7 +222,7 @@ static void removeKprobe(int index)
 }
 #endif
 
-static void __exit monitor_exit(void)
+static void monitor_exit(void)
 {
 #ifdef MY_KPROBES
 	int i=0;
@@ -264,8 +264,7 @@ void initializeTreeWithTaskInfo(pid_t new_pid)
 
 	portExists = my_portExists;
 
-	for_each_process(t)
-	{
+	for_each_process(t){
 		if (t->pid == monitor_pid || t->real_parent->pid == monitor_pid)
 		{
 			//ToDo: change all structures according to pid

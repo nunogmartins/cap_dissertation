@@ -42,6 +42,7 @@ struct packetInfo {
 typedef struct local_addresses_list {
 	struct list_head list;
 	u32 address;
+	int counter
 }local_addresses_list;
 
 extern struct socket *sockfd_lookup(int fd, int *err);

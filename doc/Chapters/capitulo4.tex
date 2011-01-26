@@ -1,2 +1,32 @@
 \chapter{Estrutura}
 \label{cap:Estrutura}
+
+
+
+
+\section{Módulos no espaço do núcleo}
+
+A estratégia foi separar os diferentes componentes e a criação de um módulo de
+\textit{debug} para que pudesse existir uma forma de acesso à monitorização por
+parte do nível de utilizador, sem que exista a necessidade de criar ou alterar
+chamadas ao sistema ou suas opções.
+
+\paragraph{Estruturas}
+
+A não criação de novas estruturas de dados, foi devido à existência das
+estruturas de dados existentes no código do núcleo do sistema de operação
+linux, que já foram bastante analisadas e existem com o propósito de serem
+utilizadas por outros programadores.
+
+\paragraph{Divisão do módulo} 
+
+O módulo subdivide-se em 4 partes, a monitorização, o ``reservatório'' de
+informação, o \textit{hook} da ligação com o \textit{bpf} e
+comunicação/\textit{debug}.
+
+\paragraph{Interacção com o LSF}
+O sistema interage também com o \textit{LSF} pois existe uma conjunção
+entre o filtro definido pelo utilizador e a captura do tráfego da aplicação a
+ser monitorizada.
+
+
