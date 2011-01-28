@@ -296,6 +296,8 @@ void my_erase(struct rb_root *root, struct packetInfo *pi)
 		removeAddressFromNode(data,pi,&head,&nelems);
 		if(nelems == 0)
 		{
+			kfree(head);
+			head = NULL;
 			// have to remove the head
 		}
 
