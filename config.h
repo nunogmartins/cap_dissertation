@@ -1,23 +1,18 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-//#define UNIT_TESTING
-#undef UNIT_TESTING
+#define UNIT_TESTING
+//#undef UNIT_TESTING
 
+#ifdef UNIT_TESTING
+#undef MY_KPROBES
+#undef TCP_PROBES
+#undef UDP_PROBES
+#else
 #define MY_KPROBES
-//#undef MY_KPROBES
-
-//#define MY_DEBUG
-#undef MY_DEBUG
-
-//#define NEW_DEBUG
-#undef NEW_DEBUG
-
 #define TCP_PROBES
-//#undef TCP_PROBES
-
 #define UDP_PROBES
-//#undef UDP_PROBES
+#endif
 
 //#define OLD_PHASE
 #undef OLD_PHASE
@@ -28,7 +23,7 @@
 #define DFITLER
 //#undef DFILTER
 
-//#define DEBUG_INFO
-#undef DEBUG_INFO
+#define DEBUG_INFO
+//#undef DEBUG_INFO
 
 #endif

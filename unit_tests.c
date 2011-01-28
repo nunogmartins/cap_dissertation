@@ -55,6 +55,7 @@ int depopulate(void)
 		deletePort((ports+iteration));
 
 	}
+
 	printTree();
 
 	kfree(ports);

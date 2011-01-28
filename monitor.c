@@ -61,9 +61,14 @@ extern struct rb_root db;
 extern int init_debug(void);
 extern void destroy_debug(void);
 
+#ifdef MY_KPROBES
 extern int init_kretprobes_syscalls(int *index);
+#endif
+
+#ifdef UNIT_TESTING
 extern int populate(void);
 extern int depopulate(void);
+#endif
 /*extern int init_kretprobes_common(int *initial);
 extern int init_kretprobes_tcp(int *initial);
 extern int init_kretprobes_udp(int *initial);

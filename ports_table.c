@@ -48,7 +48,7 @@ int insertPort(struct packetInfo *lpi)
 	if(lpi->port == 0 || lpi->protocol == 0)
 	{
 #ifdef MY_DEBUG
-		pr_info("some info is zero port %d address 0x%x and protocol %hu",lpi->port,lpi->address, lpi->protocol);
+		pr_emerg("some info is zero port %d address 0x%x and protocol %hu",lpi->port,lpi->address, lpi->protocol);
 #endif
 		return -1;
 	}

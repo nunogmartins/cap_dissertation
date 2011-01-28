@@ -27,7 +27,6 @@ static inline int isEqualPacketInfo(struct packetInfo *pi, struct portInfo *info
 	struct local_addresses_list *tmp = NULL;
 	local_addresses_list *address = NULL;
 	struct list_head *pos = NULL;
-	int i=0;
 
 	switch(pi->protocol){
 
@@ -88,6 +87,36 @@ struct portInfo *my_search(struct rb_root *root,struct packetInfo *pi)
 	return NULL;
 }
 
+static int increaseCounter(struct packetInfo *lpi, struct portInfo *port_info)
+{
+	struct local_addresses_list *tmp = NULL;
+	local_addresses_list *address = NULL;
+	struct list_head *pos = NULL;
+
+	switch(lpi->protocol){
+	case 0x06:
+		tmp = port_info->tcp;
+		break;
+	case 0x11:
+		tmp = port_info->udp;
+		break;
+	}
+
+	if(!tmp)
+		return -1;
+
+	list_for_each(pos,&(tmp->list))
+	{
+		address = list_entry(pos,local_addresses_list,list);
+		if(lpi->address == address->address){
+			address->counter++;
+			return 1;
+		}
+	}
+
+	return -1;
+}
+
 static int addAddress(struct packetInfo *lpi, struct portInfo *port_info)
 {
 	struct local_addresses_list *tmp = NULL;
@@ -109,6 +138,7 @@ static int addAddress(struct packetInfo *lpi, struct portInfo *port_info)
 					return -1;
 
 				INIT_LIST_HEAD(&((port_info->tcp)->list));
+				port_info->tcp->counter = 0;
 			}
 			tmp = port_info->tcp;
 		}
@@ -129,6 +159,7 @@ static int addAddress(struct packetInfo *lpi, struct portInfo *port_info)
 					return -1;
 
 				INIT_LIST_HEAD(&((port_info->udp)->list));
+				port_info->udp->counter = 0;
 			}
 			tmp = port_info->udp;
 		}
@@ -144,6 +175,7 @@ static int addAddress(struct packetInfo *lpi, struct portInfo *port_info)
 		return -1;
 
 	node->address = lpi->address;
+	node->counter++;
 
 	list_add(&(node->list),&(tmp->list));
 
@@ -189,9 +221,9 @@ int my_insert(struct rb_root *root, struct packetInfo *lpi)
 			{
 				if(!isEqualPacketInfo(lpi,this))
 					addAddress(lpi,this);
-				else
-					return 0;
-
+				else{
+					increaseCounter(lpi,this);
+				}
 				return 1;
 			}
 	}
@@ -206,10 +238,11 @@ int my_insert(struct rb_root *root, struct packetInfo *lpi)
 	return 1;
 }
 
-static void removeAddressFromNode(struct portInfo *pi,struct packetInfo *lpi)
+static void removeAddressFromNode(struct portInfo *pi,struct packetInfo *lpi, struct local_addresses_list **head, int *nelems)
 {
 	struct local_addresses_list *list = NULL, *tmp = NULL;
 	struct list_head *q = NULL, *pos = NULL;
+	int i = 0;
 
 	switch(lpi->protocol)
 	{
@@ -239,47 +272,45 @@ static void removeAddressFromNode(struct portInfo *pi,struct packetInfo *lpi)
 	{
 		list = list_entry(pos,local_addresses_list,list);
 		if(lpi->address == list->address){
-			list_del(pos);
-			kfree(list);
+			list->counter--;
+			if(list->counter <= 0){
+				list_del(pos);
+				kfree(list);
+			}
+			*nelems = i;
+			head = &tmp; // ?? don't know if good decision ...
 			return;
 		}
+		i++;
 	}
 }
 
 void my_erase(struct rb_root *root, struct packetInfo *pi)
 {
-	//ToDo: completly ...
-
 	struct portInfo *data = my_search(root,pi);
+	int nelems = -1;
+	struct local_addresses_list *head = NULL;
 
-		if(data)
+	if(data)
+	{
+		removeAddressFromNode(data,pi,&head,&nelems);
+		if(nelems == 0)
 		{
-			if((!data->tcp) && !(data->udp)){
-				/* rb_erase(&data->node,root);
-					kfree(data); */
-			/*
-			 * ToDo: taking care of the information of the node
-			 */
-#ifdef MY_DEBUG
-				pr_emerg("removing the node");
-#endif
-			}else{
-				//ToDo: remove only the address it needs to remove ...
-#ifdef MY_DEBUG
-				pr_emerg("removing only the address");
-#endif
-				removeAddressFromNode(data,pi);
-				if((!data->tcp) && (!data->udp))
-				{
-#ifdef MY_DEBUG
-					pr_emerg("needing to remove the node");
-#endif
-				}
-			}
-			//ToDo: possibly here to kfree data memory ...
-			//@here ... allocated in createPacketInfo
-
+			// have to remove the head
 		}
+
+
+		if((!data->tcp) && !(data->udp)){
+			rb_erase(&data->node,root);
+			kfree(data);
+#ifdef MY_DEBUG
+			pr_emerg("removing the node");
+#endif
+		}
+		//ToDo: possibly here to kfree data memory ...
+		//@here ... allocated in createPacketInfo
+
+	}
 
 
 }
@@ -294,9 +325,7 @@ static void iterateList(struct local_addresses_list *tmp)
 	list_for_each(pos,&(tmp->list))
 	{
 		address = list_entry(pos,local_addresses_list,list);
-#ifdef MY_DEBUG
 		pr_emerg("address 0x%x",address->address);
-#endif
 	}
 }
 
@@ -311,16 +340,12 @@ void printAll(struct rb_root *tree)
 		pr_emerg( "port = %hu ", p->port);
 
 		if(p->tcp){
-#ifdef MY_DEBUG
 			pr_emerg( "tcp addresses");
-#endif
 			iterateList(p->tcp);
 		}
 
 		if(p->udp){
-#ifdef MY_DEBUG
 			pr_emerg( "udp addresses");
-#endif
 			iterateList(p->udp);
 		}
 	}
