@@ -298,8 +298,14 @@ void my_erase(struct rb_root *root, struct packetInfo *pi)
 		if(nelems == 0)
 		{
 			pr_emerg("nelems is zero and address of head is %p and address of tcp is %p",head,data->tcp);
-			kfree(head);
-			head = NULL;
+			if(data->tcp == head){
+				kfree(data->tcp);
+				data->tcp = NULL;
+			}
+			else{
+				kfree(data->udp);
+				data->udp = NULL;
+			}
 			// have to remove the head
 		}
 
