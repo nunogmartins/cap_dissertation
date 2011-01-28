@@ -272,13 +272,14 @@ static void removeAddressFromNode(struct portInfo *pi,struct packetInfo *lpi, st
 	{
 		list = list_entry(pos,local_addresses_list,list);
 		if(lpi->address == list->address){
+			pr_emerg("found address and i is %d head is going to have %p",i,tmp);
 			list->counter--;
 			if(list->counter <= 0){
 				list_del(pos);
 				kfree(list);
 			}
 			*nelems = i;
-			head = &tmp; // ?? don't know if good decision ...
+			*head = tmp; // ?? don't know if good decision ...
 			return;
 		}
 		i++;
@@ -296,6 +297,7 @@ void my_erase(struct rb_root *root, struct packetInfo *pi)
 		removeAddressFromNode(data,pi,&head,&nelems);
 		if(nelems == 0)
 		{
+			pr_emerg("nelems is zero and address of head is %p and address of tcp is %p",head,data->tcp);
 			kfree(head);
 			head = NULL;
 			// have to remove the head
