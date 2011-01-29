@@ -126,8 +126,8 @@ static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *re
 	struct file *filp = regs->bx;
 	struct inode *inode = regs->ax;
 #elif CONFIG_X86_64
-	struct file *filp = regs->di;
-	struct inode *inode = regs->si;
+	struct file *filp = regs->si;
+	struct inode *inode = regs->di;
 #endif
 
 	struct socket *socket = NULL;
@@ -151,7 +151,7 @@ static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *re
 
 	socket = (struct socket *)filp->private_data;
 	pr_emerg( "close_sock entry %s",task->comm);
-	pr_emerg( "src port %d and dst port %d",ntohs(inet_sk(socket->sk)->sport),ntohs(inet_sk(socket->sk)->dport));
+	pr_emerg( "src port %d and dst port %d",ntohs(inet_sk(socket->sk)->inet_sport),ntohs(inet_sk(socket->sk)->inet_dport));
 
 	//print_regs("close entry",regs);
 

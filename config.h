@@ -1,8 +1,8 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define UNIT_TESTING
-//#undef UNIT_TESTING
+//#define UNIT_TESTING
+#undef UNIT_TESTING
 
 #ifdef UNIT_TESTING
 #undef MY_KPROBES
