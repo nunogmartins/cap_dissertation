@@ -122,13 +122,19 @@ static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *re
 	//void *stack = (void *)regs->bp;
 	//struct socket *socket = stack+8;
 
-//	struct file *filp = regs->bx;
-//	struct inode *inode = regs->ax;
-//	struct socket *socket = NULL;
+#ifdef CONFIG_X86_32
+	struct file *filp = regs->bx;
+	struct inode *inode = regs->ax;
+#elif CONFIG_X86_64
+	struct file *filp = regs->di;
+	struct inode *inode = regs->si;
+#endif
+
+	struct socket *socket = NULL;
 	
 	CHECK_MONITOR_PID;
-
-	/*socket = sockfd_lookup(regs->ax,&err);
+/*
+	socket = sockfd_lookup(regs->ax,&err);
 	if(err !=-ENOTSOCK && socket != NULL)
 	{
 		struct sock *sk = socket->sk;
@@ -136,18 +142,19 @@ static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *re
 
 		my_data->port = i_sock->num;
 
-	}*/
+	}
 
-/*	printk(KERN_INFO "sport %d dport %d " ,ntohs(inet_sk(socket->sk)->sport),ntohs(inet_sk(socket->sk)->dport));
+	pr_emerg("sport %d dport %d " ,ntohs(inet_sk(socket->sk)->sport),ntohs(inet_sk(socket->sk)->dport));
 	my_data->fd = regs->ax;
 */
-/*
+
+
 	socket = (struct socket *)filp->private_data;
-	printk(KERN_INFO "close_sock entry %s",task->comm);
-	printk(KERN_INFO "src port %d and dst port %d",ntohs(inet_sk(socket->sk)->sport),ntohs(inet_sk(socket->sk)->dport));
+	pr_emerg( "close_sock entry %s",task->comm);
+	pr_emerg( "src port %d and dst port %d",ntohs(inet_sk(socket->sk)->sport),ntohs(inet_sk(socket->sk)->dport));
 
 	//print_regs("close entry",regs);
-*/
+
 	return 0;
 }
 
