@@ -151,7 +151,7 @@ static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *re
 
 	socket = (struct socket *)filp->private_data;
 	pr_emerg( "close_sock entry %s",task->comm);
-	pr_emerg( "src port %d and dst port %d",ntohs(inet_sk(socket->sk)->inet_sport),ntohs(inet_sk(socket->sk)->inet_dport));
+	pr_emerg( "src port %hu and dst port %hu local_port %hu",ntohs(inet_sk(socket->sk)->inet_sport),ntohs(inet_sk(socket->sk)->inet_dport),inet_sk(socket->sk)->inet_num);
 
 	//print_regs("close entry",regs);
 
