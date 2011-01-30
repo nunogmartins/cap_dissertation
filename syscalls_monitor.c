@@ -118,7 +118,7 @@ static int recvfrom_ret_handler(struct kretprobe_instance *ri, struct pt_regs *r
 static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	struct task_struct *task = ri->task;
-	struct cell *my_data = (struct cell *)ri->data;
+	struct packetInfo *my_data = (struct packetInfo *)ri->data;
 	//void *stack = (void *)regs->bp;
 	//struct socket *socket = stack+8;
 
@@ -126,34 +126,21 @@ static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *re
 	struct file *filp = regs->bx;
 	struct inode *inode = regs->ax;
 #elif CONFIG_X86_64
-	struct file *filp = regs->si;
-	struct inode *inode = regs->di;
+	struct file *filp = (struct file *)regs->si;
+	struct inode *inode = (struct inode *)regs->di;
 #endif
 
-	struct socket *socket = NULL;
-	
+	int err = -1;
+
 	CHECK_MONITOR_PID;
-/*
-	socket = sockfd_lookup(regs->ax,&err);
-	if(err !=-ENOTSOCK && socket != NULL)
-	{
-		struct sock *sk = socket->sk;
-		struct inet_sock *i_sock = inet_sk(sk);
 
-		my_data->port = i_sock->num;
-
+	getLocalPacketInfoFromFile(filp,my_data,&err);
+	if(err >= 0){
+		pr_emerg( "close_sock entry %s",task->comm);
+		pr_emerg( "port %hu address %d protocol %hu",my_data->port,my_data->address,my_data->protocol);
 	}
-
-	pr_emerg("sport %d dport %d " ,ntohs(inet_sk(socket->sk)->sport),ntohs(inet_sk(socket->sk)->dport));
-	my_data->fd = regs->ax;
-*/
-
-
-	socket = (struct socket *)filp->private_data;
-	pr_emerg( "close_sock entry %s",task->comm);
-	pr_emerg( "src port %hu and dst port %hu local_port %hu",ntohs(inet_sk(socket->sk)->inet_sport),ntohs(inet_sk(socket->sk)->inet_dport),inet_sk(socket->sk)->inet_num);
-
-	//print_regs("close entry",regs);
+	else
+		return 1;
 
 	return 0;
 }
@@ -161,12 +148,11 @@ static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *re
 static int close_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	int retval = regs_return_value(regs);
-	struct cell *my_data = (struct cell *)ri->data;
+	struct packetInfo *pi = (struct packetInfo *)ri->data;
 	
 
 	if(retval == 0){
-		//deletePort(getPort(my_data->fd,my_data->direction));
-		;
+		deletePort(pi);
 	}
 	return 0;
 }
@@ -347,7 +333,7 @@ int init_kretprobes_syscalls(int *initial)
 			return -1;
 */
 
-		ret = instantiationKRETProbe((kretprobes+index),"sock_close",close_ret_handler,close_entry_handler,(ssize_t)sizeof(struct cell));
+		ret = instantiationKRETProbe((kretprobes+index),"sock_close",close_ret_handler,close_entry_handler,(ssize_t)sizeof(struct packetInfo));
 		index +=1;
 		if(ret < 0)
 			return -1;
