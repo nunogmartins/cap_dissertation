@@ -18,13 +18,6 @@
 extern struct rb_root db;
 extern struct local_addresses_list *local_list;
 
-#define NIPQUAD(addr) \
-    ((unsigned char *)&addr)[3], \
-    ((unsigned char *)&addr)[2], \
-    ((unsigned char *)&addr)[1], \
-    ((unsigned char *)&addr)[0]
-
-
 void debugFunc(struct packetInfo *lpi)
 {
 	pr_emerg("insert port");

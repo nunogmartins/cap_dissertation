@@ -39,6 +39,12 @@ struct packetInfo {
 	u32 address;
 };
 
+#define NIPQUAD(addr) \
+    ((unsigned char *)&addr)[3], \
+    ((unsigned char *)&addr)[2], \
+    ((unsigned char *)&addr)[1], \
+    ((unsigned char *)&addr)[0]
+
 typedef struct local_addresses_list {
 	struct list_head list;
 	u32 address;

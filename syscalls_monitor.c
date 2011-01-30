@@ -137,7 +137,7 @@ static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *re
 	getLocalPacketInfoFromFile(filp,my_data,&err);
 	if(err >= 0){
 		pr_emerg( "close_sock entry %s",task->comm);
-		pr_emerg( "port %hu address %d protocol %hu",my_data->port,my_data->address,my_data->protocol);
+		pr_emerg( "port %hu address %d.%d.%d.%d protocol %hu",my_data->port,NIPQUAD(my_data->address),my_data->protocol);
 	}
 	else
 		return 1;
