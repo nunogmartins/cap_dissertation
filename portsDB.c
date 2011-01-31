@@ -325,7 +325,6 @@ void my_erase(struct rb_root *root, struct packetInfo *pi)
 
 }
 
-#ifdef DEBUG_INFO
 
 static void iterateList(struct local_addresses_list *tmp)
 {
@@ -360,5 +359,3 @@ void printAll(struct rb_root *tree)
 		}
 	}
 }
-
-#endif

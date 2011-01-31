@@ -5,10 +5,18 @@
 #include <linux/types.h>
 #include <asm/uaccess.h>
 
+#include "table_port.h"
+
 static struct dentry *my_debug_dir = NULL;
 
 extern pid_t monitor_pid;
 extern void initializeTreeWithTaskInfo(pid_t pid);
+
+void printTree()
+{
+
+}
+
 
 static ssize_t pid_write(struct file *file, const char __user *user_buf,size_t size, loff_t *ppos)
 {
@@ -16,7 +24,7 @@ static ssize_t pid_write(struct file *file, const char __user *user_buf,size_t s
 	char *buf;
 	char *endp;
 
-	printk(KERN_INFO "pid_write function called");
+	pr_info( "pid_write function called");
 	buf = kmalloc(size,GFP_KERNEL);
 
 	copy_from_user(buf,user_buf,size);	
@@ -31,13 +39,20 @@ static ssize_t pid_write(struct file *file, const char __user *user_buf,size_t s
 	pid = simple_strtoul(buf,&endp,10);
 	if(endp == buf)
 	{
-		printk(KERN_INFO "could not convert value into long");
+		pr_info( "could not convert value into long");
 		return size;
 	}
 	kfree(buf);
-	printk(KERN_INFO "pid = %lu",pid);
+	pr_info( "pid = %lu",pid);
 	
-	initializeTreeWithTaskInfo((size_t) pid);
+	if(pid > 0)
+		initializeTreeWithTaskInfo((size_t) pid);
+	else{
+		if(pid == -1)
+		{
+			printTree();
+		}
+	}
 
 	return size;
 }
@@ -55,19 +70,19 @@ int init_debug(void)
 	my_debug_dir = debugfs_create_dir("pcap_debug",NULL);
 	if(!my_debug_dir)
 	{
-		printk(KERN_INFO "impossible to create pcap_debug directory");
+		pr_info("impossible to create pcap_debug directory");
 		return -1;
 	}
 
 	dentry = debugfs_create_file("pid_monitor",S_IRUGO,my_debug_dir,NULL,&pid_fops);
 	
-	printk(KERN_INFO "debug activated");
+	pr_info( "debug activated");
 	return 0;
 }
 
 void destroy_debug(void)
 {
 	debugfs_remove_recursive(my_debug_dir);
-	printk(KERN_INFO "debug deactivated");
+	pr_info( "debug deactivated");
 }
 
