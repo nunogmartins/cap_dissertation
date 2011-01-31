@@ -10,6 +10,10 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
+#include <time.h>
+
+#define MAX_IPV4 16
 
 #define PORT 2010
 
@@ -21,13 +25,20 @@ int main(int argc, char **argv)
 	int i,j;
 	struct sockaddr_in serv_addr;
 	int garbage;
+	char address[MAX_IPV4];
+	clock_t t1,t2;
+
+	if(argc != 4)
+		return -1;
+
+	inet_pton(AF_INET,argv[3],&(serv_addr.sin_addr));
 	scanf("%d",&garbage);
 
 	serv_addr.sin_family = AF_INET;
-	serv_addr.sin_addr.s_addr = INADDR_ANY;
 	serv_addr.sin_port = htons(PORT);
 
 	sockfds = malloc(number_of_sockets*sizeof(int));
+	t1=clock();
 	for(j=0; j < number_of_times; j++){
 		for(i= 0; i < number_of_sockets; i++)
 		{
@@ -42,6 +53,8 @@ int main(int argc, char **argv)
 			close(sockfds[i]);
 		}
 	}
+	t2=clock();
 	free(sockfds);
+    printf("%.4lf seconds of processing\n", (t2-t1)/(double)CLOCKS_PER_SEC);
 	return 0;
 }
