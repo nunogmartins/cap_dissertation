@@ -44,17 +44,25 @@ int main(int argc, char **argv)
 		{
 			serv_addr.sin_port = htons(PORT+i);
 			sockfds[i] = socket(AF_INET, SOCK_STREAM, 0);
+			if(sockfds[i] < 0)
+			printf("error");
+			else{
 			bind(sockfds[i], (struct sockaddr *)&serv_addr, sizeof(serv_addr));
 			listen(sockfds[i], 5);
+			}
 		}
 
 		for(i;i >= 0; --i)
 		{
-			close(sockfds[i]);
+			if(sockfds[i] > 0)
+				close(sockfds[i]);
+			else
+				printf("error");
 		}
 	}
 	t2=clock();
 	free(sockfds);
     printf("%.4lf seconds of processing\n", (t2-t1)/(double)CLOCKS_PER_SEC);
+    printf("%.8lf mili of processing\n", (double)(t2-t1));
 	return 0;
 }
