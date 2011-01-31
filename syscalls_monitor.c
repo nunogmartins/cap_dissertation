@@ -106,8 +106,11 @@ static int recvfrom_ret_handler(struct kretprobe_instance *ri, struct pt_regs *r
 		getLocalPacketInfoFromFd(fd,&pi,&err);
 		if(err == 0)
 			insertPort(&pi);
-	}else
-		pr_info("recvfrom retval < 0 which is %d", retval);
+	}else{
+#ifdef MY_DEBUG
+	pr_info("recvfrom retval < 0 which is %d", retval);
+#endif
+	}	
 
 
 	return 0;
@@ -136,8 +139,10 @@ static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *re
 
 	getLocalPacketInfoFromFile(filp,my_data,&err);
 	if(err >= 0){
+#ifdef MY_DEBUG
 		pr_emerg( "close_sock entry %s",task->comm);
 		pr_emerg( "port %hu address %d.%d.%d.%d protocol %hu",my_data->port,NIPQUAD(my_data->address),my_data->protocol);
+#endif	
 	}
 	else
 		return 1;

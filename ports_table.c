@@ -61,6 +61,8 @@ int deletePort(struct packetInfo *pi)
 	return 0;
 }
 
+#ifdef DEBUG_INFO
 void printTree(void){
 	printAll(&db);
 }
+#endif
