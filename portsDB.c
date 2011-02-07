@@ -87,23 +87,11 @@ struct portInfo *my_search(struct rb_root *root,struct packetInfo *pi)
 	return NULL;
 }
 
-static int increaseCounter(struct packetInfo *lpi, struct portInfo *port_info)
+static int addAddress(struct packetInfo *lpi, struct local_addresses_list *tmp, int *list_counter)
 {
-	struct local_addresses_list *tmp = NULL;
 	local_addresses_list *address = NULL;
 	struct list_head *pos = NULL;
-
-	switch(lpi->protocol){
-	case 0x06:
-		tmp = port_info->tcp;
-		break;
-	case 0x11:
-		tmp = port_info->udp;
-		break;
-	}
-
-	if(!tmp)
-		return -1;
+	struct local_addresses_list *node = NULL;
 
 	list_for_each(pos,&(tmp->list))
 	{
@@ -114,75 +102,105 @@ static int increaseCounter(struct packetInfo *lpi, struct portInfo *port_info)
 		}
 	}
 
-	return -1;
-}
-
-static int addAddress(struct packetInfo *lpi, struct portInfo *port_info)
-{
-	struct local_addresses_list *tmp = NULL;
-
-	struct local_addresses_list *node = NULL;
-
-	switch(lpi->protocol){
-	case 0x06:
-		if(lpi->address == 0){
-			port_info->tcp = local_list;
-			return 1;
-		}
-		else{
-			if(!port_info->tcp)
-			{
-				port_info->tcp = kmalloc(sizeof(*tmp),GFP_KERNEL);
-
-				if(!port_info->tcp)
-					return -1;
-
-				INIT_LIST_HEAD(&((port_info->tcp)->list));
-				port_info->tcp->counter = 0;
-			}
-			tmp = port_info->tcp;
-		}
-		break;
-
-	case 0x11:
-		if(lpi->address == 0){
-			port_info->tcp = local_list;
-			return 1;
-		}
-		else{
-			if(!port_info->udp)
-			{
-				
-				port_info->udp = kmalloc(sizeof(*tmp),GFP_KERNEL);
-			
-				if(!port_info->udp)
-					return -1;
-
-				INIT_LIST_HEAD(&((port_info->udp)->list));
-				port_info->udp->counter = 0;
-			}
-			tmp = port_info->udp;
-		}
-		break;
-
-	default:
-		return -1;
-	}
-
 	node = kmalloc(sizeof(*node),GFP_KERNEL);
 
 	if(!node)
 		return -1;
 
 	node->address = lpi->address;
-	node->counter++;
+	node->counter = 1;
 
 	list_add(&(node->list),&(tmp->list));
+	(*list_counter)++;
 
 	return 1;
 }
 
-struct portInfo * createPacketInfo(struct packetInfo *lpi)
+static int insertAddress(struct packetInfo *lpi, struct portInfo *port_info)
+{
+
+	switch(lpi->protocol)
+	{
+	case TCP:
+		if(!(port_info->tcp))
+		{
+			port_info->tcp = kmalloc(sizeof(struct local_addresses_list ),GFP_KERNEL);
+
+			if(!port_info->tcp)
+				return -1;
+
+			INIT_LIST_HEAD(&((port_info->tcp)->list));
+			port_info->tcp->counter = 0;
+		}
+
+		if(lpi->address == 0)
+		{
+			local_addresses_list *address = NULL;
+			struct list_head *pos = NULL;
+
+			list_for_each(pos,&(local_list->list))
+			{
+				struct packetInfo pi;
+
+				address = list_entry(pos,local_addresses_list,list);
+
+				pi.address = address->address;
+
+				addAddress(&pi,port_info->tcp,&(port_info->tcp_list_counter));
+			}
+
+		}
+		else{
+
+			addAddress(lpi,port_info->tcp,&(port_info->tcp_list_counter));
+		}
+
+		break;
+
+	case UDP:
+		if(!(port_info->udp))
+		{
+			port_info->udp = kmalloc(sizeof(struct local_addresses_list),GFP_KERNEL);
+
+			if(!port_info->udp)
+				return -1;
+
+			INIT_LIST_HEAD(&((port_info->udp)->list));
+			port_info->udp->counter = 0;
+		}
+
+		if(lpi->address == 0)
+		{
+			local_addresses_list *address = NULL;
+			struct list_head *pos = NULL;
+
+			list_for_each(pos,&(local_list->list))
+			{
+				struct packetInfo pi;
+
+				address = list_entry(pos,local_addresses_list,list);
+
+				pi.address = address->address;
+
+				addAddress(&pi,port_info->udp,&(port_info->udp_list_counter));
+			}
+
+
+		}
+		else{
+			addAddress(lpi,port_info->udp,&(port_info->udp_list_counter));
+		}
+
+		break;
+
+	default:
+		return -1;
+	}
+
+	return 0;
+}
+
+static struct portInfo * createPacketInfo(struct packetInfo *lpi)
 {
 	struct portInfo *pi = NULL;
 	pi = kmalloc(sizeof(struct portInfo),GFP_KERNEL);
@@ -193,9 +211,11 @@ struct portInfo * createPacketInfo(struct packetInfo *lpi)
 	pi->port = lpi->port;
 
 	pi->tcp = NULL;
+	pi->tcp_list_counter = 0;
 	pi->udp = NULL;
+	pi->udp_list_counter = 0;
 
-	addAddress(lpi,pi);
+	insertAddress(lpi,pi);
 
 	return pi;
 }
@@ -219,11 +239,7 @@ int my_insert(struct rb_root *root, struct packetInfo *lpi)
 			}
 			else
 			{
-				if(!isEqualPacketInfo(lpi,this))
-					addAddress(lpi,this);
-				else{
-					increaseCounter(lpi,this);
-				}
+				insertAddress(lpi,this);
 				return 1;
 			}
 	}
@@ -246,27 +262,38 @@ static void removeAddressFromNode(struct portInfo *pi,struct packetInfo *lpi, st
 
 	switch(lpi->protocol)
 	{
-	case 0x6:
-		tmp = pi->tcp;
+	case TCP:
+		if(lpi->address){
+			decrementAddress(lpi,pi->tcp,pi->tcp_list_counter);
+		}else
+		{
+			//for ...
+			decrementAddress(...,pi->tcp,pi->tcp_list_counter);
+
+		}
+		if(pi->tcp_list_counter == 0)
+		{
+			// need to delete it ..
+		}
 		break;
-	case 0x11:
-		tmp = pi->udp;
+
+	case UDP:
+		if(lpi->address){
+			decrementAddress(lpi,pi->udp,pi->udp_list_counter);
+		}else
+		{
+			//for ...
+			decrementAddress(..,pi->udp,pi->udp_list_counter);
+
+		}
+		if(pi->tcp_list_counter == 0)
+		{
+			// need to delete it ..
+		}
 		break;
 	default:
 		return;
 	}
-
-	if(lpi->address == 0)
-	{
-		return;
-	}
-
-	if(!tmp)
-		return;
-
-	/*
-	 * ToDo: verify if tmp is not local_addresses
-	 */
 
 	list_for_each_safe(pos,q,&(tmp->list))
 	{

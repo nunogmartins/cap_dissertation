@@ -12,12 +12,6 @@ static struct dentry *my_debug_dir = NULL;
 extern pid_t monitor_pid;
 extern void initializeTreeWithTaskInfo(pid_t pid);
 
-void printTree()
-{
-
-}
-
-
 static ssize_t pid_write(struct file *file, const char __user *user_buf,size_t size, loff_t *ppos)
 {
 	unsigned long pid;

@@ -25,6 +25,11 @@
 		return 1;
 //ToDo: isto esta mal feito o ||
 
+
+#define TCP 0x06
+#define UDP 0x11
+
+
 struct cell{
 	int fd;
 	int type;

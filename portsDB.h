@@ -26,6 +26,8 @@ typedef struct portInfo{
 #ifdef NEXT_PHASE
 	struct local_addresses_list *udp;
 	struct local_addresses_list *tcp;
+	int tcp_list_counter;
+	int udp_list_counter;
 #endif
 }portInfo;
 
