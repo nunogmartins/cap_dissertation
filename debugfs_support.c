@@ -42,7 +42,7 @@ static ssize_t pid_write(struct file *file, const char __user *user_buf,size_t s
 	if(pid > 0)
 		initializeTreeWithTaskInfo((size_t) pid);
 	else{
-		if(pid == -1)
+		if(pid == 0)
 		{
 			printTree();
 		}
