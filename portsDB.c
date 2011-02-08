@@ -262,7 +262,7 @@ int decrementAddress(struct packetInfo *lpi,struct local_addresses_list *protoco
 	list_for_each_safe(pos,q,&(protocol->list))
 	{
 		address = list_entry(pos,local_addresses_list,list);
-		if(lpi->address == list->address){
+		if(lpi->address == address->address){
 			(address->counter)--;
 			if(address->counter <= 0){
 				list_del(pos);
@@ -278,9 +278,6 @@ int decrementAddress(struct packetInfo *lpi,struct local_addresses_list *protoco
 
 static void removeAddressFromNode(struct portInfo *pi,struct packetInfo *lpi)
 {
-	struct local_addresses_list *list = NULL, *tmp = NULL;
-	struct list_head *q = NULL, *pos = NULL;
-	int i = 0;
 
 	switch(lpi->protocol)
 	{
@@ -294,13 +291,13 @@ static void removeAddressFromNode(struct portInfo *pi,struct packetInfo *lpi)
 
 			list_for_each(pos,&(local_list->list))
 			{
-				struct packetInfo pi;
+				struct packetInfo aux;
 
 				address = list_entry(pos,local_addresses_list,list);
 
-				pi.address = address->address;
+				aux.address = address->address;
 
-				decrementAddress(&pi,pi->tcp,&(pi>tcp_list_counter));
+				decrementAddress(&aux,pi->tcp,&(pi->tcp_list_counter));
 			}
 		}
 		if(pi->tcp_list_counter == 0)
@@ -312,7 +309,7 @@ static void removeAddressFromNode(struct portInfo *pi,struct packetInfo *lpi)
 
 	case UDP:
 		if(lpi->address){
-			decrementAddress(lpi,pi->udp,pi->udp_list_counter);
+			decrementAddress(lpi,pi->udp,&(pi->udp_list_counter));
 		}else
 		{
 			local_addresses_list *address = NULL;
@@ -320,13 +317,13 @@ static void removeAddressFromNode(struct portInfo *pi,struct packetInfo *lpi)
 
 			list_for_each(pos,&(local_list->list))
 			{
-				struct packetInfo pi;
+				struct packetInfo aux;
 
 				address = list_entry(pos,local_addresses_list,list);
 
-				pi.address = address->address;
+				aux.address = address->address;
 
-				decrementAddress(&pi,pi->udp,&(pi>udp_list_counter));
+				decrementAddress(&aux,pi->udp,&(pi->udp_list_counter));
 			}
 
 		}
@@ -344,8 +341,6 @@ static void removeAddressFromNode(struct portInfo *pi,struct packetInfo *lpi)
 void my_erase(struct rb_root *root, struct packetInfo *pi)
 {
 	struct portInfo *data = my_search(root,pi);
-	int nelems = -1;
-	struct local_addresses_list *head = NULL;
 
 	if(data)
 	{
