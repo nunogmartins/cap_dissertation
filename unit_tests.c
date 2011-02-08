@@ -48,7 +48,6 @@ int depopulate(void)
 {
 	int i = INITIAL_PORT;
 	int iteration = 0;
-	printTree();
 	//do for all ports my_erase
 	for(i=INITIAL_PORT;i < FINAL_PORT; i+=10,iteration++)
 	{
