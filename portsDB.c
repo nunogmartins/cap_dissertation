@@ -372,6 +372,8 @@ void printAll(struct rb_root *tree)
 {
 	struct rb_node *node;
 	struct portInfo *p = NULL;
+	int i = 0;
+
 
 	for(node = rb_first(tree); node ; node = rb_next(node))
 	{
@@ -387,5 +389,11 @@ void printAll(struct rb_root *tree)
 			pr_emerg( "udp addresses");
 			iterateList(p->udp);
 		}
+		i++;
+	}
+
+	if(i == 0)
+	{
+		pr_emerg("Arvore vazia");
 	}
 }

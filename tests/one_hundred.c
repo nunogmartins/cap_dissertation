@@ -51,6 +51,7 @@ int main(int argc, char **argv)
 			listen(sockfds[i], 5);
 			}
 		}
+		i--;
 
 		for(i;i >= 0; --i)
 		{
