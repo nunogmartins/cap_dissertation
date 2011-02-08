@@ -233,9 +233,7 @@ static void monitor_exit(void)
 	int ret = -1;
 #endif
 
-#ifndef UNIT_TESTING
 	destroy_debug();
-#endif
 	//unregister all probes ...
 #ifdef MY_KPROBES
 	for(i=0; i < NR_PROBES ; i++)
