@@ -254,7 +254,29 @@ int my_insert(struct rb_root *root, struct packetInfo *lpi)
 	return 1;
 }
 
-static void removeAddressFromNode(struct portInfo *pi,struct packetInfo *lpi, struct local_addresses_list **head, int *nelems)
+int decrementAddress(struct packetInfo *lpi,struct local_addresses_list *protocol, int *list_counter)
+{
+	local_addresses_list *address = NULL;
+	struct list_head *pos = NULL, *q =NULL;
+
+	list_for_each_safe(pos,q,&(protocol->list))
+	{
+		address = list_entry(pos,local_addresses_list,list);
+		if(lpi->address == list->address){
+			(address->counter)--;
+			if(address->counter <= 0){
+				list_del(pos);
+				kfree(address);
+				(*(list_counter))--;
+			}
+			return 1;
+		}
+	}
+
+	return 0;
+}
+
+static void removeAddressFromNode(struct portInfo *pi,struct packetInfo *lpi)
 {
 	struct local_addresses_list *list = NULL, *tmp = NULL;
 	struct list_head *q = NULL, *pos = NULL;
@@ -264,16 +286,27 @@ static void removeAddressFromNode(struct portInfo *pi,struct packetInfo *lpi, st
 	{
 	case TCP:
 		if(lpi->address){
-			decrementAddress(lpi,pi->tcp,pi->tcp_list_counter);
+			decrementAddress(lpi,pi->tcp,&(pi->tcp_list_counter));
 		}else
 		{
-			//for ...
-			decrementAddress(...,pi->tcp,pi->tcp_list_counter);
+			local_addresses_list *address = NULL;
+			struct list_head *pos = NULL;
 
+			list_for_each(pos,&(local_list->list))
+			{
+				struct packetInfo pi;
+
+				address = list_entry(pos,local_addresses_list,list);
+
+				pi.address = address->address;
+
+				decrementAddress(&pi,pi->tcp,&(pi>tcp_list_counter));
+			}
 		}
 		if(pi->tcp_list_counter == 0)
 		{
-			// need to delete it ..
+			kfree(pi->tcp);
+			pi->tcp = NULL;
 		}
 		break;
 
@@ -282,36 +315,29 @@ static void removeAddressFromNode(struct portInfo *pi,struct packetInfo *lpi, st
 			decrementAddress(lpi,pi->udp,pi->udp_list_counter);
 		}else
 		{
-			//for ...
-			decrementAddress(..,pi->udp,pi->udp_list_counter);
+			local_addresses_list *address = NULL;
+			struct list_head *pos = NULL;
+
+			list_for_each(pos,&(local_list->list))
+			{
+				struct packetInfo pi;
+
+				address = list_entry(pos,local_addresses_list,list);
+
+				pi.address = address->address;
+
+				decrementAddress(&pi,pi->udp,&(pi>udp_list_counter));
+			}
 
 		}
-		if(pi->tcp_list_counter == 0)
+		if(pi->udp_list_counter == 0)
 		{
-			// need to delete it ..
+			kfree(pi->udp);
+			pi->udp = NULL;
 		}
 		break;
 	default:
 		return;
-	}
-
-	list_for_each_safe(pos,q,&(tmp->list))
-	{
-		list = list_entry(pos,local_addresses_list,list);
-		if(lpi->address == list->address){
-#ifdef MY_DEBUG
-			pr_emerg("found address and i is %d head is going to have %p",i,tmp);
-#endif
-			list->counter--;
-			if(list->counter <= 0){
-				list_del(pos);
-				kfree(list);
-			}
-			*nelems = i;
-			*head = tmp; // ?? don't know if good decision ...
-			return;
-		}
-		i++;
 	}
 }
 
@@ -323,23 +349,7 @@ void my_erase(struct rb_root *root, struct packetInfo *pi)
 
 	if(data)
 	{
-		removeAddressFromNode(data,pi,&head,&nelems);
-		if(nelems == 0)
-		{
-#ifdef MY_DEBUG
-			pr_emerg("nelems is zero and address of head is %p and address of tcp is %p",head,data->tcp);
-#endif
-			if(data->tcp == head){
-				kfree(data->tcp);
-				data->tcp = NULL;
-			}
-			else{
-				kfree(data->udp);
-				data->udp = NULL;
-			}
-			// have to remove the head
-		}
-
+		removeAddressFromNode(data,pi);
 
 		if((!data->tcp) && !(data->udp)){
 			rb_erase(&data->node,root);
@@ -348,14 +358,8 @@ void my_erase(struct rb_root *root, struct packetInfo *pi)
 			pr_emerg("removing the node");
 #endif
 		}
-		//ToDo: possibly here to kfree data memory ...
-		//@here ... allocated in createPacketInfo
-
 	}
-
-
 }
-
 
 static void iterateList(struct local_addresses_list *tmp)
 {
