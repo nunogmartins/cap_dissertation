@@ -45,7 +45,7 @@ int main(int argc, char **argv)
 			serv_addr.sin_port = htons(PORT+i);
 			sockfds[i] = socket(AF_INET, SOCK_STREAM, 0);
 			if(sockfds[i] < 0)
-			printf("error");
+				printf("create error on %d\t",i);
 			else{
 			bind(sockfds[i], (struct sockaddr *)&serv_addr, sizeof(serv_addr));
 			listen(sockfds[i], 5);
@@ -57,7 +57,7 @@ int main(int argc, char **argv)
 			if(sockfds[i] > 0)
 				close(sockfds[i]);
 			else
-				printf("error");
+				printf("close error on %d\t",i);
 		}
 	}
 	t2=clock();
