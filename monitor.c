@@ -195,9 +195,9 @@ static int monitor_init(void)
 	}
 #endif
 
-#ifndef UNIT_TESTING
 	init_debug();
 	
+#ifndef UNIT_TESTING
 	Backup_portExists = portExists;
 	local_list = listAllDevicesAddress();
 #endif
