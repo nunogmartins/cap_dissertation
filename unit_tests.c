@@ -21,7 +21,7 @@ int populate(void)
 	struct packetInfo pi;
 
 	ports = kmalloc(MAX_DATA*sizeof(*ports),GFP_KERNEL);
-
+	pr_emerg("Populate\n");
 	for(i=INITIAL_PORT,iteration=0;i < FINAL_PORT; i+=10,iteration++)
 	{
 		struct packetInfo *sentinel = (ports)+iteration;
@@ -46,6 +46,7 @@ int populate(void)
 
 int depopulate(void)
 {
+	pr_emerg("DePopulate\n");
 	int i = INITIAL_PORT;
 	int iteration = 0;
 	//do for all ports my_erase
