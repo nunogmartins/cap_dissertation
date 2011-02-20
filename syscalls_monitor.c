@@ -206,11 +206,15 @@ static int connect_entry_handler(struct kretprobe_instance *ri, struct pt_regs *
 	//int fd = regs->di;
 #ifdef CONFIG_X86_32
 	int fd = regs->ax;
+	struct sockaddr_in *in = regs->dx;
 #else
 	int fd = regs->di;
+	struct sockaddr_in *in = regs->si;
 #endif
 
 	CHECK_MONITOR_PID;
+
+	pr_info("in address %p port number %d",in,ntohs(in->sin_port));
 
 	my_data->fd = fd;
 
