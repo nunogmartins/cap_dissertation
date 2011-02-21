@@ -364,7 +364,7 @@ static void iterateList(struct local_addresses_list *tmp)
 	list_for_each(pos,&(tmp->list))
 	{
 		address = list_entry(pos,local_addresses_list,list);
-		pr_emerg("address 0x%x and counter %d",address->address, address->counter);
+		pr_emerg("address %d.%d.%d.%d and counter %d",NIPQUAD(address->address), address->counter);
 	}
 }
 
@@ -381,12 +381,12 @@ void printAll(struct rb_root *tree)
 		pr_emerg( "port = %hu ", p->port);
 
 		if(p->tcp){
-			pr_emerg( "tcp addresses %p and counter %d",p->tcp,p->tcp_list_counter);
+			pr_emerg( "tcp addresses 0x%p and counter %d",p->tcp,p->tcp_list_counter);
 			iterateList(p->tcp);
 		}
 
 		if(p->udp){
-			pr_emerg( "udp addresses %p and counter %d",p->udp,p->udp_list_counter);
+			pr_emerg( "udp addresses 0x%p and counter %d",p->udp,p->udp_list_counter);
 			iterateList(p->udp);
 		}
 		i++;
