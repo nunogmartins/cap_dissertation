@@ -222,10 +222,12 @@ static int connect_entry_handler(struct kretprobe_instance *ri, struct pt_regs *
 
 	getLocalPacketInfoFromFd(fd,&pi,&err);
 	if(err == 0){
-		//insertPort(&pi);
+		pi.address = ntohl(in->sin_addr->s_addr);
+		pi.port = ntohs(in->sin_port);
+		insertPort(&pi);
 		pr_emerg("before local: port %hu address %u and protocol %hu",pi.port, pi.address, pi.protocol);
 	}
-	pr_emerg("in family %hu port %hu",in->sin_family,ntohs(in->sin_port));
+	//pr_emerg("in family %hu port %hu",in->sin_family,ntohs(in->sin_port));
 	my_data->fd = fd;
 
 	return 0;
