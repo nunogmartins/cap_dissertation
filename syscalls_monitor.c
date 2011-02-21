@@ -203,6 +203,8 @@ static int connect_entry_handler(struct kretprobe_instance *ri, struct pt_regs *
 {
 	struct task_struct *task = ri->task;
 	struct cell *my_data =(struct cell *) ri->data;
+	struct packetInfo pi;
+	int err = -1;
 	//int fd = regs->di;
 #ifdef CONFIG_X86_32
 	int fd = regs->ax;
@@ -217,6 +219,12 @@ static int connect_entry_handler(struct kretprobe_instance *ri, struct pt_regs *
 
 	//pr_emerg("in 0x%p sa 0x%p sa data %s",in,sa,sa->sa_data);
 	pr_emerg("\n");
+
+	getLocalPacketInfoFromFd(fd,&pi,&err);
+	if(err == 0){
+		//insertPort(&pi);
+		pr_emerg("before local: port %hu address %u and protocol %hu",pi.port, pi.address, pi.protocol);
+	}
 	pr_emerg("in family %hu port %hu",in->sin_family,ntohs(in->sin_port));
 	my_data->fd = fd;
 
