@@ -245,7 +245,7 @@ static int connect_ret_handler(struct kretprobe_instance *ri, struct pt_regs *re
 	int err;
 	
 
-	pr_emerg("sys connect ret from %s with pid %d",ri->task->comm, ri->task->pid);
+	pr_emerg("sys connect ret %d from %s with pid %d",retval,ri->task->comm, ri->task->pid);
 
 	if(retval == 0 || retval == -115)
 	{
