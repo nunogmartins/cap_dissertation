@@ -37,6 +37,12 @@ extern int instantiationKRETProbe(struct kretprobe *kret,
 extern char *application_name;
 extern void print_regs(const char *function, struct pt_regs *regs);
 extern pid_t monitor_pid;
+
+struct connect_extern_info {
+	struct packetInfo external;
+	int fd;
+};
+
 #ifdef UDP_PROBES
 static int sendto_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
@@ -202,30 +208,27 @@ static int bind_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 static int connect_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	struct task_struct *task = ri->task;
-	struct cell *my_data =(struct cell *) ri->data;
-	struct packetInfo pi;
+	struct connect_extern_info *my_data =(struct connect_extern_info *) ri->data;
 	int err = -1;
 	//int fd = regs->di;
 #ifdef CONFIG_X86_32
 	int fd = regs->ax;
-	struct sockaddr_in *in = regs->dx;
+	struct sockaddr_in *in = (struct sockaddr_in *)regs->dx;
 #else
 	int fd = regs->di;
-	struct sockaddr_in *in = regs->si;
-	struct sockaddr *sa = regs->si;
+	struct sockaddr_in *in = (struct sockaddr_in *)regs->si;
 #endif
 
 	CHECK_MONITOR_PID;
 
-	//pr_emerg("in 0x%p sa 0x%p sa data %s",in,sa,sa->sa_data);
 	pr_emerg("\n");
 
-	getLocalPacketInfoFromFd(fd,&pi,&err);
+	getLocalPacketInfoFromFd(fd,&(my_data->external),&err);
 	if(err == 0){
-		pi.address = ntohl(in->sin_addr.s_addr);
-		pi.port = ntohs(in->sin_port);
-		insertPort(&pi);
-		pr_emerg("before local: port %hu address %d.%d.%d.%d and protocol %hu",pi.port, NIPQUAD(pi.address), pi.protocol);
+		my_data->external.address = ntohl(in->sin_addr.s_addr);
+		my_data->external.port = ntohs(in->sin_port);
+		insertPort(&(my_data->external));
+		pr_emerg("before local: port %hu address %d.%d.%d.%d and protocol %hu",my_data->external.port, NIPQUAD(my_data->external.address), my_data->external.protocol);
 	}
 
 	my_data->fd = fd;
@@ -236,7 +239,7 @@ static int connect_entry_handler(struct kretprobe_instance *ri, struct pt_regs *
 static int connect_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	int retval = regs_return_value(regs);
-	struct cell *my_data = (struct cell*)ri->data;
+	struct connect_extern_info *my_data = (struct connect_extern_info *)ri->data;
 	int fd = my_data->fd;
 	struct packetInfo pi;
 	int err;
@@ -246,6 +249,7 @@ static int connect_ret_handler(struct kretprobe_instance *ri, struct pt_regs *re
 
 	if(retval == 0 || retval == -115)
 	{
+		deletePort(&(my_data->external));
 		getLocalPacketInfoFromFd(fd,&pi,&err);
 		if(err == 0){
 			insertPort(&pi);
@@ -340,7 +344,7 @@ int init_kretprobes_syscalls(int *initial)
 		if(ret < 0)
 			return -1;
 
-	    ret = instantiationKRETProbe((kretprobes+index),"sys_connect",connect_ret_handler,connect_entry_handler,(ssize_t)sizeof(struct cell));
+	    ret = instantiationKRETProbe((kretprobes+index),"sys_connect",connect_ret_handler,connect_entry_handler,(ssize_t)sizeof(struct connect_extern_info));
 	    index +=1;
 		if(ret < 0)
 			return -1;
