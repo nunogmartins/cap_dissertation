@@ -34,7 +34,7 @@ int main(int argc, char **argv)
 			if(fd > 0)
 			{
 				char buf[5];
-				vsnprintf(buf,4,"%l",pid);
+				snprintf(buf,4,"%l",pid);
 				write(fd,(const void *)buf,sizeof(buf));
 				close(fd);
 			}
