@@ -17,24 +17,29 @@ int main(int argc, char **argv)
 
 	pid_t pid;
 
+	printf("%s",argv[1]);
+
 	pid = fork();
 
 	if(pid == 0)
 	{
 		setuid(1000);
 		execv(argv[1],NULL);
-	}else
+	}else{
 		if(pid > 0)
 		{
 			int fd = open("/sys/kernel/debug/pcap_debug/pid_monitor",O_WRONLY);
+			int status;
 
 			if(fd > 0)
 			{
-				write(fd,pid,sizeof(pid_t));
+				write(fd,(const void *)&pid,sizeof(pid_t));
 				close(fd);
 			}
-			waitpid(pid);
+
+			waitpid(pid,&status,0);
 		}
+	}
 
 	return 0;
 }
