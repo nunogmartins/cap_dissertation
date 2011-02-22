@@ -163,7 +163,7 @@ static int close_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs
 	
 
 	if(retval == 0){
-		pr_emerg( "port %hu address %d.%d.%d.%d protocol %hu",pi->port,NIPQUAD(pi->address),pi->protocol);
+		pr_emerg( "close_ret: port %hu address %d.%d.%d.%d protocol %hu",pi->port,NIPQUAD(pi->address),pi->protocol);
 		deletePort(pi);
 	}
 	return 0;
