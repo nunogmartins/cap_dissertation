@@ -197,10 +197,9 @@ static int monitor_init(void)
 
 	init_debug();
 	
-#ifndef UNIT_TESTING
 	Backup_portExists = portExists;
+	portExists = my_portExists;
 	local_list = listAllDevicesAddress();
-#endif
 
 #ifdef UNIT_TESTING
 	populate();
@@ -240,20 +239,20 @@ static void monitor_exit(void)
 	{
 		removeKprobe(i);
 	}
-#endif
+
 	if(kretprobes)
 		kfree(kretprobes);
+#endif
 
-	portExists = Backup_portExists;
+
 #ifdef UNIT_TESTING
 	depopulate();
 #endif
 
-#ifndef UNIT_TESTING
+	portExists = Backup_portExists;
 	ret = remove_local_addresses_list(local_list);
 	if(ret == 0)
 		kfree(local_list);
-#endif
 	//ToDo: need to destroy the portTree ....
 	//ToDo: clear the memory leak ...
 
@@ -264,7 +263,7 @@ void initializeTreeWithTaskInfo(pid_t new_pid)
 	struct task_struct *t;
 	monitor_pid = new_pid;
 
-	portExists = my_portExists;
+
 
 	for_each_process(t){
 		if (t->pid == monitor_pid || t->real_parent->pid == monitor_pid)
