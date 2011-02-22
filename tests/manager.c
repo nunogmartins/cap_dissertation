@@ -24,7 +24,7 @@ int main(int argc, char **argv)
 	if(pid == 0)
 	{
 		setuid(1000);
-		execv(argv[1],NULL);
+		execv(argv[1],argv+1);
 	}else{
 		if(pid > 0)
 		{
@@ -33,8 +33,8 @@ int main(int argc, char **argv)
 
 			if(fd > 0)
 			{
-				char buf[5];
-				snprintf(buf,4,"%l",pid);
+				char buf[10];
+				snprintf(buf,9,"%lu",(unsigned long)pid);
 				write(fd,(const void *)buf,sizeof(buf));
 				close(fd);
 			}
