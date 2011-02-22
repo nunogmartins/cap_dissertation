@@ -17,28 +17,30 @@ int main(int argc, char **argv)
 
 	pid_t pid;
 
-	printf("%s",argv[1]);
+	printf("%s\n",argv[1]);
 
 	pid = fork();
 
 	if(pid == 0)
 	{
+		int fd = open("/sys/kernel/debug/pcap_debug/pid_monitor",O_WRONLY);
+		pid_t my_pid;
+		my_pid = getpid();
+
+		if(fd > 0)
+		{
+			char buf[10];
+			snprintf(buf,9,"%lu",(unsigned long)my_pid);
+			write(fd,(const void *)buf,sizeof(buf));
+			close(fd);
+		}
 		setuid(1000);
+		sleep(5);
 		execv(argv[1],argv+1);
 	}else{
 		if(pid > 0)
 		{
-			int fd = open("/sys/kernel/debug/pcap_debug/pid_monitor",O_WRONLY);
 			int status;
-
-			if(fd > 0)
-			{
-				char buf[10];
-				snprintf(buf,9,"%lu",(unsigned long)pid);
-				write(fd,(const void *)buf,sizeof(buf));
-				close(fd);
-			}
-
 			waitpid(pid,&status,0);
 		}
 	}
