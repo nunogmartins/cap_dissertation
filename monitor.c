@@ -42,7 +42,7 @@ MODULE_LICENSE("GPL");
 
 
 pid_t monitor_pid;
-int index = 0;
+int kprobes_index;
 
 /*
 * extern from linux kernel
@@ -156,9 +156,8 @@ unsigned int my_portExists(struct packetInfo *src_pi,struct packetInfo *dst_pi)
 static int monitor_init(void)
 {
 #ifdef MY_KPROBES
-	int index = 0;
 	int ret = -1;
-
+	kprobes_index = 0;
 	monitor_pid = -1;
 
 	kretprobes = kmalloc(sizeof(*kretprobes)*NR_PROBES,GFP_KERNEL);
@@ -167,7 +166,7 @@ static int monitor_init(void)
 		return -1;
 	}
 
-	ret = init_kretprobes_syscalls(&index);
+	ret = init_kretprobes_syscalls(&kprobes_index);
 	if(ret < 0)
 	{
 		pr_info( "problem in syscalls");
@@ -218,7 +217,7 @@ static void monitor_exit(void)
 	destroy_debug();
 	//unregister all probes ...
 #ifdef MY_KPROBES
-	for(i=0; i < index ; i++)
+	for(i=0; i < kprobes_index ; i++)
 	{
 		removeKprobe(i);
 	}
