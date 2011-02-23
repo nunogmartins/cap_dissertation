@@ -44,6 +44,7 @@ struct connect_extern_info {
 };
 
 #ifdef UDP_PROBES
+#ifdef SENDPROBE
 static int sendto_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	struct task_struct *task = ri->task;
@@ -80,7 +81,9 @@ static int sendto_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 
 	return 0;
 }
+#endif //SENDPROBE
 
+#ifdef RECVPROBE
 static int recvfrom_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {	
 	struct task_struct *task = ri->task;
@@ -121,9 +124,39 @@ static int recvfrom_ret_handler(struct kretprobe_instance *ri, struct pt_regs *r
 
 	return 0;
 }
-#endif
+#endif //RECVPROBE
+
+#endif // UDPPROBES
 
 #ifdef TCP_PROBES
+static int accept_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
+{
+	struct task_struct *task = ri->task;
+
+	CHECK_MONITOR_PID;
+
+	return 0;
+}
+static int accept_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
+{
+	int retval = regs_return_value(regs);
+	struct packetInfo pi;
+	int err;
+
+	if(retval > 0)
+	{
+		getLocalPacketInfoFromFd(retval,&pi,&err);
+		if(err == 0)
+			insertPort(&pi);
+	}
+
+	return 0;
+}
+#endif //TCP_PROBES
+
+#ifdef COMMON_TCP_UDP
+
+#ifdef CLOSEPROBE
 static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	struct task_struct *task = ri->task;
@@ -168,8 +201,9 @@ static int close_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs
 	}
 	return 0;
 }
+#endif //CLOSEPROBE
 
-
+#ifdef BINDPROBE
 static int bind_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	struct task_struct *task = ri->task;
@@ -204,8 +238,9 @@ static int bind_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 
 	return 0;
 }
+#endif //BINDPROBE
 
-
+#ifdef CONNECTPROBE
 static int connect_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	struct task_struct *task = ri->task;
@@ -261,31 +296,8 @@ static int connect_ret_handler(struct kretprobe_instance *ri, struct pt_regs *re
 	
 	return 0;
 }
-
-static int accept_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
-{
-	struct task_struct *task = ri->task;
-
-	CHECK_MONITOR_PID;
-
-	return 0;
-}
-static int accept_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
-{
-	int retval = regs_return_value(regs);
-	struct packetInfo pi;
-	int err;
-
-	if(retval > 0)
-	{
-		getLocalPacketInfoFromFd(retval,&pi,&err);
-		if(err == 0)
-			insertPort(&pi);
-	}
-
-	return 0;
-}
-
+#endif //CONNECTPROBE
+#ifdef SOCKETPROBE
 static int socket_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	struct task_struct *task = ri->task;
@@ -323,10 +335,14 @@ static int socket_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 
 	return 0;
 }
+
+#endif //SOCKETPROBE
+
+#endif //COMMON_TCP_UDP
+
 /*
  * function called on module init to initialize kretprobes common to tcp and udp
  */
-#endif
 
 int init_kretprobes_syscalls(int *initial)
 {
@@ -334,52 +350,56 @@ int init_kretprobes_syscalls(int *initial)
 	int index = *initial;
 
 
+#ifdef COMMON_TCP_UDP
+#ifdef BINDPROBE
+	ret = instantiationKRETProbe((kretprobes+index),"sys_bind",bind_ret_handler,bind_entry_handler,(ssize_t)sizeof(struct cell));
+	index +=1;
+	if(ret < 0)
+		return -1;
+#endif //BINDPROBE
+#ifdef CONNECTPROBE
+	ret = instantiationKRETProbe((kretprobes+index),"sys_connect",connect_ret_handler,connect_entry_handler,(ssize_t)sizeof(struct connect_extern_info));
+	index +=1;
+	if(ret < 0)
+		return -1;
+#endif //CONNECTPROBE
+#ifdef SOCKETPROBE
+	ret = instantiationKRETProbe((kretprobes+index),"sys_socket",socket_ret_handler,socket_entry_handler,(ssize_t)sizeof(struct cell));
+	index +=1;
+	if(ret < 0)
+		return -1;
+
+#endif //SOCKETPROBE
+#ifdef CLOSEPROBE
+	ret = instantiationKRETProbe((kretprobes+index),"sock_close",close_ret_handler,close_entry_handler,(ssize_t)sizeof(struct packetInfo));
+	index +=1;
+	if(ret < 0)
+		return -1;
+#endif //CLOSEPROBE
+#endif //COMMON_TCP_UDP
+
 #ifdef TCP_PROBES
-	    ret = instantiationKRETProbe((kretprobes+index),"sys_socket",socket_ret_handler,socket_entry_handler,(ssize_t)sizeof(struct cell));
-	    index +=1;
-		if(ret < 0)
-			return -1;
-
-	    ret = instantiationKRETProbe((kretprobes+index),"sys_bind",bind_ret_handler,bind_entry_handler,(ssize_t)sizeof(struct cell));
-	    index +=1;
-		if(ret < 0)
-			return -1;
-
-	    ret = instantiationKRETProbe((kretprobes+index),"sys_connect",connect_ret_handler,connect_entry_handler,(ssize_t)sizeof(struct connect_extern_info));
-	    index +=1;
-		if(ret < 0)
-			return -1;
-
-	    ret = instantiationKRETProbe((kretprobes+index),"sys_accept4",accept_ret_handler,accept_entry_handler,(ssize_t)sizeof(struct cell));
-	    index +=1;
-		if(ret < 0)
-			return -1;
-
-/*
-	    ret = instantiationKRETProbe((kretprobes+index),"sys_close",close_ret_handler,close_entry_handler,(ssize_t)sizeof(struct cell));
-	    index +=1;
-		if(ret < 0)
-			return -1;
-*/
-
-		ret = instantiationKRETProbe((kretprobes+index),"sock_close",close_ret_handler,close_entry_handler,(ssize_t)sizeof(struct packetInfo));
+	ret = instantiationKRETProbe((kretprobes+index),"sys_accept4",accept_ret_handler,accept_entry_handler,(ssize_t)sizeof(struct cell));
 		index +=1;
 		if(ret < 0)
 			return -1;
-#endif
+#endif // TCP_PROBES
+
 #ifdef UDP_PROBES
-		ret = instantiationKRETProbe((kretprobes+index),"sys_sendto",sendto_ret_handler,sendto_entry_handler,(ssize_t)sizeof(struct cell));
-		index +=1;
-		if(ret < 0)
-			return -1;
-
-
-	    ret = instantiationKRETProbe((kretprobes+index),"sys_recvfrom",recvfrom_ret_handler,recvfrom_entry_handler,(ssize_t)sizeof(struct cell));
-	    index +=1;
-		if(ret < 0)
-			return -1;
-#endif
-		return 0;
+#ifdef SENDPROBE
+	ret = instantiationKRETProbe((kretprobes+index),"sys_sendto",sendto_ret_handler,sendto_entry_handler,(ssize_t)sizeof(struct cell));
+	index +=1;
+	if(ret < 0)
+		return -1;
+#endif //SENDPROBE
+#ifdef RECVPROBE
+	ret = instantiationKRETProbe((kretprobes+index),"sys_recvfrom",recvfrom_ret_handler,recvfrom_entry_handler,(ssize_t)sizeof(struct cell));
+	index +=1;
+	if(ret < 0)
+		return -1;
+#endif //RECVPROBE
+#endif //UDP_PROBES
+	return 0;
 }
 
 int destroy_kretprobes_syscalls(int *initial)

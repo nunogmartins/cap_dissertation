@@ -30,6 +30,8 @@ struct jprobe *jprobes = NULL;
 char *application_name = "server";
 struct local_addresses_list *local_list = NULL;
 
+
+
 static void monitor_exit(void);
 static int  monitor_init(void);
 
@@ -40,6 +42,7 @@ MODULE_LICENSE("GPL");
 
 
 pid_t monitor_pid;
+int index = 0;
 
 /*
 * extern from linux kernel
@@ -163,30 +166,7 @@ static int monitor_init(void)
 		pr_info( "problem allocating memory");
 		return -1;
 	}
-#endif
-/*
-	ret = init_kretprobes_common(&index);
-	if(ret < 0)
-	{
-		pr_info( "problem in common");
-		goto problem;
-	}
 
-	ret = init_kretprobes_tcp(&index);
-	if(ret < 0)
-	{
-		pr_info( "problem in tcp");
-		goto problem;
-	}
-
-	ret = init_kretprobes_udp(&index);
-	if(ret < 0)
-	{
-		pr_info( "problem in udp");
-		goto problem;
-	}
-*/
-#ifdef MY_KPROBES
 	ret = init_kretprobes_syscalls(&index);
 	if(ret < 0)
 	{
@@ -204,14 +184,17 @@ static int monitor_init(void)
 #ifdef UNIT_TESTING
 	populate();
 #endif
-	return 0;
+
+
+
 #ifdef MY_KPROBES
 problem:
 	/* ToDo:todos os probes que ja foram registados têm de ser desregistados
 	 */
 	kfree(kretprobes);
-	return 0;
 #endif
+
+	return 0;
 }
 
 #ifdef MY_KPROBES
@@ -220,7 +203,7 @@ static void removeKprobe(int index)
 	if((kretprobes+index)!=NULL){
 		pr_info( "in index %d missed %d probes" , index,(kretprobes+index)->nmissed);
 		unregister_kretprobe((kretprobes+index));
-		pr_info( "kretprobe at %p unregistered\n", (kretprobes+index)->kp.addr);
+		pr_info( "kretprobe at %p named %s unregistered\n", (kretprobes+index)->kp.addr, (kretprobes+index)->kp.symbol_name);
 	}
 }
 #endif
@@ -235,7 +218,7 @@ static void monitor_exit(void)
 	destroy_debug();
 	//unregister all probes ...
 #ifdef MY_KPROBES
-	for(i=0; i < NR_PROBES ; i++)
+	for(i=0; i < index ; i++)
 	{
 		removeKprobe(i);
 	}
@@ -262,8 +245,6 @@ void initializeTreeWithTaskInfo(pid_t new_pid)
 {
 	struct task_struct *t;
 	monitor_pid = new_pid;
-
-
 
 	for_each_process(t){
 		if (t->pid == monitor_pid || t->real_parent->pid == monitor_pid)
