@@ -399,6 +399,8 @@ int init_kretprobes_syscalls(int *initial)
 		return -1;
 #endif //RECVPROBE
 #endif //UDP_PROBES
+
+	*initial = index;
 	return 0;
 }
 

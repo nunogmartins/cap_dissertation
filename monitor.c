@@ -153,6 +153,17 @@ unsigned int my_portExists(struct packetInfo *src_pi,struct packetInfo *dst_pi)
 	return 0;
 }
 
+#ifdef MY_KPROBES
+static void removeKprobe(int index)
+{
+	if((kretprobes+index)!=NULL){
+		pr_info( "in index %d missed %d probes" , index,(kretprobes+index)->nmissed);
+		unregister_kretprobe((kretprobes+index));
+		pr_info( "kretprobe at %p named %s unregistered\n", (kretprobes+index)->kp.addr, (kretprobes+index)->kp.symbol_name);
+	}
+}
+#endif
+
 static int monitor_init(void)
 {
 #ifdef MY_KPROBES
@@ -167,6 +178,8 @@ static int monitor_init(void)
 	}
 
 	ret = init_kretprobes_syscalls(&kprobes_index);
+	pr_info("Loaded %d probes", kprobes_index);
+
 	if(ret < 0)
 	{
 		pr_info( "problem in syscalls");
@@ -184,28 +197,17 @@ static int monitor_init(void)
 	populate();
 #endif
 
-
+	return 0;
 
 #ifdef MY_KPROBES
 problem:
-	/* ToDo:todos os probes que ja foram registados têm de ser desregistados
-	 */
+	for(;kprobes_index >=0; kprobes_index--)
+		removeKprobe(kprobes_index);
+
 	kfree(kretprobes);
+	return -1;
 #endif
-
-	return 0;
 }
-
-#ifdef MY_KPROBES
-static void removeKprobe(int index)
-{
-	if((kretprobes+index)!=NULL){
-		pr_info( "in index %d missed %d probes" , index,(kretprobes+index)->nmissed);
-		unregister_kretprobe((kretprobes+index));
-		pr_info( "kretprobe at %p named %s unregistered\n", (kretprobes+index)->kp.addr, (kretprobes+index)->kp.symbol_name);
-	}
-}
-#endif
 
 static void monitor_exit(void)
 {
