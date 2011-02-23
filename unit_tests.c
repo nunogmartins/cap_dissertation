@@ -38,7 +38,14 @@ int populate(void)
 		insertPort(&pi);
 	}
 
-	(ports)->address = (ports->address)+4;
+
+	{
+		pi = *ports;
+		pi.protocol = 0x11;
+		insertPort(&pi);
+	}
+
+	//(ports)->address = (ports->address);
 
 	printTree();
 	return 0;	
@@ -46,16 +53,23 @@ int populate(void)
 
 int depopulate(void)
 {
-	pr_emerg("DePopulate\n");
 	int i = INITIAL_PORT;
 	int iteration = 0;
 	//do for all ports my_erase
+	pr_emerg("DePopulate\n");
 	for(i=INITIAL_PORT;i < FINAL_PORT; i+=10,iteration++)
 	{
 		deletePort((ports+iteration));
 
 	}
 
+	deletePort((ports+0));
+	{
+		struct packetInfo pi;
+		pi = *(ports);
+		pi.protocol = 0x11;
+		deletePort(&pi);
+	}
 	printTree();
 
 	kfree(ports);
