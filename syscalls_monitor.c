@@ -165,8 +165,8 @@ static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *re
 	//struct socket *socket = stack+8;
 
 #ifdef CONFIG_X86_32
-	struct file *filp = regs->bx;
-	struct inode *inode = regs->ax;
+	struct file *filp = (struct file *)regs->bx;
+	struct inode *inode = (struct inode *)regs->ax;
 #else
 	struct file *filp = (struct file *)regs->si;
 	struct inode *inode = (struct inode *)regs->di;
