@@ -129,6 +129,7 @@ static int recvfrom_ret_handler(struct kretprobe_instance *ri, struct pt_regs *r
 #endif // UDPPROBES
 
 #ifdef TCP_PROBES
+#ifdef ACCEPTPROBE
 static int accept_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	struct task_struct *task = ri->task;
@@ -152,6 +153,7 @@ static int accept_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 
 	return 0;
 }
+#endif //ACCEPTPROBE
 #endif //TCP_PROBES
 
 #ifdef COMMON_TCP_UDP
