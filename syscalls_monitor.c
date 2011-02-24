@@ -379,10 +379,12 @@ int init_kretprobes_syscalls(int *initial)
 #endif //COMMON_TCP_UDP
 
 #ifdef TCP_PROBES
+#ifdef 	ACCEPTPROBE
 	ret = instantiationKRETProbe((kretprobes+index),"sys_accept4",accept_ret_handler,accept_entry_handler,(ssize_t)sizeof(struct cell));
 		index +=1;
 		if(ret < 0)
 			return -1;
+#endif // ACCEPTPROBE
 #endif // TCP_PROBES
 
 #ifdef UDP_PROBES
