@@ -6,8 +6,11 @@
  */
 #include <stdio.h>
 #include <time.h>
-#include <asm/unistd.h>
-//#include <unistd.h>
+//#include <linux/unistd.h>
+#include <sys/syscall.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 
 
@@ -16,6 +19,7 @@ int main(int argc, char **argv)
 	clock_t t1,t2;
 	int i;
 	int iterations;
+	pid_t pid;
 
 	if(argc != 2)
 	{
@@ -27,11 +31,17 @@ int main(int argc, char **argv)
 	t1 = clock();
 	for(i=0; i < iterations; i++)
 	{
-		__SYSCALL(__NR_getpid, sys_getpid);
+		//getpid();
+		//__SYSCALL(__NR_getpid, sys_getpid)
+		//_syscall0( long, sys_getpid );
+		//__SYSCALL(__NR_getpid);
+		 pid = syscall( SYS_getpid );
+		//syscall0( 39 );
+
 	}
 	t2 = clock();
 
-	printf("%.4lf seconds of processing\n", (t2-t1)/(double)CLOCKS_PER_SEC);
+	printf("pid = %ld \n %.4lf seconds of processing\n", (long int)pid,(t2-t1)/(double)CLOCKS_PER_SEC);
 	printf("%.8lf mili of processing\n", (double)(t2-t1));
 
 
