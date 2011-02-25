@@ -11,10 +11,6 @@
 #include "portsDB.h"
 #include "pcap_monitoring.h"
 
-/*
-* need to create a list with all ports in use
-*/
-
 extern struct rb_root db;
 extern struct local_addresses_list *local_list;
 
@@ -31,10 +27,11 @@ int insertPort(struct packetInfo *lpi)
 {
 	int ret=1;
 
+#ifdef MY_DEBUG
 	if(lpi == NULL){
 		return 	-1;
 	}
-#ifdef MY_DEBUG
+
 	debugFunc(lpi);
 #endif
 
@@ -45,7 +42,6 @@ int insertPort(struct packetInfo *lpi)
 #endif
 		return -1;
 	}
-
 
 	ret = my_insert(&db,lpi);
 

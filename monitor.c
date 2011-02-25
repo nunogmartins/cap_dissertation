@@ -262,7 +262,7 @@ void initializeTreeWithTaskInfo(pid_t new_pid)
 #ifdef MY_DEBUG	
 			pr_info( "application %s with pid %lu", t->comm,(unsigned long)t->pid);
 #endif
-			while(fdt!=NULL)
+			while(fdt != NULL)
 			{
 				unsigned long file_descriptor = 0;
 				struct file *file;
@@ -274,24 +274,19 @@ void initializeTreeWithTaskInfo(pid_t new_pid)
 						struct packetInfo p;
 						int err;
 						getLocalPacketInfoFromFile(file,&p,&err);
+#ifdef MY_DEBUG
 						if(err == 0)
 						{
-#ifdef MY_DEBUG
 							pr_info( "iteration %lu is socket",file_descriptor);
-#endif
 							if(insertPort(&p) > 0){
-#ifdef MY_DEBUG
 								pr_info("insertion was ok");
-#endif
 							}
-
 							else{
-#ifdef MY_DEBUG
 								pr_info("something was wrong with the insertion");
-#endif
-							}
 
+							}
 						}
+#endif
 					}
 				}
 				//end of for or while more internal ...

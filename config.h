@@ -28,7 +28,7 @@
 #endif
 
 #ifdef COMMON_TCP_UDP
-#define SOCKETPROBE
+//#define SOCKETPROBE
 #define CLOSEPROBE
 #define CONNECTPROBE
 #define BINDPROBE
