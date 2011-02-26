@@ -15,6 +15,10 @@
 #include "pcap_monitoring.h"
 #include "portsDB.h"
 
+#ifdef MY_DEBUG
+#include "info_acquire.h"
+#endif
+
 struct rb_root db = RB_ROOT;
 extern struct local_addresses_list *local_list;
 

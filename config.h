@@ -5,6 +5,7 @@
 #undef UNIT_TESTING
 
 #ifdef UNIT_TESTING
+
 #undef MY_KPROBES
 #undef TCP_PROBES
 #undef UDP_PROBES
@@ -34,6 +35,11 @@
 #define BINDPROBE
 #endif
 
+#endif //UNIT_TESTING
+
+
+#define MY_DEBUG
+
 
 //#define OLD_PHASE
 #undef OLD_PHASE
@@ -46,5 +52,3 @@
 
 #define DEBUG_INFO
 //#undef DEBUG_INFO
-
-#endif

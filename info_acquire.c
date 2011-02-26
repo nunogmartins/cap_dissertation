@@ -8,14 +8,14 @@
 
 #include "config.h"
 
-#include "colector.h"
+#include "info_acquire.h"
 
 /*
  *  this function is going to gather all
  *  information present in this system
  *
  */
-int collectInfo(struct colected_info *info)
+int acquireInfo(struct info_acquire *info)
 {
 	return 0;
 }

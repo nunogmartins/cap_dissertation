@@ -25,6 +25,11 @@
 #include "table_port.h"
 #include "portsDB.h"
 
+#ifdef MY_DEBUG
+#include "info_acquire.h"
+struct filter_info_acquire filter_info = {.entry = 0,.src = 0, .dst = 0 };
+#endif
+
 struct kretprobe *kretprobes = NULL;
 struct jprobe *jprobes = NULL;
 char *application_name = "server";
@@ -121,7 +126,9 @@ unsigned int my_portExists(struct packetInfo *src_pi,struct packetInfo *dst_pi)
 
 	struct portInfo *sentinel_src = NULL;
 	struct portInfo *sentinel_dst = NULL;
-
+#ifdef MY_DEBUG
+	filter_info.entry++;
+#endif
 	if(src_pi!=NULL && dst_pi!=NULL)
 	{
 
@@ -132,7 +139,7 @@ unsigned int my_portExists(struct packetInfo *src_pi,struct packetInfo *dst_pi)
 			if(sentinel_src != NULL)
 			{
 #ifdef MY_DEBUG
-				pr_emerg( "found src port %hu",src_pi->port);
+				filter_info.src++;
 #endif
 				return 1;
 			}
@@ -142,7 +149,7 @@ unsigned int my_portExists(struct packetInfo *src_pi,struct packetInfo *dst_pi)
 			if(sentinel_dst != NULL)
 			{
 #ifdef MY_DEBUG
-				pr_emerg( "found dst port %hu",dst_pi->port);
+				filter_info.dst++;
 #endif
 				return 1;
 			}
