@@ -7,6 +7,8 @@
 
 
 #include "config.h"
+#include "pcap_monitoring.h"
+#include "table_port.h"
 
 #ifdef MY_DEBUG
 #include "info_acquire.h"
@@ -19,8 +21,9 @@ unsigned int (*Backup_portExists)(struct packetInfo *pi,struct packetInfo *dst_p
 unsigned int my_portExists(struct packetInfo *src_pi,struct packetInfo *dst_pi)
 {
 
-	struct portInfo *sentinel_src = NULL;
-	struct portInfo *sentinel_dst = NULL;
+	int sentinel_src = -1;
+	int  sentinel_dst = -1;
+
 #ifdef MY_DEBUG
 	filter_info.entry++;
 #endif
@@ -29,9 +32,9 @@ unsigned int my_portExists(struct packetInfo *src_pi,struct packetInfo *dst_pi)
 
 		if((src_pi->protocol == 0x11 || src_pi->protocol == 0x06)){
 
-			sentinel_src = my_search(&db,src_pi);
+			sentinel_src = searchPort(src_pi);
 
-			if(sentinel_src != NULL)
+			if(sentinel_src)
 			{
 #ifdef MY_DEBUG
 				filter_info.src++;
@@ -39,9 +42,9 @@ unsigned int my_portExists(struct packetInfo *src_pi,struct packetInfo *dst_pi)
 				return 1;
 			}
 
-			sentinel_dst = my_search(&db,dst_pi);
+			sentinel_dst = searchPort(dst_pi);
 
-			if(sentinel_dst != NULL)
+			if(sentinel_dst)
 			{
 #ifdef MY_DEBUG
 				filter_info.dst++;

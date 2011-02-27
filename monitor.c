@@ -4,10 +4,6 @@
  *  Created on: Nov 8, 2010
  *      Author: nuno
  */
-#ifndef MODULE
-#define MODULE
-#endif
-
 #include "config.h"
 
 #include <linux/module.h>
@@ -29,7 +25,6 @@
 #include "debugfs_support.h"
 
 struct kretprobe *kretprobes = NULL;
-struct jprobe *jprobes = NULL;
 char *application_name = "server";
 struct local_addresses_list *local_list = NULL;
 
@@ -40,8 +35,6 @@ static int  monitor_init(void);
 module_init(monitor_init);
 module_exit(monitor_exit);
 MODULE_LICENSE("GPL");
-
-
 
 pid_t monitor_pid;
 int kprobes_index;

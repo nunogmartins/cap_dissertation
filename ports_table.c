@@ -57,8 +57,14 @@ int deletePort(struct packetInfo *pi)
 	return 0;
 }
 
-#ifdef DEBUG_INFO
+int searchPort(struct packetInfo *pi){
+	if( my_search(&db,pi) != NULL)
+		return 1;
+	else
+		return 0;
+}
+
 void printTree(void){
 	printAll(&db);
 }
-#endif
+
