@@ -65,7 +65,7 @@ int searchPort(struct packetInfo *pi){
 }
 
 void clearInfo(void){
-	clearAllInfo();
+	clearAllInfo(&db);
 }
 
 void printTree(void){

@@ -62,6 +62,7 @@ static int loadSubSystems(void)
 	pr_info("Loaded %d probes", init_kretprobes_syscalls());
 #endif
 #endif
+	return 0;
 }
 
 static int unloadSubSystems(void)
@@ -84,6 +85,7 @@ static int unloadSubSystems(void)
 #endif
 #endif
 
+	return 0;
 }
 
 static int monitor_init(void)
