@@ -37,7 +37,7 @@ int insertPort(struct packetInfo *lpi)
 
 	if(lpi->port == 0 || lpi->protocol == 0)
 	{
-#ifdef MY_DEBUG
+#ifdef MY_DEBUG_INFO
 		pr_emerg("some info is zero port %d address 0x%x and protocol %hu",lpi->port,lpi->address, lpi->protocol);
 #endif
 		return -1;
@@ -50,7 +50,7 @@ int insertPort(struct packetInfo *lpi)
 
 int deletePort(struct packetInfo *pi)
 {
-#ifdef MY_DEBUG
+#ifdef MY_DEBUG_INFO
 	pr_emerg( "deleting port %hu",pi->port);
 #endif
 	my_erase(&db,pi);
@@ -71,4 +71,3 @@ void clearInfo(void){
 void printTree(void){
 	printAll(&db);
 }
-
