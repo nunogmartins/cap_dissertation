@@ -11,6 +11,8 @@
 
 static struct dentry *my_debug_dir = NULL;
 
+struct info_acquire d_info;
+
 extern pid_t monitor_pid;
 extern void initializeTreeWithTaskInfo(pid_t pid);
 
@@ -58,6 +60,8 @@ static const struct file_operations pid_fops = {
 		.owner = THIS_MODULE,
 		.write = pid_write,
 };
+
+
 
 int init_debug(void)
 {

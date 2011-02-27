@@ -40,13 +40,6 @@
 
 #define MY_DEBUG
 
-
-//#define OLD_PHASE
-#undef OLD_PHASE
-
-#define NEXT_PHASE
-//#undef NEXT_PHASE
-
 #define DFITLER
 //#undef DFILTER
 

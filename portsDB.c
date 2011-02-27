@@ -17,6 +17,7 @@
 
 #ifdef MY_DEBUG
 #include "info_acquire.h"
+struct db_info_acquire db_info;
 #endif
 
 struct rb_root db = RB_ROOT;
@@ -255,6 +256,10 @@ int my_insert(struct rb_root *root, struct packetInfo *lpi)
 	rb_link_node(&port->node,parent,new);
 	rb_insert_color(&port->node,root);
 
+#ifdef MY_DEBUG
+	db_info.how_many_inserts++;
+#endif
+
 	return 1;
 }
 
@@ -354,7 +359,7 @@ void my_erase(struct rb_root *root, struct packetInfo *pi)
 			rb_erase(&data->node,root);
 			kfree(data);
 #ifdef MY_DEBUG
-			pr_emerg("removing the node");
+			db_info.how_many_removes++;
 #endif
 		}
 	}
@@ -401,3 +406,50 @@ void printAll(struct rb_root *tree)
 		pr_emerg("Arvore vazia");
 	}
 }
+
+static void clearNodeInfo(struct portInfo *pi)
+{
+	/*
+	 * clear the lists and counters ... all that is inside ...
+	 */
+
+	/*
+			if(p->tcp){
+				pr_emerg( "tcp addresses 0x%p and counter %d",p->tcp,p->tcp_list_counter);
+				iterateList(p->tcp);
+			}
+
+			if(p->udp){
+				pr_emerg( "udp addresses 0x%p and counter %d",p->udp,p->udp_list_counter);
+				iterateList(p->udp);
+			}
+	*/
+}
+
+void clearAllInfo(struct rb_root *tree)
+{
+	struct rb_node *node = NULL, *next_node = NULL;
+	struct portInfo *p = NULL;
+
+	node = rb_first(tree);
+	while(node)
+	{
+		next_node = rb_next(node);
+		p = rb_entry(node,portInfo, node);
+		clearNodeInfo(p);
+
+		rb_erase(node,tree);
+		kfree(p->node);
+		p->node = node = NULL;
+		kfree(p);
+		p = NULL;
+		node = next_node;
+	}
+}
+
+#ifdef MY_DEBUG
+struct db_info_acquire * dbInfoPointer(void)
+{
+	return &db_info;
+}
+#endif

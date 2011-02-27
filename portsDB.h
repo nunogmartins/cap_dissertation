@@ -19,20 +19,19 @@
 typedef struct portInfo{
 	struct rb_node node;
 	u16 port;
-#ifdef OLD_PHASE
-	u32 address;
-	u8 protocol;
-#endif
-#ifdef NEXT_PHASE
 	struct local_addresses_list *udp;
 	struct local_addresses_list *tcp;
 	int tcp_list_counter;
 	int udp_list_counter;
-#endif
 }portInfo;
 
 struct portInfo *my_search(struct rb_root *root,struct packetInfo *pi);
 int my_insert(struct rb_root *root, struct packetInfo *lpi);
 void my_erase(struct rb_root *root, struct packetInfo *pi);
 void printAll(struct rb_root *tree);
+#ifdef MY_DEBUG
+struct db_info_acquire;
+struct db_info_acquire * dbInfoPointer(void);
+#endif
+
 #endif /* PORTSDB_H_ */
