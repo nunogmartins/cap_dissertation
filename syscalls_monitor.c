@@ -26,6 +26,11 @@
 #include "pcap_monitoring.h"
 
 #ifdef MY_KPROBES
+int kprobes_index;
+
+#define NR_PROBES 7
+
+struct kretprobe *kretprobes = NULL;
 
 void print_regs(const char *function, struct pt_regs *regs)
 {
@@ -375,35 +380,41 @@ static int instantiationKRETProbe(struct kretprobe *kret,
  * function called on module init to initialize kretprobes common to tcp and udp
  */
 
-int init_kretprobes_syscalls(int *initial)
+int init_kretprobes_syscalls(void)
 {
-	int ret = -1;
-	int index = *initial;
 
+	int ret = 0;
+
+	kretprobes = kmalloc(sizeof(*kretprobes)*NR_PROBES,GFP_KERNEL);
+
+	if(!kretprobes){
+		pr_info( "problem allocating memory");
+		return -1;
+	}
 
 #ifdef COMMON_TCP_UDP
 #ifdef BINDPROBE
-	ret = instantiationKRETProbe((kretprobes+index),"sys_bind",bind_ret_handler,bind_entry_handler,(ssize_t)sizeof(struct cell));
-	index +=1;
+	ret = instantiationKRETProbe((kretprobes+kprobes_index),"sys_bind",bind_ret_handler,bind_entry_handler,(ssize_t)sizeof(struct cell));
+	kprobes_index +=1;
 	if(ret < 0)
 		return -1;
 #endif //BINDPROBE
 #ifdef CONNECTPROBE
-	ret = instantiationKRETProbe((kretprobes+index),"sys_connect",connect_ret_handler,connect_entry_handler,(ssize_t)sizeof(struct connect_extern_info));
-	index +=1;
+	ret = instantiationKRETProbe((kretprobes+kprobes_index),"sys_connect",connect_ret_handler,connect_entry_handler,(ssize_t)sizeof(struct connect_extern_info));
+	kprobes_index +=1;
 	if(ret < 0)
 		return -1;
 #endif //CONNECTPROBE
 #ifdef SOCKETPROBE
-	ret = instantiationKRETProbe((kretprobes+index),"sys_socket",socket_ret_handler,socket_entry_handler,(ssize_t)sizeof(struct cell));
-	index +=1;
+	ret = instantiationKRETProbe((kretprobes+kprobes_index),"sys_socket",socket_ret_handler,socket_entry_handler,(ssize_t)sizeof(struct cell));
+	kprobes_index +=1;
 	if(ret < 0)
 		return -1;
 
 #endif //SOCKETPROBE
 #ifdef CLOSEPROBE
-	ret = instantiationKRETProbe((kretprobes+index),"sock_close",close_ret_handler,close_entry_handler,(ssize_t)sizeof(struct packetInfo));
-	index +=1;
+	ret = instantiationKRETProbe((kretprobes+kprobes_index),"sock_close",close_ret_handler,close_entry_handler,(ssize_t)sizeof(struct packetInfo));
+	kprobes_index +=1;
 	if(ret < 0)
 		return -1;
 #endif //CLOSEPROBE
@@ -411,8 +422,8 @@ int init_kretprobes_syscalls(int *initial)
 
 #ifdef TCP_PROBES
 #ifdef 	ACCEPTPROBE
-	ret = instantiationKRETProbe((kretprobes+index),"sys_accept4",accept_ret_handler,accept_entry_handler,(ssize_t)sizeof(struct cell));
-		index +=1;
+	ret = instantiationKRETProbe((kretprobes+kprobes_index),"sys_accept4",accept_ret_handler,accept_entry_handler,(ssize_t)sizeof(struct cell));
+	kprobes_index +=1;
 		if(ret < 0)
 			return -1;
 #endif // ACCEPTPROBE
@@ -420,27 +431,42 @@ int init_kretprobes_syscalls(int *initial)
 
 #ifdef UDP_PROBES
 #ifdef SENDPROBE
-	ret = instantiationKRETProbe((kretprobes+index),"sys_sendto",sendto_ret_handler,sendto_entry_handler,(ssize_t)sizeof(struct cell));
-	index +=1;
+	ret = instantiationKRETProbe((kretprobes+kprobes_index),"sys_sendto",sendto_ret_handler,sendto_entry_handler,(ssize_t)sizeof(struct cell));
+	kprobes_index +=1;
 	if(ret < 0)
 		return -1;
 #endif //SENDPROBE
 #ifdef RECVPROBE
-	ret = instantiationKRETProbe((kretprobes+index),"sys_recvfrom",recvfrom_ret_handler,recvfrom_entry_handler,(ssize_t)sizeof(struct cell));
-	index +=1;
+	ret = instantiationKRETProbe((kretprobes+kprobes_index),"sys_recvfrom",recvfrom_ret_handler,recvfrom_entry_handler,(ssize_t)sizeof(struct cell));
+	kprobes_index +=1;
 	if(ret < 0)
 		return -1;
 #endif //RECVPROBE
 #endif //UDP_PROBES
 
-	*initial = index;
-	return 0;
+	return kprobes_index;
 }
 
-int destroy_kretprobes_syscalls(int *initial)
+static void removeKprobe(int index)
 {
+	if((kretprobes+index)!=NULL){
+		pr_info( "in index %d missed %d probes" , index,(kretprobes+index)->nmissed);
+		unregister_kretprobe((kretprobes+index));
+		pr_info( "kretprobe at %p named %s unregistered\n", (kretprobes+index)->kp.addr, (kretprobes+index)->kp.symbol_name);
+	}
+}
 
-	return 0;
+void destroy_kretprobes_syscalls(void)
+{
+	int i=-1;
+
+	for(i=0; i < kprobes_index ; i++)
+	{
+		removeKprobe(i);
+	}
+
+	if(kretprobes)
+		kfree(kretprobes);
 }
 
 #endif

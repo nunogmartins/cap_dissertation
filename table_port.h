@@ -8,6 +8,7 @@
 int insertPort(struct packetInfo *lpi);
 int deletePort(struct packetInfo *pi);
 int searchPort(struct packetInfo *pi);
+void clearInfo(void);
 void printTree(void);
 
 #endif

@@ -10,21 +10,20 @@
 #include <linux/init.h>
 #include <linux/kernel.h>
 #include <linux/slab.h>
-#include <linux/kprobes.h>
 #include <linux/types.h>
 #include <linux/fs.h>
 #include <linux/fdtable.h>
-#include <linux/skbuff.h>
-#include <linux/list.h>
 #include <linux/sched.h>
 
 #include "pcap_monitoring.h"
 #include "table_port.h"
-#include "portsDB.h"
 #include "filter.h"
 #include "debugfs_support.h"
 
-struct kretprobe *kretprobes = NULL;
+#ifdef MY_KPROBES
+#include "syscalls_monitor.h"
+#endif
+
 char *application_name = "server";
 struct local_addresses_list *local_list = NULL;
 
@@ -37,52 +36,23 @@ module_exit(monitor_exit);
 MODULE_LICENSE("GPL");
 
 pid_t monitor_pid;
-int kprobes_index;
-
-#ifdef MY_KPROBES
-extern int init_kretprobes_syscalls(int *index);
-#endif
 
 #ifdef UNIT_TESTING
 extern int populate(void);
 extern int depopulate(void);
 #endif
 
-#define NR_PROBES 7
-
-#ifdef MY_KPROBES
-static void removeKprobe(int index)
-{
-	if((kretprobes+index)!=NULL){
-		pr_info( "in index %d missed %d probes" , index,(kretprobes+index)->nmissed);
-		unregister_kretprobe((kretprobes+index));
-		pr_info( "kretprobe at %p named %s unregistered\n", (kretprobes+index)->kp.addr, (kretprobes+index)->kp.symbol_name);
-	}
-}
-#endif
-
 static int monitor_init(void)
 {
+
 #ifdef MY_KPROBES
-	int ret = -1;
-	kprobes_index = 0;
-	monitor_pid = -1;
-
-	kretprobes = kmalloc(sizeof(*kretprobes)*NR_PROBES,GFP_KERNEL);
-	if(!kretprobes){
-		pr_info( "problem allocating memory");
-		return -1;
-	}
-
-	ret = init_kretprobes_syscalls(&kprobes_index);
-	pr_info("Loaded %d probes", kprobes_index);
-
-	if(ret < 0)
-	{
-		pr_info( "problem in syscalls");
+	int kretprobes_number = init_kretprobes_syscalls();
+	pr_info("Loaded %d probes", kretprobes_number);
+	if(kretprobes_number < 0)
 		goto problem;
-	}
 #endif
+
+	monitor_pid = -1;
 
 	init_debug();
 	
@@ -98,10 +68,7 @@ static int monitor_init(void)
 
 #ifdef MY_KPROBES
 problem:
-	for(;kprobes_index >=0; kprobes_index--)
-		removeKprobe(kprobes_index);
-
-	kfree(kretprobes);
+	destroy_kretprobes_syscalls();
 	return -1;
 #endif
 }
@@ -109,30 +76,21 @@ problem:
 static void monitor_exit(void)
 {
 #ifdef MY_KPROBES
-	int i=0;
 	int ret = -1;
 #endif
 
 	destroy_debug();
 	//unregister all probes ...
 #ifdef MY_KPROBES
-	for(i=0; i < kprobes_index ; i++)
-	{
-		removeKprobe(i);
-	}
-
-	if(kretprobes)
-		kfree(kretprobes);
+	destroy_kretprobes_syscalls();
 #endif
-
 
 #ifdef UNIT_TESTING
 	depopulate();
 #endif
 
-
 	restoreFilter();
-	clearAllInfo();
+	clearInfo();
 	ret = remove_local_addresses_list(local_list);
 	if(ret == 0)
 		kfree(local_list);
