@@ -11,4 +11,6 @@
 int init_debug(void);
 void destroy_debug(void);
 
+int register_debugfs_file(void);
+
 #endif /* DEBUGFS_SUPPORT_H_ */

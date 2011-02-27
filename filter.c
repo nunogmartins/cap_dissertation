@@ -12,6 +12,8 @@
 
 #ifdef MY_DEBUG
 #include "info_acquire.h"
+#include "debugfs_support.h"
+
 struct filter_info_acquire filter_info = {.entry = 0,.src = 0, .dst = 0 };
 #endif
 

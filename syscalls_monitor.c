@@ -27,6 +27,8 @@
 
 #ifdef MY_DEBUG
 #include "info_acquire.h"
+#include "debugfs_support.h"
+
 struct syscall_info_acquire syscall_info;
 #endif
 
