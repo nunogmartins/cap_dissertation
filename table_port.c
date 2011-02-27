@@ -11,7 +11,7 @@
 #include "portsDB.h"
 #include "pcap_monitoring.h"
 
-extern struct rb_root db;
+struct rb_root db;
 extern struct local_addresses_list *local_list;
 
 void debugFunc(struct packetInfo *lpi)
@@ -70,4 +70,13 @@ void clearInfo(void){
 
 void printTree(void){
 	printAll(&db);
+}
+
+int init_DB(void)
+{
+	return 0;
+}
+void exit_DB(void)
+{
+	clearInfo();
 }

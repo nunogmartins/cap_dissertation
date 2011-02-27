@@ -20,7 +20,6 @@
 struct db_info_acquire db_info;
 #endif
 
-struct rb_root db = RB_ROOT;
 extern struct local_addresses_list *local_list;
 
 /*
@@ -377,14 +376,14 @@ static void iterateList(struct local_addresses_list *tmp)
 	}
 }
 
-void printAll(struct rb_root *tree)
+void printAll(struct rb_root *root)
 {
 	struct rb_node *node;
 	struct portInfo *p = NULL;
 	int i = 0;
 
 
-	for(node = rb_first(tree); node ; node = rb_next(node))
+	for(node = rb_first(root); node ; node = rb_next(node))
 	{
 		p = rb_entry(node,portInfo, node);
 		pr_emerg( "port = %hu ", p->port);
@@ -426,19 +425,19 @@ static void clearNodeInfo(struct portInfo *pi)
 	*/
 }
 
-void clearAllInfo(void)
+void clearAllInfo(struct rb_root *root)
 {
 	struct rb_node *node = NULL, *next_node = NULL;
 	struct portInfo *p = NULL;
 
-	node = rb_first(&db);
+	node = rb_first(root);
 	while(node)
 	{
 		next_node = rb_next(node);
 		p = rb_entry(node,portInfo, node);
 		clearNodeInfo(p);
 
-		rb_erase(node,&db);
+		rb_erase(node,root);
 		kfree(p);
 		p = NULL;
 		node = next_node;

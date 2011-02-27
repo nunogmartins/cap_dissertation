@@ -11,4 +11,7 @@ int searchPort(struct packetInfo *pi);
 void clearInfo(void);
 void printTree(void);
 
+int init_DB(void);
+void exit_DB(void);
+
 #endif

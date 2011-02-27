@@ -40,6 +40,12 @@
 
 #define MY_DEBUG
 
+#define DEBUGFS_SUPPORT
+#define FILTER_SUPPORT
+#define DB_SUPPORT
+#define SYSCALLS_SUPPORT
+
+
 #define DFITLER
 //#undef DFILTER
 

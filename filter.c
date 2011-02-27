@@ -58,12 +58,22 @@ unsigned int my_portExists(struct packetInfo *src_pi,struct packetInfo *dst_pi)
 	return 0;
 }
 
-void backupFilter(void)
+static void backupFilter(void)
 {
 	Backup_portExists = portExists;
 	portExists = my_portExists;
 }
 
-void restoreFilter(void){
+static void restoreFilter(void){
 	portExists = Backup_portExists;
+}
+
+int init_Filter(void)
+{
+	backupFilter();
+	return 0;
+}
+void exit_Filter(void)
+{
+	restoreFilter();
 }

@@ -42,21 +42,55 @@ extern int populate(void);
 extern int depopulate(void);
 #endif
 
-static int monitor_init(void)
+static int loadSubSystems(void)
 {
 
-#ifdef MY_KPROBES
-	int kretprobes_number = init_kretprobes_syscalls();
-	pr_info("Loaded %d probes", kretprobes_number);
-	if(kretprobes_number < 0)
-		goto problem;
+#ifdef DEBUGFS_SUPPORT
+	init_debug();
 #endif
 
+#ifdef FILTER_SUPPORT
+	init_Filter();
+#endif
+
+#ifdef DB_SUPPORT
+	init_DB();
+#endif
+
+#ifdef SYSCALLS_SUPPORT
+#ifdef MY_KPROBES
+	pr_info("Loaded %d probes", init_kretprobes_syscalls());
+#endif
+#endif
+}
+
+static int unloadSubSystems(void)
+{
+#ifdef DEBUGFS_SUPPORT
+	destroy_debug();
+#endif
+
+#ifdef FILTER_SUPPORT
+	exit_Filter();
+#endif
+
+#ifdef DB_SUPPORT
+	exit_DB();
+#endif
+
+#ifdef SYSCALLS_SUPPORT
+#ifdef MY_KPROBES
+	destroy_kretprobes_syscalls();
+#endif
+#endif
+
+}
+
+static int monitor_init(void)
+{
 	monitor_pid = -1;
 
-	init_debug();
-	
-	backupFilter();
+	loadSubSystems();
 
 	local_list = listAllDevicesAddress();
 
@@ -65,32 +99,18 @@ static int monitor_init(void)
 #endif
 
 	return 0;
-
-#ifdef MY_KPROBES
-problem:
-	destroy_kretprobes_syscalls();
-	return -1;
-#endif
 }
 
 static void monitor_exit(void)
 {
-#ifdef MY_KPROBES
 	int ret = -1;
-#endif
 
-	destroy_debug();
-	//unregister all probes ...
-#ifdef MY_KPROBES
-	destroy_kretprobes_syscalls();
-#endif
+	unloadSubSystems();
 
 #ifdef UNIT_TESTING
 	depopulate();
 #endif
 
-	restoreFilter();
-	clearInfo();
 	ret = remove_local_addresses_list(local_list);
 	if(ret == 0)
 		kfree(local_list);
