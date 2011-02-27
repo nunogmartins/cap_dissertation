@@ -43,5 +43,5 @@
 #define DFITLER
 //#undef DFILTER
 
-#define DEBUG_INFO
+#define MY_DEBUG_INFO
 //#undef DEBUG_INFO

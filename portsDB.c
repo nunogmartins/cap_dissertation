@@ -426,21 +426,19 @@ static void clearNodeInfo(struct portInfo *pi)
 	*/
 }
 
-void clearAllInfo(struct rb_root *tree)
+void clearAllInfo(void)
 {
 	struct rb_node *node = NULL, *next_node = NULL;
 	struct portInfo *p = NULL;
 
-	node = rb_first(tree);
+	node = rb_first(&db);
 	while(node)
 	{
 		next_node = rb_next(node);
 		p = rb_entry(node,portInfo, node);
 		clearNodeInfo(p);
 
-		rb_erase(node,tree);
-		kfree(p->node);
-		p->node = node = NULL;
+		rb_erase(node,&db);
 		kfree(p);
 		p = NULL;
 		node = next_node;

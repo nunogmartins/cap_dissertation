@@ -10,9 +10,10 @@
 #include "table_port.h"
 
 static struct dentry *my_debug_dir = NULL;
-
+#ifdef MY_DEBUG
+#include "info_acquire.h"
 struct info_acquire d_info;
-
+#endif
 extern pid_t monitor_pid;
 extern void initializeTreeWithTaskInfo(pid_t pid);
 

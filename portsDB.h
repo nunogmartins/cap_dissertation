@@ -29,6 +29,7 @@ struct portInfo *my_search(struct rb_root *root,struct packetInfo *pi);
 int my_insert(struct rb_root *root, struct packetInfo *lpi);
 void my_erase(struct rb_root *root, struct packetInfo *pi);
 void printAll(struct rb_root *tree);
+void clearAllInfo(void);
 #ifdef MY_DEBUG
 struct db_info_acquire;
 struct db_info_acquire * dbInfoPointer(void);

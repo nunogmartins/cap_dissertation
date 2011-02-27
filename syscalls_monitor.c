@@ -27,12 +27,14 @@
 
 #ifdef MY_KPROBES
 
+void print_regs(const char *function, struct pt_regs *regs)
+{
+#ifdef CONFIG_X86_64
+	pr_emerg( "%s ax=%p bx=%p cx=%p dx=%p di=%p si=%p r8=%p r9=%p",function, (void *)regs->ax,(void *)regs->bx,(void *)regs->cx,(void *)regs->dx,(void*)regs->di,(void *) regs->si,(void *)regs->r8,(void *)regs->r9);
+#endif
+}
+
 extern struct kretprobe *kretprobes;
-extern int instantiationKRETProbe(struct kretprobe *kret,
-		const char *function_name,
-		kretprobe_handler_t func_handler,
-		kretprobe_handler_t func_entry_handler,
-		ssize_t data_size);
 
 extern char *application_name;
 extern void print_regs(const char *function, struct pt_regs *regs);
@@ -312,10 +314,7 @@ static int socket_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 	if(domain==AF_INET || domain==AF_INET6){
 		if(type==SOCK_STREAM || type==SOCK_DGRAM)
 		{
-			//ToDo: add a socket to cell with tcp
-					//and which version so that ret can 
-					// use it 
-					//my_data->
+
 		}else
 			return 1;
 	}
@@ -331,8 +330,7 @@ static int socket_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 	
 	if(retval > 0)
 	{
-		//TODO: add this file descriptor to the system
-		//my_data-> ... something
+
 	}
 
 	return 0;
@@ -341,6 +339,37 @@ static int socket_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 #endif //SOCKETPROBE
 
 #endif //COMMON_TCP_UDP
+
+
+static int instantiationKRETProbe(struct kretprobe *kret,
+								const char *function_name,
+								kretprobe_handler_t func_handler,
+								kretprobe_handler_t func_entry_handler,
+								ssize_t data_size)
+{
+	int ret = -1;
+
+	struct kprobe kp = {
+	.symbol_name = function_name,
+	};
+
+	kret->kp = kp;
+	kret->handler = func_handler;
+	kret->entry_handler = func_entry_handler;
+	kret->data_size		= data_size;
+	kret->maxactive		= 20;
+
+	ret = register_kretprobe(kret);
+    if (ret < 0) {
+		pr_info( "register_kretprobe failed, returned %d\n", ret);
+		return -1;
+	}
+
+	pr_info( "Planted kretprobe at %p, handler addr %p\n",
+	       kret->kp.symbol_name, kret->kp.addr);
+
+	return ret;
+}
 
 /*
  * function called on module init to initialize kretprobes common to tcp and udp
