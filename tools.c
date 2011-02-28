@@ -108,7 +108,8 @@ void getInetSockParameters(struct inet_sock *inetsock,struct packetInfo *ret)
 	ret->port = inetsock->inet_num;
 #ifdef MY_DEBUG_INFO
 	pr_emerg( "rcv is 0x%x",ntohl(inetsock->inet_rcv_saddr));
-	pr_emerg( "sport %hu dport %hu daddr 0x%x laddr 0x%x",ntohs(inetsock->inet_sport),ntohs(inetsock->inet_dport), ntohl(inetsock->inet_daddr),ntohl(inetsock->inet_saddr));
+	pr_emerg( "sport %hu dport %hu daddr %d.%d.%d.%d laddr %d.%d.%d.%d",
+			ntohs(inetsock->inet_sport),ntohs(inetsock->inet_dport), NIPQUAD(ntohl(inetsock->inet_daddr)),NIPQUAD(ntohl(inetsock->inet_saddr)));
 #endif
 	if(ret->port == ntohs(inetsock->inet_sport))
 	{
@@ -153,7 +154,7 @@ void getLocalPacketInfoFromFd(unsigned int fd, struct packetInfo *ret, int *err)
 				socket = f->private_data;
 				getInetSockParameters((struct inet_sock *)(socket->sk),ret);
 #ifdef MY_DEBUG_INFO
-				pr_emerg("local port %hu addr 0x%x proto %hu",ret->port, ret->address, ret->protocol);
+				pr_emerg("local port %hu addr %d.%d.%d.%d proto %hu",ret->port, NIPQUAD(ret->address), ret->protocol);
 #endif
 			}else
 			{
@@ -194,7 +195,7 @@ void getLocalPacketInfoFromFile(struct file *f, struct packetInfo *ret, int *err
 				getInetSockParameters((struct inet_sock *)(socket->sk),ret);
 
 #ifdef MY_DEBUG_INFO
-				pr_info( "lport %hu addr 0x%x proto %hu",ret->port, ret->address, ret->protocol);
+				pr_info( "lport %hu addr %d.%d.%d.%d proto %hu",ret->port, NIPQUAD(ret->address), ret->protocol);
 #endif
 			}else
 			{
@@ -233,7 +234,7 @@ struct local_addresses_list* listAllDevicesAddress(void)
 			for(addr = in4->ifa_list ; addr; addr = addr->ifa_next)
 			{
 #ifdef MY_DEBUG_INFO
-				pr_info( "ip address 0x%x", ntohl(addr->ifa_address));
+				pr_info( "ip address %d.%d.%d.%d", NIPQUAD(ntohl(addr->ifa_address)));
 #endif
 				tmp = kmalloc(sizeof(*tmp),GFP_KERNEL);
 				tmp->address = ntohl(addr->ifa_address);
@@ -253,7 +254,7 @@ int remove_local_addresses_list(struct local_addresses_list *list)
 	{
 		tmp = list_entry(pos,local_addresses_list, list);//(pos,struct local_addresses_list,list);
 #ifdef MY_DEBUG_INFO
-		pr_info( "removing address 0x%x",tmp->address);
+		pr_info( "removing address %d.%d.%d.%d",NIPQUAD(tmp->address));
 #endif
 		list_del(pos);
 		kfree(tmp);
