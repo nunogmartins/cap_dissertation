@@ -107,9 +107,13 @@ void getInetSockParameters(struct inet_sock *inetsock,struct packetInfo *ret)
 {
 	ret->port = inetsock->inet_num;
 #ifdef MY_DEBUG_INFO
+	{
+		int src_addr = ntohl(inetsock->inet_saddr);
+		int dst_addr = ntohl(inetsock->inet_daddr);
 	pr_emerg( "rcv is 0x%x",ntohl(inetsock->inet_rcv_saddr));
 	pr_emerg( "sport %hu dport %hu daddr %d.%d.%d.%d laddr %d.%d.%d.%d",
-			ntohs(inetsock->inet_sport),ntohs(inetsock->inet_dport), NIPQUAD(ntohl(inetsock->inet_daddr)),NIPQUAD(ntohl(inetsock->inet_saddr)));
+			ntohs(inetsock->inet_sport),ntohs(inetsock->inet_dport), NIPQUAD(dst_addr),NIPQUAD(src_addr));
+	}
 #endif
 	if(ret->port == ntohs(inetsock->inet_sport))
 	{
@@ -222,8 +226,7 @@ struct local_addresses_list* listAllDevicesAddress(void)
 	list = kmalloc(sizeof(*list),GFP_KERNEL);
 	INIT_LIST_HEAD(&(list->list));
 
-	for_each_netdev(net,dev)
-	{
+	for_each_netdev(net,dev){
 #ifdef MY_DEBUG_INFO
 		pr_info( "device %s",dev->name);
 #endif
@@ -234,7 +237,8 @@ struct local_addresses_list* listAllDevicesAddress(void)
 			for(addr = in4->ifa_list ; addr; addr = addr->ifa_next)
 			{
 #ifdef MY_DEBUG_INFO
-				pr_info( "ip address %d.%d.%d.%d", NIPQUAD(ntohl(addr->ifa_address)));
+				int aux_addr = ntohl(addr->ifa_address);
+				pr_info( "ip address %d.%d.%d.%d", NIPQUAD(aux_addr));
 #endif
 				tmp = kmalloc(sizeof(*tmp),GFP_KERNEL);
 				tmp->address = ntohl(addr->ifa_address);
