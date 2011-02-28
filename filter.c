@@ -70,9 +70,16 @@ static void restoreFilter(void){
 	portExists = Backup_portExists;
 }
 
+static const struct file_operations filter_stats_fops = {
+		.owner = THIS_MODULE,
+		//.write = pid_write,
+		//.read =
+};
+
 int init_Filter(void)
 {
 	backupFilter();
+	register_debugfs_file("filter_stats",&filter_stats_fops);
 	return 0;
 }
 void exit_Filter(void)
