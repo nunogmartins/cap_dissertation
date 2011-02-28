@@ -408,7 +408,7 @@ void printAll(struct rb_root *root)
 
 static void clearNodeInfo(struct portInfo *pi)
 {
-	struct local_addresses_list *tmp;
+	struct local_addresses_list *tmp = NULL;
 	struct list_head *pos = NULL, *q = NULL;
 
 
