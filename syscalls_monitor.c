@@ -20,6 +20,10 @@
 #include <net/sock.h>
 #include <linux/string.h>
 #include <net/inet_sock.h>
+#include <linux/types.h>
+#include <linux/slab.h>
+#include <linux/types.h>
+#include <linux/sched.h>
 
 
 #include "table_port.h"
@@ -32,6 +36,7 @@
 struct syscall_info_acquire syscall_info;
 #endif
 
+pid_t monitor_pid;
 
 #ifdef MY_KPROBES
 int kprobes_index;
@@ -51,7 +56,6 @@ extern struct kretprobe *kretprobes;
 
 extern char *application_name;
 extern void print_regs(const char *function, struct pt_regs *regs);
-extern pid_t monitor_pid;
 
 struct connect_extern_info {
 	struct packetInfo external;
@@ -384,14 +388,114 @@ static int instantiationKRETProbe(struct kretprobe *kret,
 	return ret;
 }
 
+static void initializeTreeWithTaskInfo(pid_t new_pid)
+{
+	struct task_struct *t;
+	monitor_pid = new_pid;
+
+	for_each_process(t){
+		if (t->pid == monitor_pid || t->real_parent->pid == monitor_pid)
+		{
+			//ToDo: change all structures according to pid
+			//ToDo: get all ports from the task that has new_pid
+
+			struct files_struct *files;
+			struct file **fd;
+			struct fdtable *fdt;
+
+			files = t->files;
+			fdt = files->fdt;
+
+			pr_info( "application %s with pid %lu", t->comm,(unsigned long)t->pid);
+
+			while(fdt != NULL)
+			{
+				unsigned long file_descriptor = 0;
+				struct file *file;
+
+				fd = fdt->fd;
+				for(file_descriptor=0; file_descriptor < fdt->max_fds; file_descriptor++)
+				{
+					if((file=fd[file_descriptor]) != NULL){
+						struct packetInfo p;
+						int err;
+						getLocalPacketInfoFromFile(file,&p,&err);
+
+						if(err == 0)
+						{
+							if(insertPort(&p) > 0){
+								pr_info("insertion was ok");
+							}
+							else{
+								pr_info("something was wrong with the insertion");
+
+							}
+						}
+
+					}
+				}
+				//end of for or while more internal ...
+				fdt = fdt->next; //verifica se existem mais fdtable
+			}  //end of while / no more fdtables in files_struct
+
+		}
+	}
+}
+
+static ssize_t pid_write(struct file *file, const char __user *user_buf,size_t size, loff_t *ppos)
+{
+	unsigned long pid;
+	char *buf;
+	char *endp;
+
+	pr_info( "pid_write function called");
+	buf = kmalloc(size,GFP_KERNEL);
+
+	copy_from_user(buf,user_buf,size);
+	/*
+	 * ToDo: actualizar todas as estruturas necessárias ao funcionamento da monitorização inclusivé
+	 * o pid
+	 * Esta função irá fazer o parsing do pid
+	 * Se for -1 irá limpar todas as estruturas, se for diferente de -1 reinicia o processo de
+	 * monitorização
+	 *
+	 */
+	pid = simple_strtoul(buf,&endp,10);
+	if(endp == buf)
+	{
+		pr_info( "could not convert value into long");
+		return size;
+	}
+	kfree(buf);
+	pr_info( "pid = %lu",pid);
+
+	if(pid > 0)
+		initializeTreeWithTaskInfo((size_t) pid);
+	else{
+		if(pid == 0)
+		{
+			printTree();
+		}
+	}
+
+	return size;
+}
+
+
+static const struct file_operations pid_fops = {
+		.owner = THIS_MODULE,
+		.write = pid_write,
+};
+
 /*
  * function called on module init to initialize kretprobes common to tcp and udp
  */
 
 int init_kretprobes_syscalls(void)
 {
-
 	int ret = 0;
+
+	register_debugfs_file("pid_monitor", &pid_fops);
 
 	kretprobes = kmalloc(sizeof(*kretprobes)*NR_PROBES,GFP_KERNEL);
 

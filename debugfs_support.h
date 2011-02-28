@@ -11,6 +11,6 @@
 int init_debug(void);
 void destroy_debug(void);
 
-int register_debugfs_file(void);
+int register_debugfs_file(const char *name, const struct file_operations *fops);
 
 #endif /* DEBUGFS_SUPPORT_H_ */

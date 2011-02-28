@@ -32,7 +32,7 @@ unsigned int my_portExists(struct packetInfo *src_pi,struct packetInfo *dst_pi)
 	if(src_pi!=NULL && dst_pi!=NULL)
 	{
 
-		if((src_pi->protocol == 0x11 || src_pi->protocol == 0x06)){
+		if((src_pi->protocol == UDP || src_pi->protocol == TCP)){
 
 			sentinel_src = searchPort(src_pi);
 
