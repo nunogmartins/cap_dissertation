@@ -408,21 +408,33 @@ void printAll(struct rb_root *root)
 
 static void clearNodeInfo(struct portInfo *pi)
 {
-	/*
-	 * clear the lists and counters ... all that is inside ...
-	 */
+	struct local_addresses_list *tmp;
+	struct list_head *pos = NULL, *q = NULL;
 
-	/*
-			if(p->tcp){
-				pr_emerg( "tcp addresses 0x%p and counter %d",p->tcp,p->tcp_list_counter);
-				iterateList(p->tcp);
-			}
 
-			if(p->udp){
-				pr_emerg( "udp addresses 0x%p and counter %d",p->udp,p->udp_list_counter);
-				iterateList(p->udp);
-			}
-	*/
+	if(pi->tcp_list_counter > 0 && pi->tcp != NULL){
+		struct local_addresses_list *aux = pi->tcp;
+		list_for_each_safe(pos,q,&(aux->list))
+		{
+			tmp = list_entry(pos,local_addresses_list, list);
+			list_del(pos);
+			kfree(tmp);
+		}
+		pi->tcp_list_counter = 0;
+		kfree(pi->tcp);
+	}
+
+	if(pi->udp_list_counter > 0 && pi->udp != NULL){
+		struct local_addresses_list *aux = pi->udp;
+		list_for_each_safe(pos,q,&(aux->list))
+		{
+			tmp = list_entry(pos,local_addresses_list, list);
+			list_del(pos);
+			kfree(tmp);
+		}
+		pi->udp_list_counter = 0;
+		kfree(pi->udp);
+	}
 }
 
 void clearAllInfo(struct rb_root *root)
