@@ -469,12 +469,14 @@ static ssize_t pid_write(struct file *file, const char __user *user_buf,size_t s
 	kfree(buf);
 	pr_info( "pid = %lu",pid);
 
-	if(pid > 0)
+	if(pid > 1)
 		initializeTreeWithTaskInfo((size_t) pid);
 	else{
 		if(pid == 0)
 		{
 			printTree();
+		}else if(pid == 1){
+			clearInfo();
 		}
 	}
 
