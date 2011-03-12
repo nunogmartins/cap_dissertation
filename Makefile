@@ -10,14 +10,14 @@ obj-m	:=monitoring_syscalls.o
 
 #my_module-y	:=monitor.o common_monitor_func.o tcp_monitor_func.o udp_monitor_func.o debugfs_support.o ports_table.o
 
-monitoring_syscalls-y	:=monitor.o syscalls_monitor.o debugfs_support.o ports_table.o tools.o tcp_hashtable.o portsDB.o unit_tests.o
+monitoring_syscalls-y	:=monitor.o syscalls_monitor.o debugfs_support.o filter.o table_port.o tools.o portsDB.o unit_tests.o
 
 #monitoring_calls-y	:=monitor.o common_monitor_func.o tcp_monitor_func.o udp_monitor_func.o debugfs_support.o ports_table.o
 
-#KDIR    := /lib/modules/$(shell uname -r)/build
+KDIR    := /lib/modules/$(shell uname -r)/build
 PWD    := $(shell pwd)
 
-KDIR	:=/home/nuno/linux_source
+#KDIR	:=/home/nuno/linux_source
 all:
 	$(MAKE) -C $(KDIR) SUBDIRS=$(PWD) modules
 

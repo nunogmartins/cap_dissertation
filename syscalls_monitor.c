@@ -48,7 +48,7 @@ struct kretprobe *kretprobes = NULL;
 void print_regs(const char *function, struct pt_regs *regs)
 {
 #ifdef CONFIG_X86_64
-	pr_emerg( "%s ax=%p bx=%p cx=%p dx=%p di=%p si=%p r8=%p r9=%p",function, (void *)regs->ax,(void *)regs->bx,(void *)regs->cx,(void *)regs->dx,(void*)regs->di,(void *) regs->si,(void *)regs->r8,(void *)regs->r9);
+	pr_info( "%s ax=%p bx=%p cx=%p dx=%p di=%p si=%p r8=%p r9=%p",function, (void *)regs->ax,(void *)regs->bx,(void *)regs->cx,(void *)regs->dx,(void*)regs->di,(void *) regs->si,(void *)regs->r8,(void *)regs->r9);
 #endif
 }
 
@@ -200,8 +200,8 @@ static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *re
 	getLocalPacketInfoFromFile(filp,my_data,&err);
 	if(err >= 0){
 #ifdef MY_DEBUG_INFO
-		pr_emerg( "close_sock entry %s",task->comm);
-		pr_emerg( "port %hu address %d.%d.%d.%d protocol %hu",my_data->port,NIPQUAD(my_data->address),my_data->protocol);
+		pr_info( "close_sock entry %s",task->comm);
+		pr_info( "port %hu address %d.%d.%d.%d protocol %hu",my_data->port,NIPQUAD(my_data->address),my_data->protocol);
 #endif	
 	}
 	else
@@ -217,7 +217,7 @@ static int close_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs
 	
 
 	if(retval == 0){
-		pr_emerg( "close_ret: port %hu address %d.%d.%d.%d protocol %hu",pi->port,NIPQUAD(pi->address),pi->protocol);
+		pr_info( "close_ret: port %hu address %d.%d.%d.%d protocol %hu",pi->port,NIPQUAD(pi->address),pi->protocol);
 		deletePort(pi);
 	}
 	return 0;
@@ -276,16 +276,16 @@ static int connect_entry_handler(struct kretprobe_instance *ri, struct pt_regs *
 	struct sockaddr_in *in = (struct sockaddr_in *)regs->si;
 #endif
 
-	CHECK_MONITOR_PID;
+	//CHECK_MONITOR_PID;
 
-	pr_emerg("\n");
+	pr_info("\n");
 
 	getLocalPacketInfoFromFd(fd,&(my_data->external),&err);
 	if(err == 0){
 		my_data->external.address = ntohl(in->sin_addr.s_addr);
 		my_data->external.port = ntohs(in->sin_port);
 		insertPort(&(my_data->external));
-		pr_emerg("before local: port %hu address %d.%d.%d.%d and protocol %hu",my_data->external.port, NIPQUAD(my_data->external.address), my_data->external.protocol);
+		pr_info("before local: port %hu address %d.%d.%d.%d and protocol %hu",my_data->external.port, NIPQUAD(my_data->external.address), my_data->external.protocol);
 	}
 
 	my_data->fd = fd;
@@ -302,7 +302,7 @@ static int connect_ret_handler(struct kretprobe_instance *ri, struct pt_regs *re
 	int err;
 	
 
-	pr_emerg("sys connect ret %d from %s with pid %d",retval,ri->task->comm, ri->task->pid);
+	pr_info("sys connect ret %d from %s with pid %d",retval,ri->task->comm, ri->task->pid);
 
 	if(retval == 0 || retval == -115)
 	{
@@ -310,7 +310,7 @@ static int connect_ret_handler(struct kretprobe_instance *ri, struct pt_regs *re
 		getLocalPacketInfoFromFd(fd,&pi,&err);
 		if(err == 0){
 			insertPort(&pi);
-			pr_emerg("local: port %hu address %d.%d.%d.%d and protocol %hu",pi.port, NIPQUAD(pi.address), pi.protocol);
+			pr_info("local: port %hu address %d.%d.%d.%d and protocol %hu",pi.port, NIPQUAD(pi.address), pi.protocol);
 		}
 		
 	}
