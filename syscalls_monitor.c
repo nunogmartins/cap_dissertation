@@ -45,17 +45,30 @@ int kprobes_index;
 
 struct kretprobe *kretprobes = NULL;
 
+#define CHECK_MONITOR_PID	\
+	if(!current->mm)	\
+		return 1;	\
+	if(monitor_pid == -1) 	\
+		return 1;	\
+	if(task->tgid != monitor_pid) \
+		if(task->parent->tgid != monitor_pid) \
+		return 1;
+
+struct cell{
+	int fd;
+	int type;
+	int port;
+	int status;
+	int direction;
+};
+
+
 void print_regs(const char *function, struct pt_regs *regs)
 {
 #ifdef CONFIG_X86_64
 	pr_info( "%s ax=%p bx=%p cx=%p dx=%p di=%p si=%p r8=%p r9=%p",function, (void *)regs->ax,(void *)regs->bx,(void *)regs->cx,(void *)regs->dx,(void*)regs->di,(void *) regs->si,(void *)regs->r8,(void *)regs->r9);
 #endif
 }
-
-extern struct kretprobe *kretprobes;
-
-extern char *application_name;
-extern void print_regs(const char *function, struct pt_regs *regs);
 
 struct connect_extern_info {
 	struct packetInfo external;

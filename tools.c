@@ -47,62 +47,6 @@ struct inode *getInodeFromFd(unsigned int fd)
 	return d_inode;
 }
 
-
-u16 getPortFromInode(struct file *f,struct inode *inode)
-{
-	struct socket *socket = NULL;
-	if(inode)
-	{
-		if(S_ISSOCK(inode->i_mode))
-		{
-			socket = f->private_data;
-			return ntohs(inet_sk(socket->sk)->inet_num) ;
-		}
-	}
-	else
-		return 0;
-
-	return 0;
-}
-
-/*
- * unsigned int fd
- * int direction
- */
-
-u16 getPort(unsigned int fd,int direction)
-{
-	struct file *f = NULL;
-	//int fput_needed;
-	struct socket *socket = NULL;
-	/*struct sock *sock = NULL;
-struct inet_sock *i_sock = NULL;
-	 */
-	f = fget(fd);
-
-	if(f!=NULL)
-	{
-		struct dentry *dentry;
-		struct inode *d_inode;
-		fput(f);
-		dentry = f->f_dentry;
-		if(dentry !=NULL)
-		{
-			d_inode = dentry->d_inode;
-			if(S_ISSOCK(d_inode->i_mode))
-			{
-				socket = f->private_data;
-			}
-		}
-	}
-
-	if(socket == NULL)
-		return 0;
-
-	return inet_sk(socket->sk)->inet_num;
-	//return direction == 0 ? ntohs(inet_sk(socket->sk)->sport) : ntohs(inet_sk(socket->sk)->dport);
-}
-
 void getInetSockParameters(struct inet_sock *inetsock,struct packetInfo *ret)
 {
 	ret->port = inetsock->inet_num;
@@ -140,52 +84,17 @@ void getInetSockParameters(struct inet_sock *inetsock,struct packetInfo *ret)
 void getLocalPacketInfoFromFd(unsigned int fd, struct packetInfo *ret, int *err)
 {
 	struct file *f = NULL;
-	struct socket *socket = NULL;
-	short type;
-	unsigned short family;
 	*err = 0;
 	f = fget(fd);
 
+
 	if(f!=NULL)
 	{
-		struct dentry *dentry;
-		struct inode *d_inode;
 		fput(f);
-		dentry = f->f_dentry;
-		if(dentry !=NULL)
-		{
-			d_inode = dentry->d_inode;
-			if(S_ISSOCK(d_inode->i_mode))
-			{
-				socket = f->private_data;
-				type = socket->type;
-				family = socket->sk->__sk_common.skc_family;
-				if(family != AF_INET)
-				{
-					*err = -4;
-					return; 
-				}
-				getInetSockParameters((struct inet_sock *)(socket->sk),ret);
-#ifdef MY_DEBUG_INFO
-					pr_info("family %hu type %hu port %hu addr %d.%d.%d.%d proto %hu",family,type,ret->port, NIPQUAD(ret->address), ret->protocol);
-#endif
-			}else
-			{
-				*err = -1;
-			}
-		}else
-		{
-			*err = -2;
-		}
-	}
-#ifdef MY_DEBUG_INFO
-	else
-	{
-		pr_info( "f is null");
+		getLocalPacketInfoFromFile(f,ret,err);
+	}else{
 		*err = -3;
 	}
-#endif
-
 }
 
 void getLocalPacketInfoFromFile(struct file *f, struct packetInfo *ret, int *err)
