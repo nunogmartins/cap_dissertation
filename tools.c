@@ -106,15 +106,19 @@ struct inet_sock *i_sock = NULL;
 void getInetSockParameters(struct inet_sock *inetsock,struct packetInfo *ret)
 {
 	ret->port = inetsock->inet_num;
+	ret->protocol = ((struct sock *)inetsock)->sk_protocol;
+
 #ifdef MY_DEBUG_INFO
-	{
+	if(ret->protocol!=0){
 		int src_addr = ntohl(inetsock->inet_saddr);
 		int dst_addr = ntohl(inetsock->inet_daddr);
-	pr_emerg( "rcv is 0x%x",ntohl(inetsock->inet_rcv_saddr));
+		int rcv = ntohl(inetsock->inet_rcv_saddr);
+	pr_emerg( "rcv is %d.%d.%d.%d",NIPQUAD(rcv));
 	pr_emerg( "sport %hu dport %hu daddr %d.%d.%d.%d laddr %d.%d.%d.%d",
 			ntohs(inetsock->inet_sport),ntohs(inetsock->inet_dport), NIPQUAD(dst_addr),NIPQUAD(src_addr));
 	}
 #endif
+
 	if(ret->port == ntohs(inetsock->inet_sport))
 	{
 		if(!inetsock->inet_rcv_saddr){
@@ -128,7 +132,7 @@ void getInetSockParameters(struct inet_sock *inetsock,struct packetInfo *ret)
 		ret->address = inetsock->inet_daddr;
 	}
 	ret->address = ntohl(ret->address);
-	ret->protocol = ((struct sock *)inetsock)->sk_protocol;
+	//ret->protocol = ((struct sock *)inetsock)->sk_protocol;
 
 }
 
@@ -137,13 +141,11 @@ void getLocalPacketInfoFromFd(unsigned int fd, struct packetInfo *ret, int *err)
 {
 	struct file *f = NULL;
 	struct socket *socket = NULL;
-
+	short type;
+	unsigned short family;
 	*err = 0;
 	f = fget(fd);
 
-#ifdef MY_DEBUG_INFO
-	pr_info( "fd is %d f is null ? %s ", fd ,f == NULL ? "yes": "no");
-#endif
 	if(f!=NULL)
 	{
 		struct dentry *dentry;
@@ -156,9 +158,16 @@ void getLocalPacketInfoFromFd(unsigned int fd, struct packetInfo *ret, int *err)
 			if(S_ISSOCK(d_inode->i_mode))
 			{
 				socket = f->private_data;
+				type = socket->type;
+				family = socket->sk->__sk_common.skc_family;
+				if(family != AF_INET)
+				{
+					*err = -4;
+					return; 
+				}
 				getInetSockParameters((struct inet_sock *)(socket->sk),ret);
 #ifdef MY_DEBUG_INFO
-				pr_emerg("local port %hu addr %d.%d.%d.%d proto %hu",ret->port, NIPQUAD(ret->address), ret->protocol);
+					pr_info("family %hu type %hu port %hu addr %d.%d.%d.%d proto %hu",family,type,ret->port, NIPQUAD(ret->address), ret->protocol);
 #endif
 			}else
 			{
@@ -182,7 +191,8 @@ void getLocalPacketInfoFromFd(unsigned int fd, struct packetInfo *ret, int *err)
 void getLocalPacketInfoFromFile(struct file *f, struct packetInfo *ret, int *err)
 {
 	struct socket *socket = NULL;
-
+	short type;
+	unsigned short family;
 	*err = 0;
 
 	if(f!=NULL)
@@ -196,10 +206,17 @@ void getLocalPacketInfoFromFile(struct file *f, struct packetInfo *ret, int *err
 			if(S_ISSOCK(d_inode->i_mode))
 			{
 				socket = f->private_data;
+				type = socket->type;
+				family = socket->sk->__sk_common.skc_family;
+				if(family != AF_INET)
+				{
+					*err = -4;
+					return; 
+				}
 				getInetSockParameters((struct inet_sock *)(socket->sk),ret);
 
 #ifdef MY_DEBUG_INFO
-				pr_info( "lport %hu addr %d.%d.%d.%d proto %hu",ret->port, NIPQUAD(ret->address), ret->protocol);
+				pr_info( "family %hu type %hu lport %hu addr %d.%d.%d.%d proto %hu",family,type,ret->port, NIPQUAD(ret->address), ret->protocol);
 #endif
 			}else
 			{

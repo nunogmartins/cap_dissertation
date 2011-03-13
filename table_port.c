@@ -32,13 +32,13 @@ int insertPort(struct packetInfo *lpi)
 		return 	-1;
 	}
 
-	debugFunc(lpi);
+	//debugFunc(lpi);
 #endif
 
 	if(lpi->port == 0 || lpi->protocol == 0)
 	{
 #ifdef MY_DEBUG_INFO
-		pr_emerg("some info is zero port %d address 0x%x and protocol %hu",lpi->port,lpi->address, lpi->protocol);
+		//pr_emerg("some info is zero port %d address %d.%d.%d.%d and protocol %hu",lpi->port,NIPQUAD(lpi->address), lpi->protocol);
 #endif
 		return -1;
 	}

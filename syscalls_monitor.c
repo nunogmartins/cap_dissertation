@@ -276,7 +276,7 @@ static int connect_entry_handler(struct kretprobe_instance *ri, struct pt_regs *
 	struct sockaddr_in *in = (struct sockaddr_in *)regs->si;
 #endif
 
-	//CHECK_MONITOR_PID;
+	CHECK_MONITOR_PID;
 
 	pr_info("\n");
 
@@ -302,7 +302,7 @@ static int connect_ret_handler(struct kretprobe_instance *ri, struct pt_regs *re
 	int err;
 	
 
-	pr_info("sys connect ret %d from %s with pid %d",retval,ri->task->comm, ri->task->pid);
+	pr_info("sys connect ret %d from %s with pid %d and tgid %d",retval,ri->task->comm, ri->task->pid,ri->task->tgid);
 
 	if(retval == 0 || retval == -115)
 	{
@@ -394,7 +394,7 @@ static void initializeTreeWithTaskInfo(pid_t new_pid)
 	monitor_pid = new_pid;
 
 	for_each_process(t){
-		if (t->pid == monitor_pid || t->real_parent->pid == monitor_pid)
+		if (t->tgid == monitor_pid || t->parent->tgid == monitor_pid)
 		{
 			//ToDo: change all structures according to pid
 			//ToDo: get all ports from the task that has new_pid
