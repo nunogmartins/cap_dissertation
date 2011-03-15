@@ -111,7 +111,7 @@ static int sendto_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 	if(fd == -1)
 		return 0;
 
-	if(retval >= 0 || retval == -11)
+	if(retval >= 0 || retval == -11 || retval == -111)
 	{
 		getLocalPacketInfoFromFd(fd,&pi,&err);
 		if(err == 0)
