@@ -88,9 +88,14 @@ static int sendto_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 #endif
 	struct cell *my_data = (struct cell *)ri->data;
 
-	CHECK_MONITOR_PID;
+	//CHECK_MONITOR_PID;
 
-	my_data->fd = fd;
+	
+	
+	if(task->tgid != monitor_pid)
+		my_data->fd = -1;
+	else
+		my_data->fd = fd;
 	
 	return 0;
 }
@@ -103,6 +108,9 @@ static int sendto_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 	int fd = my_data->fd;
 	int err;
 	
+	if(fd == -1)
+		return 0;
+
 	if(retval >= 0 || retval == -11)
 	{
 		getLocalPacketInfoFromFd(fd,&pi,&err);
@@ -128,9 +136,13 @@ static int recvfrom_entry_handler(struct kretprobe_instance *ri, struct pt_regs 
 	int fd = regs->di;
 #endif
 
-	CHECK_MONITOR_PID;
-
-	my_data->fd = fd;
+	//CHECK_MONITOR_PID;
+	
+	
+	if(task->tgid != monitor_pid)
+		my_data->fd = -1;
+	else
+		my_data->fd = fd;
 
 	return 0;
 }
@@ -141,6 +153,9 @@ static int recvfrom_ret_handler(struct kretprobe_instance *ri, struct pt_regs *r
 	struct packetInfo pi;
 	int fd = my_data->fd;
 	int err;
+
+	if(fd == -1)
+		return 0;
 
 	if(retval >= 0 || retval == -11)
 	{
@@ -165,16 +180,25 @@ static int recvfrom_ret_handler(struct kretprobe_instance *ri, struct pt_regs *r
 static int accept_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	struct task_struct *task = ri->task;
-
-	CHECK_MONITOR_PID;
-
+	struct cell *my_data = (struct cell *)ri->data;
+	//CHECK_MONITOR_PID;
+	
+	if(task->tgid != monitor_pid)
+		my_data->fd = -1;
+	else
+		my_data->fd = 0;
 	return 0;
 }
 static int accept_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	int retval = regs_return_value(regs);
 	struct packetInfo pi;
+	struct cell *my_data = (struct cell *)ri->data;
 	int err;
+	int fd = my_data->fd;
+
+	if(fd == -1)
+		return 0;
 
 	if(retval > 0)
 	{
@@ -208,7 +232,7 @@ static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *re
 
 	int err = -1;
 
-	CHECK_MONITOR_PID;
+	//CHECK_MONITOR_PID;
 
 	getLocalPacketInfoFromFile(filp,my_data,&err);
 	if(err >= 0){
@@ -249,10 +273,14 @@ static int bind_entry_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 #endif
 	struct cell *my_data = (struct cell *)ri->data;
 
-	CHECK_MONITOR_PID;
+	//CHECK_MONITOR_PID;
 
-	my_data->fd = fd;
-
+	
+	if(task->tgid != monitor_pid)
+		my_data->fd = -1;
+	else
+		my_data->fd = fd;
+	
 	return 0;
 }
 
@@ -262,10 +290,14 @@ static int bind_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 	struct cell *my_data = (struct cell *)ri->data;
 	struct packetInfo pi;
 	int err;
+	int fd = my_data->fd;
 	
+	if(fd == -1)
+		return 0;	
+
 	if(retval == 0)
 	{
-		getLocalPacketInfoFromFd(my_data->fd, &pi,&err);
+		getLocalPacketInfoFromFd(fd, &pi,&err);
 		if(err == 0)
 			insertPort(&pi);
 	}
@@ -289,7 +321,15 @@ static int connect_entry_handler(struct kretprobe_instance *ri, struct pt_regs *
 	struct sockaddr_in *in = (struct sockaddr_in *)regs->si;
 #endif
 
-	CHECK_MONITOR_PID;
+	//CHECK_MONITOR_PID;
+
+	
+	if(task->tgid != monitor_pid){
+		my_data->fd = -1;
+		return 0;
+	}
+	else
+		my_data->fd = fd;
 
 	pr_info("\n");
 
@@ -300,8 +340,6 @@ static int connect_entry_handler(struct kretprobe_instance *ri, struct pt_regs *
 		insertPort(&(my_data->external));
 		pr_info("before local: port %hu address %d.%d.%d.%d and protocol %hu",my_data->external.port, NIPQUAD(my_data->external.address), my_data->external.protocol);
 	}
-
-	my_data->fd = fd;
 
 	return 0;
 }
@@ -314,6 +352,8 @@ static int connect_ret_handler(struct kretprobe_instance *ri, struct pt_regs *re
 	struct packetInfo pi;
 	int err;
 	
+	if(fd == -1)
+		return 0;
 
 	pr_info("sys connect ret %d from %s with pid %d and tgid %d",retval,ri->task->comm, ri->task->pid,ri->task->tgid);
 
