@@ -25,28 +25,6 @@
 
 #include "pcap_monitoring.h"
 
-struct inode *getInodeFromFd(unsigned int fd)
-{
-	struct inode *d_inode = NULL;
-	struct file *f = NULL;
-
-	f = fget(fd);
-
-	if(f!=NULL)
-	{
-		struct dentry *dentry = NULL;
-
-		fput(f);
-		dentry = f->f_dentry;
-		if(dentry!=NULL)
-		{
-			d_inode = dentry->d_inode;
-		}
-	}
-
-	return d_inode;
-}
-
 void getInetSockParameters(struct inet_sock *inetsock,struct packetInfo *ret)
 {
 	ret->port = inetsock->inet_num;
