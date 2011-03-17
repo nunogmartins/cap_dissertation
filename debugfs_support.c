@@ -40,3 +40,8 @@ int register_debugfs_file(const char *name, const struct file_operations *fops)
 
 	return 0;
 }
+
+void register_filter_calls(u64 *data)
+{
+	debugfs_create_u64("filter_calls",S_IRUSR,my_debug_dir,data);
+}

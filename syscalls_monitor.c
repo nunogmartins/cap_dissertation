@@ -56,10 +56,11 @@ struct kretprobe *kretprobes = NULL;
 
 struct cell{
 	int fd;
-	int type;
-	int port;
-	int status;
-	int direction;
+};
+
+struct closeInfo {
+	int fd;
+	struct packetInfo pi;
 };
 
 
@@ -218,7 +219,7 @@ static int accept_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	struct task_struct *task = ri->task;
-	struct packetInfo *my_data = (struct packetInfo *)ri->data;
+	struct closeInfo *my_data = (struct closeInfo *)ri->data;
 	//void *stack = (void *)regs->bp;
 	//struct socket *socket = stack+8;
 
@@ -234,15 +235,16 @@ static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *re
 
 	//CHECK_MONITOR_PID;
 
-	getLocalPacketInfoFromFile(filp,my_data,&err);
+	getLocalPacketInfoFromFile(filp,&(my_data->pi),&err);
 	if(err >= 0){
 #ifdef MY_DEBUG_INFO
 		pr_info( "close_sock entry %s",task->comm);
 		pr_info( "port %hu address %d.%d.%d.%d protocol %hu",my_data->port,NIPQUAD(my_data->address),my_data->protocol);
 #endif	
 	}
-	else
-		return 1;
+	else {
+		my_data->fd = -1;
+	}
 
 	return 0;
 }
@@ -250,12 +252,14 @@ static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *re
 static int close_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	int retval = regs_return_value(regs);
-	struct packetInfo *pi = (struct packetInfo *)ri->data;
+	struct closeInfo *cI = (struct closeInfo *)ri->data;
 	
+	if(cI->fd == -1)
+		return 0;
 
 	if(retval == 0){
-		pr_info( "close_ret: port %hu address %d.%d.%d.%d protocol %hu",pi->port,NIPQUAD(pi->address),pi->protocol);
-		deletePort(pi);
+		pr_info( "close_ret: port %hu address %d.%d.%d.%d protocol %hu",cI->pi.port,NIPQUAD(cI->pi.piaddress),cI->pi.protocol);
+		deletePort(&(ci->pi));
 	}
 	return 0;
 }
@@ -328,17 +332,19 @@ static int connect_entry_handler(struct kretprobe_instance *ri, struct pt_regs *
 		my_data->fd = -1;
 		return 0;
 	}
-	else
+	else{
 		my_data->fd = fd;
+	}
 
-	pr_info("\n");
 
 	getLocalPacketInfoFromFd(fd,&(my_data->external),&err);
 	if(err == 0){
 		my_data->external.address = ntohl(in->sin_addr.s_addr);
 		my_data->external.port = ntohs(in->sin_port);
 		insertPort(&(my_data->external));
-		pr_info("before local: port %hu address %d.%d.%d.%d and protocol %hu",my_data->external.port, NIPQUAD(my_data->external.address), my_data->external.protocol);
+		pr_info("before local: port %hu address %d.%d.%d.%d and protocol %hu\n",my_data->external.port, NIPQUAD(my_data->external.address), my_data->external.protocol);
+	}else {
+		my_data->fd = -1;
 	}
 
 	return 0;
@@ -352,10 +358,11 @@ static int connect_ret_handler(struct kretprobe_instance *ri, struct pt_regs *re
 	struct packetInfo pi;
 	int err;
 	
+	pr_info("sys connect ret %d from %s with pid %d and tgid %d\n",retval,ri->task->comm, ri->task->pid,ri->task->tgid);
+	
 	if(fd == -1)
 		return 0;
 
-	pr_info("sys connect ret %d from %s with pid %d and tgid %d",retval,ri->task->comm, ri->task->pid,ri->task->tgid);
 
 	if(retval == 0 || retval == -115)
 	{

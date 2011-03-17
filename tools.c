@@ -31,7 +31,7 @@ void getInetSockParameters(struct inet_sock *inetsock,struct packetInfo *ret)
 	ret->protocol = ((struct sock *)inetsock)->sk_protocol;
 
 #ifdef MY_DEBUG_INFO
-	if(ret->protocol!=0){
+/*	if(ret->protocol!=0){
 		int src_addr = ntohl(inetsock->inet_saddr);
 		int dst_addr = ntohl(inetsock->inet_daddr);
 		int rcv = ntohl(inetsock->inet_rcv_saddr);
@@ -39,6 +39,7 @@ void getInetSockParameters(struct inet_sock *inetsock,struct packetInfo *ret)
 	pr_emerg( "sport %hu dport %hu daddr %d.%d.%d.%d laddr %d.%d.%d.%d",
 			ntohs(inetsock->inet_sport),ntohs(inetsock->inet_dport), NIPQUAD(dst_addr),NIPQUAD(src_addr));
 	}
+*/
 #endif
 
 	if(ret->port == ntohs(inetsock->inet_sport))
@@ -103,7 +104,7 @@ void getLocalPacketInfoFromFile(struct file *f, struct packetInfo *ret, int *err
 				getInetSockParameters((struct inet_sock *)(socket->sk),ret);
 
 #ifdef MY_DEBUG_INFO
-				pr_info( "family %hu type %hu lport %hu addr %d.%d.%d.%d proto %hu",family,type,ret->port, NIPQUAD(ret->address), ret->protocol);
+		//		pr_info( "family %hu type %hu lport %hu addr %d.%d.%d.%d proto %hu",family,type,ret->port, NIPQUAD(ret->address), ret->protocol);
 #endif
 			}else
 			{
