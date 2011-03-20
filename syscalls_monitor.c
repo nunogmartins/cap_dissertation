@@ -258,7 +258,9 @@ static int close_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs
 		return 0;
 
 	if(retval == 0){
+#ifdef MY_DEBUG_INFO
 		pr_info( "close_ret: port %hu address %d.%d.%d.%d protocol %hu",cI->pi.port,NIPQUAD(cI->pi.piaddress),cI->pi.protocol);
+#endif
 		deletePort(&(ci->pi));
 	}
 	return 0;
@@ -342,7 +344,9 @@ static int connect_entry_handler(struct kretprobe_instance *ri, struct pt_regs *
 		my_data->external.address = ntohl(in->sin_addr.s_addr);
 		my_data->external.port = ntohs(in->sin_port);
 		insertPort(&(my_data->external));
+#ifdef MY_DEBUG_INFO
 		pr_info("before local: port %hu address %d.%d.%d.%d and protocol %hu\n",my_data->external.port, NIPQUAD(my_data->external.address), my_data->external.protocol);
+#endif
 	}else {
 		my_data->fd = -1;
 	}
@@ -357,9 +361,7 @@ static int connect_ret_handler(struct kretprobe_instance *ri, struct pt_regs *re
 	int fd = my_data->fd;
 	struct packetInfo pi;
 	int err;
-	
-	pr_info("sys connect ret %d from %s with pid %d and tgid %d\n",retval,ri->task->comm, ri->task->pid,ri->task->tgid);
-	
+
 	if(fd == -1)
 		return 0;
 
@@ -370,7 +372,9 @@ static int connect_ret_handler(struct kretprobe_instance *ri, struct pt_regs *re
 		getLocalPacketInfoFromFd(fd,&pi,&err);
 		if(err == 0){
 			insertPort(&pi);
+#ifdef MY_DEBUG_INFO
 			pr_info("local: port %hu address %d.%d.%d.%d and protocol %hu",pi.port, NIPQUAD(pi.address), pi.protocol);
+#endif
 		}
 		
 	}
@@ -556,6 +560,8 @@ static const struct file_operations pid_fops = {
 int init_kretprobes_syscalls(void)
 {
 	int ret = 0;
+
+	monitor_pid = -1;
 
 	register_debugfs_file("pid_monitor", &pid_fops);
 

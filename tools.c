@@ -133,7 +133,7 @@ struct local_addresses_list* listAllDevicesAddress(void)
 
 	for_each_netdev(net,dev){
 #ifdef MY_DEBUG_INFO
-		pr_info( "device %s",dev->name);
+		pr_info( "device %s\n",dev->name);
 #endif
 		if(dev->ip_ptr)
 		{
@@ -143,7 +143,7 @@ struct local_addresses_list* listAllDevicesAddress(void)
 			{
 #ifdef MY_DEBUG_INFO
 				int aux_addr = ntohl(addr->ifa_address);
-				pr_info( "ip address %d.%d.%d.%d", NIPQUAD(aux_addr));
+				pr_info( "ip address %d.%d.%d.%d\n", NIPQUAD(aux_addr));
 #endif
 				tmp = kmalloc(sizeof(*tmp),GFP_KERNEL);
 				tmp->address = ntohl(addr->ifa_address);
@@ -163,7 +163,7 @@ int remove_local_addresses_list(struct local_addresses_list *list)
 	{
 		tmp = list_entry(pos,local_addresses_list, list);//(pos,struct local_addresses_list,list);
 #ifdef MY_DEBUG_INFO
-		pr_info( "removing address %d.%d.%d.%d",NIPQUAD(tmp->address));
+		pr_info( "removing address %d.%d.%d.%d\n",NIPQUAD(tmp->address));
 #endif
 		list_del(pos);
 		kfree(tmp);
@@ -172,3 +172,17 @@ int remove_local_addresses_list(struct local_addresses_list *list)
 	return 0;
 }
 
+short isSon(pid_t pid, pid_t newpid)
+{
+	return pid == newpid ? 1 : 0;
+}
+
+short itsMe(pid_t pid, pid_t newpid)
+{
+	return pid == newpid ? 1: 0;
+}
+
+short isGroup(pid_t pid, pid_t newpid)
+{
+	return pid == newpid ? 1 : 0;
+}

@@ -380,13 +380,13 @@ void printAll(struct rb_root *root)
 {
 	struct rb_node *node;
 	struct portInfo *p = NULL;
-	int i = 0;
+	unsigned long i = 0;
 
 
 	for(node = rb_first(root); node ; node = rb_next(node))
 	{
 		p = rb_entry(node,portInfo, node);
-		pr_emerg( "port = %hu ", p->port);
+		pr_info( "port = %hu ", p->port);
 
 		if(p->tcp){
 			pr_info( "tcp addresses 0x%p and counter %d",p->tcp,p->tcp_list_counter);
@@ -402,7 +402,10 @@ void printAll(struct rb_root *root)
 
 	if(i == 0)
 	{
-		pr_info("Arvore vazia");
+		pr_info("Empty Tree");
+	}else
+	{
+		pr_info("The tree has %lu elements",i);
 	}
 }
 
