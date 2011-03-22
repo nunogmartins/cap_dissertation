@@ -171,18 +171,3 @@ int remove_local_addresses_list(struct local_addresses_list *list)
 
 	return 0;
 }
-
-short isSon(pid_t pid, pid_t newpid)
-{
-	return pid == newpid ? 1 : 0;
-}
-
-short itsMe(pid_t pid, pid_t newpid)
-{
-	return pid == newpid ? 1: 0;
-}
-
-short isGroup(pid_t pid, pid_t newpid)
-{
-	return pid == newpid ? 1 : 0;
-}

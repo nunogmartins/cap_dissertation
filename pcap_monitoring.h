@@ -43,10 +43,6 @@ void getLocalPacketInfoFromFile(struct file *f,struct packetInfo *,int *err);
 struct local_addresses_list* listAllDevicesAddress(void);
 int remove_local_addresses_list(struct local_addresses_list *list);
 
-short isSon(pid_t pid, pid_t newpid);
-short itsMe(pid_t pid, pid_t newpid);
-short isGroup(pid_t pid, pid_t newpid);
-
 extern struct net inet;
 
 #endif /* PCAP_MONITORING_H_ */

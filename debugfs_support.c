@@ -19,10 +19,7 @@ int init_debug(void)
 	{
 		pr_info("impossible to create pcap_debug directory");
 		return -1;
-	}
-
-	//dentry = debugfs_create_file("pid_monitor",S_IRUGO,my_debug_dir,NULL,&pid_fops);
-	
+	}	
 	pr_info( "debug activated");
 	return 0;
 }
@@ -44,4 +41,9 @@ int register_debugfs_file(const char *name, const struct file_operations *fops)
 void register_filter_calls(u64 *data)
 {
 	debugfs_create_u64("filter_calls",S_IRUSR,my_debug_dir,data);
+}
+
+void register_monitor_id(const char *name, u64 *data)
+{
+	debugfs_create_u64(name,S_IWUSR|S_IRUGO,my_debug_dir,data);
 }
