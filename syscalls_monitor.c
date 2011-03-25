@@ -85,7 +85,6 @@ static const struct file_operations monitor_fops = {
         .owner          = THIS_MODULE,
  };
 
-debugfs_create_file("stats",mode,parent,data,monitor_fops);
 
 */
 #endif
@@ -473,12 +472,6 @@ static int socket_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 
 #endif //COMMON_TCP_UDP
 
-void createMonitoringSystem(void)
-{
-	register_monitor_id("pid",&pid);
-	register_monitor_id("ppid",&ppid);
-	register_monitor_id("tgid",&tgid);
-}
 
 
 static int instantiationKRETProbe(struct kretprobe *kret,
@@ -616,6 +609,22 @@ static const struct file_operations pid_fops = {
 		.write = options,
 };
 
+void createMonitoringSystem(void)
+{
+
+	struct dentry *parent = NULL;
+	register_debugfs_file("option", &pid_fops);
+
+#ifdef MY_DEBUG
+/*
+	parent = createMonitorStatDir();
+	debugfs_create_file("stats",S_IRUSR,parent,NULL,&monitor_fops);
+*/
+#endif
+	register_monitor_id("pid",&pid);
+	register_monitor_id("ppid",&ppid);
+	register_monitor_id("tgid",&tgid);
+}
 /*
  * function called on module init to initialize kretprobes common to tcp and udp
  */
@@ -628,7 +637,6 @@ int init_kretprobes_syscalls(void)
 
 	createMonitoringSystem();
 
-	register_debugfs_file("option", &pid_fops);
 
 	kretprobes = kmalloc(sizeof(*kretprobes)*NR_PROBES,GFP_KERNEL);
 

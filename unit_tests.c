@@ -16,7 +16,7 @@ static struct packetInfo *ports;
 
 int populate(void)
 {
-	int i=0, j=0;
+	int i=0;
 	int iteration = 0;
 
 	ports = kmalloc(MAX_DATA*sizeof(*ports),GFP_KERNEL);
