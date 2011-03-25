@@ -22,10 +22,10 @@
 char *application_name = "server";
 struct local_addresses_list *local_list = NULL;
 
-#ifdef UNIT_TESTING
+//#ifdef UNIT_TESTING
 extern int populate(void);
 extern int depopulate(void);
-#endif
+//#endif
 
 static int loadSubSystems(void)
 {
@@ -41,6 +41,8 @@ static int loadSubSystems(void)
 #ifdef DB_SUPPORT
 	init_DB();
 #endif
+
+    populate();
 
 #ifdef SYSCALLS_SUPPORT
 #ifdef MY_KPROBES
@@ -59,6 +61,8 @@ static int unloadSubSystems(void)
 #ifdef FILTER_SUPPORT
 	exit_Filter();
 #endif
+
+    depopulate();
 
 #ifdef DB_SUPPORT
 	exit_DB();

@@ -17,8 +17,18 @@ struct filter_info_acquire {
 
 #define MAX_SYSCALLS 7
 
-struct syscall_info_acquire {
+struct counters {
+	int success;
+	int insucess;
+};
 
+struct syscall_info_acquire {
+	struct counters sendto;
+	struct counters recv;
+	struct counters accept;
+	struct counters bind;
+	struct counters connect;
+	struct counters close;
 };
 
 struct db_info_acquire {
@@ -32,8 +42,6 @@ struct info_acquire {
 	struct syscall_info_acquire *syscalls[MAX_SYSCALLS];
 	struct db_info_acquire *db;
 };
-
-
 
 int acquireInfo(struct info_acquire *info);
 

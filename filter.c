@@ -19,6 +19,59 @@ struct filter_info_acquire filter_info = {
 		.src = 0, 
 		.dst = 0 };
 
+/*
+ * qq coisa para controlar as iteracoes
+ *
+static void *filter_seq_start(struct seq_file *p, loff_t *pos)
+{
+
+}
+
+static void *filter_seq_next(struct seq_file *p, void *v, loff_t *pos)
+{
+
+}
+
+static void filter_seq_stop(struct seq_file *p, void *v)
+{
+
+}
+
+static int filter_seq_show(struct seq_file *m, void *v)
+{
+	seq_printf(m,"");
+}
+
+static const struct seq_operations filter_seq_ops = {
+        .start  = filter_seq_start,
+        .next   = filter_seq_next,
+        .stop   = filter_seq_stop,
+        .show   = filter_seq_show,
+};
+
+static int filter_open(struct inode *inode, struct file *file)
+{
+	seq_open(file,&filter_seq_ops);
+}
+
+static int filter_release(struct inode *inode, struct file *file)
+{
+
+}
+
+static const struct file_operations filter_fops = {
+        .open           = filter_open,
+        .read           = seq_read,
+        .llseek         = seq_lseek,
+        //.release        = filter_release,
+        .release = seq_release,
+        .owner          = THIS_MODULE,
+ };
+
+debugfs_create_file("stats",mode,parent,data,filter_fops);
+
+*/
+
 #endif
 
 extern unsigned int (*portExists)(struct packetInfo *src_pi,struct packetInfo *dst_pi);

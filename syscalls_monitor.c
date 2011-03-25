@@ -30,9 +30,64 @@
 #include "debugfs_support.h"
 
 #ifdef MY_DEBUG
+#include <linux/debugfs.h>
+#include <linux/seq_file.h>
 #include "info_acquire.h"
 
 struct syscall_info_acquire syscall_info;
+
+/*
+ * qq coisa para controlar as iteracoes
+ *
+static void *monitors_seq_start(struct seq_file *p, loff_t *pos)
+{
+
+}
+
+static void *monitors_seq_next(struct seq_file *p, void *v, loff_t *pos)
+{
+
+}
+
+static void monitors_seq_stop(struct seq_file *p, void *v)
+{
+
+}
+
+static int monitor_seq_show(struct seq_file *m, void *v)
+{
+	seq_printf(m,"");
+}
+
+static const struct seq_operations monitor_seq_ops = {
+        .start  = monitor_seq_start,
+        .next   = monitor_seq_next,
+        .stop   = monitor_seq_stop,
+        .show   = monitor_seq_show,
+};
+
+static int monitor_open(struct inode *inode, struct file *file)
+{
+	seq_open(file,&monitor_seq_ops);
+}
+
+static int monitor_release(struct inode *inode, struct file *file)
+{
+
+}
+
+static const struct file_operations monitor_fops = {
+        .open           = monitor_open,
+        .read           = seq_read,
+        .llseek         = seq_lseek,
+        //.release        = monitor_release,
+        .release = seq_release,
+        .owner          = THIS_MODULE,
+ };
+
+debugfs_create_file("stats",mode,parent,data,monitor_fops);
+
+*/
 #endif
 
 pid_t monitor_pid;

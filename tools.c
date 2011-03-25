@@ -25,6 +25,14 @@
 
 #include "pcap_monitoring.h"
 
+void debugFunc(struct packetInfo *lpi)
+{
+	pr_info("insert port");
+	pr_info("port %hu",lpi->port);
+	pr_info("protocol %hu",lpi->protocol);
+	pr_info("address %d.%d.%d.%d",NIPQUAD(lpi->address));
+}
+
 void getInetSockParameters(struct inet_sock *inetsock,struct packetInfo *ret)
 {
 	ret->port = inetsock->inet_num;
@@ -99,7 +107,7 @@ void getLocalPacketInfoFromFile(struct file *f, struct packetInfo *ret, int *err
 				if(family != AF_INET)
 				{
 					*err = -4;
-					return; 
+					return;
 				}
 				getInetSockParameters((struct inet_sock *)(socket->sk),ret);
 
@@ -150,6 +158,10 @@ struct local_addresses_list* listAllDevicesAddress(void)
 				list_add(&(tmp->list),&(list->list));
 			}
 		}
+
+#ifdef MY_DEBUG_INFO
+		pr_info( "end of device %s\n",dev->name);
+#endif
 	}
 
 	return list;

@@ -14,15 +14,6 @@
 struct rb_root db;
 extern struct local_addresses_list *local_list;
 
-void debugFunc(struct packetInfo *lpi)
-{
-	pr_info("insert port");
-	pr_info("port %hu",lpi->port);
-	pr_info("protocol %hu",lpi->protocol);
-	pr_info("address %d.%d.%d.%d",NIPQUAD(lpi->address));
-}
-
-
 int insertPort(struct packetInfo *lpi)
 {
 	int ret=1;
