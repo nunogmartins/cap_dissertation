@@ -18,7 +18,9 @@
 struct filter_info_acquire filter_info = {
 		.entry = 0,
 		.src = 0, 
-		.dst = 0 };
+		.dst = 0,
+		.rejected = 0
+};
 
 
 static void *filter_seq_start(struct seq_file *p, loff_t *pos)
@@ -45,7 +47,9 @@ static int filter_seq_show(struct seq_file *m, void *v)
 	if(v != NULL)
 	{
 		info = v;
-		seq_printf(m,"how many entries %ld \n",info->entry);
+		seq_printf(m,"how many entries %ld it has src %ld searches and dst "
+				"searches %ld and %ld rejected\n",info->entry, info->src,
+				info->dst,info->rejected);
 	}else
 	{
 		seq_printf(m,"V is null\n");
@@ -130,7 +134,7 @@ unsigned int my_portExists(struct packetInfo *src_pi,struct packetInfo *dst_pi)
 
 		}
 	}
-
+	filter_info.rejected++;
 	return 0;
 }
 

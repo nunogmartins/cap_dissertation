@@ -13,6 +13,7 @@ struct filter_info_acquire {
 	long entry;
 	long src;
 	long dst;
+	long rejected;
 };
 
 #define MAX_SYSCALLS 7
