@@ -47,3 +47,13 @@ void register_monitor_id(const char *name, u64 *data)
 {
 	debugfs_create_u64(name,S_IWUSR|S_IRUGO,my_debug_dir,data);
 }
+
+struct dentry *createMonitorStatDir(void)
+{
+	return debugfs_create_dir("monitor",my_debug_dir);
+}
+
+struct dentry *createFiltertatDir(void)
+{
+	return debugfs_create_dir("filter",my_debug_dir);
+}

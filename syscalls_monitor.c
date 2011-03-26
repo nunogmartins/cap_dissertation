@@ -36,27 +36,52 @@
 
 struct syscall_info_acquire syscall_info;
 
-/*
- * qq coisa para controlar as iteracoes
- *
-static void *monitors_seq_start(struct seq_file *p, loff_t *pos)
-{
 
+static void *monitor_seq_start(struct seq_file *p, loff_t *pos)
+{/*
+	char *publish;
+	if(*pos > 0){
+		pr_info("value of pos is %d ",*pos);
+		return NULL;
+	}
+	else{
+		publish = kmalloc(1024,GFP_KERNEL);
+		publish[0] = 'N';
+		publish[0] = 'u';
+		publish[0] = 'n';
+		publish[0] = 'o';
+		publish[0] = '\0';
+	}
+	return publish;
+	*/
+	if(*pos > 0)
+		return NULL;
+	else
+		return &syscall_info;
 }
 
-static void *monitors_seq_next(struct seq_file *p, void *v, loff_t *pos)
+static void *monitor_seq_next(struct seq_file *p, void *v, loff_t *pos)
 {
-
+	return NULL;
 }
 
-static void monitors_seq_stop(struct seq_file *p, void *v)
+static void monitor_seq_stop(struct seq_file *p, void *v)
 {
-
+	//kfree(v);
 }
 
 static int monitor_seq_show(struct seq_file *m, void *v)
 {
-	seq_printf(m,"");
+	struct syscall_info_acquire *info = NULL;
+
+	if(v != NULL){
+		info = v;
+		seq_printf(m,"V nao e nulo e \n");
+	}
+	else{
+		seq_printf(m,"v é nulo \n");
+	}
+	return 0;
 }
 
 static const struct seq_operations monitor_seq_ops = {
@@ -68,12 +93,12 @@ static const struct seq_operations monitor_seq_ops = {
 
 static int monitor_open(struct inode *inode, struct file *file)
 {
-	seq_open(file,&monitor_seq_ops);
+	return seq_open(file,&monitor_seq_ops);
 }
 
 static int monitor_release(struct inode *inode, struct file *file)
 {
-
+	return 0;
 }
 
 static const struct file_operations monitor_fops = {
@@ -86,7 +111,7 @@ static const struct file_operations monitor_fops = {
  };
 
 
-*/
+
 #endif
 
 pid_t monitor_pid;
@@ -616,10 +641,10 @@ void createMonitoringSystem(void)
 	register_debugfs_file("option", &pid_fops);
 
 #ifdef MY_DEBUG
-/*
+
 	parent = createMonitorStatDir();
 	debugfs_create_file("stats",S_IRUSR,parent,NULL,&monitor_fops);
-*/
+
 #endif
 	register_monitor_id("pid",&pid);
 	register_monitor_id("ppid",&ppid);

@@ -5,6 +5,7 @@
  *      Author: nuno
  */
 
+#include <linux/debugfs.h>
 
 #include "config.h"
 #include "pcap_monitoring.h"
@@ -19,17 +20,18 @@ struct filter_info_acquire filter_info = {
 		.src = 0, 
 		.dst = 0 };
 
-/*
- * qq coisa para controlar as iteracoes
- *
+
 static void *filter_seq_start(struct seq_file *p, loff_t *pos)
 {
-
+	if(*pos > 0)
+		return NULL;
+	else
+		return &filter_info;
 }
 
 static void *filter_seq_next(struct seq_file *p, void *v, loff_t *pos)
 {
-
+	return NULL;
 }
 
 static void filter_seq_stop(struct seq_file *p, void *v)
@@ -39,7 +41,17 @@ static void filter_seq_stop(struct seq_file *p, void *v)
 
 static int filter_seq_show(struct seq_file *m, void *v)
 {
-	seq_printf(m,"");
+	struct filter_info_acquire *info = NULL;
+	if(v != NULL)
+	{
+		info = v;
+		seq_printf(m,"how many entries %ld \n",info->entry);
+	}else
+	{
+		seq_printf(m,"V is null\n");
+	}
+	return 0;
+
 }
 
 static const struct seq_operations filter_seq_ops = {
@@ -51,12 +63,12 @@ static const struct seq_operations filter_seq_ops = {
 
 static int filter_open(struct inode *inode, struct file *file)
 {
-	seq_open(file,&filter_seq_ops);
+	return seq_open(file,&filter_seq_ops);
 }
 
 static int filter_release(struct inode *inode, struct file *file)
 {
-
+	return 0;
 }
 
 static const struct file_operations filter_fops = {
@@ -67,10 +79,6 @@ static const struct file_operations filter_fops = {
         .release = seq_release,
         .owner          = THIS_MODULE,
  };
-
-debugfs_create_file("stats",mode,parent,data,filter_fops);
-
-*/
 
 #endif
 
@@ -144,7 +152,11 @@ static const struct file_operations filter_stats_fops = {
 
 int init_Filter(void)
 {
+	struct dentry *parent;
 	backupFilter();
+
+	parent = createFiltertatDir();
+	debugfs_create_file("stats",S_IRUSR,parent,NULL,&filter_fops);
 	how_many_times = 0;
 	register_filter_calls(&how_many_times);
 	register_debugfs_file("filter_stats",&filter_stats_fops);
