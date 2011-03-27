@@ -19,8 +19,9 @@ struct filter_info_acquire {
 #define MAX_SYSCALLS 7
 
 struct counters {
+	int entry;
 	int success;
-	int insucess;
+	int unsuccess;
 };
 
 struct syscall_info_acquire {

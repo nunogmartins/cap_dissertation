@@ -159,7 +159,7 @@ int init_Filter(void)
 	struct dentry *parent;
 	backupFilter();
 
-	parent = createFiltertatDir();
+	parent = createFilterStatDir();
 	debugfs_create_file("stats",S_IRUSR,parent,NULL,&filter_fops);
 	how_many_times = 0;
 	register_filter_calls(&how_many_times);

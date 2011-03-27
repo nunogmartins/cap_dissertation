@@ -53,7 +53,12 @@ struct dentry *createMonitorStatDir(void)
 	return debugfs_create_dir("monitor",my_debug_dir);
 }
 
-struct dentry *createFiltertatDir(void)
+struct dentry *createFilterStatDir(void)
+{
+	return debugfs_create_dir("filter",my_debug_dir);
+}
+
+struct dentry *createDBStatDir(void)
 {
 	return debugfs_create_dir("filter",my_debug_dir);
 }

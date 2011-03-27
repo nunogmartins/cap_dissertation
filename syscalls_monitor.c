@@ -38,22 +38,7 @@ struct syscall_info_acquire syscall_info;
 
 
 static void *monitor_seq_start(struct seq_file *p, loff_t *pos)
-{/*
-	char *publish;
-	if(*pos > 0){
-		pr_info("value of pos is %d ",*pos);
-		return NULL;
-	}
-	else{
-		publish = kmalloc(1024,GFP_KERNEL);
-		publish[0] = 'N';
-		publish[0] = 'u';
-		publish[0] = 'n';
-		publish[0] = 'o';
-		publish[0] = '\0';
-	}
-	return publish;
-	*/
+{
 	if(*pos > 0)
 		return NULL;
 	else
@@ -62,6 +47,11 @@ static void *monitor_seq_start(struct seq_file *p, loff_t *pos)
 
 static void *monitor_seq_next(struct seq_file *p, void *v, loff_t *pos)
 {
+	/*if(*pos < 5)
+	{
+		return v; 
+	}
+	else*/
 	return NULL;
 }
 
@@ -76,7 +66,7 @@ static int monitor_seq_show(struct seq_file *m, void *v)
 
 	if(v != NULL){
 		info = v;
-		seq_printf(m,"V nao e nulo e \n");
+		seq_printf(m,"how many sendto %d\n",info->sendto.entry);
 	}
 	else{
 		seq_printf(m,"v é nulo \n");
@@ -184,11 +174,12 @@ static int sendto_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 	struct cell *my_data = (struct cell *)ri->data;
 
 	//CHECK_MONITOR_PID;
-
+	syscall_info.sendto.entry++;
 	TO_MONITOR(task)
 	
 monitor:
 	my_data->fd = fd;
+	syscall_info.sendto.success++;
 	return 0;
 }
 static int sendto_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
@@ -200,8 +191,11 @@ static int sendto_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 	int fd = my_data->fd;
 	int err;
 
-	if(my_data->fd == -1)
+	if(my_data->fd == -1){
+		syscall_info.sendto.unsuccess++;
 		return 0;
+	}
+
 
 	if(retval >= 0 || retval == -11 || retval == -111)
 	{
@@ -227,12 +221,12 @@ static int recvfrom_entry_handler(struct kretprobe_instance *ri, struct pt_regs 
 #else
 	int fd = regs->di;
 #endif
-
+	syscall_info.recv.entry++;
 	TO_MONITOR(task)
 	
 monitor:
 	my_data->fd = fd;
-
+	syscall_info.recv.success++;
 	return 0;
 }
 static int recvfrom_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
@@ -243,8 +237,11 @@ static int recvfrom_ret_handler(struct kretprobe_instance *ri, struct pt_regs *r
 	int fd = my_data->fd;
 	int err;
 	
-	if(my_data->fd == -1)
+	if(my_data->fd == -1){
+		syscall_info.recv.unsuccess++;
 		return 0;
+	}
+
 
 	if(retval >= 0 || retval == -11)
 	{
@@ -270,9 +267,11 @@ static int accept_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 {
 	struct task_struct *task = ri->task;
 	struct cell *my_data = (struct cell *)ri->data;
+	syscall_info.accept.entry++;
 	TO_MONITOR(task)
 	
-monitor:	
+monitor:
+	syscall_info.accept.success++;
 return 0;
 }
 static int accept_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
@@ -282,9 +281,10 @@ static int accept_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 	struct packetInfo pi;
 	int err;
 	
-	if(my_data->fd == -1)
+	if(my_data->fd == -1){
+		syscall_info.accept.unsuccess++;
 		return 0;
-
+	}
 	if(retval > 0)
 	{
 		getLocalPacketInfoFromFd(retval,&pi,&err);
@@ -316,7 +316,7 @@ static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *re
 #endif
 
 	int err = -1;
-	
+	syscall_info.close.entry++;
 	TO_MONITOR(task)
 	
 monitor:
@@ -326,7 +326,8 @@ monitor:
 #ifdef MY_DEBUG_INFO
 		pr_info( "close_sock entry %s",task->comm);
 		pr_info( "port %hu address %d.%d.%d.%d protocol %hu",my_data->pi.port,NIPQUAD(my_data->pi.address),my_data->pi.protocol);
-#endif	
+#endif
+		syscall_info.close.success++;
 	}
 	else {
 		my_data->fd = -1;
@@ -340,9 +341,10 @@ static int close_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs
 	int retval = regs_return_value(regs);
 	struct closeInfo *cI = (struct closeInfo *)ri->data;
 	
-	if(cI->fd == -1)
+	if(cI->fd == -1){
+		syscall_info.close.unsuccess++;
 		return 0;
-
+	}
 	if(retval == 0){
 #ifdef MY_DEBUG_INFO
 		pr_info( "close_ret: port %hu address %d.%d.%d.%d protocol %hu",cI->pi.port,NIPQUAD(cI->pi.address),cI->pi.protocol);
@@ -364,12 +366,12 @@ static int bind_entry_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 	int fd = regs->di;
 #endif
 	struct cell *my_data = (struct cell *)ri->data;
-
+	syscall_info.bind.entry++;
 	TO_MONITOR(task)
 	
 monitor:
 	my_data->fd = fd;
-	
+	syscall_info.bind.success++;
 	return 0;
 }
 
@@ -381,9 +383,10 @@ static int bind_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 	int err;
 	int fd = my_data->fd;	
 
-	if(my_data->fd == -1)
+	if(my_data->fd == -1){
+		syscall_info.bind.unsuccess++;
 		return 0;
-
+	}
 	if(retval == 0)
 	{
 		getLocalPacketInfoFromFd(fd, &pi,&err);
@@ -409,7 +412,7 @@ static int connect_entry_handler(struct kretprobe_instance *ri, struct pt_regs *
 	int fd = regs->di;
 	struct sockaddr_in *in = (struct sockaddr_in *)regs->si;
 #endif
-
+	syscall_info.connect.entry++;
 	TO_MONITOR(task)
 	
 monitor:
@@ -423,6 +426,7 @@ monitor:
 #ifdef MY_DEBUG_INFO
 		pr_info("before local: port %hu address %d.%d.%d.%d and protocol %hu\n",my_data->external.port, NIPQUAD(my_data->external.address), my_data->external.protocol);
 #endif
+		syscall_info.connect.success++;
 	}else {
 		my_data->fd = -1;
 	}
@@ -438,9 +442,10 @@ static int connect_ret_handler(struct kretprobe_instance *ri, struct pt_regs *re
 	struct packetInfo pi;
 	int err;
 
-	if(fd == -1)
+	if(fd == -1){
+		syscall_info.connect.unsuccess++;
 		return 0;
-
+	}
 
 	if(retval == 0 || retval == -115)
 	{
@@ -638,6 +643,7 @@ void createMonitoringSystem(void)
 {
 
 	struct dentry *parent = NULL;
+	memset(&syscall_info,0,sizeof(syscall_info));
 	register_debugfs_file("option", &pid_fops);
 
 #ifdef MY_DEBUG
