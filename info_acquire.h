@@ -16,7 +16,7 @@ struct filter_info_acquire {
 	long rejected;
 };
 
-#define MAX_SYSCALLS 7
+#define MAX_SYSCALLS 6
 
 struct counters {
 	int entry;
@@ -25,12 +25,15 @@ struct counters {
 };
 
 struct syscall_info_acquire {
+	struct counters info[MAX_SYSCALLS];
+	/*
 	struct counters sendto;
 	struct counters recv;
 	struct counters accept;
 	struct counters bind;
 	struct counters connect;
 	struct counters close;
+	*/
 };
 
 struct db_info_acquire {
