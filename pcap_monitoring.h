@@ -15,7 +15,6 @@
 #include <net/net_namespace.h>
 #include <linux/list.h>
 
-
 #define TCP 0x06
 #define UDP 0x11
 

@@ -29,7 +29,7 @@ int insertPort(struct packetInfo *lpi)
 	if(lpi->port == 0 || lpi->protocol == 0)
 	{
 #ifdef MY_DEBUG_INFO
-		//pr_info("some info is zero port %d address %d.%d.%d.%d and protocol %hu",lpi->port,NIPQUAD(lpi->address), lpi->protocol);
+		//my_print_debug("some info is zero port %d address %d.%d.%d.%d and protocol %hu",lpi->port,NIPQUAD(lpi->address), lpi->protocol);
 #endif
 		return -1;
 	}
@@ -42,7 +42,7 @@ int insertPort(struct packetInfo *lpi)
 int deletePort(struct packetInfo *pi)
 {
 #ifdef MY_DEBUG_INFO
-	pr_info( "deleting port %hu",pi->port);
+	my_print_debug( "deleting port %hu",pi->port);
 #endif
 	my_erase(&db,pi);
 	return 0;

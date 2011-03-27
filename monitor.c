@@ -46,7 +46,7 @@ static int loadSubSystems(void)
 
 #ifdef SYSCALLS_SUPPORT
 #ifdef MY_KPROBES
-	pr_info("Loaded %d probes", init_kretprobes_syscalls());
+	my_print_debug("Loaded %d probes", init_kretprobes_syscalls());
 #endif
 #endif
 	return 0;

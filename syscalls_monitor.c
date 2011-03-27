@@ -48,7 +48,7 @@ static void *monitor_seq_start(struct seq_file *p, loff_t *pos)
 static void *monitor_seq_next(struct seq_file *p, void *v, loff_t *pos)
 {
 	struct syscall_info_acquire *info = v;
-	*(pos)++;
+	*(pos)= *(pos)+1;
 	//if(v != NULL){
 		if(*pos < 5)
 		{
@@ -155,7 +155,7 @@ struct closeInfo {
 void print_regs(const char *function, struct pt_regs *regs)
 {
 #ifdef CONFIG_X86_64
-	pr_info( "%s ax=%p bx=%p cx=%p dx=%p di=%p si=%p r8=%p r9=%p",function, (void *)regs->ax,(void *)regs->bx,(void *)regs->cx,(void *)regs->dx,(void*)regs->di,(void *) regs->si,(void *)regs->r8,(void *)regs->r9);
+	my_print_debug( "%s ax=%p bx=%p cx=%p dx=%p di=%p si=%p r8=%p r9=%p",function, (void *)regs->ax,(void *)regs->bx,(void *)regs->cx,(void *)regs->dx,(void*)regs->di,(void *) regs->si,(void *)regs->r8,(void *)regs->r9);
 #endif
 }
 
@@ -207,7 +207,7 @@ static int sendto_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 		if(err == 0)
 			insertPort(&pi);
 	}else
-		pr_info("sendto retval < 0 which is %d ",retval);
+		my_print_debug("sendto retval < 0 which is %d ",retval);
 
 	return 0;
 }
@@ -254,7 +254,7 @@ static int recvfrom_ret_handler(struct kretprobe_instance *ri, struct pt_regs *r
 			insertPort(&pi);
 	}else{
 #ifdef MY_DEBUG_INFO
-	pr_info("recvfrom retval < 0 which is %d", retval);
+	my_print_debug("recvfrom retval < 0 which is %d", retval);
 #endif
 	}	
 
@@ -328,8 +328,8 @@ monitor:
 	getLocalPacketInfoFromFile(filp,&(my_data->pi),&err);
 	if(err >= 0){
 #ifdef MY_DEBUG_INFO
-		pr_info( "close_sock entry %s",task->comm);
-		pr_info( "port %hu address %d.%d.%d.%d protocol %hu",my_data->pi.port,NIPQUAD(my_data->pi.address),my_data->pi.protocol);
+		my_print_debug( "close_sock entry %s",task->comm);
+		my_print_debug( "port %hu address %d.%d.%d.%d protocol %hu",my_data->pi.port,NIPQUAD(my_data->pi.address),my_data->pi.protocol);
 #endif
 		syscall_info.info[3].success++;
 	}
@@ -351,7 +351,7 @@ static int close_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs
 	}
 	if(retval == 0){
 #ifdef MY_DEBUG_INFO
-		pr_info( "close_ret: port %hu address %d.%d.%d.%d protocol %hu",cI->pi.port,NIPQUAD(cI->pi.address),cI->pi.protocol);
+		my_print_debug( "close_ret: port %hu address %d.%d.%d.%d protocol %hu",cI->pi.port,NIPQUAD(cI->pi.address),cI->pi.protocol);
 #endif
 		deletePort(&(cI->pi));
 	}
@@ -428,7 +428,7 @@ monitor:
 		my_data->external.port = ntohs(in->sin_port);
 		insertPort(&(my_data->external));
 #ifdef MY_DEBUG_INFO
-		pr_info("before local: port %hu address %d.%d.%d.%d and protocol %hu\n",my_data->external.port, NIPQUAD(my_data->external.address), my_data->external.protocol);
+		my_print_debug("before local: port %hu address %d.%d.%d.%d and protocol %hu\n",my_data->external.port, NIPQUAD(my_data->external.address), my_data->external.protocol);
 #endif
 		syscall_info.info[5].success++;
 	}else {
@@ -458,7 +458,7 @@ static int connect_ret_handler(struct kretprobe_instance *ri, struct pt_regs *re
 		if(err == 0){
 			insertPort(&pi);
 #ifdef MY_DEBUG_INFO
-			pr_info("local: port %hu address %d.%d.%d.%d and protocol %hu",pi.port, NIPQUAD(pi.address), pi.protocol);
+			my_print_debug("local: port %hu address %d.%d.%d.%d and protocol %hu",pi.port, NIPQUAD(pi.address), pi.protocol);
 #endif
 		}
 		
@@ -528,11 +528,11 @@ static int instantiationKRETProbe(struct kretprobe *kret,
 
 	ret = register_kretprobe(kret);
     if (ret < 0) {
-		pr_info( "register_kretprobe failed, returned %d\n", ret);
+		my_print_debug( "register_kretprobe failed, returned %d\n", ret);
 		return -1;
 	}
 
-	pr_info( "Planted kretprobe at %p, handler addr %p\n",
+	my_print_debug( "Planted kretprobe at %p, handler addr %p\n",
 	       kret->kp.symbol_name, kret->kp.addr);
 
 	return ret;
@@ -555,7 +555,7 @@ static void initializeTreeWithTaskInfo(void)
 			files = t->files;
 			fdt = files->fdt;
 
-			pr_info( "application %s with pid %lu", t->comm,(unsigned long)t->pid);
+			my_print_debug( "application %s with pid %lu", t->comm,(unsigned long)t->pid);
 
 			while(fdt != NULL)
 			{
@@ -573,10 +573,10 @@ static void initializeTreeWithTaskInfo(void)
 						if(err == 0)
 						{
 							if(insertPort(&p) > 0){
-								pr_info("insertion was ok");
+								my_print_debug("insertion was ok");
 							}
 							else{
-								pr_info("something was wrong with the insertion");
+								my_print_debug("something was wrong with the insertion");
 
 							}
 						}
@@ -597,7 +597,7 @@ static ssize_t options(struct file *file, const char __user *user_buf,size_t siz
 	char *buf;
 	char *endp;
 
-	pr_info( "pid_write function called");
+	my_print_debug( "pid_write function called");
 	buf = kmalloc(size,GFP_KERNEL);
 
 	copy_from_user(buf,user_buf,size);
@@ -612,11 +612,11 @@ static ssize_t options(struct file *file, const char __user *user_buf,size_t siz
 	option = simple_strtoul(buf,&endp,10);
 	if(endp == buf)
 	{
-		pr_info( "could not convert value into long");
+		my_print_debug( "could not convert value into long");
 		return size;
 	}
 	kfree(buf);
-	pr_info( "option = %lu",option);
+	my_print_debug( "option = %lu",option);
 
 	switch(option)
 	{
@@ -630,7 +630,7 @@ static ssize_t options(struct file *file, const char __user *user_buf,size_t siz
 		clearInfo();
 		break;
 	default:
-		pr_info("OPTION NOT DEFINED \n");
+		my_print_debug("OPTION NOT DEFINED \n");
 		break;
 	}
 
@@ -676,7 +676,7 @@ int init_kretprobes_syscalls(void)
 	kretprobes = kmalloc(sizeof(*kretprobes)*NR_PROBES,GFP_KERNEL);
 
 	if(!kretprobes){
-		pr_info( "problem allocating memory");
+		my_print_debug( "problem allocating memory");
 		return -1;
 	}
 
@@ -738,9 +738,9 @@ int init_kretprobes_syscalls(void)
 static void removeKprobe(int index)
 {
 	if((kretprobes+index)!=NULL){
-		pr_info( "in index %d missed %d probes" , index,(kretprobes+index)->nmissed);
+		my_print_debug( "in index %d missed %d probes" , index,(kretprobes+index)->nmissed);
 		unregister_kretprobe((kretprobes+index));
-		pr_info( "kretprobe at %p named %s unregistered\n", (kretprobes+index)->kp.addr, (kretprobes+index)->kp.symbol_name);
+		my_print_debug( "kretprobe at %p named %s unregistered\n", (kretprobes+index)->kp.addr, (kretprobes+index)->kp.symbol_name);
 	}
 }
 

@@ -372,7 +372,7 @@ static void iterateList(struct local_addresses_list *tmp)
 	list_for_each(pos,&(tmp->list))
 	{
 		address = list_entry(pos,local_addresses_list,list);
-		pr_info("address %d.%d.%d.%d and counter %d",NIPQUAD(address->address), address->counter);
+		my_print_debug("address %d.%d.%d.%d and counter %d",NIPQUAD(address->address), address->counter);
 	}
 }
 
@@ -386,15 +386,15 @@ void printAll(struct rb_root *root)
 	for(node = rb_first(root); node ; node = rb_next(node))
 	{
 		p = rb_entry(node,portInfo, node);
-		pr_info( "port = %hu ", p->port);
+		my_print_debug( "port = %hu ", p->port);
 
 		if(p->tcp){
-			pr_info( "tcp addresses 0x%p and counter %d",p->tcp,p->tcp_list_counter);
+			my_print_debug( "tcp addresses 0x%p and counter %d",p->tcp,p->tcp_list_counter);
 			iterateList(p->tcp);
 		}
 
 		if(p->udp){
-			pr_info( "udp addresses 0x%p and counter %d",p->udp,p->udp_list_counter);
+			my_print_debug( "udp addresses 0x%p and counter %d",p->udp,p->udp_list_counter);
 			iterateList(p->udp);
 		}
 		i++;
@@ -402,10 +402,10 @@ void printAll(struct rb_root *root)
 
 	if(i == 0)
 	{
-		pr_info("Empty Tree");
+		my_print_debug("Empty Tree");
 	}else
 	{
-		pr_info("The tree has %lu elements",i);
+		my_print_debug("The tree has %lu elements",i);
 	}
 }
 
