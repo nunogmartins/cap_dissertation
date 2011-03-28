@@ -60,5 +60,5 @@ struct dentry *createFilterStatDir(void)
 
 struct dentry *createDBStatDir(void)
 {
-	return debugfs_create_dir("filter",my_debug_dir);
+	return debugfs_create_dir("db",my_debug_dir);
 }

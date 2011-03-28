@@ -47,13 +47,10 @@ static int filter_seq_show(struct seq_file *m, void *v)
 	if(v != NULL)
 	{
 		info = v;
-		seq_printf(m,"how many entries %ld it has src %ld searches and dst "
-				"searches %ld and %ld rejected\n",info->entry, info->src,
-				info->dst,info->rejected);
-	}else
-	{
-		seq_printf(m,"V is null\n");
+		seq_printf(m,"entries %ld src %ld dst searches %ld and %ld rejected\n",
+				info->entry, info->src,info->dst,info->rejected);
 	}
+
 	return 0;
 
 }

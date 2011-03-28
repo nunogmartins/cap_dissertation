@@ -33,6 +33,7 @@ void clearAllInfo(struct rb_root *root);
 #ifdef MY_DEBUG
 struct db_info_acquire;
 struct db_info_acquire * dbInfoPointer(void);
+int init_db_debug(void);
 #endif
 
 #endif /* PORTSDB_H_ */

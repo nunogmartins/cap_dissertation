@@ -65,6 +65,9 @@ void printTree(void){
 
 int init_DB(void)
 {
+#ifdef MY_DEBUG
+	init_db_debug();
+#endif
 	return 0;
 }
 void exit_DB(void)
