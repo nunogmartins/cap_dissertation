@@ -39,24 +39,41 @@ struct syscall_info_acquire syscall_info;
 
 static void *monitor_seq_start(struct seq_file *p, loff_t *pos)
 {
+	int i = 0;
 	if(*pos > 0)
 		return NULL;
-	else
+	
+		/*my_print_debug("on start return 0x%p\n",&syscall_info);
+
+		for(i = 0 ; i < 5 ; i++)
+		my_print_debug("position %d entry %d success %d unsucess %d\n",
+				i,syscall_info.info[i].entry,syscall_info.info[i].success, syscall_info.info[i].unsuccess);
+		my_print_debug("\n");
+		*/
 		return &syscall_info;
+	
 }
 
 static void *monitor_seq_next(struct seq_file *p, void *v, loff_t *pos)
 {
-	struct syscall_info_acquire *info = v;
+	struct syscall_info_acquire *info = &syscall_info;
+	int ipos = 0 ;
 	*(pos)= *(pos)+1;
-	//if(v != NULL){
-		if(*pos < 5)
-		{
-			return &(info[*pos]); 
-		}
-		else
+	ipos = *pos;
+
+	//my_print_debug("on next %d\n",ipos);
+	if(ipos <= 5)
+	{
+		/*my_print_debug("position %d entry %d success %d unsucess %d\n",
+				ipos,info->info[ipos].entry,info->info[ipos].success, info->info[ipos].unsuccess);	
+		
+		my_print_debug("on next 0x%p and return 0x%p\n",v,&info->info[ipos]);
+		*/
+		return &info->info[ipos]; 
+	}
+	else
 		return NULL;
-	//}return NULL;
+	
 }
 
 static void monitor_seq_stop(struct seq_file *p, void *v)
@@ -68,6 +85,7 @@ static int monitor_seq_show(struct seq_file *m, void *v)
 {
 	struct counters *c = NULL;
 
+	//my_print_debug("on show 0x%p \n",v);
 	if(v != NULL){
 		c = v;
 		seq_printf(m,"entry %d success %d unsucess %d\n",c->entry,c->success, c->unsuccess);
@@ -321,6 +339,7 @@ static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *re
 
 	int err = -1;
 	syscall_info.info[3].entry++;
+	my_print_debug("close %d from %s\n",syscall_info.info[3].entry, task->comm);
 	TO_MONITOR(task)
 	
 monitor:
@@ -371,6 +390,7 @@ static int bind_entry_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 #endif
 	struct cell *my_data = (struct cell *)ri->data;
 	syscall_info.info[4].entry++;
+	my_print_debug("bind %d from %s\n",syscall_info.info[4].entry, task->comm);
 	TO_MONITOR(task)
 	
 monitor:
@@ -417,6 +437,7 @@ static int connect_entry_handler(struct kretprobe_instance *ri, struct pt_regs *
 	struct sockaddr_in *in = (struct sockaddr_in *)regs->si;
 #endif
 	syscall_info.info[5].entry++;
+	my_print_debug("connect %d from %s\n",syscall_info.info[5].entry, task->comm);
 	TO_MONITOR(task)
 	
 monitor:

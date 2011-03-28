@@ -42,7 +42,7 @@ int insertPort(struct packetInfo *lpi)
 int deletePort(struct packetInfo *pi)
 {
 #ifdef MY_DEBUG_INFO
-	my_print_debug( "deleting port %hu",pi->port);
+	//my_print_debug( "deleting port %hu",pi->port);
 #endif
 	my_erase(&db,pi);
 	return 0;

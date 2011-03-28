@@ -385,6 +385,7 @@ void printAll(struct rb_root *root)
 
 	for(node = rb_first(root); node ; node = rb_next(node))
 	{
+		/*
 		p = rb_entry(node,portInfo, node);
 		my_print_debug( "port = %hu ", p->port);
 
@@ -397,6 +398,7 @@ void printAll(struct rb_root *root)
 			my_print_debug( "udp addresses 0x%p and counter %d",p->udp,p->udp_list_counter);
 			iterateList(p->udp);
 		}
+		*/
 		i++;
 	}
 
