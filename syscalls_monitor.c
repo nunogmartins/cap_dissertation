@@ -43,33 +43,34 @@ static void *monitor_seq_start(struct seq_file *p, loff_t *pos)
 	if(*pos > 0)
 		return NULL;
 	
-		/*my_print_debug("on start return 0x%p\n",&syscall_info);
+		/*my_print_debug("on start return 0x%p\n",&syscall_info.info[0]);
 
-		for(i = 0 ; i < 5 ; i++)
+		for(i = 0 ; i <= 5 ; i++)
 		my_print_debug("position %d entry %d success %d unsucess %d\n",
 				i,syscall_info.info[i].entry,syscall_info.info[i].success, syscall_info.info[i].unsuccess);
 		my_print_debug("\n");
 		*/
-		return &syscall_info;
+		return &syscall_info.info[0];
 	
 }
 
 static void *monitor_seq_next(struct seq_file *p, void *v, loff_t *pos)
 {
-	struct syscall_info_acquire *info = &syscall_info;
+	//struct syscall_info_acquire *info = &syscall_info;
 	int ipos = 0 ;
+	struct counters *c = v;
 	*(pos)= *(pos)+1;
 	ipos = *pos;
-
+	c++;
 	//my_print_debug("on next %d\n",ipos);
 	if(ipos <= 5)
 	{
 		/*my_print_debug("position %d entry %d success %d unsucess %d\n",
-				ipos,info->info[ipos].entry,info->info[ipos].success, info->info[ipos].unsuccess);	
+				ipos,c->entry,c->success, c->unsuccess);	
 		
-		my_print_debug("on next 0x%p and return 0x%p\n",v,&info->info[ipos]);
+		my_print_debug("on next 0x%p\n",v);
 		*/
-		return &info->info[ipos]; 
+		return c; 
 	}
 	else
 		return NULL;
