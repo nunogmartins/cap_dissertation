@@ -339,7 +339,6 @@ static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *re
 
 	int err = -1;
 	syscall_info.info[3].entry++;
-	my_print_debug("close %d from %s\n",syscall_info.info[3].entry, task->comm);
 	TO_MONITOR(task)
 	
 monitor:
@@ -390,7 +389,6 @@ static int bind_entry_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 #endif
 	struct cell *my_data = (struct cell *)ri->data;
 	syscall_info.info[4].entry++;
-	my_print_debug("bind %d from %s\n",syscall_info.info[4].entry, task->comm);
 	TO_MONITOR(task)
 	
 monitor:
@@ -437,7 +435,6 @@ static int connect_entry_handler(struct kretprobe_instance *ri, struct pt_regs *
 	struct sockaddr_in *in = (struct sockaddr_in *)regs->si;
 #endif
 	syscall_info.info[5].entry++;
-	my_print_debug("connect %d from %s\n",syscall_info.info[5].entry, task->comm);
 	TO_MONITOR(task)
 	
 monitor:
