@@ -23,7 +23,7 @@ int main(int argc, char **argv)
 
 	if(pid == 0)
 	{
-		int fd = open("/sys/kernel/debug/pcap_debug/pid_monitor",O_WRONLY);
+		int fd = open("/sys/kernel/debug/pcap_debug/tgid",O_WRONLY);
 		pid_t my_pid;
 		my_pid = getpid();
 

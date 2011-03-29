@@ -37,7 +37,7 @@ struct syscall_info_acquire {
 };
 
 struct db_info_acquire {
-	int how_many_ports;
+	long how_many_ports;
 	long how_many_inserts;
 	long how_many_removes;
 };

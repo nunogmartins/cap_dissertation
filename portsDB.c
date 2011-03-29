@@ -261,6 +261,7 @@ int my_insert(struct rb_root *root, struct packetInfo *lpi)
 
 #ifdef MY_DEBUG
 	db_info.how_many_inserts++;
+	db_info.how_many_ports++;
 #endif
 
 	return 1;
@@ -363,6 +364,7 @@ void my_erase(struct rb_root *root, struct packetInfo *pi)
 			kfree(data);
 #ifdef MY_DEBUG
 			db_info.how_many_removes++;
+			db_info.how_many_ports--;
 #endif
 		}
 	}
@@ -526,6 +528,8 @@ static const struct file_operations db_fops = {
         .owner          = THIS_MODULE,
  };
 
+#include <linux/debugfs.h>
+#include "debugfs_support.h"
 int init_db_debug(void)
 {
 	struct dentry *parent = NULL;
