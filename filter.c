@@ -66,12 +66,12 @@ static int filter_open(struct inode *inode, struct file *file)
 {
 	return seq_open(file,&filter_seq_ops);
 }
-
+/*
 static int filter_release(struct inode *inode, struct file *file)
 {
 	return 0;
 }
-
+*/
 static const struct file_operations filter_fops = {
         .open           = filter_open,
         .read           = seq_read,

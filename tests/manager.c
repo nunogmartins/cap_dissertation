@@ -23,19 +23,25 @@ int main(int argc, char **argv)
 
 	if(pid == 0)
 	{
-		int fd = open("/sys/kernel/debug/pcap_debug/tgid",O_WRONLY);
+		int fd[3];
+		int i=0;
 		pid_t my_pid;
-		my_pid = getpid();
 
-		if(fd > 0)
+		 fd [0] = open("/sys/kernel/debug/pcap_debug/pid",O_WRONLY);
+		 fd [1] = open("/sys/kernel/debug/pcap_debug/ppid",O_WRONLY);
+		 fd [2] = open("/sys/kernel/debug/pcap_debug/tgid",O_WRONLY);
+
+		my_pid = getpid();
+		for(i=0; i < 3 ; i++)
+		if(fd[i] > 0)
 		{
 			char buf[10];
 			snprintf(buf,9,"%lu",(unsigned long)my_pid);
-			write(fd,(const void *)buf,sizeof(buf));
-			close(fd);
+			write(fd[i],(const void *)buf,sizeof(buf));
+			close(fd[i]);
 		}
 		setuid(1000);
-		sleep(5);
+		//sleep(5);
 		execv(argv[1],argv+1);
 	}else{
 		if(pid > 0)

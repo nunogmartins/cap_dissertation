@@ -369,7 +369,7 @@ void my_erase(struct rb_root *root, struct packetInfo *pi)
 		}
 	}
 }
-
+/*
 static void iterateList(struct local_addresses_list *tmp)
 {
 	struct list_head *pos = NULL;
@@ -381,11 +381,11 @@ static void iterateList(struct local_addresses_list *tmp)
 		my_print_debug("address %d.%d.%d.%d and counter %d",NIPQUAD(address->address), address->counter);
 	}
 }
-
+*/
 void printAll(struct rb_root *root)
 {
 	struct rb_node *node;
-	struct portInfo *p = NULL;
+	//struct portInfo *p = NULL;
 	unsigned long i = 0;
 
 

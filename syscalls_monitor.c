@@ -39,7 +39,7 @@ struct syscall_info_acquire syscall_info;
 
 static void *monitor_seq_start(struct seq_file *p, loff_t *pos)
 {
-	int i = 0;
+	//int i = 0;
 	if(*pos > 0)
 		return NULL;
 	
@@ -108,12 +108,12 @@ static int monitor_open(struct inode *inode, struct file *file)
 {
 	return seq_open(file,&monitor_seq_ops);
 }
-
+/*
 static int monitor_release(struct inode *inode, struct file *file)
 {
 	return 0;
 }
-
+*/
 static const struct file_operations monitor_fops = {
         .open           = monitor_open,
         .read           = seq_read,
@@ -332,10 +332,10 @@ static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *re
 
 #ifdef CONFIG_X86_32
 	struct file *filp = (struct file *)regs->bx;
-	struct inode *inode = (struct inode *)regs->ax;
+	//struct inode *inode = (struct inode *)regs->ax;
 #else
 	struct file *filp = (struct file *)regs->si;
-	struct inode *inode = (struct inode *)regs->di;
+	//struct inode *inode = (struct inode *)regs->di;
 #endif
 
 	int err = -1;

@@ -52,7 +52,7 @@
 #define MY_DEBUG_INFO
 //#undef DEBUG_INFO
 
-#define VM
+#define MACHINE
 
 #ifdef VM
 #define my_print_debug(fmt, ...)\
