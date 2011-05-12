@@ -42,7 +42,7 @@ static int loadSubSystems(void)
 	init_DB();
 #endif
 
-    populate();
+//    populate();
 
 #ifdef SYSCALLS_SUPPORT
 #ifdef MY_KPROBES
@@ -62,7 +62,7 @@ static int unloadSubSystems(void)
 	exit_Filter();
 #endif
 
-    depopulate();
+//    depopulate();
 
 #ifdef DB_SUPPORT
 	exit_DB();

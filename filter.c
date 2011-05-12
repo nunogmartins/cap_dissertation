@@ -101,8 +101,7 @@ unsigned int my_portExists(struct packetInfo *src_pi,struct packetInfo *dst_pi)
 #ifdef MY_DEBUG
 	filter_info.entry++;
 #endif
-	/* my_print_debug("src addr %d.%d.%d.%d port %d dst addr %d.%d.%d.%d port %d and protocol %d\n",
-		NIPQUAD(src_pi->address),src_pi->port,NIPQUAD(dst_pi->address),dst_pi->port,src_pi->protocol); */
+	/* my_print_debug("src addr %d.%d.%d.%d port %d dst addr %d.%d.%d.%d port %d and protocol %d\n", NIPQUAD(src_pi->address),src_pi->port,NIPQUAD(dst_pi->address),dst_pi->port,src_pi->protocol); */
 	
 	if(src_pi!=NULL && dst_pi!=NULL)
 	{
@@ -131,6 +130,8 @@ unsigned int my_portExists(struct packetInfo *src_pi,struct packetInfo *dst_pi)
 
 		}
 	}
+	//my_print_debug("src addr %d.%d.%d.%d port %d dst addr %d.%d.%d.%d port %d and protocol %d\n", NIPQUAD(src_pi->address),src_pi->port,NIPQUAD(dst_pi->address),dst_pi->port,src_pi->protocol);
+
 	filter_info.rejected++;
 	return 0;
 }

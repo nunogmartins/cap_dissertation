@@ -27,7 +27,7 @@ int populate(void)
 	ports = kmalloc(MAX_DATA*sizeof(*ports),GFP_KERNEL);
 	pr_info("Populate\n");
 
-	initial = ktime_get();	
+	//initial = ktime_get();	
 	for(i=INITIAL_PORT,iteration=0;i < FINAL_PORT ; i++,iteration++)
 	{
 		sentinel = (ports)+iteration;
@@ -36,7 +36,7 @@ int populate(void)
 		sentinel->protocol = 0x06;
 		insertPort(sentinel);
 	}
-	end = ktime_get();
+	/*end = ktime_get();
 	delta = ktime_to_ns(ktime_sub(end,initial));
 	pr_info("%lld ns to execute a insert\n",(long long)delta);
 
@@ -45,7 +45,7 @@ int populate(void)
 	end = ktime_get();
 	delta = ktime_to_ns(ktime_sub(end,initial));
 	pr_info("%lld ns to execute one search\n",(long long)delta);
-
+*/
     printTree();
 
 	return 0;
@@ -59,15 +59,15 @@ int depopulate(void)
 	ktime_t initial, end;
 
 	pr_info("DePopulate\n");
-	initial = ktime_get();
+//	initial = ktime_get();
 	for(i=INITIAL_PORT, iteration=0;i < FINAL_PORT; i++,iteration++)
 	{
 		deletePort((ports+iteration));
 	}
-	end = ktime_get();
+/*	end = ktime_get();
 	delta = ktime_to_ns(ktime_sub(end,initial));
 	pr_info("%lld ns to execute a remove\n",(long long)delta);
-	
+*/	
 	printTree();
 
 	kfree(ports);

@@ -12,6 +12,9 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+void transformMonitorStats(int fd);
+void transformFilterStats(int fd);
+
 int main(int argc, char **argv)
 {
 
@@ -33,7 +36,7 @@ int main(int argc, char **argv)
 
 		my_pid = getpid();
 		for(i=0; i < 3 ; i++)
-		if(fd[i] > 0)
+		if(fd[i] >= 0)
 		{
 			char buf[10];
 			snprintf(buf,9,"%lu",(unsigned long)my_pid);
@@ -47,9 +50,29 @@ int main(int argc, char **argv)
 		if(pid > 0)
 		{
 			int status;
+			int ofd[2];
 			waitpid(pid,&status,0);
+			ofd[0] = open("/sys/kernel/debug/pcap_debug/monitor/stats",O_RDONLY);
+			ofd[1] = open("/sys/kernel/debug/pcap_debug/filter/stats",O_RDONLY);
+			if(ofd[0] >= 0 && ofd[1] >=0 )
+			{
+				transformMonitorStats(ofd[0]);
+				transformFilterStats(ofd[1]);
+				close(ofd[0]);
+				close(ofd[1]);
+			}
 		}
 	}
 
 	return 0;
+}
+
+
+void transformMonitorStats(int fd)
+{
+
+}
+void transformFilterStats(int fd)
+{
+
 }

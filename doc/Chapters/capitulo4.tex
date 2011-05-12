@@ -2,7 +2,26 @@
 \label{cap:Estrutura}
 
 
+A arquitectura foi pensada para ser executada de forma ortogonal ao sistema
+utilizado. Desta forma não existe a necessidade de recompilar programas
+antigos. Para além desta situação novas aplicações podem utilizar esta
+ferramenta de forma transparente.
 
+Esta ferramenta foi desenvolvida para os processadores x86 e x86\_64 pois nestas
+arquitecturas existe suporte para o sistema de monitorização KProbes \ref{},
+sendo que é a unica dependência especifica que a ferramenta irá ter.
+
+As diferentes partes da ferramenta foram desenvolvidas de forma a poderem ser
+utilizadas em separado  
+Foi desenvolvida uma arquitectura modular suportada em 4 subpartes.  para
+que fosse possível um desenvolvimento 
+
+Filter 
+Necessidade de registar um \textit{hook} para aceder directamente à função de
+filtro. Caso este \textit{hook} não esteja ligado o \textit{overhead}
+introduzido será o de um teste para verificar se existe ligação ou não.
+No caso de não existir a ligação a este \textit{hook} o sistema comporta-se de
+forma a utilizar apenas o sistema anterior.
 
 \section{Módulos no espaço do núcleo}
 

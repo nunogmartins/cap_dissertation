@@ -29,6 +29,10 @@
 #include "pcap_monitoring.h"
 #include "debugfs_support.h"
 
+#ifdef TIMMING
+#include <linux/ktime.h>
+#endif
+
 #ifdef MY_DEBUG
 #include <linux/debugfs.h>
 #include <linux/seq_file.h>
@@ -133,17 +137,17 @@ extern struct dentry *my_debug_dir;
 #ifdef MY_KPROBES
 int kprobes_index;
 
-static short isSon(pid_t pid, pid_t newpid)
+static inline short isSon(pid_t pid, pid_t newpid)
 {
 	return pid == newpid ? 1 : 0;
 }
 
-static short itsMe(pid_t pid, pid_t newpid)
+static inline short itsMe(pid_t pid, pid_t newpid)
 {
 	return pid == newpid ? 1: 0;
 }
 
-static short isGroup(pid_t pid, pid_t newpid)
+static inline short isGroup(pid_t pid, pid_t newpid)
 {
 	return pid == newpid ? 1 : 0;
 }
@@ -162,14 +166,27 @@ static short isGroup(pid_t pid, pid_t newpid)
 struct kretprobe *kretprobes = NULL;
 
 struct cell{
+#ifdef TIMMING
+	ktime_t init_time;
+#endif
 	int fd;
 };
 
 struct closeInfo {
+#ifdef TIMMING
+	ktime_t init_time;
+#endif
 	int fd;
 	struct packetInfo pi;
 };
 
+struct connect_extern_info {
+#ifdef TIMMING
+	ktime_t init_time;
+#endif
+	struct packetInfo external;
+	int fd;
+};
 
 void print_regs(const char *function, struct pt_regs *regs)
 {
@@ -177,11 +194,6 @@ void print_regs(const char *function, struct pt_regs *regs)
 	my_print_debug( "%s ax=%p bx=%p cx=%p dx=%p di=%p si=%p r8=%p r9=%p",function, (void *)regs->ax,(void *)regs->bx,(void *)regs->cx,(void *)regs->dx,(void*)regs->di,(void *) regs->si,(void *)regs->r8,(void *)regs->r9);
 #endif
 }
-
-struct connect_extern_info {
-	struct packetInfo external;
-	int fd;
-};
 
 #ifdef UDP_PROBES
 #ifdef SENDPROBE
@@ -212,7 +224,7 @@ static int sendto_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 	struct cell *my_data = (struct cell *)ri->data;
 	struct packetInfo pi;
 	int fd = my_data->fd;
-	int err;
+	int err = 0;
 
 	if(my_data->fd == -1){
 		syscall_info.info[0].unsuccess++;
@@ -258,7 +270,7 @@ static int recvfrom_ret_handler(struct kretprobe_instance *ri, struct pt_regs *r
 	struct cell *my_data = (struct cell*)ri->data;
 	struct packetInfo pi;
 	int fd = my_data->fd;
-	int err;
+	int err = 0;
 	
 	if(my_data->fd == -1){
 		syscall_info.info[1].unsuccess++;
@@ -347,10 +359,11 @@ monitor:
 	getLocalPacketInfoFromFile(filp,&(my_data->pi),&err);
 	if(err >= 0){
 #ifdef MY_DEBUG_INFO
-		my_print_debug( "close_sock entry %s",task->comm);
-		my_print_debug( "port %hu address %d.%d.%d.%d protocol %hu",my_data->pi.port,NIPQUAD(my_data->pi.address),my_data->pi.protocol);
+		//my_print_debug( "close_sock entry %s",task->comm);
+		//my_print_debug( "port %hu address %d.%d.%d.%d protocol %hu",my_data->pi.port,NIPQUAD(my_data->pi.address),my_data->pi.protocol);
 #endif
 		syscall_info.info[3].success++;
+		my_data->fd = -2;
 	}
 	else {
 		my_data->fd = -1;
@@ -370,7 +383,7 @@ static int close_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs
 	}
 	if(retval == 0){
 #ifdef MY_DEBUG_INFO
-		my_print_debug( "close_ret: port %hu address %d.%d.%d.%d protocol %hu",cI->pi.port,NIPQUAD(cI->pi.address),cI->pi.protocol);
+		//my_print_debug( "close_ret: port %hu address %d.%d.%d.%d protocol %hu",cI->pi.port,NIPQUAD(cI->pi.address),cI->pi.protocol);
 #endif
 		deletePort(&(cI->pi));
 	}
@@ -435,6 +448,9 @@ static int connect_entry_handler(struct kretprobe_instance *ri, struct pt_regs *
 	int fd = regs->di;
 	struct sockaddr_in *in = (struct sockaddr_in *)regs->si;
 #endif
+#ifdef TIMMING
+	//my_data->init_time = ktime_get();
+#endif
 	syscall_info.info[5].entry++;
 	TO_MONITOR(task)
 	
@@ -447,7 +463,7 @@ monitor:
 		my_data->external.port = ntohs(in->sin_port);
 		insertPort(&(my_data->external));
 #ifdef MY_DEBUG_INFO
-		my_print_debug("before local: port %hu address %d.%d.%d.%d and protocol %hu\n",my_data->external.port, NIPQUAD(my_data->external.address), my_data->external.protocol);
+		//my_print_debug("before local: port %hu address %d.%d.%d.%d and protocol %hu\n",my_data->external.port, NIPQUAD(my_data->external.address), my_data->external.protocol);
 #endif
 		syscall_info.info[5].success++;
 	}else {
@@ -464,9 +480,16 @@ static int connect_ret_handler(struct kretprobe_instance *ri, struct pt_regs *re
 	int fd = my_data->fd;
 	struct packetInfo pi;
 	int err;
+#ifdef TIMMING
+	ktime_t end;
+	s64 delta;
+#endif
 
 	if(fd == -1){
 		syscall_info.info[5].unsuccess++;
+#ifdef TIMMING
+		//goto timming;
+#endif
 		return 0;
 	}
 
@@ -477,12 +500,19 @@ static int connect_ret_handler(struct kretprobe_instance *ri, struct pt_regs *re
 		if(err == 0){
 			insertPort(&pi);
 #ifdef MY_DEBUG_INFO
-			my_print_debug("local: port %hu address %d.%d.%d.%d and protocol %hu",pi.port, NIPQUAD(pi.address), pi.protocol);
+			//my_print_debug("local: port %hu address %d.%d.%d.%d and protocol %hu",pi.port, NIPQUAD(pi.address), pi.protocol);
 #endif
 		}
 		
 	}
-	
+#ifdef TIMMING
+timming:
+/*
+	end = ktime_get();
+	delta = ktime_to_ns(ktime_sub(end,my_data->init_time));
+	my_print_debug("connect %s total time %lld ",fd != -1 ? "success":"unsuccess",(long long)delta);
+*/
+#endif		
 	return 0;
 }
 #endif //CONNECTPROBE
@@ -543,7 +573,7 @@ static int instantiationKRETProbe(struct kretprobe *kret,
 	kret->handler = func_handler;
 	kret->entry_handler = func_entry_handler;
 	kret->data_size		= data_size;
-	kret->maxactive		= 20;
+	kret->maxactive		= 8;
 
 	ret = register_kretprobe(kret);
     if (ret < 0) {
