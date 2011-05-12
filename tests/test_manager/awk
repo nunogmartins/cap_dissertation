@@ -1,0 +1,1 @@
+aaaa:bbbbccc BEGIN{FS=":"; print($2) }
