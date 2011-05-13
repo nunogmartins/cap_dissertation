@@ -43,15 +43,20 @@ int main(int argc, char **argv)
 	char *config_filename = NULL;
 	struct manager man;
 	bzero(&man,sizeof(struct manager));
+	unsigned int option = 0;
 	
 	while((c=getopt(argc,argv,"c:tpm"))!=-1)
 	{
 		switch(c){
 		case 't':
-			printf("Option t is activated\n");
+			printf("Option tcpdump is activated\n");
+			option = option | 2;
+			printf("value of option is %d \n",option);
 			break;
 		case 'p':
-			printf("Option p is activated\n");
+			printf("Option process is activated\n");
+			option = option | 4;
+			printf("value of option is %d \n",option);
 			break;
 			
 		case 'c':
@@ -61,26 +66,30 @@ int main(int argc, char **argv)
 			printf("config file is %s\n",man.config_filename);
 			break;
 		case 'm':
-			printf("Option m is activated \n");
+			printf("Option module is activated \n");
+			option = option | 1;
+			printf("value of option is %d \n",option);
 		}
 	}
+	
+	printf("value of option is %x \n",option);
 	
 	if(man.config_filename != NULL)
 		readConfigFile(&man);
 	
-	if(man.module_load != NULL && man.module_unload != NULL)
+	if(option & 1 && man.module_load != NULL && man.module_unload != NULL)
 	{
 		executeModule(&man, 1);
 	}
 		
-	if(man.tcpdump_args != NULL)
+	if(option & 2 && man.tcpdump_args != NULL)
 	{
 #ifdef DEBUG
 		char **new_pointer = man.tcpdump_args;
 		int i=0;
 		while(*new_pointer !=NULL )
 		{
-			printf("cutted tcpdump in %d: %s \n",i,*new_pointer);
+			printf("tcpdump: %d %s \n",i,*new_pointer);
 			i++;
 			new_pointer++;
 		}
@@ -88,14 +97,14 @@ int main(int argc, char **argv)
 		executeTcpdump(&man);
 	}
 	
-	if(man.process_args != NULL)
+	if(option & 4 && man.process_args != NULL)
 	{
 #ifdef DEBUG	
 		char **new_pointer = man.process_args;
 		int i=0;
 		while(*new_pointer !=NULL )
 		{
-			printf("cutted in %d: %s \n",i,*new_pointer);
+			printf("process: %d %s \n",i,*new_pointer);
 			i++;
 			new_pointer++;
 		}
@@ -103,7 +112,7 @@ int main(int argc, char **argv)
 		executeProgram(&man);
 	}
 	
-	if(man.module_load != NULL && man.module_unload != NULL)
+	if(option & 1 && man.module_load != NULL && man.module_unload != NULL)
 	{
 		executeModule(&man, 0);
 	}
