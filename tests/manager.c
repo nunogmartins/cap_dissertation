@@ -310,6 +310,12 @@ void executeModule(struct manager *man, int load)
 			execv(man->module_load[0],man->module_load);
 		else
 			execv(man->module_unload[0],man->module_unload);
+	}else{
+		if(pid > 0)
+		{
+			int status;
+			waitpid(pid,&status,0);
+		}
 	}
 }
 
