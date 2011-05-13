@@ -2,9 +2,12 @@
 
 for i in {0..9}
 do
-	before=$(ifconfig eth0 | grep "RX packets" | awk '{print($2) }' | awk 'BEGIN{FS=":"}{$2=$2}1' |awk '{print($2)}')
+	beforeRX=$(ifconfig eth0 | grep "RX packets" | awk '{print($2) }' | awk 'BEGIN{FS=":"}{$2=$2}1' |awk '{print($2)}')
+	beforeTX=$(ifconfig eth0 | grep "TX packets" | awk '{print($2) }' | awk 'BEGIN{FS=":"}{$2=$2}1' |awk '{print($2)}')
 	time ./manager -p -t -m -c config.cfg
 	#sleep 10
-	after=$(ifconfig eth0 | grep "RX packets" | awk '{print($2) }' | awk 'BEGIN{FS=":"}{$2=$2}1' |awk '{print($2)}')
-	echo $((after - before))
+	afterRX=$(ifconfig eth0 | grep "RX packets" | awk '{print($2) }' | awk 'BEGIN{FS=":"}{$2=$2}1' |awk '{print($2)}')
+	afterTX=$(ifconfig eth0 | grep "TX packets" | awk '{print($2) }' | awk 'BEGIN{FS=":"}{$2=$2}1' |awk '{print($2)}')
+	echo "transferidos $((afterTX - beforeTX))"
+	echo "recebidos $((afterRX - beforeRX))"
 done
