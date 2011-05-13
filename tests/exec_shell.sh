@@ -2,7 +2,9 @@
 
 for i in {0..9}
 do
-	ifconfig eth0 | grep packets | awk '{print($2) }' | awk 'BEGIN{FS=":"}{$2=$2}1' |awk '{print($2)}'
+	before=$(ifconfig eth0 | grep "RX packets" | awk '{print($2) }' | awk 'BEGIN{FS=":"}{$2=$2}1' |awk '{print($2)}')
 	time ./manager -p -t -m -c config.cfg
-	ifconfig eth0 | grep packets | awk '{print($2) }' | awk 'BEGIN{FS=":"}{$2=$2}1' |awk '{print($2)}'
+	#sleep 10
+	after=$(ifconfig eth0 | grep "RX packets" | awk '{print($2) }' | awk 'BEGIN{FS=":"}{$2=$2}1' |awk '{print($2)}')
+	echo $((after - before))
 done
