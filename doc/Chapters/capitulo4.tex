@@ -48,4 +48,37 @@ O sistema interage também com o \textit{LSF} pois existe uma conjunção
 entre o filtro definido pelo utilizador e a captura do tráfego da aplicação a
 ser monitorizada.
 
+\section{Desenho da Arquitectura}
 
+
+
+\subsection{Monitorização da aplicação}
+
+Como foi apresentado no quadro \ref{tab:monitoring} o sistema de monitorização
+do núcleo do sistema linux que se adapta melhor para este problema é o
+KProbes\ref{sec:kprobes}. 
+
+\subsection{Repositório de dados}
+
+Para permitir a consulta dos pares número de porta endereço é necessário
+utilizar um repositório de dados. Este repositório de dados necessitará de alta
+performance mas facilidade de utilização e modificação. Terá de permitir as
+seguintes operações: adição, consulta e remoção de dados.
+
+Este repositório de dados irá ser a ponte entre o sistema de  monitorização e o
+sistema de filtragem de pacotes. 
+
+\subsection{Filtragem de pacotes}
+
+Sistema que irá indicar à função run\_filter do \textit{LSF} se um pacote deverá
+ser capturado ou não. Irá ser definido um ponto \textit{hook} dentro do núcleo
+do sistema do linux, de forma a poder ser utilizada a funcionalidade de
+filtragem dinâmica apenas quando se deseje. O custo introduzido para estas
+modificação é apenas de uma verificação se o \textit{hook} está ligado ou não.
+
+
+\subsection{Recolha de informações}
+
+Utilizando um dos sistemas definidos em \ref{tab:transferencia_dados} é
+permitido o acesso a informações de análise dos diversos sistemas anteriormente
+mencionados.
