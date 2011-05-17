@@ -101,19 +101,36 @@ buffer, é então descartado a cópia (libertado o espaço) e incrementado o val
 de pacotes descartados pelo núcleo de sistema.
 
 
-\subsection{Sistema de rede} % falta melhor nome ...
+\subsection{Subsistema de rede} % falta melhor nome ...
 
-Os \textit{sockets} são vísiveis através do sistema de ficheiros. Estes 
-
-Os protocolos TCP e UDP foram os únicos protocolos que se teve interesse
-verificar. 
+Socket  e o que é um socket ...
 
 Os ``file descriptors'' são a abstração para os ``sockets''. Os sockets são
 mapeados em ficheiros e estes em descritores de ficheiros. 
 
-
-
 Dentro do núcleo do linux a estrutura que tém a informação sobre um processo
-(\textit{task}),
+(\textit{task}), é a \textit{struct task\_struct}. Nesta estrutura existe a
+informação sobre quais os ficheiros que a aplicação abriu. Como os
+\textit{sockets} são mapeados sob a forma de ficheiros, estes também se
+encontram nesta estrutura.
 
- As aplicações mantêm uma tabela de ficheiros abertos
+Os protocolos \textit{TCP} e \textit{UDP} foram os únicos protocolos que se teve
+interesse em utilizar nesta ferramenta.
+
+Estes protocolos estão definidos numa estrutura de apontadores para funções.
+Os protocolos \textit{TCP} e \textit{UDP} têm formas diferentes de executar
+funcionalidades semelhantes e por isso estão descritos em instâncias diferentes.
+
+As principais chamadas ao sistema para estabelecer, terminar e transferir dados
+sobre \textit{sockets} são: \textit{socket}, \textit{connect}, \textit{bind},
+\textit{listen}, \textit{accept}, \textit{send}, \textit{recv}, \textit{sendto},
+\textit{recvfrom} e \textit{close}. 
+
+
+
+
+utilizadas pelas aplicações 
+
+As 
+Como os protocolos \textit{TCP} e \textit{UDP} partilham algumas das
+funcionalidades nem todas as f
