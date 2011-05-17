@@ -126,11 +126,14 @@ sobre \textit{sockets} são: \textit{socket}, \textit{connect}, \textit{bind},
 \textit{listen}, \textit{accept}, \textit{send}, \textit{recv}, \textit{sendto},
 \textit{recvfrom} e \textit{close}. 
 
+Estas chamadas aos sistema são genéricas de forma a poderem ser mapeadas nas
+diferentes instâncias dos protocolos de transferẽncia
 
+Quando a chamada ao sistema \textit{socket} é efectuada é criado uma nova
+instância de um socket e inicializados os respectivos campos com a informação
+dependente para a familia e tipo. 
 
+%  Descrever um pouco esta parte ...
 
-utilizadas pelas aplicações 
-
-As 
 Como os protocolos \textit{TCP} e \textit{UDP} partilham algumas das
 funcionalidades nem todas as f
