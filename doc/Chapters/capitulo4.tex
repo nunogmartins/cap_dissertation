@@ -86,23 +86,36 @@ mencionados.
 
 \section{Arquitectura de Rede do Linux}
 
-Desde que os dados saem da aplicação até que chegam ao controlador da interface
+Desde que os dados saem da aplicação até chegarem ao controlador da interface
 de rede. 
 % Imagem dos dados 
 
 \subsection{AF\_PACKET}
 
+A forma para comunicar enviar e receber dados directamente da interface de rede
+é através da familia de protocolos \textit{AF\_PACKET}. 
+
+Esta é a forma de implementar protocolos de rede sem recorrer à \textit{stack}
+de protocolos IP em nível utilizador. Para além desta funcionalidade esta é a
+forma de capturar os pacotes que circulam na interface de rede, permitindo
+assim efectuar uma análise do tráfego.
+
+Esta camada situa-se junto aos controladores de rede permitindo assim capturar
+dados que podem não chegar às aplicações devido à utilização de regras na
+\textit{firewall} (netfilter) do \textit{linux}.
+
 A utilização de ``lazy cloning'' permite que apenas os pacotes que sejam para
 capturar sejam efectivamente copiados. Por isso primeiro são avaliados para o
 processo de captura, caso sejam para captura a função \textit{blah blah}
 efectua a cópia da estrutura sk\_buffer e serão então adicionados ao
-\textit{ring buffer}. Se no \textit{ring buffer} não existir espaço para este
-buffer, é então descartado a cópia (libertado o espaço) e incrementado o valor
-de pacotes descartados pelo núcleo de sistema.
+\textit{ring buffer}. Se no \textit{ring buffer} não existir espaço para o
+número de bytes que devem ser capturados, é então descartado a cópia
+(libertado o espaço) e incrementado o valor de pacotes descartados pelo núcleo
+de sistema.
 
 
 \subsection{Subsistema de rede} % falta melhor nome ...
-
+\label{subsection:network}
 Socket  e o que é um socket ...
 
 Os ``file descriptors'' são a abstração para os ``sockets''. Os sockets são
@@ -127,9 +140,9 @@ sobre \textit{sockets} são: \textit{socket}, \textit{connect}, \textit{bind},
 \textit{recvfrom} e \textit{close}. 
 
 Estas chamadas aos sistema são genéricas de forma a poderem ser mapeadas nas
-diferentes instâncias dos protocolos de transferẽncia
+diferentes instâncias dos protocolos de transferência
 
-Quando a chamada ao sistema \textit{socket} é efectuada é criado uma nova
+Quando a chamada ao sistema \textit{socket} é efectuada, é criado uma nova
 instância de um socket e inicializados os respectivos campos com a informação
 dependente para a familia e tipo. 
 
@@ -137,3 +150,14 @@ dependente para a familia e tipo.
 
 Como os protocolos \textit{TCP} e \textit{UDP} partilham algumas das
 funcionalidades nem todas as f
+
+\subsection{Interfaces de rede}
+
+O núcleo do \textit{linux} mantém a informação sobre quais as interfaces de
+rede que foram inicializadas pelos seus controladores, mesmo que não estando
+activas estas constantam de uma lista duplamente ligada de
+\textit{net\_devices}. Em cada posição da lista está toda a informação
+referente a uma interface de rede e suas configurações, nomeadamente a
+informação sobre o seu endereço ip ou o seu mac address no caso de interfaces
+\textit{ethernet} ou mapeadas sobre \textit{ethernet} (como o caso das
+interfaces ponto-a-ponto).

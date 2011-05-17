@@ -6,11 +6,17 @@ Considerações ...
 
 \subsection{Repositório de dados}
 
+De forma a manter a informação sobre quais os endereços e portos que uma
+aplicação está a utilizar, sem que seja necessário consultar os sockets que
+esta está a utilizar, foi necessário criar um repositório de dados onde
+estivesse a informação relevante para as decisões do filtro de captura.
+
+As seguintes abordagens para a criação de repositório de dados com base nas
+estruturas de dados seguintes equacionada.
 
 \subsubsection{Bitmap}
 
-\subsubsection{Tabela de dispersão}
-Não existe nenhuma implementação 
+\subsubsection{Listas duplamente ligadas}
 
 \subsubsection{Árvore}
 Apesar de não ser necessário percorrer os elementos ou obter os indíces de
@@ -27,4 +33,79 @@ elementos da árvore.
 
 Problema quando é necessário balancear a árvore, é uma penalização
 
+\subsubsection{Tabela de dispersão}
+Não existe nenhuma implementação 
+
 \subsubsection{Bloom Filter}
+bloom filters ...
+
+\paragraph*{}
+A estrutura de dados escolhida para a criação do repositório de dados foi
+\textit{Red-black tree}. Esta escolha foi devido principalmente à boa
+performance e a existir uma implementação da estrutura de dados no núcleo do
+linux. Devido a esta estrutura estar presente no núcleo do \textit{linux}
+permitiu que a implementação da ferramenta tivesse um ciclo de implementação
+mais rápido devido à confiança na ``validação`` desta estrutura pelos
+responsáveis do núcleo do \textit{linux}.
+
+\subsection{Funções a monitorizar}
+
+
+Como foi anteriormente descrito em \ref{subsection:network} sobre as chamadas
+aos sistema para utilizar as funcionalidades de rede
+
+Foi necessário conhecer a \textit{ABI}\ref{ABI}\cite{ABI} referente a quais os
+registos que são utilizados nas arquitecturas \textit{x86} e \textit{x86\_64},
+para a passagem de parâmetros das chamadas aos sistema.
+
+O sistema de \textit{KProbes} permite consultar os registos do processador onde
+foi efectuada a chamada à função (neste caso a chamada ao sistema). Por isso
+foram definidos 6 \textit{KRetProbes} referentes às chamadas \textit{connect},
+\textit{bind}, \textit{accept}, \textit{sendto}, \textit{recvfrom} e
+\textit{close}. Para esta última $\left( \textit{close} \right)$ devido à
+elevada utilização desta chamada ao sistema por diferentes aplicações no
+sistema, foi utilizada a função \textit{qqq coisa ...  ????}
+
+\section{Informação dentro do núcleo}
+
+Devido à necessidade de obter algumas informações sobre o estado da computação
+dos diversos componentes da ferramenta foram criados alguns ficheiros no
+sistema de ficheiros virtual \textit{DebugFs}.
+
+Na verdade não foi só para obter o estado da computação foi também uma forma
+invocar o inicio da monitorização. Isto é, através dos ficheiros \textit{pid},
+\textit{ppid}, \textit{tgid} e \textit{option}. 
+
+\section{Ferramenta de testes}
+
+Foi desenvolvida uma aplicação para testar o desenvolvimento da ferramenta.
+Esta aplicação 
+
+\subsection{Test Unit}
+
+De forma a testar o repositório de dados foram efectuados diferentes
+\textit{unit tests}, de forma a assegurar que todas as alterações efectuadas na
+ferramenta ficavam de correctas.
+
+\subsection{Aplicação de testes de performance}
+
+Para ajudar na avaliação da ferramenta desenvolvida foi criado um conjunto de
+aplicações independentes $\left( scripts e aplicações \right)$ para monitorizar
+a actividade de algumas aplicações que se consideraram pertinentes no processo
+de avaliação do desempenho da ferramenta.
+
+A aplicação desenvolvida \textit{manager} tem de ser executada sob o controlo
+do utilizador \textit{root}, devido à necessidade de executar processos que só
+este utilizador tem acesso. Estes processos anteriormente mencionados são
+\textit{insmod}, \textit{rmmod} e \textit{tcpdump}.
+
+Os \textit{scripts} criandos e bash foram para poder obter o número de dados e
+pacotes que foram transferidos na interface, bem como fazer a separação dos
+tempos que as aplicações de testes correram para conseguir automatizar o
+processo de execução e recolha de dados dos testes.
+
+\subsection{DebugFs}
+
+Criação de alguns ficheiros no sistema virtual \textit{configFs} para poder
+observar o comportamento da monitorização e dos pacotes que chegaram ao sistema
+de filtragem.
