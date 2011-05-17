@@ -82,3 +82,38 @@ modificação é apenas de uma verificação se o \textit{hook} está ligado ou 
 Utilizando um dos sistemas definidos em \ref{tab:transferencia_dados} é
 permitido o acesso a informações de análise dos diversos sistemas anteriormente
 mencionados.
+
+
+\section{Arquitectura de Rede do Linux}
+
+Desde que os dados saem da aplicação até que chegam ao controlador da interface
+de rede. 
+% Imagem dos dados 
+
+\subsection{AF\_PACKET}
+
+A utilização de ``lazy cloning'' permite que apenas os pacotes que sejam para
+capturar sejam efectivamente copiados. Por isso primeiro são avaliados para o
+processo de captura, caso sejam para captura a função \textit{blah blah}
+efectua a cópia da estrutura sk\_buffer e serão então adicionados ao
+\textit{ring buffer}. Se no \textit{ring buffer} não existir espaço para este
+buffer, é então descartado a cópia (libertado o espaço) e incrementado o valor
+de pacotes descartados pelo núcleo de sistema.
+
+
+\subsection{Sistema de rede} % falta melhor nome ...
+
+Os \textit{sockets} são vísiveis através do sistema de ficheiros. Estes 
+
+Os protocolos TCP e UDP foram os únicos protocolos que se teve interesse
+verificar. 
+
+Os ``file descriptors'' são a abstração para os ``sockets''. Os sockets são
+mapeados em ficheiros e estes em descritores de ficheiros. 
+
+
+
+Dentro do núcleo do linux a estrutura que tém a informação sobre um processo
+(\textit{task}),
+
+ As aplicações mantêm uma tabela de ficheiros abertos
