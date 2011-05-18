@@ -50,7 +50,6 @@ responsáveis do núcleo do \textit{linux}.
 
 \subsection{Funções a monitorizar}
 
-
 Como foi anteriormente descrito em \ref{subsection:network} sobre as chamadas
 aos sistema para utilizar as funcionalidades de rede
 
@@ -75,6 +74,30 @@ sistema de ficheiros virtual \textit{DebugFs}.
 Na verdade não foi só para obter o estado da computação foi também uma forma
 invocar o inicio da monitorização. Isto é, através dos ficheiros \textit{pid},
 \textit{ppid}, \textit{tgid} e \textit{option}. 
+
+\subsection{Informação do processo}
+
+Quando o módulo da ferramenta é executado os indicadores de \textit{pid},
+\textit{ppid} e \textit{tgid} são inicializados com o valor -1.
+
+Esta ferramenta de monitorização só irá passar a analisar os dados das chamadas
+ao sistema quando estes valores estiverem definidos e identificarem o processo
+que efectuou a chamada.
+
+\subsubsection{Sistema de Ficheiros}
+
+Dentro do sistema de ficheiros onde os \textit{sockets} estão incorporados,
+como apenas estamos interessados em analisar os sockets construidos para a
+familia \textit{AF\_INET} todos os sockets que não pertencerem a esta familia e
+não forem do tipo \textit{TCP} ou \textit{UDP} não serão mais analisados. Os
+\textit{sockets} que pertencem é então inicializado uma estrutura do tipo
+\textit{não me lembro ??? ver código} onde estão definidos o porto, o endereço
+e se são do tipo \textit{UDP} ou \textit{TCP}.
+
+Dependendo da chamada ao sistema realizada entre a função definida na entrada
+e a definida no retorno do \textit{KRetProbe}, são passados parâmetros que irão
+ser utilizados na função de retorno.
+
 
 \section{Ferramenta de testes}
 
@@ -109,3 +132,8 @@ processo de execução e recolha de dados dos testes.
 Criação de alguns ficheiros no sistema virtual \textit{configFs} para poder
 observar o comportamento da monitorização e dos pacotes que chegaram ao sistema
 de filtragem.
+
+A forte restrição de apenas um valor por ficheiro do \textit{SysFs} obriga a
+que para obter diferentes valores do sistema tenha de abrir diferentes
+ficheiros. Como o sistema de ficheiros \textit{proc} se sitia principalmente
+para os processos seria um bom candidado para a colocação de informação sobre 
