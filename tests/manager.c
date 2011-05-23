@@ -49,31 +49,39 @@ int main(int argc, char **argv)
 	{
 		switch(c){
 		case 't':
+#ifdef DEBUG		
 			printf("Option tcpdump is activated\n");
-			option = option | 2;
 			printf("value of option is %d \n",option);
+#endif
+			option = option | 2;
 			break;
 		case 'p':
+#ifdef DEBUG		
 			printf("Option process is activated\n");
-			option = option | 4;
 			printf("value of option is %d \n",option);
+#endif
+			option = option | 4;
 			break;
 			
 		case 'c':
 			config_filename = malloc(sizeof(char)*(strlen(optarg)+1));
 			strncpy(config_filename,optarg,strlen(optarg));
 			man.config_filename = config_filename;
+#ifdef DEBUG
 			printf("config file is %s\n",man.config_filename);
+#endif
 			break;
 		case 'm':
+#ifdef DEBUG
 			printf("Option module is activated \n");
-			option = option | 1;
 			printf("value of option is %d \n",option);
+#endif
+			option = option | 1;
 		}
 	}
-	
+#ifdef DEBUG	
 	printf("value of option is %x \n",option);
-	
+#endif	
 	if(man.config_filename != NULL)
 		readConfigFile(&man);
 	
@@ -258,9 +266,9 @@ void executeProgram(struct manager *man){
 		int i=0;
 		pid_t my_pid;
 
-		 fd [0] = open("/sys/kernel/debug/pcap_debug/pid",O_WRONLY);
-		 fd [1] = open("/sys/kernel/debug/pcap_debug/ppid",O_WRONLY);
-		 fd [2] = open("/sys/kernel/debug/pcap_debug/tgid",O_WRONLY);
+		fd [0] = open("/sys/kernel/debug/pcap_debug/pid",O_WRONLY);
+		fd [1] = open("/sys/kernel/debug/pcap_debug/ppid",O_WRONLY);
+		fd [2] = open("/sys/kernel/debug/pcap_debug/tgid",O_WRONLY);
 
 		my_pid = getpid();
 		for(i=0; i < 3 ; i++)
@@ -282,7 +290,7 @@ void executeProgram(struct manager *man){
 			waitpid(pid,&status,0);
 			
 			if(man->tcpdump != 0){
-				kill(man->tcpdump,SIGKILL);
+				kill(man->tcpdump,SIGINT);
 			}
 			
 			ofd[0] = open("/sys/kernel/debug/pcap_debug/monitor/stats",O_RDONLY);
