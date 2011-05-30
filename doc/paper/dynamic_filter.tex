@@ -1,0 +1,608 @@
+%%%%%%%%%%%%%%%%%%%%%%% file typeinst.tex %%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% This is the LaTeX source for the instructions to authors using
+% the LaTeX document class 'llncs.cls' for contributions to
+% the Lecture Notes in Computer Sciences series.
+% http://www.springer.com/lncs       Springer Heidelberg 2006/05/04
+%
+% It may be used as a template for your own input - copy it
+% to a new file with a new name and use it as the basis
+% for your article.
+%
+% NB: the document class 'llncs' has its own and detailed documentation, see
+% ftp://ftp.springer.de/data/pubftp/pub/tex/latex/llncs/latex2e/llncsdoc.pdf
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[runningheads,a4paper]{llncs}
+\usepackage{amssymb}
+\setcounter{tocdepth}{3}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage[utf8]{inputenc}
+\usepackage{todonotes}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{subfig}
+
+
+% \newcommand{\papertitle}{A Distributed Computing Framework for Heterogeneous Environments}
+
+
+\newcommand{\papertitle}{Filtros dinâmicos}
+
+%\newcommand{\papertitle}{Leveraging GPUs for Scientific Computing}
+
+\hypersetup{pdfborder=0 0 0,
+            pdfauthor={Nuno Martins e Vítor Duarte},
+%            pdfcreator=,
+            pdfkeywords={Pcap, linux, monitorização,},
+%            pdfsubject=TesteSubject,
+            pdftitle={\papertitle}
+           }
+
+
+\urldef{\mailsa}\path|nuno.m.g.martins@gmail.com|
+\urldef{\mailsb}\path|vad@di.fct.unl.pt|    
+
+\newcommand{\keywords}[1]{\par\addvspace\baselineskip
+\noindent\keywordname\enspace\ignorespaces#1}
+
+\newcommand{\td}[1]{\todo[inline]{#1}}
+
+
+\begin{document}
+
+\mainmatter  % start of an individual contribution
+
+% first the title is needed
+\title{\papertitle}
+
+\author{Nuno Martins%
+\and Vítor Duarte%
+\thanks{}%
+}
+%
+\authorrunning{\papertitle}
+% (feature abused for this document to repeat the title also on left hand pages)
+
+% the affiliations are given next; don't give your e-mail address
+% unless you accept that it will be published
+\institute{CITI --- Departamento de Informática,\\
+Universidade Nova de Lisboa, Portugal\\
+\mailsa \qquad \mailsb}
+
+%
+% NB: a more complex sample for affiliations and the mapping to the
+% corresponding authors can be found in the file "llncs.dem"
+% (search for the string "\mainmatter" where a contribution starts).
+% "llncs.dem" accompanies the document class "llncs.cls".
+%
+
+%\toctitle{Lecture Notes in Computer Science}
+%\tocauthor{Authors' Instructions}
+\maketitle
+
+\begin{abstract}
+
+Aqui começa o abstract que ainda vou ter de escrever ...
+
+\keywords{PCap; Linux Kernel; Monitorização; }
+\end{abstract}
+
+
+
+\section{Introduction}
+\label{sec:introduction}
+
+
+\section{Monitorização}
+\label{sec:mon_intro}
+
+%apenas os conceitos base
+%3/4 parágrafos
+
+A monitorização permite que diferentes partes de um programa ou processo possam ser analisados. Podemos analisar os tempos de execução de terminadas funções ou todo o processo, é possível analisar as interacções que se fazem com o exterior bem como outros parâmetros tais como a percentagem de utilização do(s) cpu(s) ou a utilização de memória.
+
+A monitorização causa perdas no desempenho e por isso é desejável que seja o menor possível. Estas devem-se a que pelo simples facto de se executar uma observação, não estar a fazer trabalho útil para o sistema.
+
+Na monitorização das interacções com o exterior via interfaces de rede é possível verificar que os principais causas da redução de desempenho são as frequentes trocas de contexto, as diferentes cópias de dados.
+
+
+\section{Monitorização de rede no Linux com recursos a filtros dinâmicos}
+\label{sec:mon_network__with_dynamic_filters_linux}
+
+Como anteriormente foi indicado a monitorização de sistemas produz uma perda de desempenho no sistema. Quando se trata de monitorizar processos dinâmicos esta monitorização pode aumentar ainda mais esta perda. O sistema desenvolvido permite que seja monitorizado um processo que faça utilização das chamadas ao sistema sobre a pilha de protocolos TCP/IP.
+
+
+\subsection{Desenho e arquitectura}
+\label{sub:architecture}
+
+Este sistema foi criado a pensar na modularidade e nas potêncialidades de modificação das diferentes componentes de forma a poder ser modificado, originando possibilidade de aumento de funcionalidades e diferentes desempenhos.
+
+As quatro partes essenciais do sistema são: função de filtragem (ligação a um \textit{hook} ), monitorização das chamadas ao sistema, ou outras funções que estejam no sistema de rede, o repositório de dados e caso seja necessário o sistema de informação de análise da monitorização.
+
+\subsubsection*{Monitorização das chamadas ao sistema de rede}
+\label{subsub:mon_syscalls}
+
+Para conseguir detectar todas as interacções que um processo executa com o exterior foi necessário monitorizar as chamadas ao sistema de rede de forma a garantir que todas estas interacções são detectadas. Uma forma de minimizar as trocas de contexto foi efectuar toda a monitorização dentro do kernel. Utilizando o sistema de monitorização KProbes, pertencente ao núcleo do Linux foi possível efectuar esta monitorização. Foram monitorizadas as chamadas ao sistema (\textit{sendto}, \textit{recvfrom}, \textit{bind}, \textit{accept}, \textit{connect} e  \textit{close}).
+Apesar de se filtrar qual o processo que está a executar a chamada ao sistema verificou-se que a chamada ao sistema \textit{close} por ser utilizada intensivamente por todo o sistema de ficheiros que poderia ser um ponto onde este sistema iria ter pior desempenho. Por esta razão decidiu-se aplicar a monitorização à função \textit{sock\_close} a monitorização ao invés de ser na função mais genérica \textit{close} e assim permitia que apenas os processos que fizessem uso do sistema de transferência de dados utilizando os métodos de rede. Desta forma foi possível reduzir significativamente o número de eventos de monitorização da chamada ao sistema \textit{close}.
+
+\subsubsection*{Filtro de pacotes}
+\label{subsub:packet_filter}
+
+Este sistema de filtros dinâmicos permite que sejam efectuadas monitorizações de rede com e sem o sistema de filtragem de pacotes definidos no \textit{Linux Socket Filter}. De forma a alterar o menos possível a forma como é efectuado a monitorização de rede no Linux, foi colocar um \textit{hook} no sistema de rede. Este \textit{hook} serve para que quando esteja ligado, a monitorização passe pelo sistema dinâmico de filtragem permitindo assim efectuar a nova monitorização sem que se perca os beneficios do \textit{Linux Socket Filter}, pois esta é uma linguagem genérica que permite efectuar alguma análise aos pacotes que estão a ser monitorizados.
+
+
+\subsubsection{Jobs}
+\label{subsub:jobs}
+
+Jobs are the computational work units handled by the framework. Each job comprises an OpenCL kernel describing the algorithm to be executed, the data to be processed, and a set of attributes pertaining to the job's data and processing requirements.
+% Job scheduling requires transferring the relevant data onto the PU where it will be processed. 
+Some relevant job attributes are: an unique \emph{job identifier}; the job's \emph{category identifier}; a list of the \emph{favoured PU architectures} for executing the job; and the OpenCL \emph{NDRange configuration}. Job categories identify jobs that display a similar behaviour for the same PU architectures.
+ % --- Jobs with an execution time that is predictably similar for the same PU types should be attributed the same category. 
+The list of the favoured PU architectures may specify if a PU architecture is required, allowed, preferred, to be avoided, or even forbidden. The NDRange configuration, if provided, will parametrize the job on the selected PU, otherwise default values are assumed.
+
+
+\subsubsection{Job Manager (JM)}
+\label{subsub:job_manager}
+
+This domain-specific component handles the creation of processor-intensive jobs to be submitted to the framework. Its design must consider the algorithm and the characteristics of the data to be processed.
+The JM may interact synchronously with the remainder of the framework by holding its execution until job results are available; or asynchronously by relying on a job completion notification service and executing further steps of the algorithm while being also able to retrieve job results as soon as they are available.
+%
+% Alternatively, the Job Manager may synchronously wait, by holding its execution, until such results are available.
+
+\subsubsection{The Application Programming Interface (API)}
+\label{subsub:API}
+
+The Job Manager resorts to an API to interact with the remainder of the framework, which includes services for job creation, job attribute configuration, job data management, and result retrieval from the Results Collector. A full description of the API can be found in~\cite{LuisOliveira:MSc:2011}.
+
+
+\subsubsection{Job Scheduler (JS)}
+\label{subsub:job_scheduler}
+
+Job submissions are received and handled by the JS\@.
+This domain-independent component dispatches jobs to the available computational resources, assigning them to the best available PUs by weighting their attributes.
+
+When the framework is started, each Processing Unit Manager (PU-M) notifies the JS about its availability and shares with it a list with its capabilities. Afterwards, the JS evaluates the link quality to each communicating PU-M\@. All of this information is kept by the JS as a set of properties per PU, which are used to make more informed decisions on job dispatching.
+
+Received jobs are appended to a pending jobs queue in the JS\@, and are subsequently assigned to an available PU according to a job scheduling algorithm. Currently, jobs are always dispatched in a First-Come First-Served order, and PUs are selected under a Round-Robin or a Score-Based workload allocation policy. 
+% New scheduling algorithms can be easily integrated into the JS as additional modules that are selected at program startup time.
+In Sect.~\ref{sub:scheduling_algorithms} we further discuss the currently available scheduling algorithms.
+
+
+\subsubsection{Processing Unit Manager (PU-M)}
+\label{subsub:PUM}
+
+When the framework is started, a set of tests and micro-benchmarks are executed in order to acquire a detailed and accurate view of the available computing resources. A set of properties are retrieved from the local environment, such as available memory, processor type and clock frequency of each OpenCL device. Various performance metrics are also conducted, such as the latency of a kernel submission, the bandwidth for memory transfers between the device and main memories, and the raw parallel processing computing performance (FLOPS) of each OpenCL device. These properties are then communicated to the JS.
+
+After the initial setup and communications with the JS, the PU-M is available for job processing. Jobs are processed in the order they are received from the JS\@.
+%
+Each job has a set of arguments, annotated by the Job Manager as input or output data, or as auxiliary data space. The data contained at the output arguments is returned to the Results Collector upon job completion. 
+% In case of failure, no data is returned and a failure code associated with the Job is sent instead.
+%
+Upon completion of each job, its results sent to the Results Collector, an informational message is sent to the JS with statistics on the execution of the job in the requested PU\@, and the next job on that PU's local job-queue is executed. If the local job-queue is empty, the PU will be idle until a new job arrives. The job execution statistics are used by the JS to implement dynamic and adaptive scheduling strategies.
+
+
+\subsubsection{Results Collector (RC)}
+\label{subsub:result_collector}
+
+The Results Collector has two main purposes: gather data pertaining to the concluded jobs, and forward that data back to the Job Manager.
+%
+A JM may register with the RC requiring to be notified when the results of a given job are available. When the data pertaining to that job arrives at the RC, the notification is sent and the JM may then fetch and process the data.
+
+
+\subsection{System Configurations}
+\label{sub:system_configurations}
+
+%    All of these components may be running on the same machine, or they may be
+%placed on different computational nodes. Each component is only required to be able
+%to communicate with the components with which it must exchange data. Different
+%instantiations of the framework may also deploy different numbers of components of
+%each type in order to better utilize specific hardware configurations. We present some
+%local and distributed configurations that may be used under typical COW, cluster and
+%grid environments:
+
+
+The framework allows multiple configurations for the deployment of its components, either centralized in a single machine or scattered among multiple nodes.
+% The only requirement is that each component can communicate with the remaining ones with which it must exchange data. 
+Multiple instances of each component are also allowed to better fit specific network and hardware configurations. Examples of possible configurations are:
+\begin{itemize}
+  \item \emph{One instance of each component, all components on the same machine} --- allows to take advantage of multiple PUs in the same machine, while still being transparent to which PU each job is assigned.
+  \item \emph{A single JS, multiple PU-Ms} --- allows to dispatch jobs onto multiple, possibly heterogeneous machines. This can be an adequate configuration for heterogeneous computer clusters where some machines are equipped with CPUs and GPUs, while others only have conventional CPUs.
+  \item \emph{Multiple JSs, multiple PU-Ms} --- allows different schedulers to dispatch jobs to different sets of PU-Ms, while leaving at the discretion of the JM to choose the JS where each job is submitted. This might be an adequate approach when using multiple independent clusters. Another possible approach (not supported yet) is to add an additional JS that might act as a \emph{meta-scheduler}, dispatching jobs to the most adequate (possibly remote) second-level JS. 
+% Although intended to be supported, this approach has not yet been thoroughly explored.
+\end{itemize}
+
+\subsection{Scheduling Algorithms}  
+\label{sub:scheduling_algorithms}
+
+As described in Sect.~\ref{subsub:job_scheduler}, the JS can dispatch jobs according to different scheduling algorithms, to better fit the jobs into the available system resources.
+
+% algorithms based on common scheduling algorithms~\cite{paralleljschedissundappr:dgfeitelson95,theorpractparalleljobsched:dgfeitelson97,paralleljschedstatusrep:dgfeitelson05}.
+
+Currently implemented scheduling algorithms comprise a single job dispatching strategy and two workload allocation policies. The dispatching strategy is a simple First-Come First-Served algorithm: jobs are selected for dispatching by the order they arrive at the JS\@. No prioritization or reordering schemes are currently implemented. The workload allocation policies comprise a Round-Robin and a Configurable Score-Based policy.
+%
+With the Round-Robin workload allocation, PUs are selected circularly without considering their hardware properties or capabilities.
+%
+The Score-Based workload allocation policy aims at better using the heterogeneous hardware architectures, such as sets of CPUs and GPUs. For each job a list of scores is calculated, one score per PU\@. From this list, the PU with the best score is selected for processing the job. Two Score-Based variations are currently available:
+
+%%%TODO: Falar de pesos para cada parâmetro no score-based approach
+
+\begin{itemize}
+  \item The \emph{fixed configuration} always gives the same score for a given PU, independently of the job type. This score reflects an estimation of the computing power (FLOPS) of that PU, weighted with the latency introduced by the channel connecting the JS to the PU.
+  \item When scheduling a new job, the \emph{adaptive configuration} considers the previous execution times of jobs of the same category. For each job category, this algorithm exhibits a sequence of three different behaviours. It starts assigning jobs to PUs using a round-robin policy, aiming at executing one job in each available PU\@. Afterwards, the algorithm switches to the behaviour of the fixed approach, where PUs are selected proportionally to their performances, as measured at startup time. When the JS receives feedback on the job processing time from the PU-Ms, that information is stored as a time-weighted average and considered in subsequent PU selections.
+\end{itemize}
+
+
+% \subsection{Implementation} % (fold)
+% \label{sub:implementation}
+% 
+% \td{2º LO}
+% 
+
+
+% subsection implementation (end)
+
+
+\section{Evaluation}
+\label{sec:evaluation}
+
+%%%%
+% Descrever os dois algoritmos
+%- explicação breve do objectivo de cada uma das computações (incl. refs para papers)
+%- TODO TODO como foram os dados/computações particionados
+%%%%
+
+The framework was tested and benchmarked with two computing-intensive algorithms: a Mandelbrot Set~\cite{mandelbrot:fractals83} renderer, a simple algorithm that fits well the SIMD execution model; and a gene identification algorithm~\cite{evallocipopstruct:beaumont96} used for identifying differentiated genes that may potentially be under natural selection, that follows a MIMD execution model. 
+
+%\subsubsection{Testing Harness} % (fold)
+%\label{ssub:testing_harness}
+
+%%
+% Mandelbrot
+%%
+
+The Mandelbrot benchmark computes a highly detailed zone of the Mandelbrot Set. The amount of data to be processed is directly proportional to the size of the intended final image. The weight of the required computation is parametrized by the number of colours to be used in the final image, which directly influences the required number of iterations. 
+
+
+%%
+% Gene Identification
+%%
+
+The gene identification algorithm recognizes genes associated with certain characteristics of individuals such as skin and hair colour, genes susceptible to certain viruses such as the HIV, genes that influence the amount of meat available on livestock animals, as well as many other differentiating indicators. This algorithm is relatively complex and has huge memory requirements when simulating huge numbers of genes.
+
+
+\subsection{Experimental Results}
+\label{sub:experimental_results}
+
+%TODO TODO
+% Framework does not address GPU reliability issues. However, an empyrical analysis of the obtained results for each test case allow to conclude that no relevant reliability issues were observed.
+
+
+%%%%
+%% Hardware & framework config
+%%%%
+
+The current version of the framework is implemented in C and the communication between components resorts to MPI~\cite{mpispec09}. Each job task is expected to be a fully compliant OpenCL~\cite{amunshi:OpenCLSpec10} kernel to be submitted to an OpenCL device.
+
+Both algorithms were benchmarked using the same computational resources. Table~\ref{tab:PUs} depicts all used PUs. For local tests, a single instance of each component was launched on the computer hosting the relevant PU\@. For distributed tests, one PU-M was launched in every node and the Job Manager, Job Scheduler, and Results Collector were all launched in an additional node with an \mbox{Intel}~Core~2~Duo~T6400 processor at~2.0$\,$GHz and~4$\,$GB of RAM. Communication between machines was performed across a virtual private network overlaying a~100$\,$Mbit LAN.
+
+\begin{table}
+  \centering
+  \caption{Hardware details (horizontal rules separate PUs on different hosts).}
+    \begin{tabular*}{0.95\linewidth}{@{\extracolsep{\fill}} l  c  c  c  c}
+      \multicolumn{1}{c}{\textbf{Designation}} & \textbf{PU type} & \textbf{Comp. Units\footnotemark[1]} & \textbf{Clock} & \textbf{RAM}\\
+      \toprule
+      SunFire X4600 M2      & CPU &  16 & 1.00$\,$GHz & 32$\,$GB \\
+      \midrule
+      Intel Core 2 6420      & CPU &  2 & 2.13$\,$GHz & 2$\,$GB \\%Lagarto
+      NVIDIA Quadro FX 3800  & GPU & 24 & 1.20$\,$GHz & 1$\,$GB \\
+      \midrule
+      Intel Xeon E5506       & CPU &  4 & 2.13$\,$GHz & 12$\,$GB\\%Medeiros
+      NVIDIA Quadro FX 3800         & GPU & 24 & 1.20$\,$GHz & 1$\,$GB\\
+      NVIDIA Tesla C1060            & GPU & 30 & 1.30$\,$GHz & 4$\,$GB\\
+      NVIDIA Tesla C1060            & GPU & 30 & 1.30$\,$GHz & 4$\,$GB\\
+      \midrule
+      Intel Core i5 650      & CPU &  4 ($2\times2$HT)\footnotemark[2] & 3.20$\,$GHz & 4$\,$GB\\%PitxDI
+      NVIDIA GeForce GTX 480 & GPU & 15 & 1.40$\,$GHz & 1.5$\,$GB\\
+      \midrule
+      Intel Xeon 5150 & CPU & 4 ($2\times2$HT)\footnotemark[2] & 2.66$\,$GHz & 2$\,$GB\\%di94
+      \bottomrule
+    \end{tabular*}
+
+\begin{minipage}{\linewidth}
+	% Force footnotes to be numeric
+	\setcounter{mpfootnote}{1}
+	\renewcommand{\thempfootnote}{\arabic{mpfootnote}}
+	% Avoid the separtor (line)
+	\renewcommand{\footnoterule}{}
+	
+\footnotetext[1]{OpenCL-reported Compute Units. For CPUs, this is equivalent to the number of virtual CPU cores.}
+\footnotetext[2]{Processors with HyperThreading technology.}
+
+\end{minipage}
+
+  \label{tab:PUs}
+\end{table}
+
+% \footnotetext[1]{OpenCL-reported Compute Units. For CPUs, this is equivalent to the number of virtual CPU cores.}
+% \footnotetext[2]{Processors with HyperThreading technology.}
+
+Before conducting the distributed benchmarks, we ran a set of local tests to ascertain the most adequate NDRange configuration for the jobs of both algorithms. Each test was performed with a smaller job displaying a behaviour similar to the longer-lasting overall intended computation. The performance variation was very similar for all PUs of a given type, so we only present the results for two configurations: the SunFire~X4600~M2 for CPUs, and the NVIDIA~GeForce~GTX~480 for GPUs.
+
+In the following charts the bars always refer to the turnaround time observed by the Job Manager since the submission of the first job until all the intended results were fetched. For local results, the blue/dark bars refer to CPU only executions, and the green/light bars refer to GPU only executions. For distributed results, the blue/dark bars refer to CPU only executions, and the green/light bars refer to mixed CPUs and GPUs executions.
+
+
+
+%%%%
+%% MANDELBROT
+%
+% Testes iniciais -> determinação de melhor configuração
+%%
+\subsubsection{Mandelbrot Set Renderer}
+\label{subsub:mandelbrot}
+
+
+The initial local tests rendered a canvas of 1024$\times$1024 pixels and the results are depicted in Fig.~\ref{fig:LocalMandelbrot}. Two main configurations were tested: one- and two-dimensional (1D and 2D) NDRange item spaces, in both cases with different numbers of items per work-group. For the 1D-NDRange,~512 items processed the canvas, each item processing a strip of~1024$\times$2 pixels. For the 2D-NDRange, a total of~512$\times$512 items processed the canvas, each item processing exactly~4 pixels. Hardware limitations impose a limit of~1024 items per work-group, hence the maximum of~32$^2$ items per group.
+
+%\begin{figure}[htb!]
+%  \centering
+%    \subfloat{
+%     \includegraphics[width=0.48\textwidth]{pics/mandelbrot-local-1dim}
+%      \label{fig:MandelLocal1Dim}
+%    }\hfill
+%    \subfloat{
+%      \includegraphics[width=0.48\textwidth]{pics/mandelbrot-local-2dim}
+%      \label{fig:MandelLocal2Dim}
+%    }
+%  \caption{Mandelbrot, local tests.}
+%  \label{fig:LocalMandelbrot}
+%\end{figure}
+
+%%
+% 1 dim: CPU performance decreases with more items
+%        GPU performance is constant with any number of items per work-group.
+% 2 dim: CPU performance with a similar behaviour as with 1 dimension
+%        GPU perf. much better, decreases with more items per group
+
+From the local tests with a 1D-NDRange, it is observable that CPU performance decreases with larger groups (with more items per group), while GPU performance seems to be unaffected by this variation. CPU performance seems to be unaffected by a 2D-NDRange, while GPU performance is strongly improved and shows an inverse tendency from 1D-NDRange, having more items per group improves kernel performance. The maximum performance is attained at 8$\times$8 items per group, even though all items are really independent and no synchronization is required between them.
+
+
+
+%%
+% Testes distribuídos -> Fixed & Adaptive
+%%
+
+
+A large canvas of~10240$\times$10240 pixels was computed by distributing the work-load on all the available PUs. The canvas was partitioned in equal-sized horizontal strips, and each job processed one strip. Each job was parametrized with a 2D-NDRange of~512$\times$512 items and~8 items per group. All jobs were classified in the same category. When using the adaptive workload approach, the benchmarking tests were preceded by an initial profiling phase, where a job that renders a much smaller (100$\times$) canvas was submitted to each available PU\@. Figure~\ref{fig:DistribMandelbrot} depicts the execution times obtained when using the fixed and adaptive workload allocation approaches.
+
+%\begin{figure}[htb!]
+%  \centering
+%    \subfloat{
+%      \includegraphics[width=0.48\textwidth]{pics/mandelbrot-distributed-fixed}
+%      \label{fig:DistribFixedMandelbrot}
+%    }\hfill
+%    \subfloat{
+%      \includegraphics[width=0.48\textwidth]{pics/mandelbrot-distributed-adaptative}
+%      \label{fig:DistribAdaptMandelbrot}
+%    }
+%  \caption{Mandelbrot, distributed benchmarks.}
+%  \label{fig:DistribMandelbrot}
+%\end{figure}
+
+The attained results allow to infer that smaller jobs provided better performance. This is understandable by the fact that more jobs end up dividing the most computationally-intensive regions of the Mandelbrot Set in smaller strips, resulting in a more fine-grained workload balancing. The overall turnaround time was improved in all cases when GPUs were also used. On average, the adaptive approach ended up providing slightly worse execution times.  We believe that the initial profiling job, although representative of the \emph{average} computation of the overall set, might have ended up misleading the adaptive algorithm. 
+% Further tests are necessary to confirm this hypothesis.
+
+
+Additionally, it is visible that, when using only CPUs, the division of work up to 4 jobs worsens the observed times. For the fixed approach there is a huge performance increase from 8 to 16 jobs and with the adaptive approach, this difference is visible from 4 to 8 jobs. A meaningful performance variation is also visible when more, smaller jobs are submitted, with execution time peaks with 32 and 128 jobs for the fixed and adaptive approaches, respectively.
+
+The lower zone of the rendered image is more processor-intensive than the remainder of it. The submitted jobs corresponding to the upper zones of the image are therefore less processor-demanding than those corresponding to the lower part of the image.
+
+After a careful analysis of the framework's execution logs for the previous tests it was possible to conclude that the first submitted jobs were dispatched to the fastest machines, while the last, \emph{heavier} jobs, were sent to slower machines. This has the effect of overloading slower machines while under-utilizing the fastest ones. In order to confirm these conjectures, an additional set of benchmark tests was performed. All run-time conditions were the same as for the previous benchmarks but the order of processing for the image was inverted. The first submitted jobs correspond to the lower zone of the image while the last ones correspond to the upper, less processor-intensive zone.
+
+
+%\begin{figure}[htb!]
+%  \centering
+%    \subfloat{
+%      \includegraphics[width=0.48\textwidth]{pics/mandelbrotINVERTED-distributed-fixed}
+%      \label{fig:DistribFixedMandelbrotINVERTED}
+%    }\hfill
+%    \subfloat{
+%      \includegraphics[width=0.48\textwidth]{pics/mandelbrotINVERTED-distributed-adaptative}
+%      \label{fig:DistribAdaptMandelbrotINVERTED}
+%    }
+%  \caption{\emph{Inverted} Mandelbrot, distributed benchmarks.}
+%  \label{fig:DistribMandelbrotINVERTED}
+%\end{figure}
+
+
+
+
+%A possible interpretation for such observed data is that the heaviest computations 
+%This data might appear counter-intuitive as with more jobs, one could expect that, as they are divided among more machines, execution times should improve (although a slight worsening could be expected for more, smaller jobs due to the influence of the framework's overhead).
+
+
+%--
+%Vê-se que os tempos com CPUs apresentam valores piores quando o nº de jobs é aumentado, até 4 jobs.
+%- Há uma descida abrupta nos 8 jobs no caso do fixed e 16 no caso do adaptive
+%- e de seguida há subidas abruptas de novo aos 32 e 128 jobs.
+
+%TODO TODO
+%---->>>>>>>>>Conjecturámos que isto se pudesse dever à atribuição das zonas mais pesadas para a computação aos processadores mais lentos. Uma consulta aprofundada aos traços de execução demonstrou que, efectivamente, o sistema atribui a zona superior aos processadores mais rápidos escolhendo de seguida processadores mais lentos, aos quais ficam atribuídas as zonas de processamento mais exigente.
+%Para confirmar esta conjectura executou-se um teste adicional, com todas as condições iguais às do teste anterior mas invertendo-se a ordem de processamento da imagem: os primeiros jobs submetidos correspondem à zona inferior (computacionalmente mais exigente) e os últimos à zona superior da imagem (computacionalmente mais leve).
+
+
+%---
+%Gráficos
+%---
+
+The benchmarks performed with the inverted Mandelbrot Set display an improved average turnaround time. When more jobs are submitted, the observed performance improves as expected. When using only CPUs, the observed times are similar with both the fixed and the adaptive approaches. When using CPUs and GPUs, the observed times are on average better with the adaptive approach than with the fixed approach.
+This proves the validity of our previous conjectures: the first jobs to be dispatched were now attributed to the fastest PUs and the subsequent ones, to the slowest ones. %TODO: ver como disse isto na tese
+
+%Estes testes demonstraram um desempenho médio melhor.
+%- A submissão de mais jobs traduziu-se numa melhoria de performance
+%- a performance observada quando foram utilizados CPUs é muito semelhante quando comparada a utilização do fixed vs adaptativo
+%- a performance com GPUs melhorou quando foi utilizado o algoritmo adaptativo
+
+
+
+\subsubsection{Gene Identification}
+\label{subsub:gene_identification}
+
+%%%%
+%% GENE IDENTIFICATION
+%
+% Testes iniciais -> determinação de melhor configuração
+%%
+
+The local tests for this algorithm simulated 5120~genes, in both one- and two-dimensional (1D and~2D) NDRanges. Due to memory requirements of the algorithm and constraints on the available hardware, jobs could not have more than~512 items. For a 2D-NDRange~484 items (22$\times$22 items) were used, the nearest square number lower than~512. Figure~\ref{fig:LocalGene} depicts the attained execution times.
+
+%\begin{figure}[htb!]
+%  \centering
+%  \subfloat{
+%    \includegraphics[width=0.48\textwidth]{pics/gene-local-1dim}
+%    \label{fig:GeneLocal1Dim}
+%  }
+%  \subfloat{
+%    \includegraphics[width=0.48\textwidth]{pics/gene-local-2dim}
+%    \label{fig:GeneLocal2Dim}
+%  }
+%  \caption{Gene Identification, local tests.}
+%  \label{fig:LocalGene}
+%\end{figure}
+
+
+In this case, using smaller groups is advantageous for both CPUs and GPUs, but GPUs perform much worse than CPUs. Using a 2D-NDRange did not render any meaningful improvements over the 1D configuration. These results may be related to the fact that this benchmark was oriented to the MIMD model.
+
+%%
+% Testes distribuídos -> Fixed & Adaptive
+%%
+
+For the distributed benchmarks, we simulated 5,12 million genes in a one-dimensional NDRange, with~512 items and~1 item per group. All jobs were assigned the same category. A single job that simulated~5120 genes was submitted for each PU during the profiling phase for the adaptive approach. Figure~\ref{fig:DistribGene} depicts the execution times for both fixed and adaptive configurations of the Job Schedulers' score-based workload allocation.
+
+%\begin{figure}[htb!]
+%  \centering
+%    \subfloat{
+%      \includegraphics[width=0.48\textwidth]{pics/gene-distributed-fixed}
+%      \label{fig:DistribFixedGene}
+%    }\hfill
+%    \subfloat{
+%      \includegraphics[width=0.48\textwidth]{pics/gene-distributed-adaptative}
+%      \label{fig:DistribAdaptGene}
+%    }
+%  \caption{Gene Identification, distributed benchmarks.}
+%  \label{fig:DistribGene}
+%\end{figure}
+
+It is clear that the fixed approach is not adequate when a MIMD application is in place. When using GPUs, the performance of the adaptive approach was one order of magnitude better then the fixed approach. 
+
+In the fixed approach, less jobs ended up rendering better execution times. When more jobs were submitted, more work was allocated to the GPUs (with higher FLOPS score) but that performed very poorly in this problem --- the GTX$\,$480~GPU was competitive with a single-core CPU, but the Tesla GPUs were up to~10$\times$ slower for this algorithm --- while the CPUs were kept idle for most of the time. With the adaptive approach, it was possible not only to improve turnaround times when GPUs were used, but also improve observed times when compared to the CPU-only, fixed approach. 
+
+%TODO: Dizer que as GPUs processaram muito menos jobs (in fact, só a partir dos 20 jobs é que começaram a ser usadas GPUs e só os 200 é que foi pelo menos 1 job para cada uma
+
+\subsection{Discussion of Results}
+\label{sub:discussion}
+
+An analysis of the charts pertaining to configuration tests allows to conclude that the NDRange strongly influences --- in a device-dependent way --- the performance of OpenCL kernels. For a strictly SIMD application such as the Mandelbrot Set, a two-dimensional NDRange in GPUs had the best turnaround times, up to two orders of magnitude faster than with a one-dimensional NDRange, whereas for CPUs no meaningful impact was observed. For a MIMD application such as the gene identification algorithm, there are no clear benefits in using a two-dimensional NDRange. For problems of this nature, CPUs are much faster than GPUs, although with the appropriate scheduling algorithm these may still be considered as useful PUs.
+
+Under a distributed, multi-PU environment, both the fixed and the adaptive workload allocation approaches provide visible performance gains for the Mandelbrot Set tests, where the fixed approach performed only slightly better. Jobs in this application have different computational requirements. If a job processes a more colourful zone of the canvas it will be computationally faster than a job that is to render darker regions. This ends up adding an error factor to the execution time observed by the Job Scheduler's adaptive approach.
+
+For the gene identification algorithm under a distributed, multi-PU environment, the fixed approach proved to be inadequate when using GPUs and the adaptive to be neutral. This is understandable by the fact that GPUs are SIMD processors. Applications that do not follow the SIMD model run much slower. Due to the fact that the fixed approach submits jobs based on the raw speed of the devices, GPUs received many more jobs to process than CPUs. In the adaptive approach, the observed bad performance of GPUs was taken into consideration and there was not a meaningful impact in the overall observed execution times.
+
+
+A deeper analysis on these and other results can be found in~\cite{LuisOliveira:MSc:2011}.
+
+% execute a kernel is a very important factor, with strong influence in the overall performance of an OpenCL program. The configuration of a
+%The area that was used had an 1024x1024 pixel area, so 1024 items (each processing an whole line of the image) proved to be the best option for the example, when running on the available CPUs.
+
+%OpenCL work-items should be grouped when they have processing affinities, i.e., when the data that each work-item processes is related with the data other work-items on the same group process. For the use-case at hands, where each pixel is processed independently from the others, all work-items are truly independent, so there is no logical benefit from this grouping. Thus, using groups of one work-item each proves to be the best option.
+
+%Using a two-dimensional matrix could sound as a reasonable option when processing a two-dimensional area. Although, the achieved results for the CPUs did not show an appreciable difference relatively to the one-dimensional array, on average being even slower than with an 1-dimensional array organization. This might be an indication of the overhead imposed on the OpenCL runtime by the need of managing the required number of work-items. Notice that a 2-D area of 1024x1024 items means that a total of 1048576 items will have to be managed by the runtime. A 1-D area of 1024 work-items merely represents that same number of items to be managed.
+
+%The graphs pertaining to the GPU execution show an interesting, differing behaviour: two-dimensional work-item ranges are clearly more efficient than one-dimensional ones. This is very likely related with the physical architecture of the GPU, designed to process two and three-dimensional objects very efficiently.
+
+%Due to the limitations of the GPU architecture, it is not possible to run a sequential version of the algorithm on the GPU. Also, perhaps due to limitations of the graphics card, it was impossible to run kernels for more than 12 seconds. Groups with 64x64 work-items or more issued an ``\emph{out of resources}'' error from the OpenCL runtime.
+
+%From the experiments we may conclude that we cab achieve higher speedups by simultaneous using multiple Processing Units when running Scientific Computations with high processing requirements. More significant results shall be expected with the fine-tuning of the jobs for this and other hardware.
+
+\subsubsection{Speedup Analysis}
+
+When running the native sequential C~version of the Mandelbrot algorithm, the best performant host was the Core i5 PU, with~5h$\,$2min$\,$20s, and the worst one was the Core~2 PU, with~10h$\,$9min$\,$42s. With our framework, we achieved the best performance when submitting~32 jobs with a fixed approach, with an overall run-time of~2min$\,$35s. This is a two-orders of magnitude speedup, more precisely of~117$\times$ and~235$\times$ relatively to the fastest and slowest sequential executions respectively.
+
+
+%The sequential, native C version of the Mandelbrot set algorithm takes 7h07m36s on the SunFire machine. The sequential version under OpenCL (one single item) takes 7h56m22s --- a \emph{speedup} of 0.9$\times$. The best distributed performance was achieved when submitting 32 jobs, with a total run-time of 2m35s --- a speedup of 165$\times$ when compared to the native C version.
+
+
+
+The native sequential C version of the gene identification algorithm was processed in 3h$\,$56min$\,$50s by the Core i5 PU and 7h$\,$31min$\,$25s on the Core~2 PU, the fastest and slowest PUs respectively.
+% The sequential version under OpenCL (one single item) takes 6h56m41s --- a \emph{speedup} of 0.87$\times$.
+The best distributed performance achieved rendered an execution time of~17min$\,$13s when submitting~20 jobs. This corresponds to a speedup of a one-order of magnitude, more precisely of 13$\times$ and 26$\times$ relatively to the fastest and slowest sequential executions respectively.
+
+
+
+\section{Related Work}
+\label{sec:related_work}
+
+%TODO TODO
+%Detalhar mais isto (ver na tese)
+
+%Compare related work with our own approach
+
+%CUDA~\cite{CUDAProgGuide231} is a computing architecture that enables general-purpose computing on compatible Nvidia graphics cards. It is designed to allow programming parallel applications capable of running on current and future GPU architectures. CUDA has recently gained a high relevance on the GPGPU field and started to be widely adopted in many applications. The CUDA architecture is very similar to the OpenCL architecture. The main difference relies on the fact that OpenCL allows to run kernels not only on GPUs as well as on CPUs or any other supported processor type.
+%\td{Tinha aqui uma parte sobre o CUDA... Acho que não faz sentido...}
+
+%Current cluster and grid schedulers and resource managers such as the Sun Grid Engine~\cite{SGE}, Torque~\cite{torque}, Moab~\cite{moab}, and Maui~\cite{maui}, are advanced systems that allow for the scheduling of batch jobs to be run on clusters of computers or on the Grid, but none of these systems consider using GPUs as computation units.
+
+
+The Moab Cluster Suite~\cite{mabadminguide5.4}, Oracle's Grid Engine~\cite{oraclegridsite}, and TORQUE~\cite{torqueadminman} are complete suites designed to centralize the management of the resources available within a cluster. These resource managers can be integrated with other software components such as job schedulers, like the Maui Scheduler~\cite{mauiadminguide02}, or components that allow for integrating multiple clusters under a single management system, such as the Hedeby project~\cite{hedebysite}. All of these well-known and widespread schedulers and managers currently consider only CPUs as computing devices and mostly see GPUs as mere I/O devices.
+%
+Some middleware systems~\cite{predictiveheterosched:jimenez10,unifiedheteroarchs:augonnet2008,multigpucpuparal:hermann2010,maestro:spafford10} propose an unified view of the multiple PUs of a computer, automating and simplifying the task of device selection. These middleware proposals have all been implemented in strictly local configurations, none covering dispatching jobs to remote nodes.
+%
+CaravelaMPI~\cite{caravelampi:syamagiwa09}, rCUDA~\cite{rcuda:duato10}, and MOSIX with VCL~\cite{mosix:barak10,mosixmanual:barak10}, are all distributed GPU aware job dispatchers. They provide the ability to process jobs on local and remote GPUs. None of them currently implements scheduling algorithms on job dispatching in order to better balance the PUs' work-load.
+% Our approach attempts to be more general-purpose, allowing for any type of computation to be requested. It also takes advantage not only of available GPUs but also CPUs.
+
+% Our work is thus the first one to consider GPUs as first order processors when scheduling computationally intensive jobs in a distributed setting using feedback-based workload allocation strategies.
+
+
+%Justificar onde é que o nosso sistema se diferencia para cada  um dos exemplos
+
+\section{Conclusions}
+\label{sec:conclusions}
+
+% The present work has shown that various kinds of applications can be processed on heterogeneous clusters of computers, provided the supporting environment is designed and configured for taking into account the different capabilities of the available Processing Units.
+
+% In this paper we proposed and evaluated a framework that enables the usage of local and remote CPUs and GPUs in an heterogeneous cluster of computers, where GPUs are side-by-side to CPUs. The framework collects data at run-time and may use this information as performance indicators in a weighted job algorithms. The provided API was designed to ease the design and coding of the Job Manager, the only domain-dependent component.
+
+To the best of our knowledge, this paper presents the first proposal of a distributed infrastructure that considers GPUs as first class processors side-by-side to CPUs, aiming at efficiently executing applications on a set of computing resources.
+%
+In this framework, the source code for each job is an OpenCL kernel, thus universal and independent from the specific architecture and CPU/GPU type where it will be compiled and executed.  This approach releases the software developer from the burden of developing specially tailored code for each type of processor/hardware, at the cost of a possible sub-optimal but still very efficient solution. 
+
+% The proposed framework enables an adequate exploitation mixed MIMD and SIMD computational models, efficiently provided by CPUs and GPUs, both as first class processors.  
+The experiments allowed to conclude that the attained speedups clearly depend on the nature of the problem and how it is coded. For some programs, GPUs behave simply as one more processor in the system, while on others they enable very significant speedups. 
+
+Despite the limited computational resources available, both testing applications --- the gene identification and Mandelbrot Set rendering --- attained considerable speedups. The gene identification application, which follows the MIMD model, had speedups over 30$\times$.  The Mandelbrot Set rendering application, which follows the SIMD model and was better fit to GPU execution, attained speedups over 200$\times$.  These results prove that our approach is both sound and efficient, allowing to transparently distribute computationally intensive jobs to both CPUs and GPUs, in a near-optimal strategy  with considerable performance improvements.
+
+% In some cases, programs executing in a distributed system containing both GPUs and multi-core CPUs controlled by our framework achieved speedups of two orders of magnitude.
+
+% We presented a framework for such environments, its architectural details and some benchmarking results. Both a synthetic, SIMD application, generating a highly detailed Mandelbrot-set as well as a MIMD application, simulating gene populations for use under scientific computing research were tested. Very meaningful performance gains were observed under both kinds of applications with speedups of two orders of magnitude (up to 235$\times$) for the SIMD application and one order of magnitude (up to 34$\times$) for the MIMD application.
+
+
+
+%Our approach in proposing and developing a Scientific Computing Framework for Heterogeneous Environments seems to be very promising, due to the added GPUs' computational power and to the strong drive of OpenCL developments, being adopted by more and more vendors and architectures. 
+% As of June 1st, ZiiLabs, a subsidiary of Creative, has announced OpenCL support for embedded devices.
+
+%Although currently under development, the framework has already achieved very interesting speedup values, and even higher speedups are expected with further optimization of the framework and fine-tuning of jobs submitted to the system. As discussed in this paper, the combination of multiple computing devices (as Processing Units in sour system) will allow to distribute the jobs over more computational resources and achieve even better performances.
+
+%This framework targets applications form the scientific computation setting, and many of these applications follow a similar pattern to that of our test case, the Mandelbrot set, with large or even huge sets of data to be processed by a relatively simple algorithm. By dividing these data sets among multiple devices, high speedups may be expected. Further testing is planned to be conducted using more realistic use-cases such as protein docking algorithms.
+
+%The current implementation of the framework only supports submitting jobs to CPUs or GPUs. However, OpenCL has seen relevant developments since the first release of the specification, with more manufacturers supporting it and releasing new tools at a steady pace. As of last June 1st, ZiiLABS, a subsidiary of Creative has announced OpenCL support for embedded devices~\cite{ziilabsOCL}. There are no limitations intrinsic to our proposal of the framework that would prevent the inclusion of these or other OpenCL devices as well.
+
+%The current prototype, with its basic scheduling algorithm, can be considered good enough for small-scale problems with a reduced number of jobs and Processing Unit Managers. However, more advanced scheduling techniques may be required if the system is to be tested on an higher number of machines and more jobs. 
+% These must take into account the submitted jobs' characteristics in order to decide which PU is more adequate to dispatch each enqueued job.
+
+
+\bibliographystyle{plain}
+\bibliography{references}
+
+\end{document}
