@@ -86,8 +86,10 @@ Universidade Nova de Lisboa, Portugal\\
 
 \begin{abstract}
 
-Monitorização de processos dinâmicos têm elevados custos de desempenho.
-Foi criado um novo subsistema de monitorização de rede, que filtra pacotes TCP e UDP de forma dinâmica.
+%Monitorização de processos dinâmicos têm elevados custos de desempenho.
+%Foi criado um novo subsistema de monitorização de rede, que filtra pacotes TCP e UDP de forma dinâmica.
+
+Neste trabalho é efectuado uma minimização do \textit{overhead} introduzido pela monitorização de rede de um processo. Esta minimização é alcançada através da monitorização dinâmica das chamadas ao sistema efectuadas pelos processos e consequente filtragem dos pacotes de rede pertencentes a este de forma a apenas serem capturados os pacotes interessantes fazendo assim reduzir o nº de pacotes copiados e transferidos para a aplicação monitorizadora. Com a redução de transferencias do nº de pacotes reduz-se o nº de trocas de contexto, consequentemente reduz-se o impacto negativo da monitorização.
 
 \keywords{PCap; Linux Kernel; Monitorização}
 \end{abstract}
