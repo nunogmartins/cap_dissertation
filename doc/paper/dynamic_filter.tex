@@ -113,8 +113,8 @@ A monitorização causa perdas no desempenho e por isso é desejável que seja o
 Na monitorização das interacções com o exterior via interfaces de rede é possível verificar que os principais causas da redução de desempenho são as frequentes trocas de contexto, as diferentes cópias de dados.
 
 
-\section{Monitorização de rede no Linux com recursos a filtros dinâmicos}
-\label{sec:mon_network__with_dynamic_filters_linux}
+\subsection{Monitorização de rede no Linux com recursos a filtros dinâmicos}
+\label{sub:mon_network__with_dynamic_filters_linux}
 %TODO explicar um pouco mais sobre a monitorização de rede no linux ...como é que acontece
 
 Como anteriormente foi indicado a monitorização de sistemas produz uma perda de desempenho no sistema. Quando se trata de monitorizar processos dinâmicos esta monitorização pode aumentar ainda mais esta perda. O sistema desenvolvido permite que seja monitorizado um processo que faça utilização das chamadas ao sistema sobre a pilha de protocolos TCP/IP.
@@ -182,6 +182,10 @@ Escrever as tabelas actuais ... e verificar quais os dados necessários para out
 
 \section{Trabalho Relacionado}
 \label{sec:related_work}
+Trabalhos anteriores tentaram resolver os mesmos problemas mas continuavam a ter número de trocas de contexto.
+
+Um dos trabalhos efectuado por Nuno Farruca~\cite{farruca}, monitorizou os processos por duas vias. Monitorizar o processo através da criação de uma biblioteca que mapeia as funções da biblioteca de C \textit{LibC} e modificando a variável LD_PRELOAD, de forma a que quando fosse efectuada uma função da biblioteca de C que estivesse mapeada na biblioteca desenvolvida, estas fosse chamada primeiro de forma a obter os parâmetros das funções e assim comunicar à \textit{LibPCap} se os pacotes pertencentes a um determinado porto de um endereço são ou não para capturar. Uma outra forma foi obter os dados dos sockets pertencentes ao processo através do sistema de ficheiros virtual \textit{ProcFs} e executar a filtragem também em nível utilizador dos pacotes que chegam à interface capturadas através da \textit{LibPcap}.
+
 
 \section{Conclusões}
 \label{sec:conclusions}
