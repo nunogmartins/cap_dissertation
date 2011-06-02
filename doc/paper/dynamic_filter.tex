@@ -61,7 +61,7 @@
 
 \author{Nuno Martins%
 \and Vítor Duarte%
-\thanks{}%
+%\thanks{}%
 }
 %
 \authorrunning{\papertitle}
@@ -88,10 +88,15 @@ Universidade Nova de Lisboa, Portugal\\
 
 %Monitorização de processos dinâmicos têm elevados custos de desempenho.
 %Foi criado um novo subsistema de monitorização de rede, que filtra pacotes TCP e UDP de forma dinâmica.
+Poder analisar um processo é uma das melhores formas de compreender a execução deste, quando não é possível aceder ao código fonte. Ao executar a monitorização o desempenho do(s) processo(s), bem como do próprio sistema diminui. Como a monitorização de rede não é excepção, este trabalho centra-se na forma de diminuir o impacto negativo da monitorização de rede de um processo.
+A monitorização da comunicação de um processo com o exterior é complicada, pois ou se conhece \textit{à priori} quais os portos que irão ser utilizados, ou é necessário capturar todo o tráfego e apenas no final filtrar quais os pacotes referentes ao processo. A forma de minimizar este impacto negativo foi criar uma forma de filtragem dinâmica através da monitorização das chamadas ao sistema de comunicação com o exterior. Assim é possível criar um repositório com os endereços e portos utilizados por um processo, e capturar apenas o trafego que flue nestes. Deste modo é possível capturar apenas os dados referente às comunicações com o exterior efectuadas por um processo. Consegue-se diminuir o número de dados transferidos entre o núcleo de sistema e a aplicação monitorizadora, o que permite um menor número de trocas de contexto, que é um dos principais problemas na monitorização. 
 
-Neste trabalho é efectuado uma minimização do \textit{overhead} introduzido pela monitorização de rede de um processo. Esta minimização é alcançada através da monitorização dinâmica das chamadas ao sistema efectuadas pelos processos e consequente filtragem dos pacotes de rede pertencentes a este de forma a apenas serem capturados os pacotes interessantes fazendo assim reduzir o nº de pacotes copiados e transferidos para a aplicação monitorizadora. Com a redução de transferencias do nº de pacotes reduz-se o nº de trocas de contexto, consequentemente reduz-se o impacto negativo da monitorização.
 
-\keywords{PCap; Linux Kernel; Monitorização}
+%As chamadas ao sistema de comunicação com o exterior são monitorizadas através do \textit{KProbes}. Este sistema de monitorização das funções do núcleo do \testit{Linux}
+
+%diminuição do número de trocas de contexto necessárias monitorização dinâmica das chamadas ao sistema efectuadas pelos processos e consequente filtragem dos pacotes de rede pertencentes a este de forma a apenas serem capturados os pacotes interessantes fazendo assim reduzir o nº de pacotes copiados e transferidos para a aplicação monitorizadora. Com a redução de transferencias do nº de pacotes reduz-se o nº de trocas de contexto, consequentemente reduz-se o impacto negativo da monitorização.
+
+\keywords{PCap; Linux Kernel; Monitorização, KProbes}
 \end{abstract}
 
 
@@ -99,14 +104,13 @@ Neste trabalho é efectuado uma minimização do \textit{overhead} introduzido p
 \section{Introdução}
 \label{sec:introduction}
 
+A monitorização permite que diferentes partes de um programa ou processo possam ser analisados. Podemos analisar os tempos de execução de terminadas funções ou todo o processo, é possível analisar as interacções que se fazem com o exterior bem como outros parâmetros tais como a percentagem de utilização do(s) cpu(s) ou a utilização de memória.
 
 \section{Monitorização}
 \label{sec:mon_intro}
 
 %apenas os conceitos base
 %3/4 parágrafos
-
-A monitorização permite que diferentes partes de um programa ou processo possam ser analisados. Podemos analisar os tempos de execução de terminadas funções ou todo o processo, é possível analisar as interacções que se fazem com o exterior bem como outros parâmetros tais como a percentagem de utilização do(s) cpu(s) ou a utilização de memória.
 
 A monitorização causa perdas no desempenho e por isso é desejável que seja o menor possível. Estas devem-se a que pelo simples facto de se executar uma observação, não estar a fazer trabalho útil para o sistema.
 
@@ -184,8 +188,9 @@ Escrever as tabelas actuais ... e verificar quais os dados necessários para out
 \label{sec:related_work}
 Trabalhos anteriores tentaram resolver os mesmos problemas mas continuavam a ter número de trocas de contexto.
 
-Um dos trabalhos efectuado por Nuno Farruca~\cite{farruca}, monitorizou os processos por duas vias. Monitorizar o processo através da criação de uma biblioteca que mapeia as funções da biblioteca de C \textit{LibC} e modificando a variável LD_PRELOAD, de forma a que quando fosse efectuada uma função da biblioteca de C que estivesse mapeada na biblioteca desenvolvida, estas fosse chamada primeiro de forma a obter os parâmetros das funções e assim comunicar à \textit{LibPCap} se os pacotes pertencentes a um determinado porto de um endereço são ou não para capturar. Uma outra forma foi obter os dados dos sockets pertencentes ao processo através do sistema de ficheiros virtual \textit{ProcFs} e executar a filtragem também em nível utilizador dos pacotes que chegam à interface capturadas através da \textit{LibPcap}.
+Um dos trabalhos efectuado por Nuno Farruca~\cite{Farruca:2009}, monitorizou os processos por duas vias. Monitorizar o processo através da criação de uma biblioteca que mapeia as funções da biblioteca de C \textit{LibC} e modificando a variável LD\_PRELOAD, de forma a que quando fosse efectuada uma função da biblioteca de C que estivesse mapeada na biblioteca desenvolvida, estas fosse chamada primeiro de forma a obter os parâmetros das funções e assim comunicar à \textit{LibPCap} se os pacotes pertencentes a um determinado porto de um endereço são ou não para capturar. Uma outra forma foi obter os dados dos sockets pertencentes ao processo através do sistema de ficheiros virtual \textit{ProcFs} e executar a filtragem também em nível utilizador dos pacotes que chegam à interface capturadas através da \textit{LibPcap}.
 
+O trabalho efectuado por \cite{1688981}, efectuou uma monitorização, utilizando o sistema de monitorização \textit{KProbes}, das funções de transmissão e recepção de dados dentro do núcleo do sistema. Desta forma é possível monitorizar os dados de um processo. Os dados recolhidos são analisados com o intuito de perceber se determinada porta e endereço são conhecidos e caso não sejam é adicionada a informação a uma tabela de dispersão utilizada para efectuar um novo filtro. O pacote capturado  é atrasado e re-injectado e forma a poder ser capturado pela biblioteca \textit{LibPCap} através do novo filtro.
 
 \section{Conclusões}
 \label{sec:conclusions}
