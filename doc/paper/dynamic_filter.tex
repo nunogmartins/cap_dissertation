@@ -14,33 +14,35 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\documentclass[runningheads,a4paper]{llncs}
-\usepackage{amssymb}
-\setcounter{tocdepth}{3}
-\usepackage{graphicx}
+%\documentclass[runningheads,a4paper]{llncs}
+\documentclass[a4paper]{llncs}
+
+%\usepackage{amssymb}
+%\setcounter{tocdepth}{3}
+%\usepackage{graphicx}
 \usepackage{url}
 \usepackage[utf8]{inputenc}
-\usepackage{todonotes}
-\usepackage{hyperref}
-\usepackage{booktabs}
-\usepackage{subfig}
-\usepackage{array}
+%\usepackage{todonotes}
+%\usepackage{hyperref}
+%\usepackage{booktabs}
+%\usepackage{subfig}
+%\usepackage{array}
 \usepackage[portuges]{babel}
 
 % \newcommand{\papertitle}{A Distributed Computing Framework for Heterogeneous Environments}
 
 
-\newcommand{\papertitle}{Filtros dinâmicos}
+\newcommand{\papertitle}{PCap com filtragem orientada ao processo}
 
 %\newcommand{\papertitle}{Leveraging GPUs for Scientific Computing}
 
-\hypersetup{pdfborder=0 0 0,
-            pdfauthor={Nuno Martins e Vítor Duarte},
-%            pdfcreator=,
-            pdfkeywords={Pcap, linux, monitorização,},
-%            pdfsubject=TesteSubject,
-            pdftitle={\papertitle}
-           }
+%\hypersetup{pdfborder=0 0 0,
+%            pdfauthor={Nuno Martins \and Vítor Duarte},
+%%            pdfcreator=,
+%            pdfkeywords={Pcap, linux, monitorização,},
+%%            pdfsubject=TesteSubject,
+%            pdftitle={\papertitle}
+%           }
 
 
 \urldef{\mailsa}\path|nuno.m.g.martins@gmail.com|
@@ -59,19 +61,18 @@
 % first the title is needed
 \title{\papertitle}
 
-\author{Nuno Martins%
-\and Vítor Duarte%
-%\thanks{}%
-}
+\author{Nuno Martins\inst{1} e Vítor Duarte\inst{2}}
 %
 \authorrunning{\papertitle}
 % (feature abused for this document to repeat the title also on left hand pages)
 
 % the affiliations are given next; don't give your e-mail address
 % unless you accept that it will be published
-\institute{CITI --- Departamento de Informática,\\
-Universidade Nova de Lisboa, Portugal\\
-\mailsa \qquad \mailsb}
+\institute{\email{nuno.m.g.martins@gmail.com} \and \email{vad@di.fct.unl.pt}\\
+CITI --- Departamento de Informática,\\
+Faculdade de Ciências e Tecnologia,\\
+Universidade Nova de Lisboa, Portugal}
+%\mailsa \qquad \mailsb}
 
 %
 % NB: a more complex sample for affiliations and the mapping to the
@@ -86,10 +87,10 @@ Universidade Nova de Lisboa, Portugal\\
 
 \begin{abstract}
 
-%Monitorização de processos dinâmicos têm elevados custos de desempenho.
-%Foi criado um novo subsistema de monitorização de rede, que filtra pacotes TCP e UDP de forma dinâmica.
-Poder analisar um processo é uma das melhores formas de compreender a execução deste, quando não é possível aceder ao código fonte. Ao executar a monitorização o desempenho do(s) processo(s), bem como do próprio sistema diminui. Como a monitorização de rede não é excepção, este trabalho centra-se na forma de diminuir o impacto negativo da monitorização de rede de um processo.
-A monitorização da comunicação de um processo com o exterior é complicada, pois ou se conhece \textit{à priori} quais os portos que irão ser utilizados, ou é necessário capturar todo o tráfego e apenas no final filtrar quais os pacotes referentes ao processo. A forma de minimizar este impacto negativo foi criar uma forma de filtragem dinâmica através da monitorização das chamadas ao sistema de comunicação com o exterior. Assim é possível criar um repositório com os endereços e portos utilizados por um processo, e capturar apenas o trafego que flue nestes. Deste modo é possível capturar apenas os dados referente às comunicações com o exterior efectuadas por um processo. Consegue-se diminuir o número de dados transferidos entre o núcleo de sistema e a aplicação monitorizadora, o que permite um menor número de trocas de contexto, que é um dos principais problemas na monitorização. 
+A monitorização do comportamento dos processos é uma das melhores formas de compreender, detectar erros e avaliar o seu desempenho durante a sua execução real, ainda mais se não for possível aceder ao seu código fonte.
+No entanto, o impacto no desempenho e comportamento pode ser bastante significativo. O caso das interacções via rede não é excepção, sendo o pcap um dos sistemas mais populares para monitorizar/capturar o tráfego de rede ao nível do SO. Este trabalho baseia-se nesse sistema e no suporte dado pelo núcleo Linux, para permitir capturar as interacções via rede de processos específicos, procurando também limitar o impacto negativo desta monitorização.
+Predende-se que sem conhecer \emph{à priori} quais os portos que irão ser utilizados pelo processo, e sem necessitar de capturar todo o tráfego que pasa pela rede obter apenas os pacotes referentes ao processo alvo. 
+  Para tal, foi criada uma forma de filtragem no \emph{bpf-filters}, usados pelo pcap que, dinamicamente, através da monitorização das chamadas ao sistema do processo, permite manter os endereços e portos em utilização pelo processo alvo e capturar apenas o seu tráfego. Deste modo é possível obter apenas os dados relevantes, diminuir o volume de dados transferidos entre o núcleo de sistema e a ferramenta que monitoriza/analisa o processo, assim como um menor número de trocas de contexto, com vantagens funcionais e de desempenho. 
 
 
 %As chamadas ao sistema de comunicação com o exterior são monitorizadas através do \textit{KProbes}. Este sistema de monitorização das funções do núcleo do \testit{Linux}
