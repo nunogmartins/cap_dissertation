@@ -100,12 +100,12 @@ Predende-se que sem conhecer \emph{à priori} quais os portos que irão ser util
 \keywords{PCap; Linux Kernel; Monitorização, KProbes}
 \end{abstract}
 
-
-
 \section{Introdução}
 \label{sec:introduction}
 
 A monitorização permite que diferentes partes de um programa ou processo possam ser analisados. Podemos analisar os tempos de execução de terminadas funções ou todo o processo, é possível analisar as interacções que se fazem com o exterior bem como outros parâmetros tais como a percentagem de utilização do(s) cpu(s) ou a utilização de memória.
+
+A monitorização causa perdas no desempenho e por isso é desejável que seja o menor possível. Estas devem-se a que pelo simples facto de se executar uma observação, não existir trabalho útil para o processo.
 
 \section{Monitorização}
 \label{sec:mon_intro}
@@ -113,9 +113,16 @@ A monitorização permite que diferentes partes de um programa ou processo possa
 %apenas os conceitos base
 %3/4 parágrafos
 
-A monitorização causa perdas no desempenho e por isso é desejável que seja o menor possível. Estas devem-se a que pelo simples facto de se executar uma observação, não estar a fazer trabalho útil para o sistema.
-
 Na monitorização das interacções com o exterior via interfaces de rede é possível verificar que os principais causas da redução de desempenho são as frequentes trocas de contexto, as diferentes cópias de dados.
+
+
+A instrumentação do código pode ser efectuada de forma estática ou dinâmica. Na instrumentação estática é necessário ter acesso ao código fonte, passar pelo ciclo colocação dos pontos a analisar, compilar, executar e novamente colocação dos pontos a analisar. Desta forma não é possível modificar os pontos de instrumentação nem interagir com estes. Na instrumentação dinâmica é possível efectuar sem acesso ao código fonte, permite a colocação e remoção de pontos de instrumentação, bem como interagir com o sistema de monitorização.
+
+A monitorização em nível utilizador pode ser efectuada de diferentes formas. A instrumentação estática do código pode ser efectuada utilizando a biblioteca \textit{Gnu Profiller}. A instrumentação dinâmica pode ser efectuada utilizando diferentes técnicas, tais como:
+
+Alteração da variável de ambiente \textit{LD\_PRELOAD} de forma a executar previamente uma biblioteca dinâmica que poderá modificar o comportamento do processo. Esta técnica implica que exista um conhecimento prévio sobre os cabeçalhos das funções que se queiram analisar. Para aplicações executadas em modo supervisor (\textit{root}) este método não funciona.
+
+Executar o processo a ser monitorizado através do controlo do processo monitorizador. O processo monitorizador executa a chamada ao sistema exec ou seus derivados e indica ao núcleo de operação que esse processo irá ser monitorizado através da chamada ao sistema \textit{PTrace}. Esta é a forma como as ferramentas \textit{strace} e  \textit{GDB} actuam.
 
 
 \subsection{Monitorização de rede no Linux com recursos a filtros dinâmicos}
@@ -132,7 +139,7 @@ Este sistema foi criado a pensar na modularidade e nas potêncialidades de modif
 
 As quatro partes essenciais do sistema são: função de filtragem (ligação a um \textit{hook} ), monitorização das chamadas ao sistema, ou outras funções que estejam no sistema de rede, o repositório de dados e caso seja necessário o sistema de informação de análise da monitorização.
 
-\subsection*{Monitorização das chamadas ao sistema de rede}
+\subsection*{Instrumentação das chamadas ao sistema de rede}
 \label{sub:mon_syscalls}
 
 Para conseguir detectar todas as interacções que um processo executa com o exterior foi necessário monitorizar as chamadas ao sistema de rede de forma a garantir que todas estas interacções são detectadas. Uma forma de minimizar as trocas de contexto foi efectuar toda a monitorização dentro do kernel. Utilizando o sistema de monitorização KProbes, pertencente ao núcleo do Linux foi possível efectuar esta monitorização. Foram monitorizadas as chamadas ao sistema (\textit{sendto}, \textit{recvfrom}, \textit{bind}, \textit{accept}, \textit{connect} e  \textit{close}).
