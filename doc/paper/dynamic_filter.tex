@@ -22,7 +22,7 @@
 %\usepackage{graphicx}
 \usepackage{url}
 \usepackage[utf8]{inputenc}
-%\usepackage{todonotes}
+\usepackage{todonotes}
 %\usepackage{hyperref}
 %\usepackage{booktabs}
 %\usepackage{subfig}
@@ -114,7 +114,7 @@ A monitorização causa perdas no desempenho e por isso é desejável que seja o
 %3/4 parágrafos
 
 Na monitorização das interacções com o exterior via interfaces de rede é possível verificar que os principais causas da redução de desempenho são as frequentes trocas de contexto, as diferentes cópias de dados.
-
+\td{FALTA DIFERNTES FORMAS DE MONITORIZACAO}
 
 A instrumentação do código pode ser efectuada de forma estática ou dinâmica. Na instrumentação estática é necessário ter acesso ao código fonte, passar pelo ciclo colocação dos pontos a analisar, compilar, executar e novamente colocação dos pontos a analisar. Desta forma não é possível modificar os pontos de instrumentação nem interagir com estes. Na instrumentação dinâmica é possível efectuar sem acesso ao código fonte, permite a colocação e remoção de pontos de instrumentação, bem como interagir com o sistema de monitorização.
 
@@ -125,12 +125,21 @@ Alteração da variável de ambiente \textit{LD\_PRELOAD} de forma a executar pr
 Executar o processo a ser monitorizado através do controlo do processo monitorizador. O processo monitorizador executa a chamada ao sistema exec ou seus derivados e indica ao núcleo de operação que esse processo irá ser monitorizado através da chamada ao sistema \textit{PTrace}. Esta é a forma como as ferramentas \textit{strace} e  \textit{GDB} actuam.
 
 
-\subsection{Monitorização de rede no Linux com recursos a filtros dinâmicos}
+\subsection{Monitorização de rede}
 \label{sub:mon_network__with_dynamic_filters_linux}
-%TODO explicar um pouco mais sobre a monitorização de rede no linux ...como é que acontece
+\td{explicar um pouco mais sobre a monitorização de rede no linux ...como é que acontece}
 
 Como anteriormente foi indicado a monitorização de sistemas produz uma perda de desempenho no sistema. Quando se trata de monitorizar processos dinâmicos esta monitorização pode aumentar ainda mais esta perda. O sistema desenvolvido permite que seja monitorizado um processo que faça utilização das chamadas ao sistema sobre a pilha de protocolos TCP/IP.
 
+
+\subsubsection{Utilização de filtros, diminuição de pacotes}
+\label{subsub:socket_filter}
+
+Uma forma de diminuir o número de pacotes copidados da interface para a aplicação monitorizadora é aplicar filtro(s) para apenas capturar os pacotes que realmente interessam. Estes filtros são aplicados através de uma maquina virtual de execução de filtros. Através da biblioteca \textit{LibPCap} é também possível aplicar filtros. Nesta biblioteca existe um sistema de optimização e aplicação de filtros bem como uma linguagem propria para os descrever e compilar para o sistema de filtros conhecido como \textit{BPF}. No núcleo do \textit{Linux} é reconhecido na máquina virtual de filtros uma versão um pouco diferente do \textit{BPF}, o \textit{LSF} (\textit{Linux Socket Filter}).
+\td{Em algum ponto falta indicar que existe uma nova maquina virtual, que é baseada em just in time, mas que só funciona para x86\_64 devido ao número de registos ser maior face ao x86}
+
+
+\td{FALTA Descrever como se processa a captura no nível mais baixo, junto ao driver ...}
 
 \section{Desenho e arquitectura}
 \label{sec:architecture}
