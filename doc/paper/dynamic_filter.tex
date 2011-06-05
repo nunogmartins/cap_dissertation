@@ -129,6 +129,10 @@ Executar o processo a ser monitorizado através do controlo do processo monitori
 \label{sub:mon_network__with_dynamic_filters_linux}
 \td{explicar um pouco mais sobre a monitorização de rede no linux ...como é que acontece}
 
+A monitorização tráfego de rede é efectuado de forma passiva. A aplicação monitorizadora indica que quer recolher todo o tráfego, ou apenas um subconjunto deste, permitindo assim díminuir o número de pacotes a capturar. Consequentemente diminui o número de cópias de dados e trocas de contexto entre o núcleo e a aplicação.
+
+Em 1992 foi desenvolvido o \textit{Berckeley Packet Filter (BPF)}~\cite{Mccanne92thebsd} um sistema de filtragem de pacotes efectuado através de uma máquina de virtual de registos. O \textit{Linux} apresenta uma versão semelhante ao \textit{BPF} com o nome \textit{Linux Socket Filter}. Neste sistema os filtros são definidos numa linguagem que contem instruções para efectuar movimentações de dados de e para alguns registos e para calculos lógicos sobre os dados dos pacotes \textit{TCP/IP}. Cada programa a ser executado pode ser uma combinação de diferentes regras. Cada pacote que é recebido ou transferido na interface de rede é aplicado o filtro anteriormente definido. Se for aceite é então efectuado uma cópia do pacote para um repositório em anel que posteriormente irá ser consumido pela aplicação monitorizadora.
+
 Como anteriormente foi indicado a monitorização de sistemas produz uma perda de desempenho no sistema. Quando se trata de monitorizar processos dinâmicos esta monitorização pode aumentar ainda mais esta perda. O sistema desenvolvido permite que seja monitorizado um processo que faça utilização das chamadas ao sistema sobre a pilha de protocolos TCP/IP.
 
 
