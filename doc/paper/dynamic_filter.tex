@@ -92,11 +92,6 @@ No entanto, o impacto no desempenho e comportamento pode ser bastante significat
 Pretende-se que sem conhecer \emph{à priori} quais os portos que irão ser utilizados pelo processo, e sem necessitar de capturar todo o tráfego que circula pela rede obter apenas os pacotes referentes ao processo alvo. 
   Para tal, foi criada uma forma de filtragem no \emph{bpf-filters}, usados pelo pcap que, dinamicamente, através da monitorização das chamadas ao sistema do processo, permite manter os endereços e portos em utilização pelo processo alvo e capturar apenas o seu tráfego. Deste modo é possível obter apenas os dados relevantes, diminuir o volume de dados transferidos entre o núcleo de sistema e a ferramenta que monitoriza/analisa o processo, assim como um menor número de trocas de contexto, com vantagens funcionais e de desempenho. 
 
-
-%As chamadas ao sistema de comunicação com o exterior são monitorizadas através do \textit{KProbes}. Este sistema de monitorização das funções do núcleo do \testit{Linux}
-
-%diminuição do número de trocas de contexto necessárias monitorização dinâmica das chamadas ao sistema efectuadas pelos processos e consequente filtragem dos pacotes de rede pertencentes a este de forma a apenas serem capturados os pacotes interessantes fazendo assim reduzir o nº de pacotes copiados e transferidos para a aplicação monitorizadora. Com a redução de transferencias do nº de pacotes reduz-se o nº de trocas de contexto, consequentemente reduz-se o impacto negativo da monitorização.
-
 \keywords{Instrumentação, KProbes, Linux Kernel, Monitorização, Núcleo do Linux, PCap}
 \end{abstract}
 
@@ -119,14 +114,15 @@ Na monitorização das interacções com o exterior via interfaces de rede é po
 
 A instrumentação do código pode ser efectuada de forma estática ou dinâmica. Na instrumentação estática é necessário ter acesso ao código fonte, passar pelo ciclo colocação dos pontos a analisar, compilar, executar e novamente colocação dos pontos a analisar. Desta forma não é possível modificar os pontos de instrumentação nem interagir com estes. Na instrumentação dinâmica é possível efectuar sem acesso ao código fonte, permite a colocação e remoção de pontos de instrumentação, bem como interagir com o sistema de monitorização.
 
-\subsection{Monitorização USERLEVEL}
+\subsection{Monitorização de aplicações}
 \label{sub:user_level_monitor}
 
 A monitorização em nível utilizador pode ser efectuada de diferentes formas. A instrumentação estática do código pode ser efectuada utilizando a biblioteca \textit{Gnu Profiller}. A instrumentação dinâmica pode ser efectuada utilizando diferentes técnicas, tais como:
 
 Alteração da variável de ambiente \textit{LD\_PRELOAD} de forma a executar previamente uma biblioteca dinâmica que poderá modificar o comportamento do processo. Esta técnica implica que exista um conhecimento prévio sobre os cabeçalhos das funções que se queiram analisar. Para aplicações executadas em modo supervisor (\textit{root}) este método não funciona.
 
-Executar o processo a ser monitorizado através do controlo do processo monitorizador. O processo monitorizador executa a chamada ao sistema exec ou seus derivados e indica ao núcleo de operação que esse processo irá ser monitorizado através da chamada ao sistema \textit{PTrace}~\cite{PTrace}. Esta é a forma como as ferramentas \textit{strace}~\cite{strace} e  \textit{GDB}~\cite{gdb} actuam.
+Executar o processo a ser monitorizado através do controlo do processo monitorizador. O processo monitorizador executa a chamada ao sistema exec ou seus derivados e indica ao núcleo de operação que esse processo irá ser monitorizado através da chamada ao sistema \textit{PTrace}~\cite{PTrace}. Esta é a forma como as ferramentas \textit{strace}~\cite{strace} e  \textit{GDB}~\cite{gdb} actuam. Como é visível é necessário um suporte do SO para que se possa proceder a uma monitorização eficiente e correcta.
+\td{falta falar do sysprof tb tem de levar suporte do núcleo}
 
 \subsection{Monitorização do núcleo}
 \label{sub_kernel_instrumentation}
@@ -136,27 +132,32 @@ A monitorização do núcleo do \textit{Linux} não é efectuado da mesma forma 
 
 Dentro da categoria dos sistemas que efectuam um traço de execução existe o \textit{LTT}~\cite{ltt} (mais recentemente o \textit{LTTng}~\cite{lttng}), o \textit{KProbes} ~\cite{KProbesSite,kernel_debug_printk_on_fly}
 
-Um sistema de instrumentação do núcleo do \textit{Linux} é o \textit{KProbes}. Este sistema permite colocar código de instrumentação do núcleo através da definição de um módulo. Existem três formas de monitorização utilizando o \textit{KProbes}, sendo o \textit{KProbe} a generalização e o \textit{JProbe} e \textit{KRetProbe} particularizações.
+Um sistema de instrumentação do núcleo do \textit{Linux} é o \textit{KProbes}. Este sistema permite colocar código de instrumentação do núcleo através da definição de um módulo. Existem três formas de monitorização utilizando o \textit{KProbes}, sendo o \textit{KProbe} a generalização e o \textit{JPrtobe} e \textit{KRetProbe} particularizações.
+
+O \textit{KProbes} permite que sejam instrumentados as funções do núcleo bem como de módulos carregados no sistema. Este sistema tem uma forma bem definida de criação e destruição dos pontos de instrumentação e permite ao programador um maior controlo. Como programar para o núcleo do \textit{Linux} pode ser complicado foram criadas pelo menos duas ferramentas (\textit{SystemTap} ~\cite{systemtap} e \textit{DProbes} ~\cite{dprobes}) que garantem algumas facilidade de programação, segurança, portabilidade entre versões, entre outras. Os programadores utilizando as linguagens fornecidas por estes programas criam os seus programas e as aplicações geram um módulo do núcleo, onde permite os acessos às funções instrumentadas.
 
 \subsubsection{Monitorização de rede}
 \label{subsub:mon_network__with_dynamic_filters_linux}
 
 A monitorização tráfego de rede é efectuado de forma passiva. A aplicação monitorizadora indica que quer recolher todo o tráfego, ou apenas um subconjunto deste, permitindo assim díminuir o número de pacotes a capturar. Consequentemente diminui o número de cópias de dados e trocas de contexto entre o núcleo e a aplicação.
-\td{explicar um pouco mais sobre a monitorização de rede no linux ...como é que acontece}
-Em 1992 foi desenvolvido o \textit{Berckeley Packet Filter (BPF)}~\cite{Mccanne92thebsd} um sistema de filtragem de pacotes efectuado através de uma máquina de virtual de registos. O \textit{Linux} apresenta uma versão semelhante ao \textit{BPF} com o nome \textit{Linux Socket Filter}. Neste sistema os filtros são definidos numa linguagem que contem instruções para efectuar movimentações de dados de e para alguns registos e para calculos lógicos sobre os dados dos pacotes \textit{TCP/IP}. Cada programa a ser executado pode ser uma combinação de diferentes regras. Cada pacote que é recebido ou transferido na interface de rede é aplicado o filtro anteriormente definido. Se for aceite é então efectuado uma cópia do pacote para um repositório em anel que posteriormente irá ser consumido pela aplicação monitorizadora.
+\td{explicar um pouco mais sobre a monitorização de rede no linux ...como se processa}
+
 
 Como anteriormente foi indicado a monitorização de sistemas introduz perdas no desempenho do sistema. Quando se trata de monitorizar processos dinâmicos esta monitorização pode aumentar ainda mais esta perda. O sistema desenvolvido permite que seja monitorizado um processo que faça utilização das chamadas ao sistema sobre a pilha de protocolos TCP/IP.
 
 \paragraph{Firewall}
 
-Existe um sistema de \textit{firewall} no \textit{Linux}, que gere o fluxo de dados de e para o exterior através de politicas de controlo. Este sistema é o \textit{NetFilter} e está dentro do núcleo do \textit{Linux}. A gestão do fluxo de dados é efectuada através de regras, estas podem ser indicadas em qualquer momento ao \textit{NetFilter} para poderem ser aplicadas. Estas regras são baseadas na definição do tráfego, ou seja, se é de entrada ou de saída ou de redireccionamento, entre outros parâmetros.
+Existe um sistema de \textit{firewall} no \textit{Linux}, que gere o fluxo de dados de e para o exterior através de politicas de controlo. Este sistema é o \textit{NetFilter} e está dentro do núcleo do \textit{Linux}. A gestão do fluxo de dados é efectuada através de regras, estas podem ser indicadas em qualquer momento ao \textit{NetFilter} para poderem ser aplicadas. Estas regras são baseadas na definição do tráfego, ou seja, se é de entrada ou de saída ou de redireccionamento, entre outros parâmetros tais como portas e interfaces de rede.
 
-O \textit{NetFilter} é composto por vários módulos do núcleo, um deles é o \textit{conntrack}. Este módulo permite monitorizar os pacotes pertencentes a um fluxo, assemelhando-se assim a uma \textit{firewall} com estado.
+O \textit{NetFilter} é composto por vários módulos do núcleo, um deles é o \textit{conntrack}. Este módulo permite monitorizar os pacotes pertencentes a um fluxo, assemelhando-se assim a uma \textit{firewall} com estado. Uma das desvantagens destes sistemas é a necessitade de conhecer as especificações do protocolo e de não mapear um fluxo de dados em relação a um processo.
 
-\subsubsection{Utilização de filtros, diminuição de pacotes}
+\subsubsection*{Suporte de Monitorização de rede}
+Em 1992 foi desenvolvido o \textit{Berckeley Packet Filter (BPF)}~\cite{Mccanne92thebsd} um sistema de filtragem de pacotes efectuado através de uma máquina de virtual de registos. O \textit{Linux} apresenta uma versão semelhante ao \textit{BPF} com o nome \textit{Linux Socket Filter}. Neste sistema os filtros são definidos numa linguagem que contem instruções para efectuar movimentações de dados de e para alguns registos e para calculos lógicos sobre os dados dos pacotes \textit{TCP/IP}. Cada programa a ser executado pode ser uma combinação de diferentes regras. Cada pacote que é recebido ou transferido na interface de rede é aplicado o filtro anteriormente definido. Se for aceite é então efectuado uma cópia do pacote para um repositório em anel que posteriormente irá ser consumido pela aplicação monitorizadora.
+
+\paragraph{Utilização de filtros, diminuição de pacotes}
 \label{subsub:socket_filter}
 
-Uma forma de diminuir o número de pacotes copidados da interface para a aplicação monitorizadora é aplicar filtro(s) para apenas capturar os pacotes que realmente interessam. Estes filtros são aplicados através de uma maquina virtual de execução de filtros. Através da biblioteca \textit{LibPCap} é também possível aplicar filtros. Nesta biblioteca existe um sistema de optimização e aplicação de filtros bem como uma linguagem propria para os descrever e compilar para o sistema de filtros conhecido como \textit{BPF}. No núcleo do \textit{Linux} é reconhecido na máquina virtual de filtros uma versão um pouco diferente do \textit{BPF}, o \textit{LSF} (\textit{Linux Socket Filter}).
+Uma forma de diminuir o número de pacotes copiados da interface para a aplicação monitorizadora é aplicar filtro(s) para apenas capturar os pacotes que realmente interessam. Estes filtros são aplicados através de uma maquina virtual de execução de filtros. Através da biblioteca \textit{LibPCap} é também possível aplicar filtros. Nesta biblioteca existe um sistema de optimização e aplicação de filtros bem como uma linguagem propria para os descrever e compilar para o sistema de filtros conhecido como \textit{BPF}. No núcleo do \textit{Linux} é reconhecido na máquina virtual de filtros uma versão um pouco diferente do \textit{BPF}, o \textit{LSF} (\textit{Linux Socket Filter}).
 \td{Em algum ponto falta indicar que existe uma nova maquina virtual, que é baseada em just in time, mas que só funciona para x86\_64 devido ao número de registos ser maior face ao x86}
 
 
@@ -171,8 +172,11 @@ O tamanho do anel de blocos é definido ao inicio da monitorização e cada paco
 \section{Desenho e arquitectura}
 \label{sec:architecture}
 
-O sistema proposto foi desenvolvido tendo em conta a modularidade e as potencialidades de modificação de diferentes componentes, de modo a torná-lo extensível, possibilitando o aumento de funcionalidades e obter diferentes desempenhos. Para tal, o sistema criado está dividido em 4 componentes principais: Função de filtragem (que recorre à ligação de um hook); Uma componente de monitorização de chamadas ao sistema ou outras funções contidas no sistema de rede; Um repositório de dados; e, finalmente, caso seja necessário, a utilização de um sistema de informação de análise da monitorização.
+O sistema proposto foi desenvolvido tendo em conta a modularidade e as potencialidades de modificação de diferentes componentes, de modo a torná-lo extensível, possibilitando o aumento de funcionalidades e obter diferentes desempenhos. Para tal, o sistema criado está dividido em 4 componentes principais: função de filtragem (que recorre à ligação de um \textit{hook}), uma componente de instrumentação das chamadas ao sistema (ou outras funções contidas no sistema de rede), um repositório de dados e, finalmente, caso seja necessário, a utilização de um sistema de informação de análise da monitorização.
 
+Este sistema permite que sejam capturados os pacotes de rede de um processo, sem que exista um conhecimento prévio sobre o(s) protocolo(s) em utilização. A utilização de um sistema de instrumentação do núcleo foi necessário de forma perceber qual o processo que executou a chamada ao sistema, permitindo desta forma obter apenas as chamadas ao sistema do(s) processo(s) que realmente são monitorizados. De forma a minimizar as trocas de contexto, todo o sistema foi desenvolvido dentro do núcleo do \textit{Linux}, assim apenas as outras aplicações de façam uso da biblioteca \textit{LibPcap}, do programa \textit{TcpDump} ou suas variantes tenham de executar código em nível utilizador. Foi construído um sistema que permite facilmente modificar os seus componentes, mas que no entanto não irá sacrificar o desempenho, por isso deverá ser minimalista nas suas opções.
+
+A apresentação da estrutura do sistema é apresentada em seguida, bem como uma imagem com os constituíntes do deste.
 
 \subsection*{Instrumentação das chamadas ao sistema de rede}
 \label{sub:mon_syscalls}
@@ -188,7 +192,7 @@ definidos no Linux Socket Filter. Deste modo, para minimizar as alterações ao 
 \subsection*{Repositório de dados}
 \label{sub:data_repository}
 
-Os portos TCP e UDP em utilização por um dado processo necessitam ser guardados num repositório de dados, de forma que aquando da chegada de um pacote à interface de rede, este pode ser comparado (acho que falta aqui uma explicação um pouco mais detalhada). A estrutura dados escolhida para o efeito, para produzir o repositório pretendido, corresponde a uma árvore Red and Black. O uso deste tipo de estrutura permite que o conteúdo da árvore esteja balanceado/equilibrado, obtendo-se um bom compromisso de tempo de acesso à estrutura versus quantidade de memória utilizada.
+Os portos TCP e UDP em utilização por um dado processo necessitam ser guardados num repositório de dados, de forma que aquando da chegada de um pacote à interface de rede, este possa ser comparado \td{explicação um pouco mais detalhada}. A estrutura dados escolhida para o efeito, para produzir o repositório pretendido, corresponde a uma árvore \textit{Red and Black}. O uso deste tipo de estrutura permite que o conteúdo da árvore esteja balanceado/equilibrado, obtendo-se um bom compromisso de tempo de acesso à estrutura \textit{versus} quantidade de memória utilizada.
 
 \subsection*{Informação de análise}
 \label{sub:data_information}
@@ -201,6 +205,8 @@ Para poder efectuar os testes de avaliação foi criado uma aplicação em níve
 
 \section{Avaliação}
 \label{sec:evaluation}
+Este sistema foi avaliado funcionalmente através dos protocolos em \textit{ftp} e \textit{http}. Estes testes iniciais não visaram a performance mas sim a correcção de todos os pacotes envolvidos nas comunicações.
+O sitema de testes utilizados permitiu que fossem capturados os pacotes de uma transferência de um ficheiro de um servidor \textit{ftp} e um servidor de \textit{http}, os dados foram capturados na obtenção do ficheiro (cliente).
 
 Escrever as tabelas actuais ... e verificar quais os dados necessários para outros testes ...
 \paragraph*{}
