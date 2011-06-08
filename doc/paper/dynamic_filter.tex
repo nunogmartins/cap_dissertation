@@ -124,7 +124,7 @@ Alteração da variável de ambiente \textit{LD\_PRELOAD} de forma a executar pr
 Executar o processo a ser monitorizado através do controlo do processo monitorizador. O processo monitorizador executa a chamada ao sistema exec ou seus derivados e indica ao núcleo de operação que esse processo irá ser monitorizado através da chamada ao sistema \textit{PTrace}~\cite{PTrace}. Esta é a forma como as ferramentas \textit{strace}~\cite{strace} e  \textit{GDB}~\cite{gdb} actuam. Como é visível é necessário um suporte do SO para que se possa proceder a uma monitorização eficiente e correcta.
 \td{falta falar do sysprof tb tem de levar suporte do núcleo}
 
-\subsection{Monitorização do núcleo}
+\subsection{Monitorização no núcleo}
 \label{sub_kernel_instrumentation}
 
 A monitorização do núcleo do \textit{Linux} não é efectuado da mesma forma das aplicações em nível utilizador. Existem diferentes sistemas de monitorização e instrumentação do núcleo, alguns pertencem à versão principal do núcleo do \textit{Linux} outros são adicionados aplicando algumas correcções/patches. Dentro do núcleo existem sistemas de instrumentação dinâmica e estática. Um dos sistemas de instrumentação estática do código é o \textit{TracePoints}, este sistema permite que sejam colocadas funções que irão ser executadas em certos pontos do código. Este sistema permite que se estes pontos não estejam activos apenas um pequeno custo (de verificação se está activo) seja imposto. Em oposição aos sistemas estáticos existem os sistemas dinâmicos, que podem ser adicionados e removidos em tempo de execução. Estes sistemas podem ser distinguidos em dois tipos, os que permite efectuar um traço da computação e aqueles que utilizam amostragens em determinados intervalos definidos. Deste último existe o OProfile~\cite{qq_coisa}. \td{Dizer qq coisa sobre OProfile}
@@ -174,7 +174,7 @@ O tamanho do anel de blocos é definido ao inicio da monitorização e cada paco
 
 O sistema proposto foi desenvolvido tendo em conta a modularidade e as potencialidades de modificação de diferentes componentes, de modo a torná-lo extensível, possibilitando o aumento de funcionalidades e obter diferentes desempenhos. Para tal, o sistema criado está dividido em 4 componentes principais: função de filtragem (que recorre à ligação de um \textit{hook}), uma componente de instrumentação das chamadas ao sistema (ou outras funções contidas no sistema de rede), um repositório de dados e, finalmente, caso seja necessário, a utilização de um sistema de informação de análise da monitorização.
 
-Este sistema permite que sejam capturados os pacotes de rede de um processo, sem que exista um conhecimento prévio sobre o(s) protocolo(s) em utilização. A utilização de um sistema de instrumentação do núcleo foi necessário de forma perceber qual o processo que executou a chamada ao sistema, permitindo desta forma obter apenas as chamadas ao sistema do(s) processo(s) que realmente são monitorizados. De forma a minimizar as trocas de contexto, todo o sistema foi desenvolvido dentro do núcleo do \textit{Linux}, assim apenas as outras aplicações de façam uso da biblioteca \textit{LibPcap}, do programa \textit{TcpDump} ou suas variantes tenham de executar código em nível utilizador. Foi construído um sistema que permite facilmente modificar os seus componentes, mas que no entanto não irá sacrificar o desempenho, por isso deverá ser minimalista nas suas opções.
+Este sistema permite que sejam capturados os pacotes de rede de um processo, sem que exista um conhecimento prévio sobre o(s) protocolo(s) em utilização. A utilização de um sistema de instrumentação do núcleo foi necessária para apenas monitorizar a parte de rede e qual o processo que executou a chamada ao sistema, permitindo desta forma obter apenas as chamadas ao sistema do(s) processo(s) que realmente são monitorizados. De forma a minimizar a redução de desempenho, todo o sistema foi desenvolvido dentro do núcleo do \textit{Linux}, assim apenas as outras aplicações de façam uso da biblioteca \textit{LibPcap}, do programa \textit{TcpDump} ou suas variantes tenham de executar código em nível utilizador. Foi construído um sistema que permite facilmente modificar os seus componentes, mas que no entanto não irá sacrificar o desempenho, por isso deverá ser minimalista nas suas opções.
 
 A apresentação da estrutura do sistema é apresentada em seguida, bem como uma imagem com os constituíntes do deste.
 
@@ -186,13 +186,12 @@ Um ponto importante deste sistema, constituiu na garantia que todas as interacç
 \subsection*{Filtro de pacotes}
 \label{sub:packet_filter}
 
-A função de filtragem aplicado a este sistema assenta no uso de filtros dinâmicos, aos quais permitem efectuar monitorização de rede com ou sem o sistema de filtragem de pacotes
-definidos no Linux Socket Filter. Deste modo, para minimizar as alterações ao nível da monitorização de rede no Linux, introduziu-se um hook no sistema de rede. Através da utilização deste hook permite que, quando ligado, a monitorização passe pelo sistema dinâmico de filtragem, possibilitando efectuar uma nova monitorização e tirar partido dos benefícios da utilização do Linux Socket Filter (na medida em que se trata de uma linguagem genérica, permitindo efectuar uma análise sobre os pacotes que estão a ser monitorizados).
+A função de filtragem aplicada a este sistema assenta no uso de filtros dinâmicos, aos quais permitem efectuar monitorização de rede com ou sem o sistema de filtragem de pacotes definidos no Linux Socket Filter. Deste modo, para minimizar as alterações ao nível da monitorização de rede no Linux, introduziu-se um hook no sistema de rede. Através da utilização deste hook, quando ligado, permite que a monitorização passe pelo sistema dinâmico de filtragem, possibilitando efectuar uma nova monitorização e tirar partido dos benefícios da utilização do Linux Socket Filter.
 
 \subsection*{Repositório de dados}
 \label{sub:data_repository}
 
-Os portos TCP e UDP em utilização por um dado processo necessitam ser guardados num repositório de dados, de forma que aquando da chegada de um pacote à interface de rede, este possa ser comparado \td{explicação um pouco mais detalhada}. A estrutura dados escolhida para o efeito, para produzir o repositório pretendido, corresponde a uma árvore \textit{Red and Black}. O uso deste tipo de estrutura permite que o conteúdo da árvore esteja balanceado/equilibrado, obtendo-se um bom compromisso de tempo de acesso à estrutura \textit{versus} quantidade de memória utilizada.
+Os portos TCP e UDP em utilização por um dado processo necessitam ser guardados num repositório de dados, para que quando chegue um pacote à interface de rede, este possa ser comparado \td{explicação um pouco mais detalhada}. A estrutura dados escolhida para o efeito, para produzir o repositório pretendido, corresponde a uma árvore \textit{Red and Black}. O uso deste tipo de estrutura permite que o conteúdo da árvore esteja balanceado/equilibrado, obtendo-se um bom compromisso de tempo de acesso à estrutura \textit{versus} quantidade de memória utilizada.
 
 \subsection*{Informação de análise}
 \label{sub:data_information}
@@ -206,7 +205,7 @@ Para poder efectuar os testes de avaliação foi criado uma aplicação em níve
 \section{Avaliação}
 \label{sec:evaluation}
 Este sistema foi avaliado funcionalmente através dos protocolos em \textit{ftp} e \textit{http}. Estes testes iniciais não visaram a performance mas sim a correcção de todos os pacotes envolvidos nas comunicações.
-O sitema de testes utilizados permitiu que fossem capturados os pacotes de uma transferência de um ficheiro de um servidor \textit{ftp} e um servidor de \textit{http}, os dados foram capturados na obtenção do ficheiro (cliente).
+O sistema de testes utilizados permitiu que fossem capturados os pacotes de uma transferência de um ficheiro, de um servidor \textit{ftp} e de um servidor de \textit{http}. Foi efectuada a monitorização da aplicação cliente para estes servidores, através do programa wget.
 
 Escrever as tabelas actuais ... e verificar quais os dados necessários para outros testes ...
 \paragraph*{}
