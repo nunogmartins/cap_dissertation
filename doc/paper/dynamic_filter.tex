@@ -88,8 +88,8 @@ Universidade Nova de Lisboa, Portugal}
 \begin{abstract}
 
 A monitorização do comportamento dos processos é uma das melhores formas de compreender, detectar erros e avaliar o seu desempenho durante a sua execução real, ainda mais se não for possível aceder ao seu código fonte.
-No entanto, o impacto no desempenho e comportamento pode ser bastante significativo. O caso das interacções via rede não é excepção, sendo o pcap um dos sistemas mais populares para monitorizar/capturar o tráfego de rede ao nível do SO. Este trabalho baseia-se nesse sistema e no suporte dado pelo núcleo Linux, para permitir capturar as interacções via rede de processos específicos, procurando também limitar o impacto negativo desta monitorização.
-Predende-se que sem conhecer \emph{à priori} quais os portos que irão ser utilizados pelo processo, e sem necessitar de capturar todo o tráfego que pasa pela rede obter apenas os pacotes referentes ao processo alvo. 
+No entanto, o impacto no desempenho e comportamento pode ser bastante significativo. O caso das interacções via rede não é excepção, sendo o PCap um dos sistemas mais populares para monitorizar/capturar o tráfego de rede ao nível do SO. Este trabalho baseia-se nesse sistema e no suporte dado pelo núcleo Linux, para permitir capturar as interacções via rede de processos específicos, procurando também limitar o impacto negativo desta monitorização.
+Pretende-se que sem conhecer \emph{à priori} quais os portos que irão ser utilizados pelo processo, e sem necessitar de capturar todo o tráfego que circula pela rede obter apenas os pacotes referentes ao processo alvo. 
   Para tal, foi criada uma forma de filtragem no \emph{bpf-filters}, usados pelo pcap que, dinamicamente, através da monitorização das chamadas ao sistema do processo, permite manter os endereços e portos em utilização pelo processo alvo e capturar apenas o seu tráfego. Deste modo é possível obter apenas os dados relevantes, diminuir o volume de dados transferidos entre o núcleo de sistema e a ferramenta que monitoriza/analisa o processo, assim como um menor número de trocas de contexto, com vantagens funcionais e de desempenho. 
 
 
@@ -97,7 +97,7 @@ Predende-se que sem conhecer \emph{à priori} quais os portos que irão ser util
 
 %diminuição do número de trocas de contexto necessárias monitorização dinâmica das chamadas ao sistema efectuadas pelos processos e consequente filtragem dos pacotes de rede pertencentes a este de forma a apenas serem capturados os pacotes interessantes fazendo assim reduzir o nº de pacotes copiados e transferidos para a aplicação monitorizadora. Com a redução de transferencias do nº de pacotes reduz-se o nº de trocas de contexto, consequentemente reduz-se o impacto negativo da monitorização.
 
-\keywords{PCap; Linux Kernel; Monitorização, KProbes}
+\keywords{Instrumentação, KProbes, Linux Kernel, Monitorização, Núcleo do Linux, PCap}
 \end{abstract}
 
 \section{Introdução}
@@ -116,29 +116,40 @@ A monitorização causa perdas no desempenho e por isso é desejável que seja o
 Na monitorização das interacções com o exterior via interfaces de rede é possível verificar que os principais causas da redução de desempenho são as frequentes trocas de contexto, as diferentes cópias de dados.
 \td{FALTA DIFERENTES FORMAS DE MONITORIZACAO}
 
+
 A instrumentação do código pode ser efectuada de forma estática ou dinâmica. Na instrumentação estática é necessário ter acesso ao código fonte, passar pelo ciclo colocação dos pontos a analisar, compilar, executar e novamente colocação dos pontos a analisar. Desta forma não é possível modificar os pontos de instrumentação nem interagir com estes. Na instrumentação dinâmica é possível efectuar sem acesso ao código fonte, permite a colocação e remoção de pontos de instrumentação, bem como interagir com o sistema de monitorização.
+
+\subsection{Monitorização USERLEVEL}
+\label{sub:user_level_monitor}
 
 A monitorização em nível utilizador pode ser efectuada de diferentes formas. A instrumentação estática do código pode ser efectuada utilizando a biblioteca \textit{Gnu Profiller}. A instrumentação dinâmica pode ser efectuada utilizando diferentes técnicas, tais como:
 
 Alteração da variável de ambiente \textit{LD\_PRELOAD} de forma a executar previamente uma biblioteca dinâmica que poderá modificar o comportamento do processo. Esta técnica implica que exista um conhecimento prévio sobre os cabeçalhos das funções que se queiram analisar. Para aplicações executadas em modo supervisor (\textit{root}) este método não funciona.
 
-Executar o processo a ser monitorizado através do controlo do processo monitorizador. O processo monitorizador executa a chamada ao sistema exec ou seus derivados e indica ao núcleo de operação que esse processo irá ser monitorizado através da chamada ao sistema \textit{PTrace}. Esta é a forma como as ferramentas \textit{strace} e  \textit{GDB} actuam.
+Executar o processo a ser monitorizado através do controlo do processo monitorizador. O processo monitorizador executa a chamada ao sistema exec ou seus derivados e indica ao núcleo de operação que esse processo irá ser monitorizado através da chamada ao sistema \textit{PTrace}~\cite{PTrace}. Esta é a forma como as ferramentas \textit{strace}~\cite{strace} e  \textit{GDB}~\cite{gdb} actuam.
+
+\subsection{Monitorização do núcleo}
+\label{sub_kernel_instrumentation}
+
+A monitorização do núcleo do \textit{Linux} não é efectuado da mesma forma das aplicações em nível utilizador. Existem diferentes sistemas de monitorização e instrumentação do núcleo, alguns pertencem à versão principal do núcleo do \textit{Linux} outros são adicionados aplicando algumas correcções/patches. Dentro do núcleo existem sistemas de instrumentação dinâmica e estática. Um dos sistemas de instrumentação estática do código é o \textit{TracePoints}, este sistema permite que sejam colocadas funções que irão ser executadas em certos pontos do código. Este sistema permite que se estes pontos não estejam activos apenas um pequeno custo (de verificação se está activo) seja imposto. Em oposição aos sistemas estáticos existem os sistemas dinâmicos, que podem ser adicionados e removidos em tempo de execução. Estes sistemas podem ser distinguidos em dois tipos, os que permite efectuar um traço da computação e aqueles que utilizam amostragens em determinados intervalos definidos. Deste último existe o OProfile~\cite{qq_coisa}. \td{Dizer qq coisa sobre OProfile}
 
 
-\subsection{Monitorização de rede}
-\label{sub:mon_network__with_dynamic_filters_linux}
-\td{explicar um pouco mais sobre a monitorização de rede no linux ...como é que acontece}
+Dentro da categoria dos sistemas que efectuam um traço de execução existe o \textit{LTT}~\cite{ltt} (mais recentemente o \textit{LTTng}~\cite{lttng}), o \textit{KProbes} ~\cite{KProbesSite,kernel_debug_printk_on_fly}
+
+Um sistema de instrumentação do núcleo do \textit{Linux} é o \textit{KProbes}. Este sistema permite colocar código de instrumentação do núcleo através da definição de um módulo. Existem três formas de monitorização utilizando o \textit{KProbes}, sendo o \textit{KProbe} a generalização e o \textit{JProbe} e \textit{KRetProbe} particularizações.
+
+\subsubsection{Monitorização de rede}
+\label{subsub:mon_network__with_dynamic_filters_linux}
 
 A monitorização tráfego de rede é efectuado de forma passiva. A aplicação monitorizadora indica que quer recolher todo o tráfego, ou apenas um subconjunto deste, permitindo assim díminuir o número de pacotes a capturar. Consequentemente diminui o número de cópias de dados e trocas de contexto entre o núcleo e a aplicação.
-
+\td{explicar um pouco mais sobre a monitorização de rede no linux ...como é que acontece}
 Em 1992 foi desenvolvido o \textit{Berckeley Packet Filter (BPF)}~\cite{Mccanne92thebsd} um sistema de filtragem de pacotes efectuado através de uma máquina de virtual de registos. O \textit{Linux} apresenta uma versão semelhante ao \textit{BPF} com o nome \textit{Linux Socket Filter}. Neste sistema os filtros são definidos numa linguagem que contem instruções para efectuar movimentações de dados de e para alguns registos e para calculos lógicos sobre os dados dos pacotes \textit{TCP/IP}. Cada programa a ser executado pode ser uma combinação de diferentes regras. Cada pacote que é recebido ou transferido na interface de rede é aplicado o filtro anteriormente definido. Se for aceite é então efectuado uma cópia do pacote para um repositório em anel que posteriormente irá ser consumido pela aplicação monitorizadora.
 
-Como anteriormente foi indicado a monitorização de sistemas produz uma perda de desempenho no sistema. Quando se trata de monitorizar processos dinâmicos esta monitorização pode aumentar ainda mais esta perda. O sistema desenvolvido permite que seja monitorizado um processo que faça utilização das chamadas ao sistema sobre a pilha de protocolos TCP/IP.
+Como anteriormente foi indicado a monitorização de sistemas introduz perdas no desempenho do sistema. Quando se trata de monitorizar processos dinâmicos esta monitorização pode aumentar ainda mais esta perda. O sistema desenvolvido permite que seja monitorizado um processo que faça utilização das chamadas ao sistema sobre a pilha de protocolos TCP/IP.
 
-\subsection{Firewall do Linux}
-\label{sub:linux_firewall}
+\paragraph{Firewall}
 
-Existe um sistema de \textit{firewall} no \textit{Linux}, que gere o fluxo de dados de e para o exterior através de politicas de controlo. Este sistema é o \texit{NetFilter} e está dentro do núcleo do \textit{Linux}. A gestão do fluxo de dados é efectuada através regras, estas podem ser indicadas em qualquer momento ao \textit{NetFilter} para poderem ser aplicadas. Estas regras são baseadas na definição do tráfego, ou seja, se é de entrada ou de saída ou de redireccionamento, entre outros parâmetros.
+Existe um sistema de \textit{firewall} no \textit{Linux}, que gere o fluxo de dados de e para o exterior através de politicas de controlo. Este sistema é o \textit{NetFilter} e está dentro do núcleo do \textit{Linux}. A gestão do fluxo de dados é efectuada através de regras, estas podem ser indicadas em qualquer momento ao \textit{NetFilter} para poderem ser aplicadas. Estas regras são baseadas na definição do tráfego, ou seja, se é de entrada ou de saída ou de redireccionamento, entre outros parâmetros.
 
 O \textit{NetFilter} é composto por vários módulos do núcleo, um deles é o \textit{conntrack}. Este módulo permite monitorizar os pacotes pertencentes a um fluxo, assemelhando-se assim a uma \textit{firewall} com estado.
 
@@ -151,41 +162,42 @@ Uma forma de diminuir o número de pacotes copidados da interface para a aplica�
 
 \td{FALTA Descrever como se processa a captura no nível mais baixo, junto ao driver ...}
 
-\subsection{Instrumentação do núcleo}
-\label{sub_kernel_instrumentation}
 
-Um sistema de instrumentação do núcleo do \textit{Linux} é o \textit{KProbes} ~\cite{KProbesSite,kernel_debug_printk_on_fly}. Este sistema permite colocar código de instrumentação do núcleo através da definição de um módulo. Existem três formas de monitorização utilizando o \textit{KProbes}, sendo o \textit{KProbe} a generalização e o \textit{JProbe} e \textit{KRetProbe} particularizações.
+O tamanho do anel de blocos é definido ao inicio da monitorização e cada pacote que seja para capturar é colocado em um bloco. Como os blocos são de tamanho fixo e os pacotes de tamanho variável existe um desperdício de espaço para dados, uma vez que não existe um ajuste ao tamanho do pacote.
+
+
 
 
 \section{Desenho e arquitectura}
 \label{sec:architecture}
 
-Este sistema foi criado a pensar na modularidade e nas potêncialidades de modificação das diferentes componentes de forma a poder ser modificado, originando possibilidade de aumento de funcionalidades e diferentes desempenhos.
+O sistema proposto foi desenvolvido tendo em conta a modularidade e as potencialidades de modificação de diferentes componentes, de modo a torná-lo extensível, possibilitando o aumento de funcionalidades e obter diferentes desempenhos. Para tal, o sistema criado está dividido em 4 componentes principais: Função de filtragem (que recorre à ligação de um hook); Uma componente de monitorização de chamadas ao sistema ou outras funções contidas no sistema de rede; Um repositório de dados; e, finalmente, caso seja necessário, a utilização de um sistema de informação de análise da monitorização.
 
-As quatro partes essenciais do sistema são: função de filtragem (ligação a um \textit{hook} ), monitorização das chamadas ao sistema, ou outras funções que estejam no sistema de rede, o repositório de dados e caso seja necessário o sistema de informação de análise da monitorização.
 
 \subsection*{Instrumentação das chamadas ao sistema de rede}
 \label{sub:mon_syscalls}
 
-Para conseguir detectar todas as interacções que um processo executa com o exterior foi necessário monitorizar as chamadas ao sistema de rede de forma a garantir que todas estas interacções são detectadas. Uma forma de minimizar as trocas de contexto foi efectuar toda a monitorização dentro do kernel. Utilizando o sistema de monitorização KProbes, pertencente ao núcleo do Linux foi possível efectuar esta monitorização. Foram monitorizadas as chamadas ao sistema (\textit{sendto}, \textit{recvfrom}, \textit{bind}, \textit{accept}, \textit{connect} e  \textit{close}).
-Apesar de se filtrar qual o processo que está a executar a chamada ao sistema verificou-se que a chamada ao sistema \textit{close} por ser utilizada intensivamente por todo o sistema de ficheiros que poderia ser um ponto onde este sistema iria ter pior desempenho. Por esta razão decidiu-se aplicar a monitorização à função \textit{sock\_close} a monitorização ao invés de ser na função mais genérica \textit{close} e assim permitia que apenas os processos que fizessem uso do sistema de transferência de dados utilizando os métodos de rede. Desta forma foi possível reduzir significativamente o número de eventos de monitorização da chamada ao sistema \textit{close}.
+Um ponto importante deste sistema, constituiu na garantia que todas as interacções desencadeadas por um processo com o exterior fossem detectadas. Para tal, foi necessário recorrer à monitorização das chamadas ao sistema de rede, ou seja, realizar a monitorização ao nível do Kernel, permitindo, assim, minimizar as trocas de contexto. Tirando partido da utilização do sistema de monitorização KProbes (pertencente ao núcleo do Linux), foi possível realizar a monitorização sob um pequeno conjunto de chamadas ao sistema, nomeadamente: sendto, recvfrom, bind, accept, connect e close. Embora o processo que está a executar a chamada ao sistema esteja a ser filtrado, verificou-se que aquando da chamada ao sistema close, ao ser utilizada intensivamente por todo o sistema de ficheiros, esta poderia constituir num ponto onde o sistema iria obter pior desempenho. Desta forma, decidiu-se aplicar a monitorização à função sock\_close, garantindo apenas que os processos que fizessem uso do sistema de transferência de dados, utilizando os métodos da rede, fossem utilizados. Deste modo, foi possível reduzir significativamente o número de eventos de monitorização da chamada ao sistema close.
 
 \subsection*{Filtro de pacotes}
 \label{sub:packet_filter}
 
-Este sistema de filtros dinâmicos permite que sejam efectuadas monitorizações de rede com e sem o sistema de filtragem de pacotes definidos no \textit{Linux Socket Filter}. De forma a alterar o menos possível a forma como é efectuado a monitorização de rede no Linux, foi colocar um \textit{hook} no sistema de rede. Este \textit{hook} serve para que quando esteja ligado, a monitorização passe pelo sistema dinâmico de filtragem permitindo assim efectuar a nova monitorização sem que se perca os beneficios do \textit{Linux Socket Filter}, pois esta é uma linguagem genérica que permite efectuar alguma análise aos pacotes que estão a ser monitorizados.
-
+A função de filtragem aplicado a este sistema assenta no uso de filtros dinâmicos, aos quais permitem efectuar monitorização de rede com ou sem o sistema de filtragem de pacotes
+definidos no Linux Socket Filter. Deste modo, para minimizar as alterações ao nível da monitorização de rede no Linux, introduziu-se um hook no sistema de rede. Através da utilização deste hook permite que, quando ligado, a monitorização passe pelo sistema dinâmico de filtragem, possibilitando efectuar uma nova monitorização e tirar partido dos benefícios da utilização do Linux Socket Filter (na medida em que se trata de uma linguagem genérica, permitindo efectuar uma análise sobre os pacotes que estão a ser monitorizados).
 
 \subsection*{Repositório de dados}
 \label{sub:data_repository}
 
-Os portos \textit{TCP} ou \textit{UDP} que estão em utilização por um processo necessitam ser guardados num repositório de dados de forma a que quando um pacote chegar à interface de rede, possa ser comparado. 
-A estrutura de dados escolhida para este repositório de dados foi uma àrvore \textit{Red and Black}. Como se trata de uma àrvore balanceada é possível obter um bom compromisso de tempo de acesso \textit{versus} quantidade de memória utilizada.
-
-Em cada folha da àrvore existe uma estrutura 
+Os portos TCP e UDP em utilização por um dado processo necessitam ser guardados num repositório de dados, de forma que aquando da chegada de um pacote à interface de rede, este pode ser comparado (acho que falta aqui uma explicação um pouco mais detalhada). A estrutura dados escolhida para o efeito, para produzir o repositório pretendido, corresponde a uma árvore Red and Black. O uso deste tipo de estrutura permite que o conteúdo da árvore esteja balanceado/equilibrado, obtendo-se um bom compromisso de tempo de acesso à estrutura versus quantidade de memória utilizada.
 
 \subsection*{Informação de análise}
 \label{sub:data_information}
+
+De forma a poder indicar qual o processo que se deseja monitorizar foram criados três ficheiros. Estes foram criados no sistema de ficheiros virtual \textit{DebugFs}~\cite{DebugFs}.
+
+\subsection{Aplicação Monitorizadora}
+\label{sub:monitor_app}
+Para poder efectuar os testes de avaliação foi criado uma aplicação em nível utilizador para poder lançar sob seu controlo a aplicação a ser monitorizada.
 
 \section{Avaliação}
 \label{sec:evaluation}
@@ -221,7 +233,7 @@ Escrever as tabelas actuais ... e verificar quais os dados necessários para out
 \label{sec:related_work}
 Trabalhos anteriores tentaram resolver os mesmos problemas mas continuavam a ter número de trocas de contexto.
 
-Um dos trabalhos efectuado por Nuno Farruca~\cite{Farruca:2009}, monitorizou os processos por duas vias. Monitorizar o processo através da criação de uma biblioteca que mapeia as funções da biblioteca de C \textit{LibC} e modificando a variável LD\_PRELOAD, de forma a que quando fosse efectuada uma função da biblioteca de C que estivesse mapeada na biblioteca desenvolvida, estas fosse chamada primeiro de forma a obter os parâmetros das funções e assim comunicar à \textit{LibPCap} se os pacotes pertencentes a um determinado porto de um endereço são ou não para capturar. Uma outra forma foi obter os dados dos sockets pertencentes ao processo através do sistema de ficheiros virtual \textit{ProcFs} e executar a filtragem também em nível utilizador dos pacotes que chegam à interface capturadas através da \textit{LibPcap}.
+Um dos trabalhos efectuado por Nuno Farruca~\cite{Farruca:2009,duarte10}, monitorizou os processos por duas vias. Monitorizar o processo através da criação de uma biblioteca que mapeia as funções da biblioteca de C \textit{LibC} e modificando a variável LD\_PRELOAD, de forma a que quando fosse efectuada uma função da biblioteca de C que estivesse mapeada na biblioteca desenvolvida, estas fosse chamada primeiro de forma a obter os parâmetros das funções e assim comunicar à \textit{LibPCap} se os pacotes pertencentes a um determinado porto de um endereço são ou não para capturar. Uma outra forma foi obter os dados dos sockets pertencentes ao processo através do sistema de ficheiros virtual \textit{ProcFs} e executar a filtragem também em nível utilizador dos pacotes que chegam à interface capturadas através da \textit{LibPcap}.
 
 O trabalho~\cite{1688981} com o título \textit{Application-specific packet capturing using kernel probes}, efectuou uma monitorização, utilizando o sistema de instrumentação \textit{KProbes}, das funções de transmissão e recepção de dados dentro do núcleo do sistema. Desta forma é possível monitorizar os dados de um processo. Os dados recolhidos são analisados com o intuito de perceber se determinada porta e endereço são conhecidos e caso não sejam é adicionada a informação a uma tabela de dispersão utilizada para efectuar um novo filtro. O pacote capturado  é atrasado e re-injectado e forma a poder ser capturado pela biblioteca \textit{LibPCap} através do novo filtro.
 
