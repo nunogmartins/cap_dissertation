@@ -24,6 +24,8 @@
 #include <linux/slab.h>
 #include <linux/types.h>
 #include <linux/sched.h>
+#include <linux/list.h>
+
 
 #include "table_port.h"
 #include "pcap_monitoring.h"
@@ -586,6 +588,65 @@ static int instantiationKRETProbe(struct kretprobe *kret,
 
 	return ret;
 }
+
+
+static void initTree(struct task_struct *task)
+{
+
+	struct fdtable *fdt;	
+	struct task_struct *aux;
+	struct list_head *pos;
+
+	if(task == NULL)
+		return;
+
+	task_lock(task);
+
+	fdt = task->files->fdt;
+
+	while(fdt != NULL){
+		int fd;
+		struct file **fds;
+		int max_fds;
+
+ 		fds = fdt->fd;
+		max_fds = fdt->max_fds;
+
+		for(fd=0; fd < max_fds ; fd++)
+		{
+			struct file *file;
+
+			if((file=fds[fd]) != NULL){
+				struct packetInfo p;
+				int err;
+				getLocalPacketInfoFromFile(file,&p,&err);
+				if(err == 0)
+				{
+					if(insertPort(&p) > 0){
+						my_print_debug("insertion was ok");
+					}
+					else{
+						my_print_debug("something was wrong with the insertion");
+					}
+				}
+			}	
+		}
+
+		fdt = fdt->next;
+	}
+
+	list_for_each(pos,&(task->sibling)){
+			aux = list_entry(pos,struct task_struct,sibling);  // sibling
+			printk(KERN_INFO "sibling pid: %d ",aux->pid);
+		
+	} 
+
+//	list_for_each_safe(){	//siblings
+
+//	}
+	task_unlock(task);
+}
+
 
 static void initializeTreeWithTaskInfo(void)
 {
