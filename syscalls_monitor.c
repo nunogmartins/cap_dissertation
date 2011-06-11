@@ -643,13 +643,18 @@ static void initializeTreeWithTaskInfo(void)
 static ssize_t options(struct file *file, const char __user *user_buf,size_t size, loff_t *ppos)
 {
 	unsigned long option;
-	char *buf;
+	char buf[11];
 	char *endp;
 
 	my_print_debug( "pid_write function called");
-	buf = kmalloc(size,GFP_KERNEL);
 
-	copy_from_user(buf,user_buf,size);
+	memset(buf,0,11);	
+
+	if(size <= 10)
+		copy_from_user(buf,user_buf,size);
+	else
+		copy_from_user(buf,user_buf,10);
+	
 	/*
 	 * ToDo: actualizar todas as estruturas necessárias ao funcionamento da monitorização inclusivé
 	 * o pid
@@ -664,7 +669,6 @@ static ssize_t options(struct file *file, const char __user *user_buf,size_t siz
 		my_print_debug( "could not convert value into long");
 		return size;
 	}
-	kfree(buf);
 	my_print_debug( "option = %lu",option);
 
 	switch(option)
