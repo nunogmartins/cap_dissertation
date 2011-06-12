@@ -67,9 +67,9 @@ int main(int argc, char **argv)
 			config_filename = malloc(sizeof(char)*(strlen(optarg)+1));
 			strncpy(config_filename,optarg,strlen(optarg));
 			man.config_filename = config_filename;
-#ifdef DEBUG
+//#ifdef DEBUG
 			printf("config file is %s\n",man.config_filename);
-#endif
+//#endif
 			break;
 		case 'm':
 #ifdef DEBUG
