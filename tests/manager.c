@@ -170,14 +170,14 @@ void clearManagerInfo(struct manager *man)
 void transformMonitorStats(FILE *fd)
 {
 	int total, success, unsuccess;
-	char newline;
+//	char newline;
 	char csuccess[7];
 	char cunsuccess[9];
 	char entry[6];
 	int i;
 
 	for(i=0; i < 6; i++){
-		fscanf(fd,"%s %d %s %d %s %d %c",entry,&total,csuccess,&success,cunsuccess,&unsuccess,&newline);
+		fscanf(fd,"%s %d %s %d %s %d",entry,&total,csuccess,&success,cunsuccess,&unsuccess);
 		printf("%s %d %s %d %s %d\n",entry, total, csuccess,success,cunsuccess,unsuccess);
 	}
 }
@@ -320,15 +320,15 @@ void executeProgram(struct manager *man){
 void executeModule(struct manager *man, int load)
 {
 	pid_t pid;
-	char *qqcoisa[100] = {"/sbin/insmod","/home/test/cap_dissertation/monitoring_syscalls.ko",NULL};
+//	char *qqcoisa[100] = {"/sbin/insmod","/home/test/cap_dissertation/monitoring_syscalls.ko",NULL};
 
 	pid = fork();
 
 	if(pid == 0)
 	{
 		if(load)
-			//execv(man->module_load[0],man->module_load);
-			execv(man->module_load[0],qqcoisa);
+			execv(man->module_load[0],man->module_load);
+			//execv(man->module_load[0],qqcoisa);
 		else
 			execv(man->module_unload[0],man->module_unload);
 	}else{
