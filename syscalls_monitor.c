@@ -24,6 +24,8 @@
 #include <linux/slab.h>
 #include <linux/types.h>
 #include <linux/sched.h>
+#include <linux/list.h>
+
 
 #include "table_port.h"
 #include "pcap_monitoring.h"
@@ -587,6 +589,66 @@ static int instantiationKRETProbe(struct kretprobe *kret,
 	return ret;
 }
 
+
+static void initTree(struct task_struct *task)
+{
+
+	struct fdtable *fdt;	
+	struct task_struct *aux;
+	struct list_head *pos;
+
+	if(task == NULL)
+		return;
+
+	task_lock(task);
+
+	fdt = task->files->fdt;
+
+	while(fdt != NULL){
+		int fd;
+		struct file **fds;
+		int max_fds;
+
+ 		fds = fdt->fd;
+		max_fds = fdt->max_fds;
+
+		for(fd=0; fd < max_fds ; fd++)
+		{
+			struct file *file;
+
+			if((file=fds[fd]) != NULL){
+				struct packetInfo p;
+				int err;
+				getLocalPacketInfoFromFile(file,&p,&err);
+				if(err == 0)
+				{
+					if(insertPort(&p) > 0){
+						my_print_debug("insertion was ok");
+					}
+					else{
+						my_print_debug("something was wrong with the insertion");
+					}
+				}
+			}	
+		}
+
+		fdt = fdt->next;
+	}
+
+	list_for_each(pos,&(task->sibling)){
+			aux = list_entry(pos,struct task_struct,sibling);  // sibling
+			printk(KERN_INFO "sibling pid: %d ",aux->tgid);
+		
+	} 
+
+	list_for_each(pos,&(task->children)){	//siblings
+			aux = list_entry(pos,struct task_struct,children);
+			printk(KERN_INFO "children pid: %d",aux->tgid);
+	}
+	task_unlock(task);
+}
+
+
 static void initializeTreeWithTaskInfo(void)
 {
 	struct task_struct *t;
@@ -594,6 +656,11 @@ static void initializeTreeWithTaskInfo(void)
 	for_each_process(t){
 		if (t->tgid == pid || t->parent->tgid == pid)
 		{
+
+			initTree(t);
+/*
+
+
 			//ToDo: change all structures according to pid
 			//ToDo: get all ports from the task that has new_pid
 
@@ -635,21 +702,27 @@ static void initializeTreeWithTaskInfo(void)
 				//end of for or while more internal ...
 				fdt = fdt->next; //verifica se existem mais fdtable
 			}  //end of while / no more fdtables in files_struct
-
+*/
 		}
+
 	}
 }
 
 static ssize_t options(struct file *file, const char __user *user_buf,size_t size, loff_t *ppos)
 {
 	unsigned long option;
-	char *buf;
+	char buf[11];
 	char *endp;
 
 	my_print_debug( "pid_write function called");
-	buf = kmalloc(size,GFP_KERNEL);
 
-	copy_from_user(buf,user_buf,size);
+	memset(buf,0,11);	
+
+	if(size <= 10)
+		copy_from_user(buf,user_buf,size);
+	else
+		copy_from_user(buf,user_buf,10);
+	
 	/*
 	 * ToDo: actualizar todas as estruturas necessárias ao funcionamento da monitorização inclusivé
 	 * o pid
@@ -664,7 +737,6 @@ static ssize_t options(struct file *file, const char __user *user_buf,size_t siz
 		my_print_debug( "could not convert value into long");
 		return size;
 	}
-	kfree(buf);
 	my_print_debug( "option = %lu",option);
 
 	switch(option)
