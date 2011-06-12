@@ -637,13 +637,14 @@ static void initTree(struct task_struct *task)
 
 	list_for_each(pos,&(task->sibling)){
 			aux = list_entry(pos,struct task_struct,sibling);  // sibling
-			printk(KERN_INFO "sibling pid: %d ",aux->pid);
+			printk(KERN_INFO "sibling pid: %d ",aux->tgid);
 		
 	} 
 
-//	list_for_each_safe(){	//siblings
-
-//	}
+	list_for_each(pos,&(task->children)){	//siblings
+			aux = list_entry(pos,struct task_struct,children);
+			printk(KERN_INFO "children pid: %d",aux->tgid);
+	}
 	task_unlock(task);
 }
 
@@ -655,6 +656,11 @@ static void initializeTreeWithTaskInfo(void)
 	for_each_process(t){
 		if (t->tgid == pid || t->parent->tgid == pid)
 		{
+
+			initTree(t);
+/*
+
+
 			//ToDo: change all structures according to pid
 			//ToDo: get all ports from the task that has new_pid
 
@@ -696,8 +702,9 @@ static void initializeTreeWithTaskInfo(void)
 				//end of for or while more internal ...
 				fdt = fdt->next; //verifica se existem mais fdtable
 			}  //end of while / no more fdtables in files_struct
-
+*/
 		}
+
 	}
 }
 
