@@ -17,4 +17,15 @@ tdrop_packets=$(cat output.$i.log |grep dropped |awk '{ print($1) }')
 
 echo "$((tcap_packets));$((trecv_packets));$((tdrop_packets));$((trans_packets));$((recv_packets))"
 
+        beforePRX=$(cat ifconfig.old.$i.log | grep "RX packets" | awk '{print($2) }' | awk 'BEGIN{FS=":"}{$2=$2}1' |awk '{print($2)}')
+        beforePTX=$(cat ifconfig.old.$i.log | grep "TX packets" | awk '{print($2) }' | awk 'BEGIN{FS=":"}{$2=$2}1' |awk '{print($2)}')
+        beforeBRX=$(cat ifconfig.old.$i.log | grep "RX bytes" | awk '{print($2) }' | awk 'BEGIN{FS=":"}{$2=$2}1' |awk '{print($2)}')
+        beforeBTX=$(cat ifconfig.old.$i.log | grep "TX bytes" | awk '{print($2) }' | awk 'BEGIN{FS=":"}{$2=$2}1' |awk '{print($2)}')
+         
+	 afterPRX=$(cat ifconfig.new.$i.log | grep "RX packets" | awk '{print($2) }' | awk 'BEGIN{FS=":"}{$2=$2}1' |awk '{print($2)}')
+         afterPTX=$(cat ifconfig.new.$i.log | grep "TX packets" | awk '{print($2) }' | awk 'BEGIN{FS=":"}{$2=$2}1' |awk '{print($2)}')
+         afterBRX=$(cat ifconfig.new.$i.log | grep "RX bytes" | awk '{print($2) }' | awk 'BEGIN{FS=":"}{$2=$2}1' |awk '{print($2)}')
+         afterBTX=$(cat ifconfig.new.$i.log | grep "TX bytes" | awk '{print($2) }' | awk 'BEGIN{FS=":"}{$2=$2}1' |awk '{print($2)}')
+        echo "$((afterPTX - beforePTX));$((afterPRX - beforePRX));$((afterBTX - beforeBTX));$((afterBRX - beforeBRX))"
 done
+
