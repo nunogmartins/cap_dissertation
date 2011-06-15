@@ -127,7 +127,7 @@ Outra forma de classificar estes sistemas tem em conta o tipo de processamento e
 \subsection{Monitorização de aplicações}
 \label{sub:user_level_monitor}
 
-A monitorização em nível utilizador pode ser efectuada de diferentes formas, como seja a simples introdução de código para monitorização no código fonte da aplicação. A instrumentação do código pode também ser efectuada utilizando a bibliotecas para o efeito (como \textit{Gnu Profiller}).
+A monitorização em nível utilizador pode ser efectuada de diferentes formas, como seja a simples introdução de código para monitorização no código fonte da aplicação. A instrumentação do código pode também ser efectuada utilizando a bibliotecas para o efeito (como \textit{Gnu Profiller})\cite{Graham:1982:GCG:800230.806987}.
 \td{qual é o gnu profiller? mais exemplos?? gprof? }
 
  A instrumentação dinâmica consiste em introduzir ou manipular a instrumentação do sistema alvo já compilado, até mesmo na fase de carregamento para execução ou mesmo, durante a sua execução. Por exemplo, alteração da variável de ambiente \textit{LD\_PRELOAD} permite a ligação a uma biblioteca dinâmica que poderá modificar o comportamento do processo com vista à sua monitorização. Esta técnica implica que exista um conhecimento prévio do código da aplicação ou suas bibliotecas. Para aplicações executadas em modo supervisor (\textit{root}) este mecanismo não é permitido pelo sistema por questões de segurança.
@@ -231,7 +231,7 @@ Um ponto importante deste sistema, constituiu na garantia que todas as interacç
 
 A função de filtragem aplicada a este sistema assenta no uso de filtros dinâmicos, aos quais permitem efectuar monitorização de rede com ou sem o sistema de filtragem de pacotes definidos no Linux Socket Filter. Deste modo, para minimizar as alterações ao nível da monitorização de rede no Linux, introduziu-se um hook no sistema de rede. Através da utilização deste hook, quando ligado, permite que a monitorização passe pelo sistema dinâmico de filtragem, possibilitando efectuar uma nova monitorização e tirar partido dos benefícios da utilização do Linux Socket Filter.
 
-\subsection*{Repositório de dados}
+\subsection*{Estado do processo}
 \label{sub:data_repository}
 
 Os portos TCP e UDP em utilização por um dado processo necessitam ser guardados num repositório de dados, para que quando chegue um pacote à interface de rede, este possa ser comparado \td{explicação um pouco mais detalhada}. A estrutura dados escolhida para o efeito, para produzir o repositório pretendido, corresponde a uma árvore \textit{Red and Black}. O uso deste tipo de estrutura permite que o conteúdo da árvore esteja balanceado/equilibrado, obtendo-se um bom compromisso de tempo de acesso à estrutura \textit{versus} quantidade de memória utilizada.
@@ -250,13 +250,9 @@ Para poder efectuar os testes de avaliação foi criado uma aplicação em níve
 Este sistema foi avaliado funcionalmente através dos protocolos em \textit{ftp} e \textit{http}. Estes testes iniciais não visaram a performance mas sim a correcção de todos os pacotes envolvidos nas comunicações.
 O sistema de testes utilizados permitiu que fossem capturados os pacotes de uma transferência de um ficheiro, de um servidor \textit{ftp} e de um servidor de \textit{http}. Foi efectuada a monitorização da aplicação cliente para estes servidores, através do programa wget.
 
-Escrever as tabelas actuais ... e verificar quais os dados necessários para outros testes ...
-
-\td{Teste ftp dia 15}
-
 \begin{table}
 \begin{center}
-\caption{Recepção de 1GB de dados por ftp}
+\caption{Tempos médios em segundos (s)}
 \begin{tabular}{ | c | c | c | c |  }
 \hline
 Teste & \hspace {0.3cm} Original \hspace {0.3cm}& \hspace {0.2cm} Com TcpDump \hspace {0.2cm} & Com TcpDump e módulo \\
@@ -273,10 +269,10 @@ IPerf - 1GB UDP & 89.7907 & 89.7952 & 90.036 \\
 
 \begin{table}
 \begin{center}
-\caption{Overhead das transferências}
+\caption{Sobrecarga das transferências}
 \begin{tabular}{ | c | c | c | c | }
 \hline
-Teste & App tcpdump & App TcpDump & \hspace {0.3cm} App \hspace {0.3cm}\\
+Teste & TcpDump com módulo & Variação do TcpDump & \hspace {0.3cm} TcpDump \hspace {0.3cm}\\
 
 \hline
 1GB - FTP  & 0.2241 & 0.2054 & 0.0188 \\
