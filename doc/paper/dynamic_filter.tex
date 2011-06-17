@@ -114,7 +114,7 @@ A monitorização permite a análise da execução de um programa ou sistemas di
 A monitorização de sistemas exige sempre a execução de acções específicas para a detecção e/ou registo dos acontecimentos que se pretendem observar que concorrem no uso dos recursos disponíveis com o próprio sistema monitorizado. Causa assim problemas de desempenho e que se pretende o menor possível. O grau da perturbação introduzida no sistema monitorizado depende dos mecanismos usados, nível de detalhe, volume de dados recolhidos, etc.  
 É comum o recurso a mecanismos de instrumentação de código para a implementação destas acções, especificamente para cada caso, por forma a minimizar esta perturbação. Estas acções podem ser introduzidas aos diferentes níveis, como sejam o no programa, bibliotecas, ou internas ao sistema de operação, de acordo com a disponibilidade da informação pretendida e a facilidade em a obter.
 
-Por exemplo, o recuso a mecanismos de monitorização presentes nos sistemas de operação, na observação das interacções via rede, permite beneficiar de um mecanismo fiável, e transparente para as aplicações, muitas vezes mais eficiente do que tentar obter a mesma funcionalidade a outro nível. Este pode no entanto ser agravado devido à necessidade de copiar os dados recolhidos no núcleo do sistema para as ferramentas que os usam e consequentes trocas de contexto (kernel-level/user-level).
+Por exemplo, o recurso a mecanismos de monitorização presentes nos sistemas de operação, na observação das interacções via rede, permite beneficiar de um mecanismo fiável, e transparente para as aplicações, muitas vezes mais eficiente do que tentar obter a mesma funcionalidade a outro nível. Este pode no entanto ser agravado devido à necessidade de copiar os dados recolhidos no núcleo do sistema para as ferramentas que os usam e consequentes trocas de contexto (kernel-level/user-level).
 
 
 
@@ -133,7 +133,8 @@ Como exemplos podemos referir a utilização do compilador e bibliotecas para ob
 \td{qual é o gnu profiller? mais exemplos?? gprof? }
 Outro caso, o recurso à variável de ambiente \textit{LD\_PRELOAD} para a ligação de uma biblioteca no arranque do processo que permita modificar o comportamento do processo com vista à sua monitorização. Esta última técnica implica o desenvolvimento dessas bibliotecas e conhecimento prévio do código da aplicação.
 
-Outra forma passa por executar o processo a ser monitorizado sob o controlo do processo monitor, tal como no caso das ferramentas \textit{strace}~\cite{strace} e  \textit{debuggers}~\cite{gdb}. Estas lançam o processo usando o suporte \textit{PTrace}~\cite{ptrace} suportado pelo sistema de operação para o controlar e observar. \td{falta falar do sysprof tb tem de levar suporte do núcleo}
+Outra forma passa por executar o processo a ser monitorizado sob o controlo do processo monitor, tal como no caso das ferramentas \textit{strace}~\cite{strace} e  \textit{debuggers}~\cite{gdb}. Estas lançam o processo usando o suporte \textit{PTrace}~\cite{ptrace} suportado pelo sistema de operação para o controlar e observar. 
+%\td{falta falar do sysprof tb tem de levar suporte do núcleo, nao li quase documentacao sobre este sistema}
 
 \subsection{Monitorização no núcleo}
 \label{sub_kernel_instrumentation}
@@ -142,20 +143,25 @@ Existem diferentes sistemas de monitorização e instrumentação no núcleo do 
 
 Um dos sistemas de instrumentação estática do código é o \textit{TracePoints}. Este permite que sejam indicadas funções a ser chamadas em pontos de instrumentação prédefinidos no código. Nos pontos em que não é definida qualquer função, apenas um pequeno custo é imposto, correspondente à sua verificação. 
 
-Em oposição aos sistemas estáticos, existem sistemas dinâmicos que podem  ser adicionados e removidos em tempo de execução. Um primeiro exemplo é o OProfile~\cite{oprofile}. \td{Dizer qq coisa sobre OProfile !!}
+Em oposição aos sistemas estáticos, existem sistemas dinâmicos que podem  ser adicionados e removidos em tempo de execução. Um primeiro exemplo é o OProfile~\cite{oprofile}. 
+\td{Dizer qq coisa sobre OProfile !!}
+Este sistema de forma a minimizar a sobrecarga imposta pela monitorização utiliza a técnica de amostragem. O utilizador pode definir qual o ritmo de amostragem para o qual quer fazer a monitorização, e desta forma consegue diminuir o número de eventos que tem de analisar. Este apesar de não efectuar traço de execução permite que sejam obtidas percentagens de eventos ou eventos de um processo, permitindo assim fazer a análise. Este sistema utiliza em nível utilizador aplicações para recolher os dados registados pela monitorização.
+\td{Talvez seja suficiente para o oprofile}
 
-
-Dentro da categoria dos sistemas que permitem obter traços detalhados da execução, existe o \textit{LTT}~\cite{ltt} (mais recentemente o \textit{LTTng}~\cite{lttng}), e o \textit{KProbes} ~\cite{KProbesSite,kernel_debug_printk_on_fly}
+Dentro da categoria dos sistemas que permitem obter traços detalhados da execução, existe o \textit{LTT}~\cite{ltt} (mais recentemente o \textit{LTTng}~\cite{Mathieu2009}), e o \textit{KProbes} ~\cite{KProbesSite,kernel_debug_printk_on_fly}. %%%%%%%%%%%%%%%%%%%%%%%
+Estes sistemas são dinâmicos não requerendo a recompilação do núcleo de sistema para serem utilizados, apenas é necessário compilar um módulo para poderem especificar quais as análises a serem efectuadas. O \textit{LTTng} também pode utilizar o sistema de \textit{TracePoints}, incluído no núcleo. O \textit{LTTng} tal como o \textit{OProfile} utiliza aplicações em nível utilizador para recolher e analisar os dados obtidos.
 \td{estes são estáticos, dinâmicos,...? o que têm que ver com o paragrafo anterior??}
+Como foi anteriormente referido o \textit{Kprobes} é um sistema de instrumentação dinâmico que permite efectuar o traço da computação. Para utilizar este sistema é necessário definir um \textit{KProbe}, ou seja uma estrutura com apontadores para a função ou instrução a analisar, bem como os \textit{handlers} a serem executados antes e após a execução da instrução. Desta forma existe um maior controlo sobre a monitorização ao nível da execução das instruções.
 
-%Outro sistema de instrumentação do núcleo do \textit{Linux} é o \textit{KProbes}. 
-Este último permite colocar código de instrumentação em vários pontos do núcleo, usando as funções fornecidas por um módulo carregado durante o funcionamento do sistema.
+\td{nao sei bem como integrar o texto seguinte com o anterior}
+ este último permite colocar código de instrumentação em vários pontos do núcleo, usando as funções fornecidas por um módulo carregado durante o funcionamento do sistema.
 \td{para quê?}
-O \textit{KProbes} permite que sejam instrumentados as funções do núcleo, defindas as acções a efectuar nesses pontos, bem como de módulos carregados no sistema. Este sistema tem uma forma bem definida de criação e destruição dos pontos de instrumentação e permite ao programador um maior controlo.
+O \textit{KProbes} permite que sejam instrumentados as funções do núcleo, definidas as acções a efectuar nesses pontos, bem como de módulos carregados no sistema. Este sistema tem uma forma bem definida de criação e destruição dos pontos de instrumentação e permite ao programador um maior controlo.
+\td{ate a este ponto}
 
- Baseados neste sistema foram ainda desenvolvidos o \textit{JProbe} e o \textit{KRetProbe} que permitem uma interacção que facilita programar as acções a na efectuar entrada ou retorno de funções no núcleo do sistema.
- \td{ confirmar que é isto que distingue estes do kprobes} 
- Como programar para o núcleo do \textit{Linux} pode ser complicado existem  ferramentas para os utilizadores finais (como o \textit{SystemTap} ~\cite{systemtap} e o \textit{DProbes} ~\cite{dprobes})  que facilitam a programação e monitorização do sistema, assim como oferecem alguma segurança e portabilidade entre diferentes  versões. Os utilizadores, utilizando as linguagens fornecidas por estas ferramentas, criam a sua instrumentação, gerando a ferramenta o respectivo módulo que permite a monitorização pretendida.
+ Baseados neste sistema foram ainda desenvolvidos o \textit{JProbe} e o \textit{KRetProbe} que permitem uma interacção que facilita programar as acções a efectuar na entrada ou retorno de funções no núcleo do sistema.
+% \td{ confirmar que é isto que distingue estes do kprobes}  esta correcto.
+ Como programar para o núcleo do \textit{Linux} pode ser complicado existem ferramentas para os utilizadores finais (como o \textit{SystemTap} ~\cite{Jones2009} e o \textit{DProbes} ~\cite{:DProbes}),  que facilitam a programação e monitorização do sistema, assim como oferecem alguma segurança e portabilidade entre diferentes  versões. Os utilizadores, utilizando as linguagens fornecidas por estas ferramentas, criam a sua instrumentação, gerando a ferramenta o respectivo módulo que permite a monitorização pretendida.
 
 \subsubsection{Monitorização de rede}
 \label{subsub:mon_network__with_dynamic_filters_linux}
@@ -171,9 +177,9 @@ O \textit{KProbes} permite que sejam instrumentados as funções do núcleo, def
 \paragraph{Biblioteca PCap\\}
 
 A monitorização das interacções via rede pode ser efectuado com base na biblioteca PCap e respectivo suporte fornecido pelo núcleo do sistema. Esta está bastante difundida entre sistemas de tipo Unix, existindo também uma versão para MS-Windows.
-No caso do sistema \textit{Linux} baseia-se no \textit{Linux Socket Filter} presente no seu núcleo, que corresponde a uma versão semelhante ao \textit{Berckeley Packet Filter (BPF)}~\cite{Mccanne92thebsd}. Estes sistemas permitem a captura seelctiva de pacotes com base numa máquina virtual de registos que permite programar filtros, usando instruções específicas para efectuar movimentações de dados e operações lógicas, sobre o conteúdo dos pacotes de rede. Cada filtro a ser executado é uma combinação de diferentes regras que determinam se cada pacote deve ou não ser capturado. Se necessário, é efectuado uma cópia do pacote para um repositório que posteriormente irá ser consumido pela aplicação/ferramenta monitora, como por exemplo o tcpdump.
+No caso do sistema \textit{Linux} baseia-se no \textit{Linux Socket Filter} presente no seu núcleo, que corresponde a uma versão semelhante ao \textit{Berckeley Packet Filter (BPF)}~\cite{Mccanne92thebsd}. Estes sistemas permitem a captura selectiva de pacotes com base numa máquina virtual de registos que permite programar filtros, usando instruções específicas para efectuar movimentações de dados e operações lógicas, sobre o conteúdo dos pacotes de rede. Cada filtro a ser executado é uma combinação de diferentes regras que determinam se cada pacote deve ou não ser capturado. Se necessário, é efectuado uma cópia do pacote para um repositório que posteriormente irá ser consumido pela aplicação/ferramenta monitora, como por exemplo o tcpdump.
 
-\td{Em algum ponto falta indicar que existe uma nova maquina virtual, que é baseada em just in time, mas que só funciona para x86\_64 devido ao número de registos ser maior face ao x86}
+%\td{Em algum ponto falta indicar que existe uma nova maquina virtual, que é baseada em just in time, mas que só funciona para x86\_64 devido ao número de registos ser maior face ao x86}
 
 %\td{FALTA Descrever como se processa a captura no nível mais baixo, junto ao driver ...}
 
@@ -192,7 +198,7 @@ Estes filtros são uma forma de reduzir o volume de dados capturados, focando a 
 
 Existe um sistema de \textit{firewall} no núcleo do sistema \textit{Linux}, o \textit{NetFilter} ~\cite{netfiltersite}, que gere o fluxo de dados de e para o exterior implementando as políticas de controlo desejadas pelo administrador. A gestão do fluxo de dados é efectuada através de regras, que podem ser indicadas/alteradas em qualquer momento no \textit{NetFilter}. Estas regras baseiam-se nas características do tráfego, como seja, se é de entrada ou de saída ou de redirecionamento, ou outros parâmetros tais como portas e interfaces de rede.
 
-O \textit{NetFilter} é implementado por vários módulos do núcleo, sendo um deles o \textit{conntrack}\cite{CTS}. Este módulo permite monitorizar os pacotes pertencentes a um fluxo, assemelhando-se assim a uma \textit{firewall} com estado.\td{??? mas estamos a descrever a firewall??}
+O \textit{NetFilter} é implementado por vários módulos do núcleo, sendo um deles o \textit{conntrack}\cite{CTS}. Este módulo permite monitorizar os pacotes pertencentes a um fluxo, necessitando conhecer os diferentes protocolos utilizados, para efectuar a monitorização.
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -221,7 +227,7 @@ Para tal, o sistema criado está dividido em 4 componentes principais (ver figur
 \end{figure}
 
 
-Este sistema permite que sejam capturados os pacotes de rede de um processo, sem que exista um conhecimento prévio sobre o(s) protocolo(s) ou portas utilizadas. A utilização de um sistema de instrumentação do núcleo foi necessária apenas para monitorizar as chamadas envolvendo \emph{sockets} e identificar o processo responsável, permitindo desta forma obter manter permanentemente actualizada a informação sobre o estado respeitante ao processo alvo. De forma a minimizar a redução de desempenho, todo o sistema foi desenvolvido dentro do núcleo do \textit{Linux}, sem alterações nas interfaces já existentes.  Assim, ferramentas de façam uso da biblioteca \textit{LibPcap}, como o programa \textit{tcpdump} ou suas variantes, podem beneficiar desta extensão sem qualquer alteração e sem impacto relevante no seu desempenho.
+Este sistema permite que sejam capturados os pacotes de rede de um processo, sem que exista um conhecimento prévio sobre o(s) protocolo(s) ou portas utilizadas. A utilização de um sistema de instrumentação do núcleo foi necessária apenas para monitorizar as chamadas envolvendo \emph{sockets} e identificar o processo responsável, permitindo desta forma obter e manter permanentemente actualizada a informação sobre o estado respeitante ao processo alvo. De forma a minimizar a redução de desempenho, todo o sistema foi desenvolvido dentro do núcleo do \textit{Linux}, sem alterações nas interfaces já existentes.  Assim, ferramentas de façam uso da biblioteca \textit{LibPcap}, como o programa \textit{tcpdump} ou suas variantes, podem beneficiar desta extensão sem qualquer alteração e sem impacto relevante no seu desempenho.
 
 
 
@@ -235,7 +241,7 @@ Um ponto importante deste sistema, constituiu na garantia que todas as interacç
 \label{sub:data_repository}
 
 O estado dos portos TCP e UDP em uso pelo processo alvo é mantido num repositório de dados, e permanentemente actualizado pelo módulo anterior. 
- A estrutura dados escolhida para o efeito, para produzir o repositório pretendido, baseia-se numa árvore \textit{Red and Black} já disponível no núcleo do sistema. 
+ A estrutura dados escolhida para o efeito, para produzir o repositório pretendido, baseia-se numa árvore \textit{Red and Black} já disponível no núcleo do sistema. O conteúdo de cada folha da árvore é uma estrutura com duas listas de elementos, cada uma contendo endereços IP utilizados pela aplicação. A chave de indexação das folhas é o número do porto, desta forma a àrvore poderá conter 65535 elementos. No pior caso a procura de um porto na àrvore necessitará de efectuar 16 iterações.
  \td{conteúdo? ip, interface, porto udp, porto tcp, etc??}
   O uso deste tipo de estrutura permite obter um bom compromisso entre o tempo de acesso à estrutura e a quantidade de memória utilizada.
 
@@ -251,14 +257,16 @@ Através da extensão do LSF com um hook, quando ligado, este invoca esta filtra
 \subsection*{Controlo e Informação}
 \label{sub:data_information}
 
-De forma a poder activar este sistema e indicar qual o processo que se deseja monitorizar, definiu-se uma interface baseada no sistema de ficheiros virtual \textit{DebugFs}~\cite{DebugFs}.
-Esta compreende três ficheiros . . . \td{quais ? para quê? }
+Para comunicar entre o sistema desenvolvido e uma aplicação monitorizadora foi necessário definir alguns ficheiros. Esta ficheiros estão apenas acessíveis ao utilizador \textit{root}, permitindo que outros utilizadores da máquina não consigam manipular o sistema de monitorização. Os ficheiros de controlo definidos foram \textit{option}, \textit{pid}, \textit{ppid} e \textit{tgid}. O primeiro ficheiro permite controlar a análise e a informação da àrvore, e os restantes são os identificadores do(s) processo(s), permitindo, em geral, monitorizar todos os processos pertencentes a um programa. Os ficheiros de informação foram definidos para obter estatísticas dos pacotes e das entradas/retornos das funções instrumentadas.
+
+ \td{ Esta compreende três ficheiros . . . quais ? para quê? }
 
 %%%%%%%%%%%%%%%%%
 \subsection{Aplicação Monitora}
 \label{sub:monitor_app}
 
-Para poder efectuar os testes de avaliação foi criado uma aplicação em nível utilizador para poder lançar sob seu controlo a aplicação a ser monitorizada.
+Para poder efectuar alguns testes de avaliação foi criado uma aplicação em nível utilizador para poder lançar sob seu controlo a aplicação a ser monitorizada. Esta situação foi devida à necessidade de saber o momento em que se dá o inicio e o fim da aplicação, de forma a indicar ao sistema qual a aplicação a monitorizar e para poder obter o tempo de execução.
+
 %%%%%%%%%%%%%%%%%%%
 
 
@@ -274,6 +282,8 @@ De modo a realizar os testes de desempenho, foram utilizadas duas máquinas com 
 \subsection{Avaliação Funcional}
 A análise funcional foi efectuada por meio de programas simples, que desencadeiam chamadas sucessivas de criação de sockets e comunicação, obtendo-se o estado destes (portos e endereços) dentro do módulo do núcleo. Estes dados poderam ser confirmados através do sistema \textit{debugfs}, por consulta do ficheiro existente para esse efeito. Este ficheiro, quando acedido, contém toda a informação relativa aos portos e endereços em utilização por parte da aplicação monitorizada.
 Deste modo, para obter um grau de comparação dos dados produzidos e validar esta análise, foi utilizada a ferramenta \textit{netstat}~\cite{netstat}, na qual indica os dados relativos aos portos e endereços utilizados pelos processos do sistema (esta ferramenta tira partido do sistema de ficheiros virtual \textit{ProcFs} ~\cite{procfskernel} para obter esses dados.
+Para além desta análise, foi efectuada a confirmação da correcção de que todos os pacotes pertencentes às comunicações foram de facto obtidos. Esta confirmação foi efectuada através da captura utilizando o \textit{tcpdump} com o módulo activo, e verificado que todo o trafego respeitante ao protocolo (\textit{ftp} e \textit{http}) estava de facto capturado e correcto, não existindo mais fluxos pertencentes à captura.
+
 \td{observação dos pacotes capturados com o tcpdump e wireshark e verificação de que a captura era correcta!!}
 
 \subsection{Avaliação do desempenho}
@@ -292,10 +302,11 @@ Teste & \hspace {0.3cm} Original \hspace {0.3cm}& \hspace {0.2cm} Com TcpDump \h
 1GB - HTTP & 91.6391 & 91.6472 & 91.6674 \\ 
 %5GB - HTTP & 457.9506 & 457.9527 & 458.2059 \\
 IPerf - 1GB TCP & 91.3790	& 91.2535	& 91.2672 \\
-%IPerf - 1GB UDP & 89.7907 & 89.7952 & 90.036 \\
+IPerf - 1GB UDP & 89.7975 & 89.8007 & 89.8464 \\
 \hline
 \hline
 1GB HTTP 2 processos & 182.1573 & 188.7156 & 182.0161 \\
+IPerf - 1GB UDP & 179.493 & 179.628 & 179.6369 \\
 \hline
 \end{tabular}
 \caption{Tempos médios em segundos (s)}
@@ -317,10 +328,11 @@ Teste & TcpDump com módulo & Variação do TcpDump & \hspace {0.3cm} TcpDump \h
 1GB - HTTP &  0.0309 & 0.0220 & 0.0088 \\
 %5GB - HTTP &  0.0557 & 0.0553 & 0.0005 \\
 IPerf - 1GB TCP &  -0.1223 & 0.015 & 0.1373 \\
-%IPerf - 1GB UDP & 0.2732 & 0.2682 & 0.0050 \\
+IPerf - 1GB UDP & 0.0545 & 0.0509 & 0.0036 \\
 \hline
 \hline
 1GB HTTP 2 processos & -0.0775 & -3.5501 & 3.6003 \\
+IPerf - 1GB UDP & 0.0802 & 0.005 & 0.0752 \\
 \hline
 \end{tabular}
 \caption{Sobrecarga das transferências (valores em percentagem)}
@@ -337,18 +349,22 @@ Para além das avaliações descritas anteriormente, tornou-se essencial analisa
 \begin{table}
 \begin{center}
 
-\begin{tabular}{ | c | c |  }
+\begin{tabular}{ | l | c |  }
 \hline
-Teste & \hspace{1cm}Duração\hspace{1cm} \\
+\hspace{1.2cm} Teste \hspace{1cm} & \hspace{1cm}Duração\hspace{1cm} \\
 \hline
 Adicionar 1 elemento & \\
 \hline
-Adicionar 1024 elementos & \\
+Remove 1 elemento & \\
+\hline
+Adicionar 1024 elementos & 869 244\\
+\hline
+Remove 1024 elementos & 675 086\\
 \hline
 
 \hline
 \end{tabular}
-\caption{Tempos em microsegundos}
+\caption{Tempos em nanosegundos}
 \label{tab:tree_info}
 \end{center}
 \end{table}
