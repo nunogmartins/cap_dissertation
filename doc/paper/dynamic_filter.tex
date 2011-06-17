@@ -132,7 +132,7 @@ A monitorização em nível utilizador pode ser efectuada de diferentes formas, 
 
  A instrumentação dinâmica consiste em introduzir ou manipular a instrumentação do sistema alvo já compilado, até mesmo na fase de carregamento para execução ou mesmo, durante a sua execução. Por exemplo, alteração da variável de ambiente \textit{LD\_PRELOAD} permite a ligação a uma biblioteca dinâmica que poderá modificar o comportamento do processo com vista à sua monitorização. Esta técnica implica que exista um conhecimento prévio do código da aplicação ou suas bibliotecas. Para aplicações executadas em modo supervisor (\textit{root}) este mecanismo não é permitido pelo sistema por questões de segurança.
 
-Outra forma pode ser executar o processo a ser monitorizado sob o controlo do processo monitor, tal como no caso das ferramentas \textit{strace}~\cite{strace} e  \textit{GDB}~\cite{gdb}. Estas lançam o processo usando o suporte \textit{PTrace}~\cite{PTrace} do sistema de operação para o controlar e observar. 
+Outra forma pode ser executar o processo a ser monitorizado sob o controlo do processo monitor, tal como no caso das ferramentas \textit{strace}~\cite{strace} e  \textit{GDB}~\cite{gdb}. Estas lançam o processo usando o suporte \textit{PTrace}~\cite{ptrace} do sistema de operação para o controlar e observar. 
 \td{falta falar do sysprof tb tem de levar suporte do núcleo}
 
 \subsection{Monitorização no núcleo}
@@ -143,14 +143,14 @@ Alguns destes sistemas pertencem à versão principal do sistema enquanto outros
 
 Um dos sistemas de instrumentação estática do código é o \textit{TracePoints}. Este sistema permite que sejam indicadas funções a ser chamadas em pontos de instrumentação prédefinidos no código. Se estes pontos não estiverem activos, apenas um pequeno custo é imposto, correspondente à verificação se está activo. 
 
-Em oposição aos sistemas estáticos existem os sistemas dinâmicos, que podem  ser adicionados e removidos em tempo de execução.  Deste último existe o OProfile~\cite{qq_coisa}. \td{Dizer qq coisa sobre OProfile !!}
+Em oposição aos sistemas estáticos existem os sistemas dinâmicos, que podem  ser adicionados e removidos em tempo de execução. Deste último existe o OProfile~\cite{oprofile}. \td{Dizer qq coisa sobre OProfile !!}
 
 
 Dentro da categoria dos sistemas que efectuam um traço de execução existe o \textit{LTT}~\cite{ltt} (mais recentemente o \textit{LTTng}~\cite{lttng}), o \textit{KProbes} ~\cite{KProbesSite,kernel_debug_printk_on_fly}
 \td{estes são estáticos, dinâmicos,...? o que têm que ver com o paragrafo anterior??}
 
 Outro sistema de instrumentação do núcleo do \textit{Linux} é o \textit{KProbes}. Este sistema permite colocar código de instrumentação do núcleo através da definição de um módulo.\td{para quê?}
- Baseados neste sistema foram ainda desenvolvidos o \textit{JPrtobe} e o \textit{KRetProbe} que permitem uma interacção facilidada \td{o que distingue estes do kprobes}.
+ Baseados neste sistema foram ainda desenvolvidos o \textit{JProbe} e o \textit{KRetProbe} que permitem uma interacção facilidada \td{o que distingue estes do kprobes}.
 
 O \textit{KProbes} permite que sejam instrumentados as funções do núcleo bem como de módulos carregados no sistema. Este sistema tem uma forma bem definida de criação e destruição dos pontos de instrumentação e permite ao programador um maior controlo. Como programar para o núcleo do \textit{Linux} pode ser complicado foram criadas pelo menos duas ferramentas para os utilizadores (\textit{SystemTap} ~\cite{systemtap} e \textit{DProbes} ~\cite{dprobes}) que facilitam a programação, oferecem alguma segurança e portabilidade entre versões. Os programadores utilizando as linguagens fornecidas por estas ferramentas criam a sua instrumentação e gerando a ferramenta  um módulo para o núcleo, que permite a monitorização pretendida.
 
@@ -169,8 +169,6 @@ O \textit{KProbes} permite que sejam instrumentados as funções do núcleo bem 
 A monitorização das interacções via rede pode ser efectuado com base na biblioteca PCap e respectivo suporte fornecido pelo núcleo do sistema.
 O \textit{Linux} inclui o \textit{Linux Socket Filter} que corresponde a uma versão semelhante ao \textit{Berckeley Packet Filter (BPF)}~\cite{Mccanne92thebsd}. Estes sistemas permitem a captura e filtragem de pacotes com base numa máquina virtual de registos que permite programar filtros usando instruções específicas, para efectuar movimentações de dados e para cálculos lógicos, sobre o conteúdo dos pacotes de rede. Cada filtro a ser executado pode ser uma combinação de diferentes regras. A cada pacote que é recebido ou transferido na interface de rede é aplicado o filtro definido que determina se é efectuado uma cópia do pacote para um repositório que posteriormente irá ser consumido pela aplicação monitora em user level, como por exemplo o tcpdump.
 
-
-
 \paragraph{Utilização de filtros}
 \label{subsub:socket_filter}
 
@@ -186,9 +184,9 @@ Uma forma de reduzir o volume de dados capturados, focando a atenção apenas na
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \paragraph{Firewall}
 
-Existe um sistema de \textit{firewall} no núcleo do sistema \textit{Linux}, o \textit{NetFilter}, que gere o fluxo de dados de e para o exterior implementando as políticas de controlo desejadas pelo administrador.  A gestão do fluxo de dados é efectuada através de regras, que podem ser indicadas/alteradas em qualquer momento no \textit{NetFilter}. Estas regras baseiam-se nas características do tráfego, como seja, se é de entrada ou de saída ou de redirecionamento, ou outros parâmetros tais como portas e interfaces de rede.
+Existe um sistema de \textit{firewall} no núcleo do sistema \textit{Linux}, o \textit{NetFilter} ~\cite{netfiltersite}, que gere o fluxo de dados de e para o exterior implementando as políticas de controlo desejadas pelo administrador. A gestão do fluxo de dados é efectuada através de regras, que podem ser indicadas/alteradas em qualquer momento no \textit{NetFilter}. Estas regras baseiam-se nas características do tráfego, como seja, se é de entrada ou de saída ou de redirecionamento, ou outros parâmetros tais como portas e interfaces de rede.
 
-O \textit{NetFilter} é implementado por vários módulos do núcleo, sendo um deles o \textit{conntrack}. Este módulo permite monitorizar os pacotes pertencentes a um fluxo, assemelhando-se assim a uma \textit{firewall} com estado.\td{??? mas estamos a descrever a firewall??}
+O \textit{NetFilter} é implementado por vários módulos do núcleo, sendo um deles o \textit{conntrack}\cite{CTS}. Este módulo permite monitorizar os pacotes pertencentes a um fluxo, assemelhando-se assim a uma \textit{firewall} com estado.\td{??? mas estamos a descrever a firewall??}
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -247,43 +245,113 @@ Para poder efectuar os testes de avaliação foi criado uma aplicação em níve
 
 \section{Avaliação}
 \label{sec:evaluation}
-Este sistema foi avaliado funcionalmente através dos protocolos em \textit{ftp} e \textit{http}. Estes testes iniciais não visaram a performance mas sim a correcção de todos os pacotes envolvidos nas comunicações.
-O sistema de testes utilizados permitiu que fossem capturados os pacotes de uma transferência de um ficheiro, de um servidor \textit{ftp} e de um servidor de \textit{http}. Foi efectuada a monitorização da aplicação cliente para estes servidores, através do programa wget.
+O sistema implementado foi avaliado funcionalmente através da utilização de protocolos \textit{ftp}\cite{ftp-proto} e \textit{http} \cite{HypTraPro--HTT}. Para tal, recorreu-se a um conjunto alargado de testes, tendo como objectivo não só observar o seu desempenho, como também, e mais importante, verificar a correcção de todos os pacotes envolvidos nas comunicações. Através destes conjunto de testes, foi possível efectuar a captura dos pacotes resultantes da transferência de um ficheiro, a partir de um servidor ftp ou http. 
+
+De modo a realizar estes testes de desempenho, foram utilizadas duas máquinas ligadas directamente, através da utlização de um cabo Ethernet cruzado. Uma das máquinas ficou responsável pela execução dos serviços \textit{ftp}, \textit{http} e \textit{iperf}.
+
+\subsection{Avaliação Funcional}
+A análise funcional foi efectuada por meio de programas simples, que desencadeiam chamadas ao sistema de operação, obtendo-se os dados (portos e endereços) dentro do módulo do núcleo. Estes dados podem ser acedidos através do sistema \textit{debugfs}, onde previamente foi registado um ficheiro para esse efeito. Este ficheiro, quando acedido, contem toda a informação relativa aos portos e endereços em utilização por parte da aplicação monitorizada.
+Deste modo, para obter um grau de comparação dos dados produzidos e validar esta análise, foi utilizada a ferramenta \textit{netstat}~\cite{netstat}, na qual indica os dados relativos aos portos e endereços utilizados pelos processos do sistema (esta ferramenta tira partido do sistema de ficheiros virtual \textit{ProcFs} ~\cite{procfskernel} para obter esses dados.
+
+\subsection{Avaliação do desempenho}
+Embora exista uma validação funcional do sistema implementado, foram também elaborados diversos testes de desempenho sobre o mesmo. Estes testes focaram-se na recepção ou transmissão de 1GigaByte de dados entre as duas máquinas conectadas directamente por interfaces de rede a 100 Mbit/s.
+
+Na execução destes testes, foram executadas 10 iterações para cada tipo considerado, de modo a obter o valor médio com um desvio padrão aceitável (os resultados obtidos estão descritos nas tabelas \ref{tab:desempenho} e \ref{tab:overhead}).
 
 \begin{table}
 \begin{center}
-\caption{Tempos médios em segundos (s)}
+
 \begin{tabular}{ | c | c | c | c |  }
 \hline
 Teste & \hspace {0.3cm} Original \hspace {0.3cm}& \hspace {0.2cm} Com TcpDump \hspace {0.2cm} & Com TcpDump e módulo \\
 \hline
-1GB - FTP & 91.7243	& 91.7415 & 91.9299 \\
-1GB - HTTP & 91.5905 & 91.6246 & 91.8642 \\
-5GB - HTTP & 457.9506 & 457.9527 & 458.2059 \\
-IPerf - 1GB TCP & 91.2028	& 91.2049	& 91.3341 \\
-IPerf - 1GB UDP & 89.7907 & 89.7952 & 90.036 \\
+1GB - FTP & 91.8508	& 1.8500 & 91.8854 \\
+1GB - HTTP & 91.6391 & 91.6472 & 91.6674 \\ 
+%5GB - HTTP & 457.9506 & 457.9527 & 458.2059 \\
+IPerf - 1GB TCP & 91.3790	& 91.2535	& 91.2672 \\
+%IPerf - 1GB UDP & 89.7907 & 89.7952 & 90.036 \\
+\hline
+\hline
+1GB HTTP 2 processos & 182.1573 & 188.7156 & 182.0161 \\
 \hline
 \end{tabular}
+\caption{Tempos médios em segundos (s)}
+\label{tab:desempenho}
 \end{center}
 \end{table}
 
+Analisar estes dados .....
+
 \begin{table}
 \begin{center}
-\caption{Sobrecarga das transferências (valores em percentagem)}
+
 \begin{tabular}{ | c | c | c | c | }
 \hline
 Teste & TcpDump com módulo & Variação do TcpDump & \hspace {0.3cm} TcpDump \hspace {0.3cm}\\
 
 \hline
-1GB - FTP  & 0.2241 & 0.2054 & 0.0188 \\
-1GB - HTTP &  0.2988 & 0.2615 & 0.0372 \\
-5GB - HTTP &  0.0557 & 0.0553 & 0.0005 \\
-IPerf - 1GB TCP &  0.1440 & 0.1417 & 0.0023 \\
-IPerf - 1GB UDP & 0.2732 & 0.2682 & 0.0050 \\
+1GB - FTP  & 0.0377 & 0.0385 & -0.0009 \\
+1GB - HTTP &  0.0309 & 0.0220 & 0.0088 \\
+%5GB - HTTP &  0.0557 & 0.0553 & 0.0005 \\
+IPerf - 1GB TCP &  -0.1223 & 0.015 & 0.1373 \\
+%IPerf - 1GB UDP & 0.2732 & 0.2682 & 0.0050 \\
+\hline
+\hline
+1GB HTTP 2 processos & -0.0775 & -3.5501 & 3.6003 \\
 \hline
 \end{tabular}
+\caption{Sobrecarga das transferências (valores em percentagem)}
+\label{tab:overhead}
 \end{center}
 \end{table}
+
+
+analisar estes dados ....
+
+\subsubsection{Desempenho da estrutura de dados}
+Para além das avaliações descritas anteriormente, tornou-se essencial analisar o comportamento da estrutura de dados utilizada (também descrita como estrutura de “estado do processo”), de modo a verificar o compromisso entre o desempenho, a versatilidade e o espaço ocupado da mesma, sobre o sistema criado. Assim, para analisar estes pressupostos,foi elaborado um teste recorrendo ao sistema de alta resolução de temporizadores (HRTimer) \cite{hrtimerKernel}, contido no núcleo do sistema de operação.
+
+\begin{table}
+\begin{center}
+
+\begin{tabular}{ | c | c |  }
+\hline
+Teste & \hspace{1cm}Duração\hspace{1cm} \\
+\hline
+Adicionar 1 elemento & \\
+\hline
+Adicionar 1024 elementos & \\
+\hline
+
+\hline
+\end{tabular}
+\caption{Tempos em microsegundos}
+\label{tab:tree_info}
+\end{center}
+\end{table}
+
+\subsubsection{Desempenho do Sistema de instrumentação}
+Sendo a instrumentação do sistema um ponto fundamental na execução da monitorização de uma aplicação, a análise ao seu comportamento é bastante importante, na medida em que é necessário verificar se a introdução deste tipo de sistemas, irá produziruma elevada penalização sobre o sistema de operação. Tendo em conta que o sistema de instrumentação utilizado corresponde ao \textit{KProbes}, foi fundamental efectuar esses testes, de modo a garantir que tal factor não sucedia, através dos valores indicados em \cite{KProbeKernel}.
+
+\begin{table}
+\begin{center}
+
+\begin{tabular}{ | c | c |  }
+\hline
+Teste & \hspace{1cm}Duração\hspace{1cm} \\
+\hline
+100 000 000 chamadas & \\
+\hline
+ & \\
+\hline
+
+\hline
+\end{tabular}
+\caption{Tempos em }
+\label{tab:kprobes_info}
+\end{center}
+\end{table}
+
 
 \section{Trabalho Relacionado}
 \label{sec:related_work}
