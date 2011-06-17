@@ -49,7 +49,7 @@
 \urldef{\mailsb}\path|vad@di.fct.unl.pt|    
 
 \newcommand{\keywords}[1]{\par\addvspace\baselineskip
-\noindent\keywordname\enspace\ignorespaces#1}
+\noindent\textbf{Palavras chave:}\enspace\ignorespaces#1}
 
 \newcommand{\td}[1]{\todo[inline]{#1}}
 
@@ -88,7 +88,7 @@ Universidade Nova de Lisboa, Portugal}
 \begin{abstract}
 
 A monitorização do comportamento dos processos é uma das melhores formas de compreender a sua execução real, de detectar erros e avaliar o seu real desempenho, ainda mais se não for possível aceder ao seu código fonte. No entanto, o impacto no desempenho e comportamento das aplicações pode ser bastante significativo.
- O caso das interacções entre processos via rede não é excepção, e mesmo sistemas populares como PCap com auxílio do núcleo do sistema de operação, podem introduzir uma grande perturbação agravada pela dificuldade de obter apenas os dados que dizem respeito à aplicação sob observação.
+ O caso das interacções entre processos via rede não é excepção, e mesmo sistemas populares como PCap com auxílio do núcleo do sistema de operação, podem introduzir uma grande perturbação agravada pela dificuldade em obter apenas os dados que dizem respeito à aplicação sob observação.
 Este trabalho estende o suporte dado no núcleo Linux a este sistema, por forma a permitir capturar as interacções via rede de processos específicos, facilitando a sua análise e procurando também limitar o impacto deste tipo de monitorização.
   Para tal, foi criada uma forma de filtragem nos \emph{lpf-filters}, usados pelo PCap que, dinamicamente, através da monitorização das chamadas ao sistema do processo, permite manter os endereços e portos em utilização pelo processo alvo e capturar apenas o seu tráfego. Deste modo é possível, sem conhecimento prévio ou alterações aos processos, obter apenas os dados relevantes. Esta extensão introduz assim, sem incompatibilidades, uma nova funcionalidade, com vantagens relativamente à perturbação do restante sistema quando se pretende analisar apenas uma determinada aplicação. 
 
@@ -100,9 +100,7 @@ Este trabalho estende o suporte dado no núcleo Linux a este sistema, por forma 
 
 A monitorização permite a análise da execução de um programa ou sistemas distribuídos com os mais variados objectivos. Estes podem passar pela simples observação de funcionamento, envolver a detecção de erros ou falhas, ajudar à depuração ou à detecção de problemas no desempenho da aplicação ou sistemas subjacentes. Em particular, em ambientes distribuídos, é uma das melhores opções para analisar as interacções entre componentes e destes com o exterior, em execuções reais. 
 %auditar, correcção, segurança, etc
-
-%% monitorização de redes de computadores nagios, NetView,
-%% ferramentas para depuração e avaliação do desempenho para sistemas paralelos e distribuidos VampirTrace, PERUSE
+Temos assim os exemplos da monitorização de redes de computadores com os sistemas  nagios e NetView, e as ferramentas para depuração e avaliação do desempenho para sistemas paralelos e distribuídos como o VampirTrace e o PERUSE.
 
 %\section{Monitorização}
 %\label{sec:mon_intro}
@@ -114,11 +112,7 @@ A monitorização permite a análise da execução de um programa ou sistemas di
 A monitorização de sistemas exige sempre a execução de acções específicas para a detecção e/ou registo dos acontecimentos que se pretendem observar que concorrem no uso dos recursos disponíveis com o próprio sistema monitorizado. Causa assim problemas de desempenho e que se pretende o menor possível. O grau da perturbação introduzida no sistema monitorizado depende dos mecanismos usados, nível de detalhe, volume de dados recolhidos, etc.  
 É comum o recurso a mecanismos de instrumentação de código para a implementação destas acções, especificamente para cada caso, por forma a minimizar esta perturbação. Estas acções podem ser introduzidas aos diferentes níveis, como sejam o no programa, bibliotecas, ou internas ao sistema de operação, de acordo com a disponibilidade da informação pretendida e a facilidade em a obter.
 
-Por exemplo, o recurso a mecanismos de monitorização presentes nos sistemas de operação, na observação das interacções via rede, permite beneficiar de um mecanismo fiável, e transparente para as aplicações, muitas vezes mais eficiente do que tentar obter a mesma funcionalidade a outro nível. Este pode no entanto ser agravado devido à necessidade de copiar os dados recolhidos no núcleo do sistema para as ferramentas que os usam e consequentes trocas de contexto (kernel-level/user-level).
-
-
-
-%\td{FALTA DIFERENTES FORMAS DE MONITORIZACAO}
+Por exemplo, o recurso a mecanismos de monitorização presentes nos sistemas de operação, na observação das interacções via rede, permite beneficiar de um mecanismo fiável, e transparente para as aplicações, muitas vezes mais eficiente do que tentar obter a mesma funcionalidade a outro nível. Este pode no entanto ser agravado devido à necessidade de copiar os dados recolhidos no núcleo do sistema para as ferramentas que os usam e consequentes trocas de contexto (\emph{kernel-level/user-level}).
 
 
 
@@ -130,10 +124,10 @@ A instrumentação do código pode ser considerada estática ou dinâmica, depen
 %%%Outra forma de classificar estes sistemas tem em conta o tipo de processamento efectuado e de informação recolhida. Podemos distinguir entre os que permitem detectar eventos e obter um traço detalhado da execução e aqueles que efectuam amostragens ao estado do sistema em determinados intervalos de tempo obtendo-se estas amostras e/ou estatísticas que procuram resumir a evolução do sistema. 
 
 Como exemplos podemos referir a utilização do compilador e bibliotecas para obter executáveis instrumentados com vista a obter o perfil e desempenho dos processos como o gprof\cite{Graham:1982:GCG:800230.806987}.
-\td{qual é o gnu profiller? mais exemplos?? gprof? }
+%\td{qual é o gnu profiller? mais exemplos?? gprof? }
 Outro caso, o recurso à variável de ambiente \textit{LD\_PRELOAD} para a ligação de uma biblioteca no arranque do processo que permita modificar o comportamento do processo com vista à sua monitorização. Esta última técnica implica o desenvolvimento dessas bibliotecas e conhecimento prévio do código da aplicação.
 
-Outra forma passa por executar o processo a ser monitorizado sob o controlo do processo monitor, tal como no caso das ferramentas \textit{strace}~\cite{strace} e  \textit{debuggers}~\cite{gdb}. Estas lançam o processo usando o suporte \textit{PTrace}~\cite{ptrace} suportado pelo sistema de operação para o controlar e observar. 
+Outra forma passa por executar o processo a ser monitorizado sob o controlo do processo monitor, tal como no caso das ferramentas \textit{strace}~\cite{strace} e  \textit{debuggers}~\cite{gdb}. Estas lançam o processo usando o suporte \textit{PTrace}~\cite{ptrace}, oferecido pelo sistema de operação para o controlar e observar. 
 %\td{falta falar do sysprof tb tem de levar suporte do núcleo, nao li quase documentacao sobre este sistema}
 
 \subsection{Monitorização no núcleo}
@@ -144,20 +138,19 @@ Existem diferentes sistemas de monitorização e instrumentação no núcleo do 
 Um dos sistemas de instrumentação estática do código é o \textit{TracePoints}. Este permite que sejam indicadas funções a ser chamadas em pontos de instrumentação prédefinidos no código. Nos pontos em que não é definida qualquer função, apenas um pequeno custo é imposto, correspondente à sua verificação. 
 
 Em oposição aos sistemas estáticos, existem sistemas dinâmicos que podem  ser adicionados e removidos em tempo de execução. Um primeiro exemplo é o OProfile~\cite{oprofile}. 
-\td{Dizer qq coisa sobre OProfile !!}
-Este sistema de forma a minimizar a sobrecarga imposta pela monitorização utiliza a técnica de amostragem. O utilizador pode definir qual o ritmo de amostragem para o qual quer fazer a monitorização, e desta forma consegue diminuir o número de eventos que tem de analisar. Este apesar de não efectuar traço de execução permite que sejam obtidas percentagens de eventos ou eventos de um processo, permitindo assim fazer a análise. Este sistema utiliza em nível utilizador aplicações para recolher os dados registados pela monitorização.
-\td{Talvez seja suficiente para o oprofile}
+%\td{Dizer qq coisa sobre OProfile !!}
+Este sistema, como forma a limitar a sobrecarga imposta pela monitorização, utiliza a técnica de amostragem de vários contadores internos ao sistema. O utilizador pode definir qual o ritmo de amostragem para o qual quer fazer a monitorização, e desta forma pode diminuir a perturbação do sistema. Este apesar de não efectuar traço de execução permite que sejam obtidas estatísticas sobre o desempenho do sistema e processos. Este  utiliza em nível utilizador aplicações para recolher os dados registados pela monitorização.
+%\td{Talvez seja suficiente para o oprofile}
 
 Dentro da categoria dos sistemas que permitem obter traços detalhados da execução, existe o \textit{LTT}~\cite{ltt} (mais recentemente o \textit{LTTng}~\cite{Mathieu2009}), e o \textit{KProbes} ~\cite{KProbesSite,kernel_debug_printk_on_fly}. %%%%%%%%%%%%%%%%%%%%%%%
-Estes sistemas são dinâmicos não requerendo a recompilação do núcleo de sistema para serem utilizados, apenas é necessário compilar um módulo para poderem especificar quais as análises a serem efectuadas. O \textit{LTTng} também pode utilizar o sistema de \textit{TracePoints}, incluído no núcleo. O \textit{LTTng} tal como o \textit{OProfile} utiliza aplicações em nível utilizador para recolher e analisar os dados obtidos.
-\td{estes são estáticos, dinâmicos,...? o que têm que ver com o paragrafo anterior??}
-Como foi anteriormente referido o \textit{Kprobes} é um sistema de instrumentação dinâmico que permite efectuar o traço da computação. Para utilizar este sistema é necessário definir um \textit{KProbe}, ou seja uma estrutura com apontadores para a função ou instrução a analisar, bem como os \textit{handlers} a serem executados antes e após a execução da instrução. Desta forma existe um maior controlo sobre a monitorização ao nível da execução das instruções.
+Estes sistemas são dinâmicos não requerendo a recompilação do núcleo de sistema para serem utilizados. Apenas é necessário fornecer um módulo  e carregá-lo, para  especificar quais as análises a serem efectuadas. O \textit{LTTng} também pode utilizar o sistema de \textit{TracePoints}, incluído no núcleo. Tal como o \textit{OProfile} utilizam-se normalmente ferramentas em nível utilizador para recolher e analisar os dados obtidos.
+%\td{estes são estáticos, dinâmicos,...? o que têm que ver com o paragrafo anterior??}
 
-\td{nao sei bem como integrar o texto seguinte com o anterior}
- este último permite colocar código de instrumentação em vários pontos do núcleo, usando as funções fornecidas por um módulo carregado durante o funcionamento do sistema.
-\td{para quê?}
-O \textit{KProbes} permite que sejam instrumentados as funções do núcleo, definidas as acções a efectuar nesses pontos, bem como de módulos carregados no sistema. Este sistema tem uma forma bem definida de criação e destruição dos pontos de instrumentação e permite ao programador um maior controlo.
-\td{ate a este ponto}
+Para utilizar o \textit{Kprobes} é necessário definir um \textit{KProbe} por cada função ou instrução a instrumentar. Este consiste numa estrutura com apontadores para a função ou instrução a analisar, bem como os \textit{handlers} a serem executados antes e após a execução da instrução monitorizada. Estes \textit{KProbe} fazem parte de um módulo que é carregado no sistema em execução. 
+Podem ser instrumentados as funções do núcleo ou de módulos carregados no sistema, e definidas as acções a efectuar nesses pontos. 
+Desta forma permite-se um grande flexibilidade e controlo sobre a monitorização dos mais variados pontos no núcleo do sistema.
+Este sistema tem uma forma bem definida de criação e destruição dos pontos de instrumentação e permite ao programador um maior controlo.
+%\td{ate a este ponto}
 
  Baseados neste sistema foram ainda desenvolvidos o \textit{JProbe} e o \textit{KRetProbe} que permitem uma interacção que facilita programar as acções a efectuar na entrada ou retorno de funções no núcleo do sistema.
 % \td{ confirmar que é isto que distingue estes do kprobes}  esta correcto.
@@ -198,7 +191,7 @@ Estes filtros são uma forma de reduzir o volume de dados capturados, focando a 
 
 Existe um sistema de \textit{firewall} no núcleo do sistema \textit{Linux}, o \textit{NetFilter} ~\cite{netfiltersite}, que gere o fluxo de dados de e para o exterior implementando as políticas de controlo desejadas pelo administrador. A gestão do fluxo de dados é efectuada através de regras, que podem ser indicadas/alteradas em qualquer momento no \textit{NetFilter}. Estas regras baseiam-se nas características do tráfego, como seja, se é de entrada ou de saída ou de redirecionamento, ou outros parâmetros tais como portas e interfaces de rede.
 
-O \textit{NetFilter} é implementado por vários módulos do núcleo, sendo um deles o \textit{conntrack}\cite{CTS}. Este módulo permite monitorizar os pacotes pertencentes a um fluxo, necessitando conhecer os diferentes protocolos utilizados, para efectuar a monitorização.
+O \textit{NetFilter} é implementado por vários módulos do núcleo, sendo um deles o \textit{conntrack}\cite{CTS}. Este módulo permite eventualmente monitorizar os pacotes pertencentes a um fluxo, pela definição de funções a executar perante o tráfego detectado. \marginpar{verifica esta descricao}
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -216,7 +209,7 @@ O sistema proposto foi desenvolvido procurando cumprir os seguintes requisitos:
 \item a implementação deve envolver poucas alterações ao código do sistema, para facilitar a sua manutenção e evolução com as novas versões do sistema Linux.
 \end{itemize}
 
-Para tal, o sistema criado está dividido em 4 componentes principais (ver figura \ref{arquitectura}). A função de filtragem, invocada por um \textit{hook} que estende o LSF, permite que apenas o tráfego do processo alvo seja analisado pelo restante sistema de fitragem do LSF. Uma componente de instrumentação das chamadas ao sistema (ou outras funções contidas no sistema de rede) que actualiza o repositório de dados onde é mantido o estado das interacções via rede do(s) processo(s) alvo. Caso seja necessário, existe ainda um sistema para controlo e para obter informação do estado da monitorização.  (???)
+Para tal, o sistema criado está dividido em 4 componentes principais (ver figura \ref{arquitectura}). A função de filtragem, invocada por um \textit{hook} que estende o LSF, permite que apenas o tráfego do processo alvo seja analisado pelo restante sistema de fitragem do LSF. Uma componente de instrumentação das chamadas ao sistema (ou outras funções contidas no sistema de rede) que actualiza o repositório de dados onde é mantido o estado das interacções via rede do(s) processo(s) alvo. Existe ainda um sistema para controlo/configuração e para obter informação do estado da monitorização.
 
 \begin{figure}[htbp]
 \begin{center}
@@ -235,14 +228,14 @@ Este sistema permite que sejam capturados os pacotes de rede de um processo, sem
 \label{sub:mon_syscalls}
 
 Um ponto importante deste sistema, constituiu na garantia que todas as interacções desencadeadas por um processo com o exterior fossem detectadas. Para tal, foi necessário recorrer à monitorização das chamadas ao sistema de rede ao nível do Kernel, permitindo, assim, minimizar as cópias de dados e trocas de contexto. Tirando partido da utilização do sistema de monitorização KProbes foi possível realizar a monitorização sob o pequeno conjunto de chamadas ao sistema relevantes, nomeadamente: sendto, recvfrom, bind, accept, connect e close.
- Na realidade verificou-se a chamada ao sistema close, ao ser utilizada intensivamente por todo o sistema de ficheiros, poderia degradar desnecessariamente o desempenho. Desta forma, decidiu-se aplicar a monitorização à função sock\_close, garantindo apenas a monitorização das chamadas close sobre os sockets, reduzindo significativamente o número de eventos respeitantes à chamada ao sistema close.
+ Na realidade verificou-se a chamada ao sistema close, ao ser utilizada intensivamente por todo o sistema de ficheiros, poderia degradar desnecessariamente o desempenho. Desta forma, decidiu-se aplicar a monitorização à função interna \texttt{sock\_close}, garantindo apenas a monitorização das chamadas close sobre os sockets, reduzindo significativamente o número de eventos face às chamadas ao sistema do \texttt{close}.
 
 \subsection*{Estado do processo}
 \label{sub:data_repository}
 
 O estado dos portos TCP e UDP em uso pelo processo alvo é mantido num repositório de dados, e permanentemente actualizado pelo módulo anterior. 
- A estrutura dados escolhida para o efeito, para produzir o repositório pretendido, baseia-se numa árvore \textit{Red and Black} já disponível no núcleo do sistema. O conteúdo de cada folha da árvore é uma estrutura com duas listas de elementos, cada uma contendo endereços IP utilizados pela aplicação. A chave de indexação das folhas é o número do porto, desta forma a àrvore poderá conter 65535 elementos. No pior caso a procura de um porto na àrvore necessitará de efectuar 16 iterações.
- \td{conteúdo? ip, interface, porto udp, porto tcp, etc??}
+ A estrutura dados escolhida para o efeito, para produzir o repositório pretendido, baseia-se numa árvore \textit{Red and Black} já disponível no núcleo do sistema. O conteúdo de cada folha da árvore é uma estrutura com duas listas de elementos, cada uma contendo endereços IP utilizados pela aplicação. A chave de indexação das folhas é o número do porto, desta forma a árvore poderá conter 65535 elementos. No pior caso, a procura de um porto na árvore necessitará de efectuar 16 iterações.
+%\td{conteúdo? ip, interface, porto udp, porto tcp, etc??}
   O uso deste tipo de estrutura permite obter um bom compromisso entre o tempo de acesso à estrutura e a quantidade de memória utilizada.
 
 
@@ -257,15 +250,18 @@ Através da extensão do LSF com um hook, quando ligado, este invoca esta filtra
 \subsection*{Controlo e Informação}
 \label{sub:data_information}
 
-Para comunicar entre o sistema desenvolvido e uma aplicação monitorizadora foi necessário definir alguns ficheiros. Esta ficheiros estão apenas acessíveis ao utilizador \textit{root}, permitindo que outros utilizadores da máquina não consigam manipular o sistema de monitorização. Os ficheiros de controlo definidos foram \textit{option}, \textit{pid}, \textit{ppid} e \textit{tgid}. O primeiro ficheiro permite controlar a análise e a informação da àrvore, e os restantes são os identificadores do(s) processo(s), permitindo, em geral, monitorizar todos os processos pertencentes a um programa. Os ficheiros de informação foram definidos para obter estatísticas dos pacotes e das entradas/retornos das funções instrumentadas.
+Para facilmente controlar e configurar o sistema desenvolvido foi definida uma interface baseada em ficheiros virtuais (DebugFS). Estes ficheiros estão apenas acessíveis ao utilizador \textit{root}, controlando o acesso por parte dos utilizadores da máquina ao sistema de monitorização. Os ficheiros de controlo definidos foram \textit{option}, \textit{pid}, \textit{ppid} e \textit{tgid}. O primeiro ficheiro permite controlar a análise e a informação da árvore,
+\marginpar{não percebo o que o option faz...}
+ e os restantes permitem definir o(s) processo(s) a monitorizar. Pode ser indicado um processo ou todos os processos de um grupo. Os ficheiros de informação
+\marginpar{quais sao os fich de informacao??}
+foram definidos para obter estatísticas dos pacotes analisados e das entradas/retornos das funções instrumentadas.
 
- \td{ Esta compreende três ficheiros . . . quais ? para quê? }
 
 %%%%%%%%%%%%%%%%%
 \subsection{Aplicação Monitora}
 \label{sub:monitor_app}
 
-Para poder efectuar alguns testes de avaliação foi criado uma aplicação em nível utilizador para poder lançar sob seu controlo a aplicação a ser monitorizada. Esta situação foi devida à necessidade de saber o momento em que se dá o inicio e o fim da aplicação, de forma a indicar ao sistema qual a aplicação a monitorizar e para poder obter o tempo de execução.
+Para poder mais facilmente efectuar os testes de avaliação, foi criado uma ferramenta em nível utilizador que permite lançar a aplicação e configurar automaticamente o sistema para a monitorizar. Esta verifica o identificador do processos e o momento em que se dá o inicio e o fim da sua execução, de forma a iniciar e terminar a monitorização quando necessário.
 
 %%%%%%%%%%%%%%%%%%%
 
@@ -273,7 +269,12 @@ Para poder efectuar alguns testes de avaliação foi criado uma aplicação em n
 \section{Avaliação}
 \label{sec:evaluation}
 
-O sistema implementado foi avaliado funcionalmente através da utilização de protocolos \textit{ftp}\cite{ftp-proto} e \textit{http} \cite{HypTraPro--HTT}. Para tal, recorreu-se a um conjunto alargado de testes, tendo como objectivo não só observar o seu desempenho, como também, e mais importante, verificar a correcção do funcionamento e a sua capacidade de capturar todos os pacotes envolvidos nas comunicações de um processo alvo (e apenas esses pacotes). 
+O sistema implementado foi avaliado funcionalmente através da utilização de
+protocolos \textit{ftp}\cite{ftp-proto} e \textit{http} \cite{HypTraProHTT}.
+Para tal, recorreu-se a um conjunto alargado de testes, tendo como objectivo não
+só observar o seu desempenho, como também, e mais importante, verificar a
+correcção do funcionamento e a sua capacidade de capturar todos os pacotes
+envolvidos nas comunicações de um processo alvo (e apenas esses pacotes). 
 
 %Através destes conjunto de testes, foi possível efectuar a captura dos pacotes resultantes da transferência de um ficheiro, a partir de um servidor ftp ou http. 
 
@@ -284,12 +285,12 @@ A análise funcional foi efectuada por meio de programas simples, que desencadei
 Deste modo, para obter um grau de comparação dos dados produzidos e validar esta análise, foi utilizada a ferramenta \textit{netstat}~\cite{netstat}, na qual indica os dados relativos aos portos e endereços utilizados pelos processos do sistema (esta ferramenta tira partido do sistema de ficheiros virtual \textit{ProcFs} ~\cite{procfskernel} para obter esses dados.
 Para além desta análise, foi efectuada a confirmação da correcção de que todos os pacotes pertencentes às comunicações foram de facto obtidos. Esta confirmação foi efectuada através da captura utilizando o \textit{tcpdump} com o módulo activo, e verificado que todo o trafego respeitante ao protocolo (\textit{ftp} e \textit{http}) estava de facto capturado e correcto, não existindo mais fluxos pertencentes à captura.
 
-\td{observação dos pacotes capturados com o tcpdump e wireshark e verificação de que a captura era correcta!!}
+\td{nao foi tambem feita a observação dos pacotes capturados com o tcpdump e wireshark e verificado que a captura era correcta??!}
 
 \subsection{Avaliação do desempenho}
 Foram efectuados diversos testes para avaliação do overhwad introduzido por este sistema. Estes testes basearam-se na recepção ou transmissão de 1GigaByte de dados, por diferentes programas e protocolos, entre as duas máquinas conectadas directamente por interfaces de rede a 100 Mbit/s.
 
-Na execução destes testes, foram executadas 10 iterações para cada experiência considerada, de modo a obter um valor médio com um desvio padrão aceitável (os resultados obtidos estão descritos nas tabelas \ref{tab:desempenho} e \ref{tab:overhead}).
+Na execução destes testes, foram executadas 10 iterações para cada experiência considerada, de modo a obter um valor médio com um desvio padrão aceitável. Os resultados obtidos estão apresentados nas tabelas \ref{tab:desempenho} e \ref{tab:overhead}.
 
 \begin{table}
 \begin{center}
@@ -344,22 +345,23 @@ IPerf - 1GB UDP & 0.0802 & 0.005 & 0.0752 \\
 analisar estes dados ....
 
 \subsubsection{Desempenho da estrutura de dados}
-Para além das avaliações descritas anteriormente, tornou-se essencial analisar o comportamento da estrutura de dados utilizada para manter o “estado do processo”, de modo a verificar o compromisso entre o desempenho, a versatilidade e o espaço ocupado da mesma, sobre o sistema criado. Assim, para esta análise, foi elaborado um teste que usa o sistema de alta resolução de temporizadores (HRTimer) \cite{hrtimerKernel}, contido no núcleo do sistema de operação.
+Para além das avaliações descritas anteriormente, tornou-se essencial analisar o comportamento da estrutura de dados utilizada para manter o “estado do processo”, de modo a verificar o seu desempenho e o espaço ocupado pela mesma. Assim, para esta análise, foi elaborado um teste que usa o sistema de alta resolução de temporizadores (HRTimer) \cite{hrtimerKernel}, contido no núcleo do sistema de operação.
+\marginpar{como foi testado??}
+O teste consistiu em obter o tempo antes de iniciar a inserção dos 1024
+elementos, inserir os elementos, e obter novamente o tempo, permitindo assim
+obter o tempo decorrido desde o inicio da operação.
 
 \begin{table}
 \begin{center}
 
-\begin{tabular}{ | l | c |  }
+\begin{tabular}{ | l | c | c | }
 \hline
-\hspace{1.2cm} Teste \hspace{1cm} & \hspace{1cm}Duração\hspace{1cm} \\
+\hspace{1.2cm} Teste \hspace{1cm} & \hspace{1cm}Duração\hspace{1cm} &  Média por
+elemento \\
 \hline
-Adicionar 1 elemento & \\
+Adicionar 1024 elementos & 869 244 & 848.8711 \\
 \hline
-Remove 1 elemento & \\
-\hline
-Adicionar 1024 elementos & 869 244\\
-\hline
-Remove 1024 elementos & 675 086\\
+Remove 1024 elementos & 675 086 & 659.2637\\
 \hline
 
 \hline
@@ -369,8 +371,12 @@ Remove 1024 elementos & 675 086\\
 \end{center}
 \end{table}
 
+Como se pode verificar a inserção de um elemento na àrvore é sensivelmente 1
+microsegundo, o que demonstra que 
+
 \subsubsection{Desempenho do Sistema de instrumentação}
-Sendo a instrumentação do sistema um ponto fundamental na execução da monitorização de uma aplicação, a análise ao seu comportamento é bastante importante, na medida em que é necessário verificar se a introdução deste tipo de sistemas, irá produzir uma elevada penalização sobre o sistema de operação. Tendo em conta que o sistema de instrumentação utilizado corresponde ao \textit{KProbes}, foi fundamental efectuar esses testes, de modo a garantir que tal factor não sucedia, através dos valores indicados em \cite{KProbeKernel}.
+Sendo a instrumentação das chamadas ao sistema um ponto fundamental na execução da monitorização de uma aplicação, a análise ao seu comportamento é bastante importante, na medida em que é necessário verificar se a introdução deste tipo de sistema irá produzir uma elevada penalização sobre o sistema de operação. Tendo em conta que o sistema de instrumentação utilizado corresponde ao \textit{KProbes}, foi fundamental efectuar esses testes, de modo a garantir que tal factor não sucedia, através dos valores indicados em \cite{KProbeKernel}.
+\marginpar{nao percebo o fim desta frase!!}
 
 \begin{table}
 \begin{center}
@@ -396,14 +402,45 @@ Teste & \hspace{1cm}Duração\hspace{1cm} \\
 \label{sec:related_work}
 
 
-Este trabalho vem na sequência dos trabalhos efectuado por Nuno Farruca~\cite{Farruca:2009,duarte10}, que teve como objectivo monitorizar os processos de um sistema distribuído, tirando partido do libPCap e LSF existente em Linux. As dificuldades sentidas em obter apenas o trafego respeitante à aplicação sob monitorização levou a duas soluções. A primeira, monitorizarando o comportamento do processo através da criação de uma biblioteca que mapeia as funções sobre sockets da biblioteca de C \textit{LibC} de forma a obter os seus parâmetros e assim comunicar ao monitor quais dos pacotes capturados pelo PCap são ou não relevantes. Esta biblioteca é ligada aos processos da aplicação, no seu arranque, por definição da variável LD\_PRELOAD.
+Este trabalho vem na sequência do trabalho efectuado por Nuno Farruca~\cite{Farruca:2009,duarte10}, que teve como objectivo monitorizar os processos de um sistema distribuído, tirando partido do libPCap e LSF existente em Linux. As dificuldades sentidas em obter apenas o tráfego respeitante à aplicação sob monitorização levou a duas soluções. A primeira, monitorizarando o comportamento de cada processo através da criação de uma biblioteca que mapeia as funções sobre sockets da biblioteca de C \textit{LibC} de forma a obter os seus parâmetros e assim comunicar ao monitor quais dos pacotes capturados pelo PCap são ou não relevantes. Esta biblioteca é ligada aos processos da aplicação, no seu arranque, por definição da variável LD\_PRELOAD.
  Uma outra forma foi obter os dados dos sockets pertencentes aos processos alvo através de consultas periódicas do sistema de ficheiros virtual \textit{ProcFs} e executar também depois a filtragem de quais os pacotes dizem respeito à aplicação alvo.  Estas soluções sofrem de grandes problemas de desempenho além de, para a segunda solução, não oferecer garantias de que todo o tráfego relevante era mantido.
 
-O trabalho~\cite{1688981} com o título \textit{Application-specific packet capturing using kernel probes}, efectuou uma monitorização, utilizando o sistema de instrumentação \textit{KProbes}, das funções de transmissão e recepção de dados dentro do núcleo do sistema. Desta forma é possível monitorizar os dados de um processo. Os dados recolhidos são analisados com o intuito de perceber se determinada porta e endereço são conhecidos e caso não sejam é adicionada a informação a uma tabela de dispersão utilizada para efectuar um novo filtro. O pacote capturado  é atrasado e re-injectado e forma a poder ser capturado pela biblioteca \textit{LibPCap} através do novo filtro.
+O trabalho de Byungjoon Lee~\cite{1688981} efectuou uma
+monitorização utilizando o sistema de instrumentação \textit{KProbes}, nas
+funções de transmissão e recepção de dados dentro do núcleo do sistema. Desta
+forma é possível monitorizar os dados de um processo. Os dados recolhidos são
+analisados com o intuito de perceber se determinada porta e endereço são
+conhecidos e caso não sejam é adicionada a informação a uma tabela de dispersão
+utilizada para efectuar um novo filtro. O pacote capturado  é atrasado e
+re-injectado e forma a poder ser capturado pela biblioteca \textit{LibPCap}
+através do novo filtro.
+\marginpar{apontar vantagens e defeitos!!}
+
 
 \section{Conclusões}
 \label{sec:conclusions}
 
+Apresentamos o desenho e implementação de um sistema que estende o LSF, para a captura de tráfego de rede usando o libPCap, por forma a permitir filtrar o tráfego de um único processo ou de um conjunto de processos. Este oferece a possibilidade de capturar só os pacotes pretendidos, facilitando as análises que se pretendam efectuar assim como reduzindo o overhead deste tipo de sistemas. Esta funcionalidade é transparente para todas as ferramentas desenvolvidas com base no libpcap, podendo todas estas tirar partido deste sistema.
+
+Em termos de overhead introduzido face à monitorização já existente, revelou-se
+insignificante, podendo mesmo melhorar essa situação nos casos em que o foco
+sobre o tráfego de um único processo leva e reduzir o trabalho realizado pelo
+LSF.
+
+O sistema desenvolvido vem ajudar na monitorização de rede, uma vez que permite
+monitorizar o tráfego de um processo, sem a necessidade de conhecer o protocol
+de comunicação, nem incorrer numa sobrecarga mais elevada ao capturar todo o
+tráfego. Ficou mais evidente que o sistema criado é ainda melhor quando a
+máquina está sobre com uma carga mais elevada de trabalho, permitindo efectuar
+uma melhor gestão dos recursos, nomeadamente das cópias de pacotes.
+
+A sobrecarga da monitorização/instrumentação existe mas, face às anteriores
+soluções, resumidas na secção  \ref{sec:related_work}, esta é a que menor
+sobrecarga impõe no sistema, permitindo este efectuar uma melhor gestão dos
+recursos, através do \textit{lazy copy} do \textit{Pcap}.
+
+
+Trabalho futuro??.....  
 
 \bibliographystyle{plain}
 \bibliography{references}
