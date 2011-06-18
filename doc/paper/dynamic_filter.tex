@@ -53,6 +53,7 @@
 
 \newcommand{\td}[1]{\todo[inline]{#1}}
 
+\providecommand{\e}[1]{\ensuremath{\times 10^{#1}}}
 
 \begin{document}
 
@@ -100,7 +101,7 @@ Este trabalho estende o suporte dado no núcleo Linux a este sistema, por forma 
 
 A monitorização permite a análise da execução de um programa ou sistemas distribuídos com os mais variados objectivos. Estes podem passar pela simples observação de funcionamento, envolver a detecção de erros ou falhas, ajudar à depuração ou à detecção de problemas no desempenho da aplicação ou sistemas subjacentes. Em particular, em ambientes distribuídos, é uma das melhores opções para analisar as interacções entre componentes e destes com o exterior, em execuções reais. 
 %auditar, correcção, segurança, etc
-Temos assim os exemplos da monitorização de redes de computadores com os sistemas  nagios e NetView, e as ferramentas para depuração e avaliação do desempenho para sistemas paralelos e distribuídos como o VampirTrace e o PERUSE.
+Temos assim os exemplos da monitorização de redes de computadores com os sistemas  nagios e NetView, e as ferramentas para depuração e avaliação do desempenho para sistemas paralelos e distribuídos como o VampirTrace\cite{vampir:2008} e o PERUSE\cite{keller06}.
 
 %\section{Monitorização}
 %\label{sec:mon_intro}
@@ -127,7 +128,7 @@ Como exemplos podemos referir a utilização do compilador e bibliotecas para ob
 %\td{qual é o gnu profiller? mais exemplos?? gprof? }
 Outro caso, o recurso à variável de ambiente \textit{LD\_PRELOAD} para a ligação de uma biblioteca no arranque do processo que permita modificar o comportamento do processo com vista à sua monitorização. Esta última técnica implica o desenvolvimento dessas bibliotecas e conhecimento prévio do código da aplicação.
 
-Outra forma passa por executar o processo a ser monitorizado sob o controlo do processo monitor, tal como no caso das ferramentas \textit{strace}~\cite{strace} e  \textit{debuggers}~\cite{gdb}. Estas lançam o processo usando o suporte \textit{PTrace}~\cite{ptrace}, oferecido pelo sistema de operação para o controlar e observar. 
+Outra forma passa por executar o processo a ser monitorizado sob o controlo do processo monitor, tal como no caso das ferramentas \textit{strace} e  \textit{debuggers}. Estas lançam o processo usando o suporte \textit{PTrace}~\cite{ptrace}, oferecido pelo sistema de operação para o controlar e observar. 
 %\td{falta falar do sysprof tb tem de levar suporte do núcleo, nao li quase documentacao sobre este sistema}
 
 \subsection{Monitorização no núcleo}
@@ -142,7 +143,7 @@ Em oposição aos sistemas estáticos, existem sistemas dinâmicos que podem  se
 Este sistema, como forma a limitar a sobrecarga imposta pela monitorização, utiliza a técnica de amostragem de vários contadores internos ao sistema. O utilizador pode definir qual o ritmo de amostragem para o qual quer fazer a monitorização, e desta forma pode diminuir a perturbação do sistema. Este apesar de não efectuar traço de execução permite que sejam obtidas estatísticas sobre o desempenho do sistema e processos. Este  utiliza em nível utilizador aplicações para recolher os dados registados pela monitorização.
 %\td{Talvez seja suficiente para o oprofile}
 
-Dentro da categoria dos sistemas que permitem obter traços detalhados da execução, existe o \textit{LTT}~\cite{ltt} (mais recentemente o \textit{LTTng}~\cite{Mathieu2009}), e o \textit{KProbes} ~\cite{KProbesSite,kernel_debug_printk_on_fly}. %%%%%%%%%%%%%%%%%%%%%%%
+Dentro da categoria dos sistemas que permitem obter traços detalhados da execução, existe o \textit{LTT} (mais recentemente o \textit{LTTng}~\cite{Mathieu2009}), e o \textit{KProbes} ~\cite{kernel_debug_printk_on_fly}. %%%%%%%%%%%%%%%%%%%%%%%
 Estes sistemas são dinâmicos não requerendo a recompilação do núcleo de sistema para serem utilizados. Apenas é necessário fornecer um módulo  e carregá-lo, para  especificar quais as análises a serem efectuadas. O \textit{LTTng} também pode utilizar o sistema de \textit{TracePoints}, incluído no núcleo. Tal como o \textit{OProfile} utilizam-se normalmente ferramentas em nível utilizador para recolher e analisar os dados obtidos.
 %\td{estes são estáticos, dinâmicos,...? o que têm que ver com o paragrafo anterior??}
 
@@ -198,6 +199,7 @@ O \textit{NetFilter} é implementado por vários módulos do núcleo, sendo um d
 
 Uma das desvantagens de todos estes sistemas é não ser possível indicar como critério de monitorização um determinado processo, mas sim necessitar de conhecer os protocolos ou portas usadas por este para tentar obter a informação relevante, mas sem garantias de se estar a obter apenas os dados do processo pretendido.
 
+No resto deste artigo apresenta-se na secção 2 o desenho e implementação de um sistema que estende o LSF por forma a permitir a captura de pacotes de um processo, na secção 3 apresenta-se a avaliação efectuada e na 4 apresentam-se trabalhos relacionados. Finalmente, na secção 6, são apresentadas algumas conclusões.
 
 \section{Desenho e arquitectura}
 \label{sec:architecture}
@@ -251,7 +253,7 @@ Através da extensão do LSF com um hook, quando ligado, este invoca esta filtra
 \subsection*{Controlo e Informação}
 \label{sub:data_information}
 
-Para facilmente controlar e configurar o sistema desenvolvido foi definida uma interface baseada em ficheiros virtuais (DebugFS). Estes ficheiros estão apenas acessíveis ao utilizador \textit{root}, controlando o acesso por parte dos utilizadores da máquina ao sistema de monitorização. Os ficheiros de controlo definidos foram \textit{option}, \textit{pid}, \textit{ppid} e \textit{tgid}. O primeiro ficheiro permite controlar a análise e a informação da árvore. Dependendo do valor a escrever em \textit{option} o sistema poderá proceder a uma análise dos \textit{sockets} do processo (identificado em \textit{pid, ppid, tgid}), e carregar essa informação para a àrvore do estado do processo, bem como poderá remover todos os elementos da àrvore se for essa a opção escrita para o ficheiro. Como foi indicado os restantes ficheiros permitem definir o(s) processo(s) a monitorizar. Pode ser indicado um processo ou todos os processos de um grupo. Os ficheiros de informação \textit{filter\_stats},  \textit{syscalls\_calls\_stats} e \textit{tree\_info} foram definidos para obter estatísticas dos pacotes analisados e das entradas/retornos das funções instrumentadas, bem como dos elementos presentes na àrvore (dados dos sockets activos do processo).
+Para facilmente controlar e configurar o sistema desenvolvido foi definida uma interface baseada em ficheiros virtuais (DebugFS). Estes ficheiros estão apenas acessíveis ao utilizador \textit{root}, controlando o acesso por parte dos utilizadores da máquina ao sistema de monitorização. Os ficheiros de controlo definidos foram \textit{option}, \textit{pid}, \textit{ppid} e \textit{tgid}. O primeiro ficheiro permite controlar a análise e a informação da árvore. Dependendo do valor a escrever em \textit{option} o sistema poderá proceder a uma análise dos \textit{sockets} do processo (identificado em \textit{pid, ppid, tgid}), e carregar essa informação para a àrvore do estado do processo, bem como poderá remover todos os elementos da àrvore se for essa a opção escrita para o ficheiro. Como foi indicado os restantes ficheiros permitem definir o(s) processo(s) a monitorizar. Pode ser indicado um processo ou todos os processos de um grupo. Os ficheiros de informação \textit{filter\_stats},  \textit{syscalls\_calls\_stats} e \textit{tree\_info} foram definidos para obter estatísticas dos pacotes analisados e das entradas/retornos das funções instrumentadas, bem como dos elementos presentes na árvore (dados dos sockets activos do processo).
 
 
 %%%%%%%%%%%%%%%%%
@@ -266,7 +268,7 @@ Para poder mais facilmente efectuar os testes de avaliação, foi criado uma fer
 \section{Avaliação}
 \label{sec:evaluation}
 
-O sistema implementado foi avaliado funcionalmente através da utilização de protocolos \textit{ftp}\cite{ftp-proto} e \textit{http} \cite{HypTraProHTT}. Para tal, recorreu-se a um conjunto alargado de testes, tendo como objectivo não só observar o seu desempenho, como também, e mais importante, verificar a correcção do funcionamento e a sua capacidade de capturar todos os pacotes envolvidos nas comunicações de um processo alvo (e apenas esses pacotes). 
+O sistema implementado foi avaliado funcionalmente através da utilização de protocolos \textit{ftp} e \textit{http}. Para tal, recorreu-se a um conjunto alargado de testes, tendo como objectivo não só observar o seu desempenho, como também, e mais importante, verificar a correcção do funcionamento e a sua capacidade de capturar todos os pacotes envolvidos nas comunicações de um processo alvo (e apenas esses pacotes). 
 
 %Através destes conjunto de testes, foi possível efectuar a captura dos pacotes resultantes da transferência de um ficheiro, a partir de um servidor ftp ou http. 
 
@@ -274,16 +276,16 @@ De modo a realizar os testes de desempenho, foram utilizadas duas máquinas com 
 
 \subsection{Avaliação Funcional}
 A análise funcional foi efectuada por meio de programas simples, que desencadeiam chamadas sucessivas de criação de sockets e comunicação, obtendo-se o estado destes (portos e endereços) dentro do módulo do núcleo. Estes dados poderam ser confirmados através do sistema \textit{debugfs}, por consulta do ficheiro existente para esse efeito. Este ficheiro, quando acedido, contém toda a informação relativa aos portos e endereços em utilização por parte da aplicação monitorizada.
-Deste modo, para obter um grau de comparação dos dados produzidos e validar esta análise, foi utilizada a ferramenta \textit{netstat}~\cite{netstat}, na qual indica os dados relativos aos portos e endereços utilizados pelos processos do sistema (esta ferramenta tira partido do sistema de ficheiros virtual \textit{ProcFs} ~\cite{procfskernel} para obter esses dados.
+Deste modo, para obter um grau de comparação dos dados produzidos e validar esta análise, foi utilizada a ferramenta \textit{netstat}, na qual indica os dados relativos aos portos e endereços utilizados pelos processos do sistema (esta ferramenta tira partido do sistema de ficheiros virtual \textit{ProcFs} para obter esses dados.
 Para além desta análise, foi efectuada a confirmação da correcção de que todos os pacotes pertencentes às comunicações foram de facto obtidos. Esta confirmação foi efectuada através da captura utilizando o \textit{tcpdump} com o módulo activo, e verificado que todo o tráfego respeitante ao protocolo (\textit{ftp} e \textit{http}) estava de facto completo e correcto, não existindo outros pacotes na captura. Esta validação foi verificada utilizando o programa \textit{wireshark}, que identificou os fluxos de dados dos protocolos.
 %\td{nao foi tambem feita a observação dos pacotes capturados com o tcpdump e wireshark e verificado que a captura era correcta??!}
 
 \subsection{Avaliação do desempenho}
-Foram efectuados diversos testes para avaliação do overhwad introduzido por este sistema. Estes testes basearam-se na recepção ou transmissão de 1GigaByte de dados, por diferentes programas e protocolos, entre as duas máquinas conectadas directamente por interfaces de rede a 100 Mbit/s. Ambas máquinas (1 e 2) executaram com apenas um processador activo de 2 e 2.6 Ghz, respectivamente. Na máquina 1 foram efectuados os testes que em seguida serão apresentados.
+Foram efectuados diversos testes para avaliar o \emph{overhead} introduzido por este sistema. Estes testes basearam-se na recepção ou transmissão de 1GigaByte de dados, por diferentes programas e protocolos, entre as duas máquinas conectadas directamente por interfaces de rede a 100 Mbit/s. Ambas máquinas (1 e 2) executaram com apenas um processador activo de 2 e 2.6 Ghz, respectivamente. Na máquina 1 foram efectuados os testes que em seguida serão apresentados. A versão do sistema de operação utilizado nas duas máquinas foi o 2.6.39, sendo que na máquina 1 introduziu-se a modificação para incluir o \textit{Hook} e suas funções auxiliares, enquanto que na máquina 2 executou-se o sistema original.
 
 Na execução destes testes, foram executadas 10 iterações para cada experiência considerada, de modo a obter um valor médio com um desvio padrão aceitável. Os resultados obtidos estão apresentados nas tabelas \ref{tab:desempenho} e \ref{tab:overhead}.
 
-Os testes identificados com os números de $^{1}$ a $^{4}$ foram efectuados utilizando apenas uma conexão ao servidor, enquanto que os testes $^{5}$ e $^{6}$ foram efectuados utilizando mais uma comunicação de forma a aumentar o peso sobre o processador e o número de pacotes a circular entre as máquinas, permitindo identificar a sobrecarga exercida quando o \textit{tcpdump} está a executar e a capturar todos os dados ou apenas um subconjunto destes (os pertencentes ao processo). As coluna Original é o resultado do tempo médio das execuções das transferências, a Com TcpDump é a média dos tempos da execução concorrente da transferência com a captura total do tráfego, enquanto que a coluna identificada com Com TcpDump e módulo é a média dos tempos da execução concorrente da transferência com o tcpdump e o módulo no núcleo de forma a apenas capturar o tráfego da transferência.
+Os testes identificados com os números de $^{1}$ a $^{4}$ foram efectuados utilizando apenas uma conexão ao servidor, enquanto que os testes $^{5}$ e $^{6}$ foram efectuados utilizando mais uma comunicação de forma a aumentar o peso sobre o processador e o número de pacotes a circular entre as máquinas, permitindo identificar a sobrecarga exercida quando o \textit{tcpdump} está a executar e a capturar todos os dados ou apenas um subconjunto destes (os pertencentes ao processo). A coluna Original é o resultado do tempo médio das execuções das transferências sem qualquer monitorização, a coluna Com TcpDump apresenta a média dos tempos de transferência com a captura total do tráfego, enquanto que a coluna identificada com Com TcpDump e módulo mostra a média dos tempos para a transferência com a captura pelo tcpdump e o módulo no núcleo de forma a apenas capturar o tráfego da transferência de um processo.
 
 \begin{table}
 \begin{center}
@@ -292,7 +294,7 @@ Os testes identificados com os números de $^{1}$ a $^{4}$ foram efectuados util
 \hline
 Teste & \hspace {0.3cm} Original \hspace {0.3cm}& \hspace {0.2cm} Com TcpDump \hspace {0.2cm} & Com TcpDump e módulo \\
 \hline
-1GB - FTP$^{1}$ & 91.8508	& 1.8500 & 91.8854 \\
+1GB - FTP$^{1}$ & 91.8508	& 91.8500 & 91.8854 \\
 1GB - HTTP$^{2}$ & 91.6391 & 91.6472 & 91.6674 \\ 
 %5GB - HTTP & 457.9506 & 457.9527 & 458.2059 \\
 IPerf - 1GB TCP$^{3}$ & 91.3790	& 91.2535	& 91.2672 \\
@@ -300,7 +302,7 @@ IPerf - 1GB UDP$^{4}$ & 89.7975 & 89.8007 & 89.8464 \\
 \hline
 \hline
 1GB HTTP - 2 conexões$^{5}$ & 182.1573 & 188.7156 & 182.0161 \\
-IPerf - 1GB UDP 2 conexões$^{6}$ & 179.493 & 179.628 & 179.6369 \\
+IPerf - 1GB UDP 2 conexões$^{6}$ & 179.4930 & 179.6280 & 179.6369 \\
 \hline
 \end{tabular}
 \caption{Tempos médios em segundos (s)}
@@ -308,25 +310,25 @@ IPerf - 1GB UDP 2 conexões$^{6}$ & 179.493 & 179.628 & 179.6369 \\
 \end{center}
 \end{table}
 
-Nos primeiros 4 testes é possível verificar que a utilização do módulo no núcleo agravou de forma ligeira o tempo de execução. É possível verificar que em $^{3}$ quando existiu a utilização apenas do tcpdump conseguiu ser ligeiramente mais rápido que a versão original. Esta situação deve-se ao facto de quando a máquina tem um pouco mais de carga o tamanho médio dos pacotes aumenta, permitindo adequar-se a uma melhor gestão dos recursos da máquina.
+Nos primeiros 4 testes é possível verificar que a utilização do módulo no núcleo agravou ligeiramente o tempo de execução. É também possível observar que em $^{1}$ e $^{3}$ quando existiu a utilização apenas do tcpdump, a execução foi ligeiramente mais rápida que sem monitorização. Esta situação pode dever-se ao facto de quando a máquina é sobrecarregada, dá oportunidade de aumentar o tamanho médio dos pacotes,  necessitando assim de transferir menos pacotes e poupando no volume de dados transferidos devido a menos cabeçalhos dos pacotes.
 
 \begin{table}
 \begin{center}
 
-\begin{tabular}{ | c | c | c | c | }
+\begin{tabular}{ | c | c | c |}
 \hline
-Teste & TcpDump com módulo & Variação do TcpDump & \hspace {0.3cm} TcpDump \hspace {0.3cm}\\
+Teste & \hspace {0.3cm} TcpDump \hspace {0.3cm} & TcpDump com módulo  \\
 
 \hline
-1GB - FTP$^{1}$  & 0.0377 & 0.0385 & -0.0009 \\
-1GB - HTTP$^{2}$ &  0.0309 & 0.0220 & 0.0088 \\
-%5GB - HTTP &  0.0557 & 0.0553 & 0.0005 \\
-IPerf - 1GB TCP$^{3}$ &  -0.1223 & 0.015 & 0.1373 \\
-IPerf - 1GB UDP$^{4}$ & 0.0545 & 0.0509 & 0.0036 \\
+1GB - FTP$^{1}$ & -0.0009  & 0.0377  \\
+1GB - HTTP$^{2}$ & 0.0088 &  0.0309   \\
+%5GB - HTTP &  0.0557 & 0.0553  \\
+IPerf - 1GB TCP$^{3}$ & 0.1373 &  -0.1223   \\
+IPerf - 1GB UDP$^{4}$ & 0.0036 & 0.0545 \\
 \hline
 \hline
-1GB HTTP - 2 conexões$^{5}$ & -0.0775 & -3.5501 & 3.6003 \\
-IPerf - 1GB UDP 2 conexões$^{6}$ & 0.0802 & 0.005 & 0.0752 \\
+1GB HTTP - 2 conexões$^{5}$ & 3.6003 & -0.0775   \\
+IPerf - 1GB UDP 2 conexões$^{6}$ & 0.0752 & 0.0802   \\
 \hline
 \end{tabular}
 \caption{Sobrecarga das transferências (valores em percentagem)}
@@ -334,11 +336,13 @@ IPerf - 1GB UDP 2 conexões$^{6}$ & 0.0802 & 0.005 & 0.0752 \\
 \end{center}
 \end{table}
 
-
+Nos testes $^{5}$ e $^{6}$, como o tráfego na interface é duplicado e o \textit{tcpdump} tem de capturar tudo, é possível evidenciar a sobrecarga exercida por estas cópias de dados e conseguintes transferências para nível utilizador. Na tabela \ref{tab:overhead} é possível verificar que, para o teste $^{5}$, a sobrecarga do \textit{tcpdump} atinge os 3.6\% face ao original, enquanto que a sobrecarga do tcpdump com módulo até permitiu uma pequena melhoria face ao original (-0.0775\%). Conclui-se que quando o fluxo de dados que não pretendemos capturar aumenta consideravelmente torna-se bastante mais vantajoso utilizar este sistema, do que capturar todos os pacotes, agravado ainda caso necessite depois de uma análise em nível utilizador para identificar e filtrar os pacotes pertencentes ao processo.
 
 
 \subsubsection{Desempenho da estrutura de dados}
-Para além das avaliações descritas anteriormente, tornou-se essencial analisar o comportamento da estrutura de dados utilizada para manter o “estado do processo”, de modo a verificar o seu desempenho e o espaço ocupado pela mesma. Assim, para esta análise, foi elaborado um teste que usa o sistema de alta resolução de temporizadores (HRTimer) \cite{hrtimerKernel}, contido no núcleo do sistema de operação.
+Para além das avaliações descritas anteriormente, tornou-se essencial analisar o comportamento da estrutura de dados utilizada para manter o “estado do processo”, de modo a verificar o seu desempenho. 
+%e o espaço ocupado pela mesma.  <--- este esta em falta
+Assim, para esta análise, foi elaborado um teste que usa o sistema de alta resolução de temporizadores (HRTimer), contido no núcleo do sistema de operação.
 O teste consistiu em obter o tempo antes de iniciar a inserção dos 1024 elementos, inserir os elementos, e obter novamente o tempo, permitindo assim obter o tempo decorrido. De igual forma foi efectuado o calculo do tempo para a remoção dos 1024 elementos.
 
 \begin{table}
@@ -351,43 +355,41 @@ elemento \\
 \hline
 Adicionar 1024 elementos & 869 244 & 848.8711 \\
 \hline
-Remove 1024 elementos & 675 086 & 659.2637\\
+Remover 1024 elementos & 675 086 & 659.2637\\
 \hline
 
 \hline
 \end{tabular}
-\caption{Tempos em nanosegundos}
+\caption{Custo das operações (tempos em nanosegundos)}
 \label{tab:tree_info}
 \end{center}
 \end{table}
 
-Como se pode verificar a inserção de um elemento na àrvore é sensivelmente 1 microsegundo, o que demonstra que
+Como se pode verificar a inserção de um elemento na árvore é inferior a 1 microsegundo, o que demonstra que foi uma escolha correcta, pois para além de ter um bom compromisso de desempenho e utilização de memória permitiu utilizar uma estrutura que já foi analisada por diversas pessoas, e ser disponibilizado para utilização dentro do núcleo, o que permite ter um elevado grau de confiança na sua utilização.
 
-O tempo médio dispendido para procurar o elemento com o valor de chave mais pequeno, nos 1024 elementos adicionados, foi de 1327 nanosegundos. Como este valor é possível verificar que fazer 10 iterações de procura na àrvore incorre numa penalização de 1.3 microsegundos.
+O tempo médio despendido para procurar o elemento com o menor valor de chave, nos 1024 elementos adicionados, foi de 1327 nanosegundos. Com este valor é possível verificar que fazer 10 iterações de procura na árvore incorre numa penalização de 1.3 microsegundos. Este valor permite identificar que, o tempo médio de procura de elementos na estrutura é inferior ou igual a 1.3 microsegundos.
 
-\subsubsection{Desempenho do Sistema de instrumentação}
-Sendo a instrumentação das chamadas ao sistema um ponto fundamental na execução da monitorização de uma aplicação, a análise ao seu comportamento é bastante importante, na medida em que é necessário verificar se a introdução deste tipo de sistema irá produzir uma elevada penalização sobre o sistema de operação. Tendo em conta que o sistema de instrumentação utilizado corresponde ao \textit{KProbes}, foi fundamental efectuar esses testes, de modo a garantir que tal factor não sucedia. Os valores comparativos dos criadores do \textit{KProbes} estão em \cite{KProbeKernel}.
-\marginpar{falta colocar os valores e verificar que são inferiores}
-
-\begin{table}
-\begin{center}
-
-\begin{tabular}{ | c | c |  }
-\hline
-Teste & \hspace{1cm}Duração\hspace{1cm} \\
-\hline
-100 000 000 chamadas & \\ 
-\hline
- & \\
-\hline
-
-\hline
-\end{tabular}
-\caption{Tempos em }
-\label{tab:kprobes_info}
-\end{center}
-\end{table}
-
+%\subsubsection{Desempenho do Sistema de instrumentação}
+%Sendo a instrumentação das chamadas ao sistema um ponto fundamental na execução da monitorização de uma aplicação, a análise ao seu comportamento é bastante importante, na medida em que é necessário verificar se a introdução deste tipo de sistema irá produzir uma elevada penalização sobre o sistema de operação. A análise efectuada foi colocar um \textit{KRetProbe} na chamada ao sistema \textit{getpid} e avaliar o tempo decorrido entre o inicio e o fim do total das chamadas, com e sem o \textit{KRetProbe} de forma a avaliar o overhead e verificar se coincide com o indicado pelos criadores do sistema.
+%
+%\begin{table}
+%\begin{center}
+%
+%\begin{tabular}{ | c | c | c | c |}
+%\hline
+%Teste & Original & Com KretProbe & Sobrecarga por chamada\\
+%\hline
+%100 000 000 chamadas & 12.65 &  73.6600 & 610.10\e{-9}\\
+%1 000 000 000 chamadas & 126.85 & 737.2100 & 610.36\e{-9}\\
+%\hline
+%\hline
+%\end{tabular}
+%\caption{Duração das chamadas em segundos}
+%\label{tab:kprobes_info}
+%\end{center}
+%\end{table}
+%
+%Os valores de referencia são de 0.7 microsegundos, os valores que foram obtidos foram de 0.61 microsegundos um pouco inferiores, pois a máquina de referência também tem velocidade inferior à máquina onde foram efectuados estes testes.
 
 \section{Trabalho Relacionado}
 \label{sec:related_work}
@@ -397,7 +399,7 @@ Este trabalho vem na sequência do trabalho efectuado por Nuno Farruca~\cite{Far
  Uma outra forma foi obter os dados dos sockets pertencentes aos processos alvo através de consultas periódicas do sistema de ficheiros virtual \textit{ProcFs} e executar também depois a filtragem de quais os pacotes dizem respeito à aplicação alvo.  Estas soluções sofrem de grandes problemas de desempenho além de, para a segunda solução, não oferecer garantias de que todo o tráfego relevante era mantido.
 
 O trabalho de Byungjoon Lee~\cite{1688981} implementa a monitorização, utilizando o sistema de instrumentação \textit{KProbes} nas funções de transmissão e recepção de dados dentro do núcleo do sistema. Desta forma é possível monitorizar o uso da rede pelo processo alvo. Os dados recolhidos são analisados, pelo monitor, com o intuito de perceber se determinada porta e endereço são conhecidos e caso não sejam é adicionada a informação a uma tabela de dispersão e utilizada para redefinir o filtro usado no libPCap. O pacote capturado  é atrasado e re-injectado e forma a poder ser capturado pela biblioteca \textit{LibPCap} através do novo filtro.
-Apesar do sistema de instrumentação \textit{KProbes} ter uma sobrecarga relativamente baixa, as funções instrumentadas são utilizadas com muita frequência no sistema, penalizando no desempenho. A necessidade de atrasar as comunicações, agrava ainda mais a situação ao ter de reter um número elevado de pacotes em memória. Este sistema sofre ainda do problema de estar em grande parte implementado em modo utilizador, obrigando a transferências de dados e em trocas de contexto para actualizar os filtros.
+Apesar do sistema de instrumentação \textit{KProbes} ter uma sobrecarga relativamente baixa, as funções instrumentadas são utilizadas com muita frequência no sistema, penalizando no desempenho. A necessidade de atrasar as comunicações, agrava ainda mais a situação ao ter de reter um número elevado de pacotes em memória. Este sistema sofre ainda do problema de estar em grande parte implementado em modo utilizador, obrigando a transferências de dados e a trocas de contexto, para actualizar os filtros.
 
 %\marginpar{apontar vantagens e defeitos!| vou ainda escrever sobre isto}
 
