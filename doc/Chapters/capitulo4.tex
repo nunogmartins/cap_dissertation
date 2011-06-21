@@ -9,19 +9,21 @@ ferramenta de forma transparente.
 
 Esta ferramenta foi desenvolvida para os processadores x86 e x86\_64 pois nestas
 arquitecturas existe suporte para o sistema de monitorização KProbes \ref{},
-sendo que é a unica dependência especifica que a ferramenta irá ter.
+sendo esta a unica dependência especifica que a ferramenta irá ter.
 
 As diferentes partes da ferramenta foram desenvolvidas de forma a poderem ser
-utilizadas em separado  
-Foi desenvolvida uma arquitectura modular suportada em 4 subpartes.  para
-que fosse possível um desenvolvimento 
+modificadas em separado permitindo um melhor aproveitamento da modularização.
+Este módulo foi desenvolvido em 4 subpartes. 
 
-Filter 
-Necessidade de registar um \textit{hook} para aceder directamente à função de
-filtro. Caso este \textit{hook} não esteja ligado o \textit{overhead}
-introduzido será o de um teste para verificar se existe ligação ou não.
-No caso de não existir a ligação a este \textit{hook} o sistema comporta-se de
-forma a utilizar apenas o sistema anterior.
+\section{Filtro}
+
+Para continuar a ser opaco para os diferentes sistemas de monitorização/captura de rede foi necessário colocar um ponto de ligação entre o sistema actual e o módulo desenvolvido. Quando não existe uma ligação efectuada, existe apenas um ligeiro decréscimo do desempenho, este deve-se à verificação da existência de ligação. Caso a ligação esteja activa o fluxo de controlo é passado para a função de filtro definida no módulo.
+
+%Necessidade de registar um \textit{hook} para aceder directamente à função de
+%filtro. Caso este \textit{hook} não esteja ligado o \textit{overhead}
+%introduzido será o de um teste para verificar se existe ligação ou não.
+%No caso de não existir a ligação a este \textit{hook} o sistema comporta-se de
+%forma a utilizar apenas o sistema anterior.
 
 \section{Módulos no espaço do núcleo}
 
