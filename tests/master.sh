@@ -10,14 +10,26 @@
 	./exec_shell0.sh config0.cfg
 	cp gathertimes.sh $DIR_PATH
 	cp gatherpackets.sh $DIR_PATH
-	
+	cd $DIR_PATH
+	./gathertimes.sh
+	./gatherpackets.sh > packets.csv
+	cd ..
+
 	export DIR_PATH="data_1"
 	./exec_shell1.sh config1.cfg
 	cp gathertimes.sh $DIR_PATH
 	cp gatherpackets.sh $DIR_PATH
+	cd $DIR_PATH
+	./gathertimes.sh
+	./gatherpackets.sh > packets.csv
+	cd ..
 	
 	export DIR_PATH="data_2"
 	./exec_shell2.sh config2.cfg
 	cp gathertimes.sh $DIR_PATH
 	cp gatherpackets.sh $DIR_PATH
+	cd $DIR_PATH
+	./gathertimes.sh
+	./gatherpackets.sh > packets.csv
+	cd ..
 	
