@@ -15,6 +15,10 @@ As diferentes partes da ferramenta foram desenvolvidas de forma a poderem ser
 modificadas em separado permitindo um melhor aproveitamento da modularização.
 Este módulo foi desenvolvido em 4 subpartes. 
 
+\section{Módulos no espaço do núcleo}
+
+A estratégia foi separar os diferentes componentes e a criação de um módulo de \textit{debug} para que pudesse existir uma forma de acesso à monitorização por parte do nível de utilizador, sem que exista a necessidade de criar ou alterar chamadas ao sistema ou suas opções.
+
 \section{Filtro}
 
 Para continuar a ser opaco para os diferentes sistemas de monitorização/captura de rede foi necessário colocar um ponto de ligação entre o sistema actual e o módulo desenvolvido. Quando não existe uma ligação efectuada, existe apenas um ligeiro decréscimo do desempenho, este deve-se à verificação da existência de ligação. Caso a ligação esteja activa o fluxo de controlo é passado para a função de filtro definida no módulo.
@@ -24,13 +28,6 @@ Para continuar a ser opaco para os diferentes sistemas de monitorização/captur
 %introduzido será o de um teste para verificar se existe ligação ou não.
 %No caso de não existir a ligação a este \textit{hook} o sistema comporta-se de
 %forma a utilizar apenas o sistema anterior.
-
-\section{Módulos no espaço do núcleo}
-
-A estratégia foi separar os diferentes componentes e a criação de um módulo de
-\textit{debug} para que pudesse existir uma forma de acesso à monitorização por
-parte do nível de utilizador, sem que exista a necessidade de criar ou alterar
-chamadas ao sistema ou suas opções.
 
 \paragraph{Estruturas}
 

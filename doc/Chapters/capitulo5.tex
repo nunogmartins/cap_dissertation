@@ -1,6 +1,9 @@
 \chapter{Implementação}
 \label{cap:Implementacao}
 
+% falta falar sobre filesystem vfs e como chegar ao socket file private\_data para alem da parte de interrupts, tasklets e bottomhalfs bem como sobre os contextos de execucao
+
+
 \section{Ferramenta}
 Considerações ...
 
@@ -11,8 +14,8 @@ aplicação está a utilizar, sem que seja necessário consultar os sockets que
 esta está a utilizar, foi necessário criar um repositório de dados onde
 estivesse a informação relevante para as decisões do filtro de captura.
 
-As seguintes abordagens para a criação de repositório de dados com base nas
-estruturas de dados seguintes equacionada.
+As abordagens para a criação de repositório de dados com base nas
+estruturas de dados:
 
 \subsubsection{Bitmap}
 
@@ -31,7 +34,7 @@ forma ordenada.
 Complexidade de inserção, procura e remoção é O(log n), sendo n o número de
 elementos da árvore.
 
-Problema quando é necessário balancear a árvore, é uma penalização
+Existe uma penalização no desempenho quando existe a necessidade de balancear a àrvore, mas os ganhos provenientes deste balanceamento face às àrvores não balanceadas é muito superior.
 
 \subsubsection{Tabela de dispersão}
 Não existe nenhuma implementação 
