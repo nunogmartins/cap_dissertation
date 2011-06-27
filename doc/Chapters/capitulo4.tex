@@ -44,7 +44,18 @@ Quando a aplicação está a executar e efectua uma chamada ao sistema de opera�
 
 \subsection{Sistema de ficheiros}
 
+Um processo para poder comunicar com a interface de rede tem de abrir um canal entre o processo e o núcleo de operação que por sua vez comunica com a interface de rede.
+ Este canal nos sistemas de operação \textit{Linux} é efectuado através da chamada ao sistema \textit{socket}.
+ Esta função regista a abertura de um canal de comunicação entre o processo e o sistema de rede, sendo o descritor do \textit{socket} um identificador do sistema de ficheiros, que fica registado no descritor do processo dentro do núcleo.
+ Esta é apenas a primeira das abstrações que o núcleo efectua sobre a arquitectura do sistema de rede.
+  
+algures falar sobre o accept e o bind e o socket devido à estrutura interna que aguarda o indicador da porta igual ... tenho de verificar isto correctamente
+ 
+
 \subsection{Estrutura de um processo}
+
+Um processo para executar tem de ser carregado para memória e posteriormente ser agendado para execução através do escalonador de processos do núcleo.
+ Um processo para o núcleo é uma estrutura com a informação sobre as zonas de memória, descritores de ficheiros abertos, informações sobre os tempos de execução, informações sobre a hierarquia de processos pertencentes a este, etc. Nos descritores de ficheiros abertos são também incluidos os descritores de \textit{sockets} abertos para comunicação. 
 
 \subsection{NetFilter}
 
