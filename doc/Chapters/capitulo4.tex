@@ -27,9 +27,28 @@ No processo de recepção da \textit{frame} é verificado se existem \textit{sni
 % Faltar indicar que o processo está bloqueado à espera de input que lhe é copiado entre o nucleo e o processo em nivel utilizador por meio de o kiovec (talvez kernel io vector ...) 
 
 
+A variável global \textit{ptype\_base} do núcleo é uma tabela de dispersão aberta, que contém os tipos de controladores de protocolos de rede. Os diferentes protocolos endereçam uma função que recebe o pacote e sabe o que fazer com ele, passando pela \textit{firewall netfilter} terminando na cópia dos dados dos \textit{buffers} do núcleo para os do processo, que ficou bloqueado numa lista de espera através da chamada ao sistema de operação \textit{recv}, \textit{recvfrom} ou \textit{recvmsg}.
+
 \subsection{Transmissão de dados}
 
-Uma aplicação em nível utilizador transfere dados sobre a rede através de chamadas ao sistema de operação, sendo que estas podem ser \textit{send}, \textit{sendto}, \textit{sendmsg}. Neste ponto de entrada os dados tem de ser copiados e efectuadas diversas verificações sobre estes, após estas verificações são utilizadas estruturas e funções através da \textit{stack TCP/IP} e fluir pela \textit{firewall netfilter}. Os dados gerados pelas diversas camadas da \textit{stack} são agregados numa estrutura \textit{sk\_buffer} para ser adicionados a uma fila para ser enviados pela ferramenta \textit{traffic control}. Quando esta ferramenta irá enviar os dados para o controlador é passada a referência sobre este pacote para os \textit{sniffers} registados, sendo apenas efectuada uma cópia dos dados caso o pacote seja recolhido para maior análise. Os dados passados ao controlador da interface de rede são então transferidos para a interface de rede e daí para o seu destino.
+Uma aplicação em nível utilizador transfere dados sobre a rede através de chamadas ao sistema de operação, sendo que estas podem ser \textit{send}, \textit{sendto}, \textit{sendmsg}.
+ Neste ponto de entrada os dados tem de ser copiados e efectuadas diversas verificações sobre estes, após estas verificações são utilizadas estruturas e funções através da \textit{stack TCP/IP} e fluir pela \textit{firewall netfilter}.
+ Os dados gerados pelas diversas camadas da \textit{stack} são agregados numa estrutura \textit{sk\_buffer} para ser adicionados a uma fila para ser enviados pela ferramenta \textit{traffic control}.
+ Quando esta ferramenta irá enviar os dados para o controlador é passada a referência sobre este pacote para os \textit{sniffers} registados, sendo apenas efectuada uma cópia dos dados caso o pacote seja recolhido para maior análise. Os dados passados ao controlador da interface de rede são então transferidos para a interface de rede, e daí para o seu destino.
+
+Quando a aplicação está a executar e efectua uma chamada ao sistema de operação, o sistema muda de modo e executa dentro do núcleo "em nome da aplicação".
+ Durante parte da execução da chamada ao sistema de operação é possível referenciar qual o processo que efectuou a chamada, pois caso a chamada seja sincrona, é agendada um processamento sobre os dados e a aplicação fica bloqueada à espera de ser re-escalonada através da função \textit{schedule}.
+ O sistema de ficheiros mantém a referência sobre quais os ficheiros/sockets abertos para cada processo e é possível obter qual o processo a que cada descritor de ficheiros pertence. % back pointers ... nos sockets ... binded de uma porta a um processo ... pode nao ser a chamada bind ... 
+
+\subsection{Estrutura de um sk\_buff}
+
+\subsection{Sistema de ficheiros}
+
+\subsection{Estrutura de um processo}
+
+\subsection{NetFilter}
+
+\subsection{Traffic Control}
 
 \section{Arquitectura do módulo desenvolvido}
 
@@ -46,11 +65,11 @@ As diferentes partes da ferramenta foram desenvolvidas de forma a poderem ser
 modificadas em separado permitindo um melhor aproveitamento da modularização.
 Este módulo foi desenvolvido em 4 subpartes. 
 
-\section{Módulos no espaço do núcleo}
+\subsection{Módulos no espaço do núcleo}
 %a não utilização de ioctl para o debug ... 
 A estratégia foi separar os diferentes componentes e a criação de um módulo de \textit{debug} para que pudesse existir uma forma de acesso à monitorização por parte do nível de utilizador, sem que exista a necessidade de criar ou alterar chamadas ao sistema ou suas opções.
 
-\section{Filtro}
+\subsection{Filtro}
 
 Para continuar a ser opaco para os diferentes sistemas de monitorização/captura de rede foi necessário colocar um ponto de ligação entre o sistema actual e o módulo desenvolvido. Quando não existe uma ligação efectuada, existe apenas um ligeiro decréscimo do desempenho, este deve-se à verificação da existência de ligação. Caso a ligação esteja activa o fluxo de controlo é passado para a função de filtro definida no módulo.
 
@@ -78,17 +97,15 @@ O sistema interage também com o \textit{LSF} pois existe uma conjunção
 entre o filtro definido pelo utilizador e a captura do tráfego da aplicação a
 ser monitorizada.
 
-\section{Desenho da Arquitectura}
+\subsection{Arquitectura}
 
-
-
-\subsection{Monitorização da aplicação}
+\subsubsection{Monitorização da aplicação}
 
 Como foi apresentado no quadro \ref{tab:monitoring} o sistema de monitorização
 do núcleo do sistema linux que se adapta melhor para este problema é o
 KProbes\ref{sec:kprobes}. 
 
-\subsection{Repositório de dados}
+\subsubsection{Repositório de dados}
 
 Para permitir a consulta dos pares número de porta endereço é necessário
 utilizar um repositório de dados. Este repositório de dados necessitará de alta
@@ -98,7 +115,7 @@ seguintes operações: adição, consulta e remoção de dados.
 Este repositório de dados irá ser a ponte entre o sistema de  monitorização e o
 sistema de filtragem de pacotes. 
 
-\subsection{Filtragem de pacotes}
+\subsubsection{Filtragem de pacotes}
 
 Sistema que irá indicar à função run\_filter do \textit{LSF} se um pacote deverá
 ser capturado ou não. Irá ser definido um ponto \textit{hook} dentro do núcleo
@@ -107,7 +124,7 @@ filtragem dinâmica apenas quando se deseje. O custo introduzido para estas
 modificação é apenas de uma verificação se o \textit{hook} está ligado ou não.
 
 
-\subsection{Recolha de informações}
+\subsubsection{Recolha de informações}
 
 Utilizando um dos sistemas definidos em \ref{tab:transferencia_dados} é
 permitido o acesso a informações de análise dos diversos sistemas anteriormente
