@@ -2,6 +2,37 @@
 \label{cap:Estrutura}
 
 
+Neste capitulo vai ser apresentado parte da arquitectura de rede do núcleo do \textit{Linux}, bem como a arquitctura do projecto efectuado.
+
+A arquitectura de rede do núcleo do \textit{Linux} poderá ser apresentada de duas formas, \textit{Bottom-Top} ou \textit{Top-Bottom}. A escolha recaíu sobre a primeira pois permite observar o aumento da complexidade e abstracção existente nesta arquitectura. 
+
+\section{Arquitectura de rede do núcleo}
+
+Falar aqui sobre qq coisa da estrutura de rede ... 
+Talvez tb imagem com um pouco da arquitectura ... básica 
+
+Falta falar sobre o netfilter ... sobre tc trafic control
+
+\subsection{Recepção de dados}
+
+A chegada de um pacote de dados à interface de rede desencadeia uma acção de interrupção da actividade do processador, permitindo quer este seja transferido para o sistema o mais cedo possível. Esta interrupção é efectuada através de um \textit{irq} pré-definido entre o controlador e a interface de rede. As interrupções são atendidas no processador desligando a atenção a todas as outras interrupções provenientes de outros dispositivos. %esta frase está ruim ...
+O processador deve estar o menor intervalo de tempo possível com as interrupções desligadas, antes de retornar da interrupção o sistema agenda a execução de uma função que irá terminar a recepção do pacote para a camada correcta da \textit{stack TCP/IP}.%ainda falta falar sobre DMA, interrupt mode too exclusive deve ser breve, encaminhar pelo processamento da stack tcp/ip 
+
+No processo de recepção da \textit{frame} é verificado se existem \textit{sniffers} registados, caso existam é passada uma referência sobre a frame, de forma a efectuar apenas a cópia da frame quando necessária. Esta situação é devida à possível existência de um filtro sobre a \textit{frame}, em que se não for necessário capturá-la, a cópia dos dados seja desnecessária, permitindo efectuar trabalho útil.
+
+%Faltar falar que a frame segue para a stack tcp ip de forma normal ...
+
+%Falta falar sobre o netfilter ... firewall do linux que existem 5 pontos de "entrada" onde existe algumas verificações .... 
+
+% Faltar indicar que o processo está bloqueado à espera de input que lhe é copiado entre o nucleo e o processo em nivel utilizador por meio de o kiovec (talvez kernel io vector ...) 
+
+
+\subsection{Transmissão de dados}
+
+
+
+\section{Arquitectura do módulo desenvolvido}
+
 A arquitectura foi pensada para ser executada de forma ortogonal ao sistema
 utilizado. Desta forma não existe a necessidade de recompilar programas
 antigos. Para além desta situação novas aplicações podem utilizar esta
@@ -16,7 +47,7 @@ modificadas em separado permitindo um melhor aproveitamento da modularização.
 Este módulo foi desenvolvido em 4 subpartes. 
 
 \section{Módulos no espaço do núcleo}
-
+%a não utilização de ioctl para o debug ... 
 A estratégia foi separar os diferentes componentes e a criação de um módulo de \textit{debug} para que pudesse existir uma forma de acesso à monitorização por parte do nível de utilizador, sem que exista a necessidade de criar ou alterar chamadas ao sistema ou suas opções.
 
 \section{Filtro}
