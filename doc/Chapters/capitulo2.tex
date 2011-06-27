@@ -403,3 +403,16 @@ No segundo trabalho foram implementadas duas abordagens, uma com monitorização
 
 O núcleo de sistema do \textit{Linux} tem a informação sobre quais os portos de comunicação que uma aplicação tem com o exterior e permite que estes dados sejam consultados através do sistema de ficheiros virtual \textit{ProcFs} apresentado em \ref{cap:ProcFs_overview}. Uma das formas de monitorização foi consultar estes dados de forma regular, com intervalos reduzidos. Esta forma de monitorização consome demasiados recursos e não é 100\% fiável e quanto menor o intervalo de tempo que se utilizar, maior a perturbação que o sistema tem.
 A outra abordagem efectuada foi de interceptar às chamadas à bibiloteca \textit{LibC} para a utilização de \textit{sockets}, criando uma bibiloteca partilhada com a mesma sintaxe das chamadas que são utilizadas. Para utilizar este método é necessário definir a variável de ambiente \textit{LD\_PRELOAD} de forma a fazer esta intercepção. Como esta biblioteca está em nível utilizador é necessário capturar todos os pacotes e apenas em nível utilizador visualizar o tráfego respeitante ao processo. Capturar todos os pacotes pode ser uma tarefa com um elevado grau de perturbação do sistema. 
+
+\section{Outros projectos}
+
+Falta falar do ipt\_owner do iptables entre outros ....
+
+
+\section{Outras alternativas splice e tee}
+
+falta falar destas duas chamadas ao sistema importantes na redução do overhead na parte de desempenho
+
+\section{Monitorização em nível utilizador}
+
+Falta falar sobre ptrace LDPRELOAD, procfs, etc conjugar a informação completa ... falta falar que estão em continuação a tentativa de modificar o recurso ao ptrace atraves do utrace ... 
