@@ -29,7 +29,7 @@ No processo de recepção da \textit{frame} é verificado se existem \textit{sni
 
 \subsection{Transmissão de dados}
 
-
+Uma aplicação em nível utilizador transfere dados sobre a rede através de chamadas ao sistema de operação, sendo que estas podem ser \textit{send}, \textit{sendto}, \textit{sendmsg}. Neste ponto de entrada os dados tem de ser copiados e efectuadas diversas verificações sobre estes, após estas verificações são utilizadas estruturas e funções através da \textit{stack TCP/IP} e fluir pela \textit{firewall netfilter}. Os dados gerados pelas diversas camadas da \textit{stack} são agregados numa estrutura \textit{sk\_buffer} para ser adicionados a uma fila para ser enviados pela ferramenta \textit{traffic control}. Quando esta ferramenta irá enviar os dados para o controlador é passada a referência sobre este pacote para os \textit{sniffers} registados, sendo apenas efectuada uma cópia dos dados caso o pacote seja recolhido para maior análise. Os dados passados ao controlador da interface de rede são então transferidos para a interface de rede e daí para o seu destino.
 
 \section{Arquitectura do módulo desenvolvido}
 
