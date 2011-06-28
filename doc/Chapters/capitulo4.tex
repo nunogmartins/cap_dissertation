@@ -64,86 +64,6 @@ O sistema de operação \textit{Linux} tem um sistema de \textit{firewall} que p
 
 \subsection{Traffic Control}
 
-\section{Arquitectura do módulo desenvolvido}
-
-A arquitectura foi pensada para ser executada de forma ortogonal ao sistema
-utilizado. Desta forma não existe a necessidade de recompilar programas
-antigos. Para além desta situação novas aplicações podem utilizar esta
-ferramenta de forma transparente.
-
-Esta ferramenta foi desenvolvida para os processadores x86 e x86\_64 pois nestas
-arquitecturas existe suporte para o sistema de monitorização KProbes \ref{},
-sendo esta a unica dependência especifica que a ferramenta irá ter.
-
-As diferentes partes da ferramenta foram desenvolvidas de forma a poderem ser
-modificadas em separado permitindo um melhor aproveitamento da modularização.
-Este módulo foi desenvolvido em 4 subpartes. 
-
-\subsection{Módulos no espaço do núcleo}
-%a não utilização de ioctl para o debug ... 
-A estratégia foi separar os diferentes componentes e a criação de um módulo de \textit{debug} para que pudesse existir uma forma de acesso à monitorização por parte do nível de utilizador, sem que exista a necessidade de criar ou alterar chamadas ao sistema ou suas opções.
-
-\subsection{Filtro}
-
-Para continuar a ser opaco para os diferentes sistemas de monitorização/captura de rede foi necessário colocar um ponto de ligação entre o sistema actual e o módulo desenvolvido. Quando não existe uma ligação efectuada, existe apenas um ligeiro decréscimo do desempenho, este deve-se à verificação da existência de ligação. Caso a ligação esteja activa o fluxo de controlo é passado para a função de filtro definida no módulo.
-
-%Necessidade de registar um \textit{hook} para aceder directamente à função de
-%filtro. Caso este \textit{hook} não esteja ligado o \textit{overhead}
-%introduzido será o de um teste para verificar se existe ligação ou não.
-%No caso de não existir a ligação a este \textit{hook} o sistema comporta-se de
-%forma a utilizar apenas o sistema anterior.
-
-\paragraph{Estruturas}
-
-A não criação de novas estruturas de dados, foi devido à existência das
-estruturas de dados existentes no código do núcleo do sistema de operação
-linux, que já foram bastante analisadas e existem com o propósito de serem
-utilizadas por outros programadores.
-
-\paragraph{Divisão do módulo} 
-
-O módulo subdivide-se em 4 partes, a monitorização, o ``reservatório'' de
-informação, o \textit{hook} da ligação com o \textit{bpf} e
-comunicação/\textit{debug}.
-
-\paragraph{Interacção com o LSF}
-O sistema interage também com o \textit{LSF} pois existe uma conjunção
-entre o filtro definido pelo utilizador e a captura do tráfego da aplicação a
-ser monitorizada.
-
-\subsection{Arquitectura}
-
-\subsubsection{Monitorização da aplicação}
-
-Como foi apresentado no quadro \ref{tab:monitoring} o sistema de monitorização
-do núcleo do sistema linux que se adapta melhor para este problema é o
-KProbes\ref{sec:kprobes}. 
-
-\subsubsection{Repositório de dados}
-
-Para permitir a consulta dos pares número de porta endereço é necessário
-utilizar um repositório de dados. Este repositório de dados necessitará de alta
-performance mas facilidade de utilização e modificação. Terá de permitir as
-seguintes operações: adição, consulta e remoção de dados.
-
-Este repositório de dados irá ser a ponte entre o sistema de  monitorização e o
-sistema de filtragem de pacotes. 
-
-\subsubsection{Filtragem de pacotes}
-
-Sistema que irá indicar à função run\_filter do \textit{LSF} se um pacote deverá
-ser capturado ou não. Irá ser definido um ponto \textit{hook} dentro do núcleo
-do sistema do linux, de forma a poder ser utilizada a funcionalidade de
-filtragem dinâmica apenas quando se deseje. O custo introduzido para estas
-modificação é apenas de uma verificação se o \textit{hook} está ligado ou não.
-
-
-\subsubsection{Recolha de informações}
-
-Utilizando um dos sistemas definidos em \ref{tab:transferencia_dados} é
-permitido o acesso a informações de análise dos diversos sistemas anteriormente
-mencionados.
-
 
 \section{Arquitectura de Rede do Linux}
 
@@ -223,6 +143,86 @@ informação sobre o seu endereço ip ou o seu mac address no caso de interfaces
 \textit{ethernet} ou mapeadas sobre \textit{ethernet} (como o caso das
 interfaces ponto-a-ponto).
 
+
+\section{Arquitectura do módulo desenvolvido}
+
+A arquitectura foi pensada para ser executada de forma ortogonal ao sistema
+utilizado. Desta forma não existe a necessidade de recompilar programas
+antigos. Para além desta situação novas aplicações podem utilizar esta
+ferramenta de forma transparente.
+
+Esta ferramenta foi desenvolvida para os processadores x86 e x86\_64 pois nestas
+arquitecturas existe suporte para o sistema de monitorização KProbes \ref{},
+sendo esta a unica dependência especifica que a ferramenta irá ter.
+
+As diferentes partes da ferramenta foram desenvolvidas de forma a poderem ser
+modificadas em separado permitindo um melhor aproveitamento da modularização.
+Este módulo foi desenvolvido em 4 subpartes. 
+
+\subsection{Módulos no espaço do núcleo}
+%a não utilização de ioctl para o debug ... 
+A estratégia foi separar os diferentes componentes e a criação de um módulo de \textit{debug} para que pudesse existir uma forma de acesso à monitorização por parte do nível de utilizador, sem que exista a necessidade de criar ou alterar chamadas ao sistema ou suas opções.
+
+\subsection{Filtro}
+
+Para continuar a ser opaco para os diferentes sistemas de monitorização/captura de rede foi necessário colocar um ponto de ligação entre o sistema actual e o módulo desenvolvido. Quando não existe uma ligação efectuada, existe apenas um ligeiro decréscimo do desempenho, este deve-se à verificação da existência de ligação. Caso a ligação esteja activa o fluxo de controlo é passado para a função de filtro definida no módulo.
+
+%Necessidade de registar um \textit{hook} para aceder directamente à função de
+%filtro. Caso este \textit{hook} não esteja ligado o \textit{overhead}
+%introduzido será o de um teste para verificar se existe ligação ou não.
+%No caso de não existir a ligação a este \textit{hook} o sistema comporta-se de
+%forma a utilizar apenas o sistema anterior.
+
+\paragraph{Estruturas}
+
+A não criação de novas estruturas de dados, foi devido à existência das
+estruturas de dados existentes no código do núcleo do sistema de operação
+linux, que já foram bastante analisadas e existem com o propósito de serem
+utilizadas por outros programadores.
+
+\paragraph{Divisão do módulo} 
+
+O módulo subdivide-se em 4 partes, a monitorização, o ``reservatório'' de
+informação, o \textit{hook} da ligação com o \textit{bpf} e
+comunicação/\textit{debug}.
+
+\paragraph{Interacção com o LSF}
+O sistema interage também com o \textit{LSF} pois existe uma conjunção
+entre o filtro definido pelo utilizador e a captura do tráfego da aplicação a
+ser monitorizada.
+
+\subsection{Arquitectura}
+
+\subsubsection{Monitorização da aplicação}
+
+Como foi apresentado no quadro \ref{tab:monitoring} o sistema de monitorização
+do núcleo do sistema linux que se adapta melhor para este problema é o
+KProbes\ref{sec:kprobes}. 
+
+\subsubsection{Repositório de dados}
+
+Para permitir a consulta dos pares número de porta endereço é necessário
+utilizar um repositório de dados. Este repositório de dados necessitará de alta
+performance mas facilidade de utilização e modificação. Terá de permitir as
+seguintes operações: adição, consulta e remoção de dados.
+
+Este repositório de dados irá ser a ponte entre o sistema de  monitorização e o
+sistema de filtragem de pacotes. 
+
+\subsubsection{Filtragem de pacotes}
+
+Sistema que irá indicar à função run\_filter do \textit{LSF} se um pacote deverá
+ser capturado ou não. Irá ser definido um ponto \textit{hook} dentro do núcleo
+do sistema do linux, de forma a poder ser utilizada a funcionalidade de
+filtragem dinâmica apenas quando se deseje. O custo introduzido para estas
+modificação é apenas de uma verificação se o \textit{hook} está ligado ou não.
+
+
+\subsubsection{Recolha de informações}
+
+Utilizando um dos sistemas definidos em \ref{tab:transferencia_dados} é
+permitido o acesso a informações de análise dos diversos sistemas anteriormente
+mencionados.
 
 \section{Temporizadores}
 
