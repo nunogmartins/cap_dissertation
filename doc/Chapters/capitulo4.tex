@@ -7,6 +7,13 @@ Como esta visão é muito abrangente, apenas serão focados os pontos essenciais
 Após esta visão geral do sistema, é apresentado a arquitectura do projecto desenvolvido.
 
 
+\section{Arquitectura de rede em \textit{Linux}}
+
+Um processo para poder comunicar remotamente com outro processo em outra máquina remotamente irá utilizar as funcionalidades de rede do seu sistema de operação.
+ Para isto um processo tem de efectuar o inicio da comunicação enviando alguns pacotes de inicio de sessão (caso o protocolo de comunicação necessite).
+ Um processo em \textit{Linux} é uma instância de um programa que partilha da máquina e que pode comunicar com outros processos.
+ Os processos dentro do núcleo são instâncias de uma estrutura \textit{task\_struct} que contém diversos elementos pertencentes ao processo, tais como identificador de processo, ficheiros abertos no sistema de ficheiros, zonas de memória que lhe foram atribuidas, etc.
+ 
 
 \section{Arquitectura de rede do núcleo}
 
@@ -17,22 +24,6 @@ Falar aqui sobre qq coisa da estrutura de rede ...
 Talvez tb imagem com um pouco da arquitectura ... básica 
 
 Falta falar sobre o netfilter ... sobre tc trafic control
-
-\subsection{Estrutura de um processo}
-
-Um processo para executar tem de ser carregado para memória e posteriormente ser agendado para execução através do escalonador de processos do núcleo.
- Um processo para o núcleo é uma estrutura com a informação sobre as zonas de memória, descritores de ficheiros abertos, informações sobre os tempos de execução, informações sobre a hierarquia de processos pertencentes a este, etc. Nos descritores de ficheiros abertos são também incluidos os descritores de \textit{sockets} abertos para comunicação. 
-
-\subsection{Sistema de ficheiros}
-
-Um processo para poder comunicar com a interface de rede tem de abrir um canal entre o processo e o núcleo de operação que por sua vez comunica com a interface de rede.
- Este canal nos sistemas de operação \textit{Linux} é efectuado através da chamada ao sistema \textit{socket}.
- Esta função regista a abertura de um canal de comunicação entre o processo e o sistema de rede, sendo o descritor do \textit{socket} um identificador do sistema de ficheiros, que fica registado no descritor do processo dentro do núcleo.
- Esta é apenas a primeira das abstrações que o núcleo efectua sobre a arquitectura do sistema de rede.
-  
-algures falar sobre o accept e o bind e o socket devido à estrutura interna que aguarda o indicador da porta igual ... tenho de verificar isto correctamente
-
-
 
 \subsection{Subsistema de rede} % falta melhor nome ...
 \label{subsection:network}
@@ -70,6 +61,24 @@ dependente para a familia e tipo.
 
 Como os protocolos \textit{TCP} e \textit{UDP} partilham algumas das
 funcionalidades nem todas as f
+
+
+
+
+\subsection{Estrutura de um processo}
+
+Um processo para executar tem de ser carregado para memória e posteriormente ser agendado para execução através do escalonador de processos do núcleo.
+ Um processo para o núcleo é uma estrutura com a informação sobre as zonas de memória, descritores de ficheiros abertos, informações sobre os tempos de execução, informações sobre a hierarquia de processos pertencentes a este, etc. Nos descritores de ficheiros abertos são também incluidos os descritores de \textit{sockets} abertos para comunicação. 
+
+\subsection{Sistema de ficheiros}
+
+Um processo para poder comunicar com a interface de rede tem de abrir um canal entre o processo e o núcleo de operação que por sua vez comunica com a interface de rede.
+ Este canal nos sistemas de operação \textit{Linux} é efectuado através da chamada ao sistema \textit{socket}.
+ Esta função regista a abertura de um canal de comunicação entre o processo e o sistema de rede, sendo o descritor do \textit{socket} um identificador do sistema de ficheiros, que fica registado no descritor do processo dentro do núcleo.
+ Esta é apenas a primeira das abstrações que o núcleo efectua sobre a arquitectura do sistema de rede.
+  
+algures falar sobre o accept e o bind e o socket devido à estrutura interna que aguarda o indicador da porta igual ... tenho de verificar isto correctamente
+
 
 
 
