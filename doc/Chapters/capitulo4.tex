@@ -2,45 +2,26 @@
 \label{cap:Estrutura}
 
 
-Neste capitulo vai ser apresentado parte da arquitectura de rede do núcleo do \textit{Linux}, bem como a arquitctura do projecto efectuado.
+Neste capitulo vai ser apresentado a constituição do sistema de rede do \textit{Linux}, desde o momento em que a aplicação envia os dados, até ao momento em que estes chegam à interface de rede e vice-versa.
+Como esta visão é muito abrangente, apenas serão focados os pontos essenciais da arquitectura.
+Após esta visão geral do sistema, é apresentado a arquitectura do projecto desenvolvido.
 
-A arquitectura de rede do núcleo do \textit{Linux} poderá ser apresentada de duas formas, \textit{Bottom-Top} ou \textit{Top-Bottom}. A escolha recaíu sobre a primeira pois permite observar o aumento da complexidade e abstracção existente nesta arquitectura. 
+
 
 \section{Arquitectura de rede do núcleo}
+
+A arquitectura de rede do núcleo do \textit{Linux} poderá ser apresentada de duas formas, \textit{Bottom-Top} ou \textit{Top-Bottom}. 
+A escolha recaíu sobre a primeira pois permite observar o aumento da complexidade e abstracção existente nesta arquitectura. 
 
 Falar aqui sobre qq coisa da estrutura de rede ... 
 Talvez tb imagem com um pouco da arquitectura ... básica 
 
 Falta falar sobre o netfilter ... sobre tc trafic control
 
-\subsection{Recepção de dados}
+\subsection{Estrutura de um processo}
 
-A chegada de um pacote de dados à interface de rede desencadeia uma acção de interrupção da actividade do processador, permitindo quer este seja transferido para o sistema o mais cedo possível. Esta interrupção é efectuada através de um \textit{irq} pré-definido entre o controlador e a interface de rede. As interrupções são atendidas no processador desligando a atenção a todas as outras interrupções provenientes de outros dispositivos. %esta frase está ruim ...
-O processador deve estar o menor intervalo de tempo possível com as interrupções desligadas, antes de retornar da interrupção o sistema agenda a execução de uma função que irá terminar a recepção do pacote para a camada correcta da \textit{stack TCP/IP}.%ainda falta falar sobre DMA, interrupt mode too exclusive deve ser breve, encaminhar pelo processamento da stack tcp/ip 
-
-No processo de recepção da \textit{frame} é verificado se existem \textit{sniffers} registados, caso existam é passada uma referência sobre a frame, de forma a efectuar apenas a cópia da frame quando necessária. Esta situação é devida à possível existência de um filtro sobre a \textit{frame}, em que se não for necessário capturá-la, a cópia dos dados seja desnecessária, permitindo efectuar trabalho útil.
-
-%Faltar falar que a frame segue para a stack tcp ip de forma normal ...
-
-%Falta falar sobre o netfilter ... firewall do linux que existem 5 pontos de "entrada" onde existe algumas verificações .... 
-
-% Faltar indicar que o processo está bloqueado à espera de input que lhe é copiado entre o nucleo e o processo em nivel utilizador por meio de o kiovec (talvez kernel io vector ...) 
-
-
-A variável global \textit{ptype\_base} do núcleo é uma tabela de dispersão aberta, que contém os tipos de controladores de protocolos de rede. Os diferentes protocolos endereçam uma função que recebe o pacote e sabe o que fazer com ele, passando pela \textit{firewall netfilter} terminando na cópia dos dados dos \textit{buffers} do núcleo para os do processo, que ficou bloqueado numa lista de espera através da chamada ao sistema de operação \textit{recv}, \textit{recvfrom} ou \textit{recvmsg}.
-
-\subsection{Transmissão de dados}
-
-Uma aplicação em nível utilizador transfere dados sobre a rede através de chamadas ao sistema de operação, sendo que estas podem ser \textit{send}, \textit{sendto}, \textit{sendmsg}.
- Neste ponto de entrada os dados tem de ser copiados e efectuadas diversas verificações sobre estes, após estas verificações são utilizadas estruturas e funções através da \textit{stack TCP/IP} e fluir pela \textit{firewall netfilter}.
- Os dados gerados pelas diversas camadas da \textit{stack} são agregados numa estrutura \textit{sk\_buffer} para ser adicionados a uma fila para ser enviados pela ferramenta \textit{traffic control}.
- Quando esta ferramenta irá enviar os dados para o controlador é passada a referência sobre este pacote para os \textit{sniffers} registados, sendo apenas efectuada uma cópia dos dados caso o pacote seja recolhido para maior análise. Os dados passados ao controlador da interface de rede são então transferidos para a interface de rede, e daí para o seu destino.
-
-Quando a aplicação está a executar e efectua uma chamada ao sistema de operação, o sistema muda de modo e executa dentro do núcleo "em nome da aplicação".
- Durante parte da execução da chamada ao sistema de operação é possível referenciar qual o processo que efectuou a chamada, pois caso a chamada seja sincrona, é agendada um processamento sobre os dados e a aplicação fica bloqueada à espera de ser re-escalonada através da função \textit{schedule}.
- O sistema de ficheiros mantém a referência sobre quais os ficheiros/sockets abertos para cada processo e é possível obter qual o processo a que cada descritor de ficheiros pertence. % back pointers ... nos sockets ... binded de uma porta a um processo ... pode nao ser a chamada bind ... 
-
-\subsection{Estrutura de um sk\_buff}
+Um processo para executar tem de ser carregado para memória e posteriormente ser agendado para execução através do escalonador de processos do núcleo.
+ Um processo para o núcleo é uma estrutura com a informação sobre as zonas de memória, descritores de ficheiros abertos, informações sobre os tempos de execução, informações sobre a hierarquia de processos pertencentes a este, etc. Nos descritores de ficheiros abertos são também incluidos os descritores de \textit{sockets} abertos para comunicação. 
 
 \subsection{Sistema de ficheiros}
 
@@ -50,49 +31,7 @@ Um processo para poder comunicar com a interface de rede tem de abrir um canal e
  Esta é apenas a primeira das abstrações que o núcleo efectua sobre a arquitectura do sistema de rede.
   
 algures falar sobre o accept e o bind e o socket devido à estrutura interna que aguarda o indicador da porta igual ... tenho de verificar isto correctamente
- 
 
-\subsection{Estrutura de um processo}
-
-Um processo para executar tem de ser carregado para memória e posteriormente ser agendado para execução através do escalonador de processos do núcleo.
- Um processo para o núcleo é uma estrutura com a informação sobre as zonas de memória, descritores de ficheiros abertos, informações sobre os tempos de execução, informações sobre a hierarquia de processos pertencentes a este, etc. Nos descritores de ficheiros abertos são também incluidos os descritores de \textit{sockets} abertos para comunicação. 
-
-\subsection{NetFilter}
-
-O sistema de operação \textit{Linux} tem um sistema de \textit{firewall} que permite controlar os acessos dos processos aos sistemas de comunicação de rede.
- Este sistema é o \textit{NetFilter}, está presente no núcleo do sistema operação permitindo controlar o fluxo de dados dos processos para as interfaces de rede, bem como no sentido oposto. O \textit{NetFilter} está presente na \textit{stack TCP/IP} em 5 pontos apenas e desta forma consegue de uma forma simples controlar o fluxo dos dados. O \textit{NetFilter} pode ser controlado pelo \textit{iptables}, uma ferramenta em nível utilizador que através de regras define o acesso dos dados das comunicações rede.
-
-\subsection{Traffic Control}
-
-
-\section{Arquitectura de Rede do Linux}
-
-Desde que os dados saem da aplicação até chegarem ao controlador da interface
-de rede. 
-% Imagem dos dados 
-
-\subsection{AF\_PACKET}
-
-A forma para comunicar enviar e receber dados directamente da interface de rede
-é através da familia de protocolos \textit{AF\_PACKET}. 
-
-Esta é a forma de implementar protocolos de rede sem recorrer à \textit{stack}
-de protocolos IP em nível utilizador. Para além desta funcionalidade esta é a
-forma de capturar os pacotes que circulam na interface de rede, permitindo
-assim efectuar uma análise do tráfego.
-
-Esta camada situa-se junto aos controladores de rede permitindo assim capturar
-dados que podem não chegar às aplicações devido à utilização de regras na
-\textit{firewall} (netfilter) do \textit{linux}.
-
-A utilização de ``lazy cloning'' permite que apenas os pacotes que sejam para
-capturar sejam efectivamente copiados. Por isso primeiro são avaliados para o
-processo de captura, caso sejam para captura a função \textit{blah blah}
-efectua a cópia da estrutura sk\_buffer e serão então adicionados ao
-\textit{ring buffer}. Se no \textit{ring buffer} não existir espaço para o
-número de bytes que devem ser capturados, é então descartado a cópia
-(libertado o espaço) e incrementado o valor de pacotes descartados pelo núcleo
-de sistema.
 
 
 \subsection{Subsistema de rede} % falta melhor nome ...
@@ -132,6 +71,8 @@ dependente para a familia e tipo.
 Como os protocolos \textit{TCP} e \textit{UDP} partilham algumas das
 funcionalidades nem todas as f
 
+
+
 \subsection{Interfaces de rede}
 
 O núcleo do \textit{linux} mantém a informação sobre quais as interfaces de
@@ -142,6 +83,72 @@ referente a uma interface de rede e suas configurações, nomeadamente a
 informação sobre o seu endereço ip ou o seu mac address no caso de interfaces
 \textit{ethernet} ou mapeadas sobre \textit{ethernet} (como o caso das
 interfaces ponto-a-ponto).
+ 
+
+
+\subsection{NetFilter}
+
+O sistema de operação \textit{Linux} tem um sistema de \textit{firewall} que permite controlar os acessos dos processos aos sistemas de comunicação de rede.
+ Este sistema é o \textit{NetFilter}, está presente no núcleo do sistema operação permitindo controlar o fluxo de dados dos processos para as interfaces de rede, bem como no sentido oposto. O \textit{NetFilter} está presente na \textit{stack TCP/IP} em 5 pontos apenas e desta forma consegue de uma forma simples controlar o fluxo dos dados. O \textit{NetFilter} pode ser controlado pelo \textit{iptables}, uma ferramenta em nível utilizador que através de regras define o acesso dos dados das comunicações rede.
+
+\subsection{Traffic Control}
+
+\subsection{Estrutura de um sk\_buff}
+
+\subsection{AF\_PACKET}
+
+A forma para comunicar enviar e receber dados directamente da interface de rede
+é através da familia de protocolos \textit{AF\_PACKET}. 
+
+Esta é a forma de implementar protocolos de rede sem recorrer à \textit{stack}
+de protocolos IP em nível utilizador. Para além desta funcionalidade esta é a
+forma de capturar os pacotes que circulam na interface de rede, permitindo
+assim efectuar uma análise do tráfego.
+
+Esta camada situa-se junto aos controladores de rede permitindo assim capturar
+dados que podem não chegar às aplicações devido à utilização de regras na
+\textit{firewall} (netfilter) do \textit{linux}.
+
+A utilização de ``lazy cloning'' permite que apenas os pacotes que sejam para
+capturar sejam efectivamente copiados. Por isso primeiro são avaliados para o
+processo de captura, caso sejam para captura a função \textit{blah blah}
+efectua a cópia da estrutura sk\_buffer e serão então adicionados ao
+\textit{ring buffer}. Se no \textit{ring buffer} não existir espaço para o
+número de bytes que devem ser capturados, é então descartado a cópia
+(libertado o espaço) e incrementado o valor de pacotes descartados pelo núcleo
+de sistema.
+
+
+
+
+\subsection{Recepção de dados}
+
+A chegada de um pacote de dados à interface de rede desencadeia uma acção de interrupção da actividade do processador, permitindo quer este seja transferido para o sistema o mais cedo possível. Esta interrupção é efectuada através de um \textit{irq} pré-definido entre o controlador e a interface de rede. As interrupções são atendidas no processador desligando a atenção a todas as outras interrupções provenientes de outros dispositivos. %esta frase está ruim ...
+O processador deve estar o menor intervalo de tempo possível com as interrupções desligadas, antes de retornar da interrupção o sistema agenda a execução de uma função que irá terminar a recepção do pacote para a camada correcta da \textit{stack TCP/IP}.%ainda falta falar sobre DMA, interrupt mode too exclusive deve ser breve, encaminhar pelo processamento da stack tcp/ip 
+
+No processo de recepção da \textit{frame} é verificado se existem \textit{sniffers} registados, caso existam é passada uma referência sobre a frame, de forma a efectuar apenas a cópia da frame quando necessária. Esta situação é devida à possível existência de um filtro sobre a \textit{frame}, em que se não for necessário capturá-la, a cópia dos dados seja desnecessária, permitindo efectuar trabalho útil.
+
+%Faltar falar que a frame segue para a stack tcp ip de forma normal ...
+
+%Falta falar sobre o netfilter ... firewall do linux que existem 5 pontos de "entrada" onde existe algumas verificações .... 
+
+% Faltar indicar que o processo está bloqueado à espera de input que lhe é copiado entre o nucleo e o processo em nivel utilizador por meio de o kiovec (talvez kernel io vector ...) 
+
+
+A variável global \textit{ptype\_base} do núcleo é uma tabela de dispersão aberta, que contém os tipos de controladores de protocolos de rede. Os diferentes protocolos endereçam uma função que recebe o pacote e sabe o que fazer com ele, passando pela \textit{firewall netfilter} terminando na cópia dos dados dos \textit{buffers} do núcleo para os do processo, que ficou bloqueado numa lista de espera através da chamada ao sistema de operação \textit{recv}, \textit{recvfrom} ou \textit{recvmsg}.
+
+\subsection{Transmissão de dados}
+
+Uma aplicação em nível utilizador transfere dados sobre a rede através de chamadas ao sistema de operação, sendo que estas podem ser \textit{send}, \textit{sendto}, \textit{sendmsg}.
+ Neste ponto de entrada os dados tem de ser copiados e efectuadas diversas verificações sobre estes, após estas verificações são utilizadas estruturas e funções através da \textit{stack TCP/IP} e fluir pela \textit{firewall netfilter}.
+ Os dados gerados pelas diversas camadas da \textit{stack} são agregados numa estrutura \textit{sk\_buffer} para ser adicionados a uma fila para ser enviados pela ferramenta \textit{traffic control}.
+ Quando esta ferramenta irá enviar os dados para o controlador é passada a referência sobre este pacote para os \textit{sniffers} registados, sendo apenas efectuada uma cópia dos dados caso o pacote seja recolhido para maior análise. Os dados passados ao controlador da interface de rede são então transferidos para a interface de rede, e daí para o seu destino.
+
+Quando a aplicação está a executar e efectua uma chamada ao sistema de operação, o sistema muda de modo e executa dentro do núcleo "em nome da aplicação".
+ Durante parte da execução da chamada ao sistema de operação é possível referenciar qual o processo que efectuou a chamada, pois caso a chamada seja sincrona, é agendada um processamento sobre os dados e a aplicação fica bloqueada à espera de ser re-escalonada através da função \textit{schedule}.
+ O sistema de ficheiros mantém a referência sobre quais os ficheiros/sockets abertos para cada processo e é possível obter qual o processo a que cada descritor de ficheiros pertence. % back pointers ... nos sockets ... binded de uma porta a um processo ... pode nao ser a chamada bind ... 
+
+
 
 
 \section{Arquitectura do módulo desenvolvido}
