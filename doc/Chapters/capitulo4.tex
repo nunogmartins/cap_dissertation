@@ -14,6 +14,10 @@ Um processo para poder comunicar remotamente com outro processo em outra máquin
  Um processo em \textit{Linux} é uma instância de um programa que partilha da máquina e que pode comunicar com outros processos.
  Os processos dentro do núcleo são instâncias de uma estrutura \textit{task\_struct} que contém diversos elementos pertencentes ao processo, tais como identificador de processo, ficheiros abertos no sistema de ficheiros, zonas de memória que lhe foram atribuidas, etc.
  
+ Um processo para utilizar as funcionalidades de rede necessita criar uma instância de um socket em o indicador devolvido ao processo é um descritor de ficheiros (descritor de socket).
+ Isto porque os \textit{sockets} de um processo são mapeados em um sistema de ficheiros virtual neste caso sobre a forma de sockets, forma de comunicação sobre a rede.
+ Estes descritores permite ao processo identificar o socket e efectuar as comunicações.
+ Estas comunicações, bem como o estabelecimento destes canais de comunicação, são efectuadas através de chamadas ao sistema de operação.
 
 \section{Arquitectura de rede do núcleo}
 
