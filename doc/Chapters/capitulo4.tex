@@ -8,7 +8,7 @@ Após esta visão geral do sistema, é apresentado a arquitectura do projecto de
 
 
 \section{Arquitectura de rede em \textit{Linux}}
-
+\label{subsection:network}
 Um processo para poder comunicar remotamente com outro processo em outra máquina remotamente irá utilizar as funcionalidades de rede do seu sistema de operação.
  Para isto um processo tem de efectuar o inicio da comunicação enviando alguns pacotes de inicio de sessão (caso o protocolo de comunicação necessite).
  Um processo em \textit{Linux} é uma instância de um programa que partilha da máquina e que pode comunicar com outros processos.
@@ -19,8 +19,6 @@ Um processo para poder comunicar remotamente com outro processo em outra máquin
  Estes descritores permite ao processo identificar o socket e efectuar as comunicações.
  Estas comunicações, bem como o estabelecimento destes canais de comunicação, são efectuadas através de chamadas ao sistema de operação.
 
-\section{Arquitectura de rede do núcleo}
-
 A arquitectura de rede do núcleo do \textit{Linux} poderá ser apresentada de duas formas, \textit{Bottom-Top} ou \textit{Top-Bottom}. 
 A escolha recaíu sobre a primeira pois permite observar o aumento da complexidade e abstracção existente nesta arquitectura. 
 
@@ -29,8 +27,6 @@ Talvez tb imagem com um pouco da arquitectura ... básica
 
 Falta falar sobre o netfilter ... sobre tc trafic control
 
-\subsection{Subsistema de rede} % falta melhor nome ...
-\label{subsection:network}
 Socket  e o que é um socket ...
 
 Os ``file descriptors'' são a abstração para os ``sockets''. Os sockets são
@@ -97,7 +93,7 @@ informação sobre o seu endereço ip ou o seu mac address no caso de interfaces
 \textit{ethernet} ou mapeadas sobre \textit{ethernet} (como o caso das
 interfaces ponto-a-ponto).
  
-
+\subsection{Estrutura de um sk\_buff}
 
 \subsection{NetFilter}
 
@@ -105,8 +101,9 @@ O sistema de operação \textit{Linux} tem um sistema de \textit{firewall} que p
  Este sistema é o \textit{NetFilter}, está presente no núcleo do sistema operação permitindo controlar o fluxo de dados dos processos para as interfaces de rede, bem como no sentido oposto. O \textit{NetFilter} está presente na \textit{stack TCP/IP} em 5 pontos apenas e desta forma consegue de uma forma simples controlar o fluxo dos dados. O \textit{NetFilter} pode ser controlado pelo \textit{iptables}, uma ferramenta em nível utilizador que através de regras define o acesso dos dados das comunicações rede.
 
 \subsection{Traffic Control}
+Apesar de ter estrutra para controlo dos dados que chegam da interface de rede o principal propósito é controlo do dados que saem da interface.
 
-\subsection{Estrutura de um sk\_buff}
+
 
 \subsection{AF\_PACKET}
 
@@ -130,9 +127,6 @@ efectua a cópia da estrutura sk\_buffer e serão então adicionados ao
 número de bytes que devem ser capturados, é então descartado a cópia
 (libertado o espaço) e incrementado o valor de pacotes descartados pelo núcleo
 de sistema.
-
-
-
 
 \subsection{Recepção de dados}
 
@@ -185,6 +179,22 @@ Para tal, o sistema criado está dividido em 4 componentes principais (ver figur
 
 Este sistema permite que sejam capturados os pacotes de rede de um processo, sem que exista um conhecimento prévio sobre o(s) protocolo(s) ou portas utilizadas. A utilização de um sistema de instrumentação do núcleo foi necessária apenas para monitorizar as chamadas envolvendo \emph{sockets} e identificar o processo responsável, permitindo desta forma obter e manter permanentemente actualizada a informação sobre o estado respeitante ao processo alvo. De forma a minimizar a redução de desempenho, todo o sistema foi desenvolvido dentro do núcleo do \textit{Linux}, sem alterações nas interfaces já existentes.  Assim, ferramentas de façam uso da biblioteca \textit{LibPcap}, como o programa \textit{tcpdump} ou suas variantes, podem beneficiar desta extensão sem qualquer alteração e sem impacto relevante no seu desempenho.
 
+---------------------------------------------------------------------------------------------------------
+
+A arquitectura foi pensada para ser executada de forma ortogonal ao sistema
+utilizado. Desta forma não existe a necessidade de recompilar programas
+antigos. Para além desta situação novas aplicações podem utilizar esta
+ferramenta de forma transparente.
+
+Esta ferramenta foi desenvolvida para os processadores x86 e x86\_64 pois nestas
+arquitecturas existe suporte para o sistema de monitorização KProbes \ref{},
+sendo esta a unica dependência especifica que a ferramenta irá ter.
+
+As diferentes partes da ferramenta foram desenvolvidas de forma a poderem ser
+modificadas em separado permitindo um melhor aproveitamento da modularização.
+Este módulo foi desenvolvido em 4 subpartes. 
+
+---------------------------------------------------------------------------------------------------------
 
 
 \subsection*{Instrumentação das chamadas ao sistema de rede}
@@ -225,20 +235,9 @@ Para poder mais facilmente efectuar os testes de avaliação, foi criado uma fer
 %%%%%%%%%%%%%%%%%%%
 
 
-\section{Arquitectura do módulo desenvolvido}
+-----------------------------------------------------------------------------
 
-A arquitectura foi pensada para ser executada de forma ortogonal ao sistema
-utilizado. Desta forma não existe a necessidade de recompilar programas
-antigos. Para além desta situação novas aplicações podem utilizar esta
-ferramenta de forma transparente.
 
-Esta ferramenta foi desenvolvida para os processadores x86 e x86\_64 pois nestas
-arquitecturas existe suporte para o sistema de monitorização KProbes \ref{},
-sendo esta a unica dependência especifica que a ferramenta irá ter.
-
-As diferentes partes da ferramenta foram desenvolvidas de forma a poderem ser
-modificadas em separado permitindo um melhor aproveitamento da modularização.
-Este módulo foi desenvolvido em 4 subpartes. 
 
 \subsection{Módulos no espaço do núcleo}
 %a não utilização de ioctl para o debug ... 
@@ -305,12 +304,5 @@ Utilizando um dos sistemas definidos em \ref{tab:transferencia_dados} é
 permitido o acesso a informações de análise dos diversos sistemas anteriormente
 mencionados.
 
-\section{Temporizadores}
 
-Temporizadores no núcleo do sistema.
-
-
-\subsection{Temporizadores de Alta-Resolução}
-
-\textit{HrTimer}
 
