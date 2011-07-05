@@ -10,7 +10,7 @@ Após esta visão geral do sistema, é apresentado a arquitectura do projecto de
 
 
 \section{Arquitectura de rede em \textit{Linux}}
-\label{subsection:network}
+\label{sub:network}
 Um processo para poder comunicar remotamente com outro processo em outra máquina remotamente irá utilizar as funcionalidades de rede do seu sistema de operação.
  Para isto um processo tem de efectuar o inicio da comunicação enviando alguns pacotes de inicio de sessão (caso o protocolo de comunicação necessite).
  Um processo em \textit{Linux} é uma instância de um programa que partilha da máquina e que pode comunicar com outros processos.
@@ -82,28 +82,75 @@ Um processo para poder comunicar com a interface de rede tem de abrir um canal e
 algures falar sobre o accept e o bind e o socket devido à estrutura interna que aguarda o indicador da porta igual ... tenho de verificar isto correctamente
 
 
+\subsection{Sockets e suas familias}
+\label{sub:af_inet}
 
+Como já foi indicado em \ref{}, um processo para comunicar tem de utlizar um \textit{socket}.
+ Os \textit{sockets} para se diferenciarem devido às suas diferentes utilidades utilizam familias de endereços para definir o seu domínio.
+ Os \textit{sockets} para comunicação de internet utilizam o domínio \textit{AF\_INET}, que permite utilizar diferentes tipos de protocolos, tais como \textit{UDP} e \textit{TCP}.
+ Estes protocolos são utilizados pela generalidade das aplicações quando necessita de comunicar com outro processo que utilize os mesmos protocolos de comunicação.
+
+%Address Family para o INET, internet sockets para ipv4 e AF\_INET6 para ipv6
+
+\subsubsection{AF\_INET}
+
+atraves desta familia que e implementado o tcp sobre ipv4 e o udp sobre ipv4 existe tb o sock\_raw que permite enviar pacotes directamente para o nivel de transporte ip ... 
+
+%\lstset{language=C}
+%\begin{lstlisting}
+%struct proto {
+%	void			(*close)(struct sock *sk, 
+%                        long timeout);
+%	int				(*connect)(struct sock *sk,
+%                        struct sockaddr *uaddr, int addr_len);
+%	int				(*disconnect)(struct sock *sk, int flags);
+% 
+%	struct sock *	(*accept) (struct sock *sk, int flags, int *err)
+%	int				(*ioctl)(struct sock *sk, int cmd, unsigned long arg);
+%	int				(*init)(struct sock *sk);
+%	void			(*destroy)(struct sock *sk);
+%	void			(*shutdown)(struct sock *sk, int how);
+%	int				(*setsockopt)(struct sock *sk, int level, int optname, 
+%						char __user *optval, unsigned int optlen);
+%	int				(*getsockopt)(struct sock *sk, int level, int optname, 
+%						char __user *optval, int __user *option);     
+%						
+% 									...
+%
+%	int				(*sendmsg)(struct kiocb *iocb, struct sock *sk,
+%						struct msghdr *msg, size_t len);
+%	int				(*recvmsg)(struct kiocb *iocb, struct sock *sk,
+%						struct msghdr *msg, size_t len, int noblock, int flags, 
+%						int *addr_len);
+%	int				(*sendpage)(struct sock *sk, struct page *page,
+%						int offset, size_t size, int flags);
+%	int				(*bind)(struct sock *sk, struct sockaddr *uaddr, int addr_len);
+% 
+%									...
+%};
+%\end{lstlisting}
 
 \subsection{Interfaces de rede}
 
-O núcleo do \textit{linux} mantém a informação sobre quais as interfaces de
-rede que foram inicializadas pelos seus controladores, mesmo que não estando
-activas estas constantam de uma lista duplamente ligada de
-\textit{net\_devices}. Em cada posição da lista está toda a informação
-referente a uma interface de rede e suas configurações, nomeadamente a
-informação sobre o seu endereço ip ou o seu mac address no caso de interfaces
-\textit{ethernet} ou mapeadas sobre \textit{ethernet} (como o caso das
-interfaces ponto-a-ponto).
+O núcleo do \textit{linux} mantém a informação sobre quais as interfaces de rede que foram inicializadas pelos seus controladores, mesmo que não estando activas estas constantam de uma lista duplamente ligada de \textit{net\_devices}. 
+ Em cada posição da lista está toda a informação referente a uma interface de rede e suas configurações, nomeadamente a informação sobre o seu endereço ip ou o seu mac address no caso de interfaces \textit{ethernet} ou mapeadas sobre \textit{ethernet} (como o caso das interfaces ponto-a-ponto).
+ % Falar sobre os controladores das interfaces de rede, e que definem um conjunto de funções para serem desencadeadas em determinados pontos do envio ou recepcao de frames ... 
  
 \subsection{Estrutura de um sk\_buff}
 
 \subsection{NetFilter}
 
 O sistema de operação \textit{Linux} tem um sistema de \textit{firewall} que permite controlar os acessos dos processos aos sistemas de comunicação de rede.
- Este sistema é o \textit{NetFilter}, está presente no núcleo do sistema operação permitindo controlar o fluxo de dados dos processos para as interfaces de rede, bem como no sentido oposto. O \textit{NetFilter} está presente na \textit{stack TCP/IP} em 5 pontos apenas e desta forma consegue de uma forma simples controlar o fluxo dos dados. O \textit{NetFilter} pode ser controlado pelo \textit{iptables}, uma ferramenta em nível utilizador que através de regras define o acesso dos dados das comunicações rede.
+ Este sistema é o \textit{NetFilter}, está presente no núcleo do sistema operação permitindo controlar o fluxo de dados dos processos para as interfaces de rede, bem como no sentido oposto.
+ O \textit{NetFilter} está presente na \textit{stack TCP/IP} em 5 pontos apenas e desta forma consegue de uma forma simples controlar o fluxo dos dados.
+ O \textit{NetFilter} pode ser controlado pelo \textit{iptables}, uma ferramenta em nível utilizador que através de regras define o acesso dos dados das comunicações rede.
 
 \subsection{Traffic Control}
-Apesar de ter estrutra para controlo dos dados que chegam da interface de rede o principal propósito é controlo do dados que saem da interface.
+ Dentro do núcleo do \textit{Linux} para além da \textit{firewall NetFilter} existe um mecanismo de controlo sobre os dados que circulam nas interfaces de rede.
+ O principal propósito deste sistema é controlar a transmissão de dados, \textit{egress data transfer}.
+ Quando os protocolos de nível 3 vão enviar os dados, para a camada de nível 2, estes são armazenados em \textit{QDisks} para serem posteriormente serem enviados.
+ Com a necessidade de diferenciar os diferentes tipos de dados os administradores de sistemas podem diferenciar o trafego e armazená-lo em diferentes \textit{QDisks}, de forma a poder efectuar \textit{Quality of Service}.
+Apesar de ter estrutra para controlo dos dados que chegam da interface de rede o principal propósito é controlo do dados que saem através das interface de rede.
 
 
 
