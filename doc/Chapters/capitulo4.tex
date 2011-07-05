@@ -11,58 +11,45 @@ Após esta visão geral do sistema, é apresentado a arquitectura do projecto de
 
 \section{Arquitectura de rede em \textit{Linux}}
 \label{sub:network}
-Um processo para poder comunicar remotamente com outro processo em outra máquina remotamente irá utilizar as funcionalidades de rede do seu sistema de operação.
+ Um processo para poder comunicar remotamente com outro processo em outra máquina remotamente irá utilizar as funcionalidades de rede do seu sistema de operação.
  Para isto um processo tem de efectuar o inicio da comunicação enviando alguns pacotes de inicio de sessão (caso o protocolo de comunicação necessite).
  Um processo em \textit{Linux} é uma instância de um programa que partilha da máquina e que pode comunicar com outros processos.
  Os processos dentro do núcleo são instâncias de uma estrutura \textit{task\_struct} que contém diversos elementos pertencentes ao processo, tais como identificador de processo, ficheiros abertos no sistema de ficheiros, zonas de memória que lhe foram atribuidas, etc.
  
- Um processo para utilizar as funcionalidades de rede necessita criar uma instância de um socket em o indicador devolvido ao processo é um descritor de ficheiros (descritor de socket).
- Isto porque os \textit{sockets} de um processo são mapeados em um sistema de ficheiros virtual neste caso sobre a forma de sockets, forma de comunicação sobre a rede.
- Estes descritores permite ao processo identificar o socket e efectuar as comunicações.
+ Um processo para utilizar as funcionalidades de rede necessita criar uma instância de um \textit{socket}, que fica referênciado através de um descritor de ficheiros (descritor de \textit{socket}).
+ Isto porque os \textit{sockets} de um processo são mapeados no sistema de ficheiros virtual, neste caso sobre a forma de \textit{sockets}, forma de comunicação sobre a rede.
+ Estes descritores permitem ao processo identificar o \textit{socket}, para efectuar comunicações.
  Estas comunicações, bem como o estabelecimento destes canais de comunicação, são efectuadas através de chamadas ao sistema de operação.
 
-A arquitectura de rede do núcleo do \textit{Linux} poderá ser apresentada de duas formas, \textit{Bottom-Top} ou \textit{Top-Bottom}. 
-A escolha recaíu sobre a primeira pois permite observar o aumento da complexidade e abstracção existente nesta arquitectura. 
+%A arquitectura de rede do núcleo do \textit{Linux} poderá ser apresentada de duas formas, \textit{Bottom-Top} ou \textit{Top-Bottom}. 
+%A escolha recaíu sobre a primeira pois permite observar o aumento da complexidade e abstracção existente nesta arquitectura. 
 
-Falar aqui sobre qq coisa da estrutura de rede ... 
-Talvez tb imagem com um pouco da arquitectura ... básica 
+%Falar aqui sobre qq coisa da estrutura de rede ... 
+%Talvez tb imagem com um pouco da arquitectura ... básica 
 
-Falta falar sobre o netfilter ... sobre tc trafic control
+%Falta falar sobre o netfilter ... sobre tc trafic control
 
-Socket  e o que é um socket ...
+%Socket  e o que é um socket ...
 
-Os ``file descriptors'' são a abstração para os ``sockets''. Os sockets são
-mapeados em ficheiros e estes em descritores de ficheiros. 
+%Os ``file descriptors'' são a abstração para os ``sockets''. Os sockets são %mapeados em ficheiros e estes em descritores de ficheiros. 
 
-Dentro do núcleo do linux a estrutura que tém a informação sobre um processo
-(\textit{task}), é a \textit{struct task\_struct}. Nesta estrutura existe a
-informação sobre quais os ficheiros que a aplicação abriu. Como os
-\textit{sockets} são mapeados sob a forma de ficheiros, estes também se
-encontram nesta estrutura.
 
-Os protocolos \textit{TCP} e \textit{UDP} foram os únicos protocolos que se teve
-interesse em utilizar nesta ferramenta.
+Os protocolos \textit{TCP} e \textit{UDP} foram os únicos protocolos que se teve interesse em utilizar nesta ferramenta.
 
 Estes protocolos estão definidos numa estrutura de apontadores para funções.
-Os protocolos \textit{TCP} e \textit{UDP} têm formas diferentes de executar
-funcionalidades semelhantes e por isso estão descritos em instâncias diferentes.
+Os protocolos \textit{TCP} e \textit{UDP} têm formas diferentes de executar funcionalidades semelhantes e por isso estão descritos em instâncias diferentes.
 
-As principais chamadas ao sistema para estabelecer, terminar e transferir dados
-sobre \textit{sockets} são: \textit{socket}, \textit{connect}, \textit{bind},
-\textit{listen}, \textit{accept}, \textit{send}, \textit{recv}, \textit{sendto},
-\textit{recvfrom} e \textit{close}. 
+As principais chamadas ao sistema para estabelecer, terminar e comunicar sobre \textit{sockets} são: \textit{socket}, \textit{connect}, \textit{bind}, \textit{listen}, \textit{accept}, \textit{send}, \textit{recv}, \textit{sendto}, \textit{recvfrom} e \textit{close}. 
 
-Estas chamadas aos sistema são genéricas de forma a poderem ser mapeadas nas
-diferentes instâncias dos protocolos de transferência
+Estas chamadas aos sistema são genéricas de forma a poderem ser mapeadas nas diferentes instâncias dos protocolos de comunicação tais como \textit{INET} , \textit{NETLINK}, \textit{UNIX LOCAL}, etc.
 
-Quando a chamada ao sistema \textit{socket} é efectuada, é criado uma nova
-instância de um socket e inicializados os respectivos campos com a informação
-dependente para a familia e tipo. 
+%Quando a chamada ao sistema \textit{socket} é efectuada, é criado uma nova instância de um socket e inicializados os respectivos campos com a informação dependente para a familia e tipo. 
 
 %  Descrever um pouco esta parte ...
+ A generalidade das aplicações utilizam os \textit{sockets} da familia \textit{AF\_INET} para efectuar as suas comunicações sobre redes.
+ Nesta familia de \textit{sockets} os tipos mais utilizados são os \textit{INET\_STREAM} e \textit{INET\_DGRAM}, para comunicações com estado e sem estado, respectivamente.
 
-Como os protocolos \textit{TCP} e \textit{UDP} partilham algumas das
-funcionalidades nem todas as f
+%Como os protocolos \textit{TCP} e \textit{UDP} partilham algumas das funcionalidades nem todas as f
 
 
 
@@ -71,6 +58,10 @@ funcionalidades nem todas as f
 
 Um processo para executar tem de ser carregado para memória e posteriormente ser agendado para execução através do escalonador de processos do núcleo.
  Um processo para o núcleo é uma estrutura com a informação sobre as zonas de memória, descritores de ficheiros abertos, informações sobre os tempos de execução, informações sobre a hierarquia de processos pertencentes a este, etc. Nos descritores de ficheiros abertos são também incluidos os descritores de \textit{sockets} abertos para comunicação. 
+
+ Dentro do núcleo do linux a estrutura que tém a informação sobre um processo (\textit{task}), é a \textit{struct task\_struct}. 
+ Nesta estrutura existe a informação sobre quais os ficheiros que a aplicação abriu.
+ Como os \textit{sockets} são mapeados sob a forma de ficheiros, estes também se encontram nesta estrutura.
 
 \subsection{Sistema de ficheiros}
 
