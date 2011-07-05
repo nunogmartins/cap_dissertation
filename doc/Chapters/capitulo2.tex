@@ -238,12 +238,26 @@ O sistema de instrumentação do núcleo de sistema \textit{Linux}, \textit{KPro
 
 \paragraph*{RelayFs}\label{cap:RelayFs_overview}
 
-Este sistema de ficheiros virtual foi desenvolvido tendo em mente a transferência de grandes quantidades de dados entre o núcleo de sistema e o espaço de utilizador. Este novo sistema de ficheiros virtual tem novas primitivas onde não existem tantas zonas de controlo de concorrência. Desta forma o \textit{RelayFs} permite um aumento de transferências de dados entre o núcleo de sistema e o espaço de endereçamento do utilizador\cite{Donovan2007}.
+Este sistema de ficheiros virtual foi desenvolvido tendo em mente a transferência de grandes quantidades de dados entre o núcleo de sistema e o espaço de utilizador.
+ Este novo sistema de ficheiros virtual tem novas primitivas onde não existem tantas zonas de controlo de concorrência.
+ Desta forma o \textit{RelayFs} permite um aumento de transferências de dados entre o núcleo de sistema e o espaço de endereçamento do utilizador\cite{Donovan2007}.
 
 \paragraph*{NetLink}\label{cap:NetLink_overview}
-O \textit{NetLink} utiliza uma forma de comunicação baseada em \textit{sockets} para fazer a comunicação entre o núcleo de sistema e os programas de nível utilizador. Tendo como abstracção os \textit{sockets} este sistema também tem a possibilidade de enviar dados para múltiplos processos, pois utiliza as primitivas de envio colectivo (\textit{Multicast}). 
+O \textit{NetLink} utiliza uma forma de comunicação baseada em \textit{sockets} para fazer a comunicação entre o núcleo de sistema e os programas de nível utilizador. 
+ Tendo como abstracção os \textit{sockets} este sistema também tem a possibilidade de enviar dados para múltiplos processos, pois utiliza as primitivas de envio colectivo (\textit{Multicast}).
 % \todo{Explicar melhor o NetLink}
-É com base no \textit{NetLink} que a comunicação entre processos dentro da mesma máquina (\textit{IPC}) é implementada.
+ É com base no \textit{NetLink} que a comunicação entre processos dentro da mesma máquina (\textit{IPC}) é implementada.
+%Isto ja e novo
+ A comunicação com diferentes partes do subsistema de rede é efectuada recorrendo a este sistema de \textit{sockets}.
+
+%Isto e novo
+\paragraph*{Splice}
+Falar sobre esta chamada ao sistema
+
+%Isto e novo
+\paragraph*{Tee}
+Falar sobre esta chamada ao sistema
+
 
 % \todo{Corrigir esta tabela}
 \begin{table}[h]
@@ -297,13 +311,17 @@ Para ser possível efectuar a captura de pacotes, o programa tem de especificar 
 
 \subsubsection{AF\_PACKET}
 
-Quando os pacotes chegam ao controlador da interface de rede, é utilizado este componente de forma a criar os pacotes dentro do núcleo de sistema. É a partir deste momento que a informação sobre o pacote e os restantes \textit{payloads} ficam disponíveis.
+Quando os pacotes chegam ao controlador da interface de rede, é utilizado este componente de forma a criar os pacotes dentro do núcleo de sistema. 
+ É a partir deste momento que a informação sobre o pacote e os restantes \textit{payloads} ficam disponíveis.
 
 O módulo \textit{AF\_PACKET} permite utilizar explicitamente o modo promiscuo, ou seja permite que sejam capturados pacotes que não são destinados à máquina em questão.
-Na versão actual do núcleo de sistema do \textit{Linux} (2.6.32) o módulo \textit{AF\_PACKET} já pode utilizar um sistema de partilha de \textit{buffer} com o espaço de utilizador. Neste caso tem de ser o utilizador a definir explicitamente que quer utilizar o \textit{socket} desta forma, e pedir ao núcleo, uma região de memória, sendo esta, posteriormente passada como argumento de configuração do novo \textit{socket}.
+Na versão actual do núcleo de sistema do \textit{Linux} (2.6.32) o módulo \textit{AF\_PACKET} já pode utilizar um sistema de partilha de \textit{buffer} com o espaço de utilizador.
+ Neste caso tem de ser o utilizador a definir explicitamente que quer utilizar o \textit{socket} desta forma, e pedir ao núcleo, uma região de memória, sendo esta, posteriormente passada como argumento de configuração do novo \textit{socket}.
 
-Como foi anteriormente descrito o \textit{AF\_PACKET}, permite a comunicação directa com o controlador da interface de rede presente. Assim torna-se possível capturar os diversos pacotes ainda antes deses poderem ser filtrados pela \textit{firewall} presente no núcleo de sistema, neste caso o \textit{netfilter}.
-Podem ser aplicados filtros aos \textit{sockets} de forma a ser mais eficiente a captura dos pacotes, descartando aqueles que não são relevantes para a monitorização. Estes filtros irão ser descritos em seguida.
+Como foi anteriormente descrito o \textit{AF\_PACKET}, permite a comunicação directa com o controlador da interface de rede presente.
+ Assim torna-se possível capturar os diversos pacotes ainda antes deses poderem ser filtrados pela \textit{firewall} presente no núcleo de sistema, neste caso o \textit{netfilter}.
+Podem ser aplicados filtros aos \textit{sockets} de forma a ser mais eficiente a captura dos pacotes, descartando aqueles que não são relevantes para a monitorização. 
+ Estes filtros irão ser descritos em seguida.
 
 
 \subsubsection{Linux Packet Filtering}
