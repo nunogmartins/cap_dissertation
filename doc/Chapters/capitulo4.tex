@@ -21,43 +21,31 @@ Após esta visão geral do sistema, é apresentado a arquitectura do projecto de
  Estes descritores permitem ao processo identificar o \textit{socket}, para efectuar comunicações.
  Estas comunicações, bem como o estabelecimento destes canais de comunicação, são efectuadas através de chamadas ao sistema de operação.
 
-%A arquitectura de rede do núcleo do \textit{Linux} poderá ser apresentada de duas formas, \textit{Bottom-Top} ou \textit{Top-Bottom}. 
-%A escolha recaíu sobre a primeira pois permite observar o aumento da complexidade e abstracção existente nesta arquitectura. 
-
 %Falar aqui sobre qq coisa da estrutura de rede ... 
 %Talvez tb imagem com um pouco da arquitectura ... básica 
 
 %Falta falar sobre o netfilter ... sobre tc trafic control
 
-%Socket  e o que é um socket ...
-
-%Os ``file descriptors'' são a abstração para os ``sockets''. Os sockets são %mapeados em ficheiros e estes em descritores de ficheiros. 
-
-
-Os protocolos \textit{TCP} e \textit{UDP} foram os únicos protocolos que se teve interesse em utilizar nesta ferramenta.
-
-Estes protocolos estão definidos numa estrutura de apontadores para funções.
-Os protocolos \textit{TCP} e \textit{UDP} têm formas diferentes de executar funcionalidades semelhantes e por isso estão descritos em instâncias diferentes.
-
-As principais chamadas ao sistema para estabelecer, terminar e comunicar sobre \textit{sockets} são: \textit{socket}, \textit{connect}, \textit{bind}, \textit{listen}, \textit{accept}, \textit{send}, \textit{recv}, \textit{sendto}, \textit{recvfrom} e \textit{close}. 
-
-Estas chamadas aos sistema são genéricas de forma a poderem ser mapeadas nas diferentes instâncias dos protocolos de comunicação tais como \textit{INET} , \textit{NETLINK}, \textit{UNIX LOCAL}, etc.
-
-%Quando a chamada ao sistema \textit{socket} é efectuada, é criado uma nova instância de um socket e inicializados os respectivos campos com a informação dependente para a familia e tipo. 
-
 %  Descrever um pouco esta parte ...
  A generalidade das aplicações utilizam os \textit{sockets} da familia \textit{AF\_INET} para efectuar as suas comunicações sobre redes.
  Nesta familia de \textit{sockets} os tipos mais utilizados são os \textit{INET\_STREAM} e \textit{INET\_DGRAM}, para comunicações com estado e sem estado, respectivamente.
+ Outras familias de \textit{sockets} existem tais como \textit{AF\_NETLINK}, \textit{AF\_UNIX} entre outros. 
 
-%Como os protocolos \textit{TCP} e \textit{UDP} partilham algumas das funcionalidades nem todas as f
+Estas chamadas aos sistema são genéricas de forma a poderem ser mapeadas nas diferentes instâncias dos protocolos de comunicação tais como \textit{INET} , \textit{NETLINK}, \textit{UNIX LOCAL}, etc.
 
+Os protocolos \textit{TCP} e \textit{UDP} têm formas diferentes de executar funcionalidades semelhantes e por isso estão descritos em instâncias diferentes.
 
+%Quando a chamada ao sistema \textit{socket} é efectuada, é criado uma nova instância de um socket e inicializados os respectivos campos com a informação dependente para a familia e tipo. 
 
+As principais chamadas ao sistema para estabelecer, terminar e comunicar sobre \textit{sockets} são: \textit{socket}, \textit{connect}, \textit{bind}, \textit{listen}, \textit{accept}, \textit{send}, \textit{recv}, \textit{sendto}, \textit{recvfrom} e \textit{close}. 
+
+Os file descriptors (socket descriptors) são os identificadores para os sockets. Os sockets são mapeados em ficheiros e estes em descritores de ficheiros. 
 
 \subsection{Estrutura de um processo}
 
 Um processo para executar tem de ser carregado para memória e posteriormente ser agendado para execução através do escalonador de processos do núcleo.
- Um processo para o núcleo é uma estrutura com a informação sobre as zonas de memória, descritores de ficheiros abertos, informações sobre os tempos de execução, informações sobre a hierarquia de processos pertencentes a este, etc. Nos descritores de ficheiros abertos são também incluidos os descritores de \textit{sockets} abertos para comunicação. 
+ Um processo para o núcleo é uma estrutura com a informação sobre as zonas de memória, descritores de ficheiros abertos, informações sobre os tempos de execução, informações sobre a hierarquia de processos pertencentes a este, etc.
+ Nos descritores de ficheiros abertos são também incluidos os descritores de \textit{sockets} abertos para comunicação. 
 
  Dentro do núcleo do linux a estrutura que tém a informação sobre um processo (\textit{task}), é a \textit{struct task\_struct}. 
  Nesta estrutura existe a informação sobre quais os ficheiros que a aplicação abriu.
@@ -76,7 +64,7 @@ algures falar sobre o accept e o bind e o socket devido à estrutura interna que
 \subsection{Sockets e suas familias}
 \label{sub:af_inet}
 
-Como já foi indicado em \ref{}, um processo para comunicar tem de utlizar um \textit{socket}.
+Como já foi indicado em \ref{sub:network}, um processo para comunicar tem de utlizar um \textit{socket}.
  Os \textit{sockets} para se diferenciarem devido às suas diferentes utilidades utilizam familias de endereços para definir o seu domínio.
  Os \textit{sockets} para comunicação de internet utilizam o domínio \textit{AF\_INET}, que permite utilizar diferentes tipos de protocolos, tais como \textit{UDP} e \textit{TCP}.
  Estes protocolos são utilizados pela generalidade das aplicações quando necessita de comunicar com outro processo que utilize os mesmos protocolos de comunicação.
@@ -147,26 +135,16 @@ Apesar de ter estrutra para controlo dos dados que chegam da interface de rede o
 
 \subsection{AF\_PACKET}
 
-A forma para comunicar enviar e receber dados directamente da interface de rede
-é através da familia de protocolos \textit{AF\_PACKET}. 
+A forma para comunicar enviar e receber dados directamente da interface de rede é através da familia de protocolos \textit{AF\_PACKET}. 
 
-Esta é a forma de implementar protocolos de rede sem recorrer à \textit{stack}
-de protocolos IP em nível utilizador. Para além desta funcionalidade esta é a
-forma de capturar os pacotes que circulam na interface de rede, permitindo
-assim efectuar uma análise do tráfego.
+Esta é a forma de implementar protocolos de rede sem recorrer à \textit{stack} de protocolos IP em nível utilizador.
+ Para além desta funcionalidade esta é a forma de capturar os pacotes que circulam na interface de rede, permitindo assim efectuar uma análise do tráfego.
 
-Esta camada situa-se junto aos controladores de rede permitindo assim capturar
-dados que podem não chegar às aplicações devido à utilização de regras na
-\textit{firewall} (netfilter) do \textit{linux}.
+Esta camada situa-se junto aos controladores de rede permitindo assim capturar dados que podem não chegar às aplicações devido à utilização de regras na \textit{firewall} (netfilter) do \textit{linux}.
 
-A utilização de ``lazy cloning'' permite que apenas os pacotes que sejam para
-capturar sejam efectivamente copiados. Por isso primeiro são avaliados para o
-processo de captura, caso sejam para captura a função \textit{blah blah}
-efectua a cópia da estrutura sk\_buffer e serão então adicionados ao
-\textit{ring buffer}. Se no \textit{ring buffer} não existir espaço para o
-número de bytes que devem ser capturados, é então descartado a cópia
-(libertado o espaço) e incrementado o valor de pacotes descartados pelo núcleo
-de sistema.
+A utilização de ``lazy cloning'' permite que apenas os pacotes que sejam para capturar sejam efectivamente copiados.
+ Por isso primeiro são avaliados para o processo de captura, caso sejam para captura a função \textit{blah blah} efectua a cópia da estrutura sk\_buffer e serão então adicionados ao \textit{ring buffer}.
+ Se no \textit{ring buffer} não existir espaço para o número de bytes que devem ser capturados, é então descartado a cópia (libertado o espaço) e incrementado o valor de pacotes descartados pelo núcleo de sistema.
 
 \subsection{Recepção de dados}
 
