@@ -116,6 +116,11 @@ O núcleo do \textit{linux} mantém a informação sobre quais as interfaces de 
  % Falar sobre os controladores das interfaces de rede, e que definem um conjunto de funções para serem desencadeadas em determinados pontos do envio ou recepcao de frames ... 
  
 \subsection{Estrutura de um sk\_buff}
+ Os dados que são enviados ou recebidos pelos controladores de rede são os \textit{sk\_buff}. Uma estrutura com os diferentes cabeçalhos necessários à sua transmissão ou recepção.
+\lstset{language=C}
+\begin{lstlisting}
+
+\end{lstlisting}
 
 \subsection{NetFilter}
 
@@ -133,14 +138,21 @@ Apesar de ter estrutra para controlo dos dados que chegam da interface de rede o
 
 \subsection{AF\_PACKET}
 
-A forma para comunicar enviar e receber dados directamente da interface de rede é através da familia de protocolos \textit{AF\_PACKET}. 
+A familia \textit{AF\_PACKET} permite comunicar directamente com o controlador de rede, por isso esta é a forma efectuar a monitorização de rede. 
+ Tal como nas anteriores familias apresentadas em \ref{} e \ref{}, esta familia permite definir diferentes formas de comunicação, em função do tipo e protocolo associados ao \textit{socket}.
+ A utilização destes \textit{sockets} requer uma autorização de \textit{CAP\_NET\_RAW}.
+ Esta situação serve para evitar que utilizadores não autorizados possam monitorizar, ou injectar pacotes na rede que de alguma forma podem modificar o comportamento da(s) rede(s).
 
-Esta é a forma de implementar protocolos de rede sem recorrer à \textit{stack} de protocolos IP em nível utilizador.
+ Podem ser utilizados os tipos \textit{SOCK\_DGRAM} ou \textit{SOCK\_RAW}. Em \textit{DGRAM}
+ 
+%A forma para comunicar enviar e receber dados directamente da interface de rede é através da familia de protocolos \textit{AF\_PACKET}. 
+
+ Esta é a forma de implementar protocolos de rede sem recorrer à \textit{stack} de protocolos IP em nível utilizador.
  Para além desta funcionalidade esta é a forma de capturar os pacotes que circulam na interface de rede, permitindo assim efectuar uma análise do tráfego.
 
-Esta camada situa-se junto aos controladores de rede permitindo assim capturar dados que podem não chegar às aplicações devido à utilização de regras na \textit{firewall} (netfilter) do \textit{linux}.
+ Esta camada situa-se junto aos controladores de rede permitindo assim capturar dados que podem não chegar às aplicações devido à utilização de regras na \textit{firewall} (netfilter) do \textit{linux}.
 
-A utilização de ``lazy cloning'' permite que apenas os pacotes que sejam para capturar sejam efectivamente copiados.
+ A utilização de \textit{lazy cloning}, isto é apenas efectuar a cópia caso seja necessária, permitindo assim diminuir a perda de eficiência do sistema quando está a monitorizar os pacotes de rede.
  Por isso primeiro são avaliados para o processo de captura, caso sejam para captura a função \textit{blah blah} efectua a cópia da estrutura sk\_buffer e serão então adicionados ao \textit{ring buffer}.
  Se no \textit{ring buffer} não existir espaço para o número de bytes que devem ser capturados, é então descartado a cópia (libertado o espaço) e incrementado o valor de pacotes descartados pelo núcleo de sistema.
 
