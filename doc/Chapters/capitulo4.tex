@@ -141,7 +141,7 @@ Apesar de ter estrutra para controlo dos dados que chegam da interface de rede o
 A familia \textit{AF\_PACKET} permite comunicar directamente com o controlador de rede, por isso esta é a forma efectuar a monitorização de rede. 
  Tal como nas anteriores familias apresentadas em \ref{} e \ref{}, esta familia permite definir diferentes formas de comunicação, em função do tipo e protocolo associados ao \textit{socket}.
  A utilização destes \textit{sockets} requer uma autorização de \textit{CAP\_NET\_RAW}.
- Esta situação serve para evitar que utilizadores não autorizados possam monitorizar, ou injectar pacotes na rede que de alguma forma podem modificar o comportamento da(s) rede(s).
+ Esta situação serve para evitar que utilizadores não autorizados possam monitorizar, ou injectar pacotes na rede, influenciando o comportamento da(s) rede(s).
 
  Podem ser utilizados os tipos \textit{SOCK\_DGRAM} ou \textit{SOCK\_RAW}. Em \textit{DGRAM}
  
