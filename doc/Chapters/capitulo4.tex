@@ -2,19 +2,20 @@
 \label{cap:Estrutura}
 
 Para conceber a arquitectura do sistema de monitorização de rede de um processo, foi necessário conhecer como os processos comunicam com o exterior.
- Conhecendo a arquitectura de rede do \textit{Linux}, foi necessário perceber de que forma se processa a captura dos dados transmitidos e/ou recebidos pela interface de rede. 
+ Conhecendo a arquitectura de rede do \textit{Linux}, foi necessário perceber de que forma se processa a recepção e/ ou transmissão, bem como a monitorização de rede. 
 
 Neste capitulo vai ser apresentado a constituição do sistema de rede do \textit{Linux}, desde o momento em que a aplicação envia os dados, até ao momento em que estes chegam à interface de rede e vice-versa.
 Como esta visão é muito abrangente, apenas serão focados os pontos essenciais da arquitectura.
-Após esta visão geral do sistema, é apresentado a arquitectura do projecto desenvolvido.
+Após esta análise geral do sistema de rede do \textit{Linux}, será apresentado a arquitectura do projecto desenvolvido.
 
 
 \section{Arquitectura de rede em \textit{Linux}}
 \label{sub:network}
- Um processo para poder comunicar remotamente com outro processo em outra máquina remotamente irá utilizar as funcionalidades de rede do seu sistema de operação.
- Para isto um processo tem de efectuar o inicio da comunicação enviando alguns pacotes de inicio de sessão (caso o protocolo de comunicação necessite).
- Um processo em \textit{Linux} é uma instância de um programa que partilha da máquina e que pode comunicar com outros processos.
- Os processos dentro do núcleo são instâncias de uma estrutura \textit{task\_struct} que contém diversos elementos pertencentes ao processo, tais como identificador de processo, ficheiros abertos no sistema de ficheiros, zonas de memória que lhe foram atribuidas, etc.
+ Um processo para comunicar remotamente com outro, utilizará as funcionalidades de rede do seu sistema de operação.
+ 
+ %Para isto um processo tem de efectuar o inicio da comunicação enviando alguns pacotes de inicio de sessão (caso o protocolo de comunicação necessite).
+ Um processo em \textit{Linux} é uma instância de um programa que partilha recursos da máquina, físicos ou lógicos.
+ Os processos dentro do núcleo são instâncias de uma estrutura \textit{task\_struct} que contém diversos elementos pertencentes ao processo, tais como identificadores de processo, tabela de ficheiros abertos, zonas de memória atribuidas, etc.
  
  Um processo para utilizar as funcionalidades de rede necessita criar uma instância de um \textit{socket}, que fica referênciado através de um descritor de ficheiros (descritor de \textit{socket}).
  Isto porque os \textit{sockets} de um processo são mapeados no sistema de ficheiros virtual, neste caso sobre a forma de \textit{sockets}, forma de comunicação sobre a rede.
@@ -65,7 +66,7 @@ algures falar sobre o accept e o bind e o socket devido à estrutura interna que
 \label{sub:af_inet}
 
 Como já foi indicado em \ref{sub:network}, um processo para comunicar tem de utlizar um \textit{socket}.
- Os \textit{sockets} para se diferenciarem devido às suas diferentes utilidades utilizam familias de endereços para definir o seu domínio.
+ Os \textit{sockets} para se diferenciarem devido às suas diferentes utilidades são definidos em  familias de endereços.
  Os \textit{sockets} para comunicação de internet utilizam o domínio \textit{AF\_INET}, que permite utilizar diferentes tipos de protocolos, tais como \textit{UDP} e \textit{TCP}.
  Estes protocolos são utilizados pela generalidade das aplicações quando necessita de comunicar com outro processo que utilize os mesmos protocolos de comunicação.
 
