@@ -114,7 +114,11 @@ atraves desta familia que e implementado o tcp sobre ipv4 e o udp sobre ipv4 exi
 
 O núcleo do \textit{linux} mantém a informação sobre quais as interfaces de rede que foram inicializadas pelos seus controladores, mesmo que não estando activas estas constantam de uma lista duplamente ligada de \textit{net\_devices}. 
  Em cada posição da lista está toda a informação referente a uma interface de rede e suas configurações, nomeadamente a informação sobre o seu endereço ip ou o seu mac address no caso de interfaces \textit{ethernet} ou mapeadas sobre \textit{ethernet} (como o caso das interfaces ponto-a-ponto).
- % Falar sobre os controladores das interfaces de rede, e que definem um conjunto de funções para serem desencadeadas em determinados pontos do envio ou recepcao de frames ... 
+
+ Falar sobre os controladores das interfaces de rede, e que definem um conjunto de funções para serem desencadeadas em determinados pontos do envio ou recepcao de frames ... ndo (netdevice operations) 
+
+ Quando é registado um novo controlador de interface de rede é necessário definir quais as operações que irão ser executadas em certos eventos, tais como, recepção e/ou transmissão de frames, remoção da interface, etc.
+ Estas operações são definidas através de uma interface comum \textit{struct netdev\_ops}.
  
 \subsection{Estrutura de um sk\_buff}
  Os dados que são enviados ou recebidos pelos controladores de rede são os \textit{sk\_buff}. Uma estrutura com os diferentes cabeçalhos necessários à sua transmissão ou recepção.
@@ -143,12 +147,19 @@ A familia \textit{AF\_PACKET} permite comunicar directamente com o controlador d
  Tal como nas anteriores familias apresentadas em \ref{} e \ref{}, esta familia permite definir diferentes formas de comunicação, em função do tipo e protocolo associados ao \textit{socket}.
  A utilização destes \textit{sockets} requer uma autorização de \textit{CAP\_NET\_RAW}.
  Esta situação serve para evitar que utilizadores não autorizados possam monitorizar, ou injectar pacotes na rede, influenciando o comportamento da(s) rede(s).
+ Como permite enviar pacotes directamente para o controlador de rede, uma das utilizações é a implementação de protocolos de rede em nível utilizador.
+ É frequentemente utilizada para sistemas de detecção de intrusos, dado que permite analisar as frames e detectar falhas na correcta formatação destas.
+
+ Como a obtenção das frames é efectuada a um nível mais baixo que a recepção dos dados pelas aplicações é possível obter mais frames que aquelas que a aplicação recebe. 
+ Esta situação deve-se a que se o \textit{netfilter} estiver activo e a bloquear alguns acessos a portos ou a determinadas frames, estas não chegam à aplicação.
+ No entanto ficaram visíveis à monitorização pois esta é efectuada antes de chegar aos \textit{Hooks} do \textit{netfilter}.
+ 
 
  Podem ser utilizados os tipos \textit{SOCK\_DGRAM} ou \textit{SOCK\_RAW}. Em \textit{DGRAM}
  
 %A forma para comunicar enviar e receber dados directamente da interface de rede é através da familia de protocolos \textit{AF\_PACKET}. 
 
- Esta é a forma de implementar protocolos de rede sem recorrer à \textit{stack} de protocolos IP em nível utilizador.
+ A utilização destes \textit{sockets} permitem a implementação de protocolos de rede, sem recorrer à \textit{stack} de protocolos IP dentro do núcleo.
  Para além desta funcionalidade esta é a forma de capturar os pacotes que circulam na interface de rede, permitindo assim efectuar uma análise do tráfego.
 
  Esta camada situa-se junto aos controladores de rede permitindo assim capturar dados que podem não chegar às aplicações devido à utilização de regras na \textit{firewall} (netfilter) do \textit{linux}.
