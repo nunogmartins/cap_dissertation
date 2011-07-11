@@ -1,0 +1,424 @@
+%%%%%%%%%%%%%%%%%%%%%%% file typeinst.tex %%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% This is the LaTeX source for the instructions to authors using
+% the LaTeX document class 'llncs.cls' for contributions to
+% the Lecture Notes in Computer Sciences series.
+% http://www.springer.com/lncs       Springer Heidelberg 2006/05/04
+%
+% It may be used as a template for your own input - copy it
+% to a new file with a new name and use it as the basis
+% for your article.
+%
+% NB: the document class 'llncs' has its own and detailed documentation, see
+% ftp://ftp.springer.de/data/pubftp/pub/tex/latex/llncs/latex2e/llncsdoc.pdf
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass[runningheads,a4paper]{llncs}
+\documentclass[a4paper]{llncs}
+
+%\usepackage{amssymb}
+%\setcounter{tocdepth}{3}
+%\usepackage{graphicx}
+\usepackage{url}
+\usepackage[utf8]{inputenc}
+\usepackage{todonotes}
+%\usepackage{hyperref}
+%\usepackage{booktabs}
+%\usepackage{subfig}
+%\usepackage{array}
+\usepackage[portuges]{babel}
+
+% \newcommand{\papertitle}{A Distributed Computing Framework for Heterogeneous Environments}
+
+
+\newcommand{\papertitle}{PCap com filtragem orientada ao processo}
+
+%\newcommand{\papertitle}{Leveraging GPUs for Scientific Computing}
+
+%\hypersetup{pdfborder=0 0 0,
+%            pdfauthor={Nuno Martins \and Vítor Duarte},
+%%            pdfcreator=,
+%            pdfkeywords={Pcap, linux, monitorização,},
+%%            pdfsubject=TesteSubject,
+%            pdftitle={\papertitle}
+%           }
+
+
+\urldef{\mailsa}\path|nuno.m.g.martins@gmail.com|
+\urldef{\mailsb}\path|vad@di.fct.unl.pt|    
+
+\newcommand{\keywords}[1]{\par\addvspace\baselineskip
+\noindent\textbf{Palavras chave:}\enspace\ignorespaces#1}
+
+\newcommand{\td}[1]{\todo[inline]{#1}}
+
+\providecommand{\e}[1]{\ensuremath{\times 10^{#1}}}
+
+\begin{document}
+
+\mainmatter  % start of an individual contribution
+
+% first the title is needed
+\title{\papertitle}
+
+\author{Nuno Martins\inst{1} e Vítor Duarte\inst{2}}
+%
+\authorrunning{\papertitle}
+% (feature abused for this document to repeat the title also on left hand pages)
+
+% the affiliations are given next; don't give your e-mail address
+% unless you accept that it will be published
+\institute{\email{nuno.m.g.martins@gmail.com} \and \email{vad@di.fct.unl.pt}\\
+CITI --- Departamento de Informática,\\
+Faculdade de Ciências e Tecnologia,\\
+Universidade Nova de Lisboa, Portugal}
+%\mailsa \qquad \mailsb}
+
+%
+% NB: a more complex sample for affiliations and the mapping to the
+% corresponding authors can be found in the file "llncs.dem"
+% (search for the string "\mainmatter" where a contribution starts).
+% "llncs.dem" accompanies the docume\label{•} nt class "llncs.cls".
+%
+
+%\toctitle{Lecture Notes in Computer Science}
+%\tocauthor{Authors' Instructions}
+\maketitle
+
+\begin{abstract}
+
+A monitorização do comportamento dos processos é uma das melhores formas de compreender a sua execução real, de detectar erros e avaliar o seu real desempenho, ainda mais se não for possível aceder ao seu código fonte. No entanto, o impacto no desempenho e comportamento das aplicações pode ser bastante significativo.
+ O caso das interacções entre processos via rede não é excepção, e mesmo sistemas populares como PCap com auxílio do núcleo do sistema de operação, podem introduzir uma grande perturbação agravada pela dificuldade em obter apenas os dados que dizem respeito à aplicação sob observação.
+Este trabalho estende o suporte dado no núcleo Linux a este sistema, por forma a permitir capturar as interacções via rede de processos específicos, facilitando a sua análise e procurando também limitar o impacto deste tipo de monitorização.
+  Para tal, foi criada uma forma de filtragem nos \emph{lpf-filters}, usados pelo PCap que, dinamicamente, através da monitorização das chamadas ao sistema do processo, permite manter os endereços e portos em utilização pelo processo alvo e capturar apenas o seu tráfego. Deste modo é possível, sem conhecimento prévio ou alterações aos processos, obter apenas os dados relevantes. Esta extensão introduz assim, sem incompatibilidades, uma nova funcionalidade, com vantagens relativamente à perturbação do restante sistema quando se pretende analisar apenas uma determinada aplicação. 
+
+\keywords{Instrumentação, Monitorização, KProbes, Núcleo do Linux, PCap}
+\end{abstract}
+
+\section{Introdução}
+\label{sec:introduction}
+
+A monitorização permite a análise da execução de um programa ou sistemas distribuídos com os mais variados objectivos. Estes podem passar pela simples observação de funcionamento, envolver a detecção de erros ou falhas, ajudar à depuração ou à detecção de problemas no desempenho da aplicação ou sistemas subjacentes. Em particular, em ambientes distribuídos, é uma das melhores opções para analisar as interacções entre componentes e destes com o exterior, em execuções reais. 
+%auditar, correcção, segurança, etc
+Temos assim os exemplos da monitorização de redes de computadores com os sistemas  nagios e NetView, e as ferramentas para depuração e avaliação do desempenho para sistemas paralelos e distribuídos como o VampirTrace\cite{vampir:2008} e o PERUSE\cite{keller06}.
+
+%\section{Monitorização}
+%\label{sec:mon_intro}
+
+%apenas os conceitos base
+%3/4 parágrafos
+
+
+A monitorização de sistemas exige sempre a execução de acções específicas para a detecção e/ou registo dos acontecimentos que se pretendem observar que concorrem no uso dos recursos disponíveis com o próprio sistema monitorizado. Causa assim problemas de desempenho e que se pretende o menor possível. O grau da perturbação introduzida no sistema monitorizado depende dos mecanismos usados, nível de detalhe, volume de dados recolhidos, etc.  
+É comum o recurso a mecanismos de instrumentação de código para a implementação destas acções, especificamente para cada caso, por forma a minimizar esta perturbação. Estas acções podem ser introduzidas aos diferentes níveis, como sejam o no programa, bibliotecas, ou internas ao sistema de operação, de acordo com a disponibilidade da informação pretendida e a facilidade em a obter.
+
+Por exemplo, o recurso a mecanismos de monitorização presentes nos sistemas de operação, na observação das interacções via rede, permite beneficiar de um mecanismo fiável, e transparente para as aplicações, muitas vezes mais eficiente do que tentar obter a mesma funcionalidade a outro nível. Este pode no entanto ser agravado devido à necessidade de copiar os dados recolhidos no núcleo do sistema para as ferramentas que os usam e consequentes trocas de contexto (\emph{kernel-level/user-level}).
+
+
+
+\subsection{Monitorização de aplicações}
+\label{sub:user_level_monitor}
+
+A instrumentação do código pode ser considerada estática ou dinâmica, dependendo da facilidade com que se introduzir e configura. É estática se é necessário ter acesso ao código fonte, colocar essa instrumentação nos pontos a analisar e compilar, ou então se usa bibliotecas em que este processo já foi efectuado. Desta forma não fácil, ou limitada, a modificação da informação obtida na monitorização. Na instrumentação dinâmica permite-se, mesmo sem acesso ao código fonte, a colocação e/ou configuração dos pontos de instrumentação, alguns deles, mesmo durante a execução da própria aplicação monitorizada. 
+
+%%%Outra forma de classificar estes sistemas tem em conta o tipo de processamento efectuado e de informação recolhida. Podemos distinguir entre os que permitem detectar eventos e obter um traço detalhado da execução e aqueles que efectuam amostragens ao estado do sistema em determinados intervalos de tempo obtendo-se estas amostras e/ou estatísticas que procuram resumir a evolução do sistema. 
+
+Como exemplos podemos referir a utilização do compilador e bibliotecas para obter executáveis instrumentados com vista a obter o perfil e desempenho dos processos como o gprof\cite{Graham:1982:GCG:800230.806987}.
+%\td{qual é o gnu profiller? mais exemplos?? gprof? }
+Outro caso, o recurso à variável de ambiente \textit{LD\_PRELOAD} para a ligação de uma biblioteca no arranque do processo que permita modificar o comportamento do processo com vista à sua monitorização. Esta última técnica implica o desenvolvimento dessas bibliotecas e conhecimento prévio do código da aplicação.
+
+Outra forma passa por executar o processo a ser monitorizado sob o controlo do processo monitor, tal como no caso das ferramentas \textit{strace} e  \textit{debuggers}. Estas lançam o processo usando o suporte \textit{PTrace}~\cite{ptrace}, oferecido pelo sistema de operação para o controlar e observar. 
+%\td{falta falar do sysprof tb tem de levar suporte do núcleo, nao li quase documentacao sobre este sistema}
+
+\subsection{Monitorização no núcleo}
+\label{sub_kernel_instrumentation}
+
+Existem diferentes sistemas de monitorização e instrumentação no núcleo do sistema \textit{Linux}, que permitem analisar o seu funcionamento e definir acções a realizar em determinadas situações. Alguns destes sistemas pertencem à versão principal do sistema enquanto outros são desenvolvidos autonomamente e podem ser adicionados alterando o código fonte original. 
+
+Um dos sistemas de instrumentação estática do código é o \textit{TracePoints}. Este permite que sejam indicadas funções a ser chamadas em pontos de instrumentação prédefinidos no código. Nos pontos em que não é definida qualquer função, apenas um pequeno custo é imposto, correspondente à sua verificação. 
+
+Em oposição aos sistemas estáticos, existem sistemas dinâmicos que podem  ser adicionados e removidos em tempo de execução. Um primeiro exemplo é o OProfile~\cite{oprofile}. 
+%\td{Dizer qq coisa sobre OProfile !!}
+Este sistema, como forma a limitar a sobrecarga imposta pela monitorização, utiliza a técnica de amostragem de vários contadores internos ao sistema. O utilizador pode definir qual o ritmo de amostragem para o qual quer fazer a monitorização, e desta forma pode diminuir a perturbação do sistema. Este apesar de não efectuar traço de execução permite que sejam obtidas estatísticas sobre o desempenho do sistema e processos. Este  utiliza em nível utilizador aplicações para recolher os dados registados pela monitorização.
+%\td{Talvez seja suficiente para o oprofile}
+
+Dentro da categoria dos sistemas que permitem obter traços detalhados da execução, existe o \textit{LTT} (mais recentemente o \textit{LTTng}~\cite{Mathieu2009}), e o \textit{KProbes} ~\cite{kernel_debug_printk_on_fly}. %%%%%%%%%%%%%%%%%%%%%%%
+Estes sistemas são dinâmicos não requerendo a recompilação do núcleo de sistema para serem utilizados. Apenas é necessário fornecer um módulo  e carregá-lo, para  especificar quais as análises a serem efectuadas. O \textit{LTTng} também pode utilizar o sistema de \textit{TracePoints}, incluído no núcleo. Tal como o \textit{OProfile} utilizam-se normalmente ferramentas em nível utilizador para recolher e analisar os dados obtidos.
+%\td{estes são estáticos, dinâmicos,...? o que têm que ver com o paragrafo anterior??}
+
+Para utilizar o \textit{Kprobes} é necessário definir um \textit{KProbe} por cada função ou instrução a instrumentar. Este consiste numa estrutura com apontadores para a função ou instrução a analisar, bem como os \textit{handlers} a serem executados antes e após a execução da instrução monitorizada. Estes \textit{KProbe} fazem parte de um módulo que é carregado no sistema em execução. 
+Podem ser instrumentados as funções do núcleo ou de módulos carregados no sistema, e definidas as acções a efectuar nesses pontos. 
+Desta forma permite-se um grande flexibilidade e controlo sobre a monitorização dos mais variados pontos no núcleo do sistema.
+Este sistema tem uma forma bem definida de criação e destruição dos pontos de instrumentação e permite ao programador um maior controlo.
+%\td{ate a este ponto}
+
+ Baseados neste sistema foram ainda desenvolvidos o \textit{JProbe} e o \textit{KRetProbe} que permitem uma interacção que facilita programar as acções a efectuar na entrada ou retorno de funções no núcleo do sistema.
+% \td{ confirmar que é isto que distingue estes do kprobes}  esta correcto.
+ Como programar para o núcleo do \textit{Linux} pode ser complicado existem ferramentas para os utilizadores finais (como o \textit{SystemTap} ~\cite{Jones2009} e o \textit{DProbes} ~\cite{:DProbes}),  que facilitam a programação e monitorização do sistema, assim como oferecem alguma segurança e portabilidade entre diferentes  versões. Os utilizadores, utilizando as linguagens fornecidas por estas ferramentas, criam a sua instrumentação, gerando a ferramenta o respectivo módulo que permite a monitorização pretendida.
+
+\subsubsection{Monitorização de rede}
+\label{subsub:mon_network__with_dynamic_filters_linux}
+
+%
+%A monitorização do tráfego de rede é efectuado de forma passiva. A aplicação monitorizadora indica que quer recolher todo o tráfego, ou apenas um subconjunto deste, permitindo assim díminuir o número de pacotes a capturar. Consequentemente diminui o número de cópias de dados e trocas de contexto entre o núcleo e a aplicação.
+%\td{explicar um pouco mais sobre a monitorização de rede no linux ...como se processa}
+%
+%
+%Como anteriormente foi indicado a monitorização de sistemas introduz perdas no desempenho do sistema. Quando se trata de monitorizar processos dinâmicos esta monitorização pode aumentar ainda mais esta perda. O sistema desenvolvido permite que seja monitorizado um processo que faça utilização das chamadas ao sistema sobre a pilha de protocolos TCP/IP.
+%
+
+\paragraph{Biblioteca PCap\\}
+
+A monitorização das interacções via rede pode ser efectuado com base na biblioteca PCap e respectivo suporte fornecido pelo núcleo do sistema. Esta está bastante difundida entre sistemas de tipo Unix, existindo também uma versão para MS-Windows.
+No caso do sistema \textit{Linux} baseia-se no \textit{Linux Socket Filter} presente no seu núcleo, que corresponde a uma versão semelhante ao \textit{Berckeley Packet Filter (BPF)}~\cite{Mccanne92thebsd}. Estes sistemas permitem a captura selectiva de pacotes com base numa máquina virtual de registos que permite programar filtros, usando instruções específicas para efectuar movimentações de dados e operações lógicas, sobre o conteúdo dos pacotes de rede. Cada filtro a ser executado é uma combinação de diferentes regras que determinam se cada pacote deve ou não ser capturado. Se necessário, é efectuado uma cópia do pacote para um repositório que posteriormente irá ser consumido pela aplicação/ferramenta monitora, como por exemplo o tcpdump.
+
+%\td{Em algum ponto falta indicar que existe uma nova maquina virtual, que é baseada em just in time, mas que só funciona para x86\_64 devido ao número de registos ser maior face ao x86}
+
+%\td{FALTA Descrever como se processa a captura no nível mais baixo, junto ao driver ...}
+
+%\paragraph{Utilização de filtros}
+%\label{subsub:socket_filter}
+
+Estes filtros são uma forma de reduzir o volume de dados capturados, focando a atenção apenas na informação que é relevante e, consequentemente, diminui a sobrecarga introduzida pela monitorização. Estes filtros são definidos através da biblioteca \textit{LibPCap}. Nesta biblioteca existe um sistema de compilação e optimização da linguagem própria para descrever as regras que se pretende aplicar. Esta permite especificar tipos de pacotes, endereços e portas envolvidos, interfaces, etc. Não existe qualquer forma de, a este nível, estabelecer uma relação com os processos envolvidos no tráfego de rede.
+
+
+
+%%??%%
+%O tamanho do anel de blocos é definido ao inicio da monitorização e cada pacote que seja para capturar é colocado em um bloco. Como os blocos são de tamanho fixo e os pacotes de tamanho variável existe um desperdício de espaço para dados, uma vez que não existe um ajuste ao tamanho do pacote.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\paragraph{Firewall\\}
+
+Existe um sistema de \textit{firewall} no núcleo do sistema \textit{Linux}, o \textit{NetFilter} ~\cite{netfiltersite}, que gere o fluxo de dados de e para o exterior implementando as políticas de controlo desejadas pelo administrador. A gestão do fluxo de dados é efectuada através de regras, que podem ser indicadas/alteradas em qualquer momento no \textit{NetFilter}. Estas regras baseiam-se nas características do tráfego, como seja, se é de entrada ou de saída ou de redirecionamento, ou outros parâmetros tais como portas e interfaces de rede.
+
+O \textit{NetFilter} é implementado por vários módulos do núcleo, sendo um deles o \textit{conntrack}\cite{CTS}. Este módulo permite eventualmente monitorizar os pacotes pertencentes a um fluxo, pela definição de funções a executar perante o tráfego detectado, necessitando conhecer os diferentes protocolos de forma a identificar o  inicio e fim dos fluxos. 
+%%\marginpar{acrescentei a parte final}
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+Uma das desvantagens de todos estes sistemas é não ser possível indicar como critério de monitorização um determinado processo, mas sim necessitar de conhecer os protocolos ou portas usadas por este para tentar obter a informação relevante, mas sem garantias de se estar a obter apenas os dados do processo pretendido.
+
+No resto deste artigo apresenta-se na secção 2 o desenho e implementação de um sistema que estende o LSF por forma a permitir a captura de pacotes de um processo, na secção 3 apresenta-se a avaliação efectuada e na 4 apresentam-se trabalhos relacionados. Finalmente, na secção 6, são apresentadas algumas conclusões.
+
+\section{Desenho e arquitectura}
+\label{sec:architecture}
+
+O sistema proposto foi desenvolvido procurando cumprir os seguintes requisitos:
+\begin{itemize}
+\item permitir seleccionar as comunicações envolvendo apenas um processo (ou um conjunto de processos);
+\item manter a compatibilidade com o sistema já existente, estendendo a sua funcionalidade;
+\item procurar minimizar eventuais percas de desempenho;
+\item a implementação deve envolver poucas alterações ao código do sistema, para facilitar a sua manutenção e evolução com as novas versões do sistema Linux.
+\end{itemize}
+
+Para tal, o sistema criado está dividido em 4 componentes principais (ver figura \ref{arquitectura}). A função de filtragem, invocada por um \textit{hook} que estende o LSF, permite que apenas o tráfego do processo alvo seja analisado pelo restante sistema de fitragem do LSF. Uma componente de instrumentação das chamadas ao sistema (ou outras funções contidas no sistema de rede) que actualiza o repositório de dados onde é mantido o estado das interacções via rede do(s) processo(s) alvo. Existe ainda um sistema para controlo/configuração e para obter informação do estado da monitorização.
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[scale=0.55]{interface.pdf} 
+\caption{Arquitectura da solução}
+\label{arquitectura}
+\end{center}
+\end{figure}
+
+
+Este sistema permite que sejam capturados os pacotes de rede de um processo, sem que exista um conhecimento prévio sobre o(s) protocolo(s) ou portas utilizadas. A utilização de um sistema de instrumentação do núcleo foi necessária apenas para monitorizar as chamadas envolvendo \emph{sockets} e identificar o processo responsável, permitindo desta forma obter e manter permanentemente actualizada a informação sobre o estado respeitante ao processo alvo. De forma a minimizar a redução de desempenho, todo o sistema foi desenvolvido dentro do núcleo do \textit{Linux}, sem alterações nas interfaces já existentes.  Assim, ferramentas de façam uso da biblioteca \textit{LibPcap}, como o programa \textit{tcpdump} ou suas variantes, podem beneficiar desta extensão sem qualquer alteração e sem impacto relevante no seu desempenho.
+
+
+
+\subsection*{Instrumentação das chamadas ao sistema de rede}
+\label{sub:mon_syscalls}
+
+Um ponto importante deste sistema, constituiu na garantia que todas as interacções desencadeadas por um processo com o exterior fossem detectadas. Para tal, foi necessário recorrer à monitorização das chamadas ao sistema de rede ao nível do Kernel, permitindo, assim, minimizar as cópias de dados e trocas de contexto. Tirando partido da utilização do sistema de monitorização KProbes foi possível realizar a monitorização sob o pequeno conjunto de chamadas ao sistema relevantes, nomeadamente: sendto, recvfrom, bind, accept, connect e close.
+ Na realidade verificou-se a chamada ao sistema close, ao ser utilizada intensivamente por todo o sistema de ficheiros, poderia degradar desnecessariamente o desempenho. Desta forma, decidiu-se aplicar a monitorização à função interna \texttt{sock\_close}, garantindo apenas a monitorização das chamadas close sobre os sockets, reduzindo significativamente o número de eventos face às chamadas ao sistema do \texttt{close}.
+
+\subsection*{Estado do processo}
+\label{sub:data_repository}
+
+O estado dos portos TCP e UDP em uso pelo processo alvo é mantido num repositório de dados, e permanentemente actualizado pelo módulo anterior. 
+ A estrutura dados escolhida para o efeito, para produzir o repositório pretendido, baseia-se numa árvore \textit{Red and Black} já disponível no núcleo do sistema. O conteúdo de cada folha da árvore é uma estrutura com duas listas de elementos, cada uma contendo endereços IP utilizados pela aplicação. A chave de indexação das folhas é o número do porto, desta forma a árvore poderá conter 65535 elementos. No pior caso, a procura de um porto na árvore necessitará de efectuar 16 iterações.
+%\td{conteúdo? ip, interface, porto udp, porto tcp, etc??}
+  O uso deste tipo de estrutura permite obter um bom compromisso entre o tempo de acesso à estrutura e a quantidade de memória utilizada.
+
+
+\subsection*{Filtro de pacotes}
+\label{sub:packet_filter}
+
+A função de filtragem  implementada neste sistema assenta no estado do processo alvo, mantido pelos módulos anteriormente descritos.
+Através da extensão do LSF com um hook, quando ligado, este invoca esta filtragem que devolve ao LSF se o pacote deve ser logo ignorado (não envolve nenhum dos portos do processo alvo) ou se se deve continuar a avaliar as restantes regras de filtragem definidas. Mantém-se assim a compatibilidade e continua-se a tirar partido dos benefícios da utilização do Linux Socket Filter.
+
+
+
+\subsection*{Controlo e Informação}
+\label{sub:data_information}
+
+Para facilmente controlar e configurar o sistema desenvolvido foi definida uma interface baseada em ficheiros virtuais (DebugFS). Estes ficheiros estão apenas acessíveis ao utilizador \textit{root}, controlando o acesso por parte dos utilizadores da máquina ao sistema de monitorização. Os ficheiros de controlo definidos foram \textit{option}, \textit{pid}, \textit{ppid} e \textit{tgid}. O primeiro ficheiro permite controlar a análise e a informação da árvore. Dependendo do valor a escrever em \textit{option} o sistema poderá proceder a uma análise dos \textit{sockets} do processo (identificado em \textit{pid, ppid, tgid}), e carregar essa informação para a àrvore do estado do processo, bem como poderá remover todos os elementos da àrvore se for essa a opção escrita para o ficheiro. Como foi indicado os restantes ficheiros permitem definir o(s) processo(s) a monitorizar. Pode ser indicado um processo ou todos os processos de um grupo. Os ficheiros de informação \textit{filter\_stats},  \textit{syscalls\_calls\_stats} e \textit{tree\_info} foram definidos para obter estatísticas dos pacotes analisados e das entradas/retornos das funções instrumentadas, bem como dos elementos presentes na árvore (dados dos sockets activos do processo).
+
+
+%%%%%%%%%%%%%%%%%
+\subsection{Aplicação Monitora}
+\label{sub:monitor_app}
+
+Para poder mais facilmente efectuar os testes de avaliação, foi criado uma ferramenta em nível utilizador que permite lançar a aplicação e configurar automaticamente o sistema para a monitorizar. Esta verifica o identificador do processos e o momento em que se dá o inicio e o fim da sua execução, de forma a iniciar e terminar a monitorização quando necessário.
+
+%%%%%%%%%%%%%%%%%%%
+
+
+\section{Avaliação}
+\label{sec:evaluation}
+
+O sistema implementado foi avaliado funcionalmente através da utilização de protocolos \textit{ftp} e \textit{http}. Para tal, recorreu-se a um conjunto alargado de testes, tendo como objectivo não só observar o seu desempenho, como também, e mais importante, verificar a correcção do funcionamento e a sua capacidade de capturar todos os pacotes envolvidos nas comunicações de um processo alvo (e apenas esses pacotes). 
+
+%Através destes conjunto de testes, foi possível efectuar a captura dos pacotes resultantes da transferência de um ficheiro, a partir de um servidor ftp ou http. 
+
+De modo a realizar os testes de desempenho, foram utilizadas duas máquinas com interfaces de 100Mbits/s, ligadas directamente através de um cabo Ethernet cruzado. Uma das máquinas ficou responsável pela execução dos serviços \textit{ftp}, \textit{http} e \textit{iperf}.
+
+\subsection{Avaliação Funcional}
+A análise funcional foi efectuada por meio de programas simples, que desencadeiam chamadas sucessivas de criação de sockets e comunicação, obtendo-se o estado destes (portos e endereços) dentro do módulo do núcleo. Estes dados poderam ser confirmados através do sistema \textit{debugfs}, por consulta do ficheiro existente para esse efeito. Este ficheiro, quando acedido, contém toda a informação relativa aos portos e endereços em utilização por parte da aplicação monitorizada.
+Deste modo, para obter um grau de comparação dos dados produzidos e validar esta análise, foi utilizada a ferramenta \textit{netstat}, na qual indica os dados relativos aos portos e endereços utilizados pelos processos do sistema (esta ferramenta tira partido do sistema de ficheiros virtual \textit{ProcFs} para obter esses dados.
+Para além desta análise, foi efectuada a confirmação da correcção de que todos os pacotes pertencentes às comunicações foram de facto obtidos. Esta confirmação foi efectuada através da captura utilizando o \textit{tcpdump} com o módulo activo, e verificado que todo o tráfego respeitante ao protocolo (\textit{ftp} e \textit{http}) estava de facto completo e correcto, não existindo outros pacotes na captura. Esta validação foi verificada utilizando o programa \textit{wireshark}, que identificou os fluxos de dados dos protocolos.
+%\td{nao foi tambem feita a observação dos pacotes capturados com o tcpdump e wireshark e verificado que a captura era correcta??!}
+
+\subsection{Avaliação do desempenho}
+Foram efectuados diversos testes para avaliar o \emph{overhead} introduzido por este sistema. Estes testes basearam-se na recepção ou transmissão de 1GigaByte de dados, por diferentes programas e protocolos, entre as duas máquinas conectadas directamente por interfaces de rede a 100 Mbit/s. Ambas máquinas (1 e 2) executaram com apenas um processador activo de 2 e 2.6 Ghz, respectivamente. Na máquina 1 foram efectuados os testes que em seguida serão apresentados. A versão do sistema de operação utilizado nas duas máquinas foi o 2.6.39, sendo que na máquina 1 introduziu-se a modificação para incluir o \textit{Hook} e suas funções auxiliares, enquanto que na máquina 2 executou-se o sistema original.
+
+Na execução destes testes, foram executadas 10 iterações para cada experiência considerada, de modo a obter um valor médio com um desvio padrão aceitável. Os resultados obtidos estão apresentados nas tabelas \ref{tab:desempenho} e \ref{tab:overhead}.
+
+Os testes identificados com os números de $^{1}$ a $^{4}$ foram efectuados utilizando apenas uma conexão ao servidor, enquanto que os testes $^{5}$ e $^{6}$ foram efectuados utilizando mais uma comunicação de forma a aumentar o peso sobre o processador e o número de pacotes a circular entre as máquinas, permitindo identificar a sobrecarga exercida quando o \textit{tcpdump} está a executar e a capturar todos os dados ou apenas um subconjunto destes (os pertencentes ao processo). A coluna Original é o resultado do tempo médio das execuções das transferências sem qualquer monitorização, a coluna Com TcpDump apresenta a média dos tempos de transferência com a captura total do tráfego, enquanto que a coluna identificada com Com TcpDump e módulo mostra a média dos tempos para a transferência com a captura pelo tcpdump e o módulo no núcleo de forma a apenas capturar o tráfego da transferência de um processo.
+
+\begin{table}
+\begin{center}
+
+\begin{tabular}{ | c | c | c | c |  }
+\hline
+Teste & \hspace {0.3cm} Original \hspace {0.3cm}& \hspace {0.2cm} Com TcpDump \hspace {0.2cm} & Com TcpDump e módulo \\
+\hline
+1GB - FTP$^{1}$ & 91.8508	& 91.8500 & 91.8854 \\
+1GB - HTTP$^{2}$ & 91.6391 & 91.6472 & 91.6674 \\ 
+%5GB - HTTP & 457.9506 & 457.9527 & 458.2059 \\
+IPerf - 1GB TCP$^{3}$ & 91.3790	& 91.2535	& 91.2672 \\
+IPerf - 1GB UDP$^{4}$ & 89.7975 & 89.8007 & 89.8464 \\
+\hline
+\hline
+1GB HTTP - 2 conexões$^{5}$ & 182.1573 & 188.7156 & 182.0161 \\
+IPerf - 1GB UDP 2 conexões$^{6}$ & 179.4930 & 179.6280 & 179.6369 \\
+\hline
+\end{tabular}
+\caption{Tempos médios em segundos (s)}
+\label{tab:desempenho}
+\end{center}
+\end{table}
+
+Nos primeiros 4 testes é possível verificar que a utilização do módulo no núcleo agravou ligeiramente o tempo de execução. É também possível observar que em $^{1}$ e $^{3}$ quando existiu a utilização apenas do tcpdump, a execução foi ligeiramente mais rápida que sem monitorização. Esta situação pode dever-se ao facto de quando a máquina é sobrecarregada, dá oportunidade de aumentar o tamanho médio dos pacotes,  necessitando assim de transferir menos pacotes e poupando no volume de dados transferidos devido a menos cabeçalhos dos pacotes.
+
+\begin{table}
+\begin{center}
+
+\begin{tabular}{ | c | c | c |}
+\hline
+Teste & \hspace {0.3cm} TcpDump \hspace {0.3cm} & TcpDump com módulo  \\
+
+\hline
+1GB - FTP$^{1}$ & -0.0009  & 0.0377  \\
+1GB - HTTP$^{2}$ & 0.0088 &  0.0309   \\
+%5GB - HTTP &  0.0557 & 0.0553  \\
+IPerf - 1GB TCP$^{3}$ & 0.1373 &  -0.1223   \\
+IPerf - 1GB UDP$^{4}$ & 0.0036 & 0.0545 \\
+\hline
+\hline
+1GB HTTP - 2 conexões$^{5}$ & 3.6003 & -0.0775   \\
+IPerf - 1GB UDP 2 conexões$^{6}$ & 0.0752 & 0.0802   \\
+\hline
+\end{tabular}
+\caption{Sobrecarga das transferências (valores em percentagem)}
+\label{tab:overhead}
+\end{center}
+\end{table}
+
+Nos testes $^{5}$ e $^{6}$, como o tráfego na interface é duplicado e o \textit{tcpdump} tem de capturar tudo, é possível evidenciar a sobrecarga exercida por estas cópias de dados e conseguintes transferências para nível utilizador. Na tabela \ref{tab:overhead} é possível verificar que, para o teste $^{5}$, a sobrecarga do \textit{tcpdump} atinge os 3.6\% face ao original, enquanto que a sobrecarga do tcpdump com módulo até permitiu uma pequena melhoria face ao original (-0.0775\%). Conclui-se que quando o fluxo de dados que não pretendemos capturar aumenta consideravelmente torna-se bastante mais vantajoso utilizar este sistema, do que capturar todos os pacotes, agravado ainda caso necessite depois de uma análise em nível utilizador para identificar e filtrar os pacotes pertencentes ao processo.
+
+
+\subsubsection{Desempenho da estrutura de dados}
+Para além das avaliações descritas anteriormente, tornou-se essencial analisar o comportamento da estrutura de dados utilizada para manter o “estado do processo”, de modo a verificar o seu desempenho. 
+%e o espaço ocupado pela mesma.  <--- este esta em falta
+Assim, para esta análise, foi elaborado um teste que usa o sistema de alta resolução de temporizadores (HRTimer), contido no núcleo do sistema de operação.
+O teste consistiu em obter o tempo antes de iniciar a inserção dos 1024 elementos, inserir os elementos, e obter novamente o tempo, permitindo assim obter o tempo decorrido. De igual forma foi efectuado o calculo do tempo para a remoção dos 1024 elementos.
+
+\begin{table}
+\begin{center}
+
+\begin{tabular}{ | l | c | c | }
+\hline
+\hspace{1.2cm} Teste \hspace{1cm} & \hspace{1cm}Duração\hspace{1cm} &  Média por
+elemento \\
+\hline
+Adicionar 1024 elementos & 869 244 & 848.8711 \\
+\hline
+Remover 1024 elementos & 675 086 & 659.2637\\
+\hline
+
+\hline
+\end{tabular}
+\caption{Custo das operações (tempos em nanosegundos)}
+\label{tab:tree_info}
+\end{center}
+\end{table}
+
+Como se pode verificar a inserção de um elemento na árvore é inferior a 1 microsegundo, o que demonstra que foi uma escolha correcta, pois para além de ter um bom compromisso de desempenho e utilização de memória permitiu utilizar uma estrutura que já foi analisada por diversas pessoas, e ser disponibilizado para utilização dentro do núcleo, o que permite ter um elevado grau de confiança na sua utilização.
+
+O tempo médio despendido para procurar o elemento com o menor valor de chave, nos 1024 elementos adicionados, foi de 1327 nanosegundos. Com este valor é possível verificar que fazer 10 iterações de procura na árvore incorre numa penalização de 1.3 microsegundos. Este valor permite identificar que, o tempo médio de procura de elementos na estrutura é inferior ou igual a 1.3 microsegundos.
+
+%\subsubsection{Desempenho do Sistema de instrumentação}
+%Sendo a instrumentação das chamadas ao sistema um ponto fundamental na execução da monitorização de uma aplicação, a análise ao seu comportamento é bastante importante, na medida em que é necessário verificar se a introdução deste tipo de sistema irá produzir uma elevada penalização sobre o sistema de operação. A análise efectuada foi colocar um \textit{KRetProbe} na chamada ao sistema \textit{getpid} e avaliar o tempo decorrido entre o inicio e o fim do total das chamadas, com e sem o \textit{KRetProbe} de forma a avaliar o overhead e verificar se coincide com o indicado pelos criadores do sistema.
+%
+%\begin{table}
+%\begin{center}
+%
+%\begin{tabular}{ | c | c | c | c |}
+%\hline
+%Teste & Original & Com KretProbe & Sobrecarga por chamada\\
+%\hline
+%100 000 000 chamadas & 12.65 &  73.6600 & 610.10\e{-9}\\
+%1 000 000 000 chamadas & 126.85 & 737.2100 & 610.36\e{-9}\\
+%\hline
+%\hline
+%\end{tabular}
+%\caption{Duração das chamadas em segundos}
+%\label{tab:kprobes_info}
+%\end{center}
+%\end{table}
+%
+%Os valores de referencia são de 0.7 microsegundos, os valores que foram obtidos foram de 0.61 microsegundos um pouco inferiores, pois a máquina de referência também tem velocidade inferior à máquina onde foram efectuados estes testes.
+
+\section{Trabalho Relacionado}
+\label{sec:related_work}
+
+
+Este trabalho vem na sequência do trabalho efectuado por Nuno Farruca~\cite{Farruca:2009,duarte10}, que teve como objectivo monitorizar os processos de um sistema distribuído, tirando partido do libPCap e LSF existente em Linux. As dificuldades sentidas em obter apenas o tráfego respeitante à aplicação sob monitorização levou a duas soluções. A primeira, monitorizarando o comportamento de cada processo através da criação de uma biblioteca que mapeia as funções sobre sockets da biblioteca de C \textit{LibC} de forma a obter os seus parâmetros e assim comunicar ao monitor quais dos pacotes capturados pelo PCap são ou não relevantes. Esta biblioteca é ligada aos processos da aplicação, no seu arranque, por definição da variável LD\_PRELOAD.
+ Uma outra forma foi obter os dados dos sockets pertencentes aos processos alvo através de consultas periódicas do sistema de ficheiros virtual \textit{ProcFs} e executar também depois a filtragem de quais os pacotes dizem respeito à aplicação alvo.  Estas soluções sofrem de grandes problemas de desempenho além de, para a segunda solução, não oferecer garantias de que todo o tráfego relevante era mantido.
+
+O trabalho de Byungjoon Lee~\cite{1688981} implementa a monitorização, utilizando o sistema de instrumentação \textit{KProbes} nas funções de transmissão e recepção de dados dentro do núcleo do sistema. Desta forma é possível monitorizar o uso da rede pelo processo alvo. Os dados recolhidos são analisados, pelo monitor, com o intuito de perceber se determinada porta e endereço são conhecidos e caso não sejam é adicionada a informação a uma tabela de dispersão e utilizada para redefinir o filtro usado no libPCap. O pacote capturado  é atrasado e re-injectado e forma a poder ser capturado pela biblioteca \textit{LibPCap} através do novo filtro.
+Apesar do sistema de instrumentação \textit{KProbes} ter uma sobrecarga relativamente baixa, as funções instrumentadas são utilizadas com muita frequência no sistema, penalizando no desempenho. A necessidade de atrasar as comunicações, agrava ainda mais a situação ao ter de reter um número elevado de pacotes em memória. Este sistema sofre ainda do problema de estar em grande parte implementado em modo utilizador, obrigando a transferências de dados e a trocas de contexto, para actualizar os filtros.
+
+%\marginpar{apontar vantagens e defeitos!| vou ainda escrever sobre isto}
+
+
+\section{Conclusões}
+\label{sec:conclusions}
+
+Apresentámos o desenho e implementação de um sistema que estende o LSF, usado na captura de tráfego de rede usando o libPCap, por forma a permitir filtrar o tráfego de um único processo ou de um conjunto de processos. Este oferece a possibilidade de capturar só os pacotes pretendidos, facilitando as análises que se pretendam efectuar e como reduzindo o overhead deste tipo de sistemas. Deixa de ser necessário capturar mais do que o tráfego necessário e de necessitar de conhecer os protocolos e portos usados pela aplicação.
+
+Esta funcionalidade é transparente para todas as ferramentas desenvolvidas com base no libpcap, podendo todas estas tirar partido deste sistema.
+
+Em termos de overhead introduzido face à monitorização já existente, revelou-se insignificante, podendo mesmo melhorar essa situação nos casos em que o foco sobre o tráfego de um único processo leva e reduzir o trabalho realizado pelo LSF.
+
+As vantagens do sistema criado tornam-se ainda mais notórias quando a máquina está sobre uma carga mais elevada de trabalho, ou grande volume de tráfego via rede, dado manter o uso dos recursos na proporção aproximada apenas do tráfego do processo alvo.
+
+Como trabalho futuro existe a possibilidade de integrar este trabalho no anterior trabalho \cite{Farruca:2009,duarte10}, formando uma ferramenta de monitorização distribuída com baixa sobrecarga. Como o sistema implementado permite apenas monitorizar protocolos que assentem sobre \textit{TCP} e \textit{UDP}, uma nova contribuição seria aumentar o número de protocolos que se possam monitorizar, focando a instrumentação apenas nas funções essenciais de forma a diminuir ainda mais a sobrecarga imposta pela monitorização. A partilha destas novas alterações, submetendo este sistema para análise, e possível implementação na versão principal do núcleo do \textit{Linux}.   
+
+
+\bibliographystyle{plain}
+\bibliography{references}
+
+\end{document}
