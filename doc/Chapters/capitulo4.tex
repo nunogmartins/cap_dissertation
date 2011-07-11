@@ -74,6 +74,12 @@ Como já foi indicado em \ref{sub:network}, um processo para comunicar tem de ut
 
 \subsubsection{AF\_INET}
 
+\textit{AF\_INET} é familia de endereços utilizada para comunicar através do protocolo \textit{IP versão 4}, protocolo este de nível rede para efectuar comunicações através da \textit{internet}.
+Existem diferentes tipos de protocolos de nível transporte sobre \textit{IPv4}, sendo alguns dos mais utilizados o \textit{TCP}, \textit{UDP}, \textit{ICMP}, etc.
+Estes protocolos podem ser utilizados através da chamada ao sistema \textit{socket}, indicando os valores \textit{SOCK\_STREAM}, \textit{SOCK\_DGRAM} e \textit{SOCK\_ICMP} na variável tipo, para os anteriormente indicados.
+Estes valores só têm correspondência caso tenha sido definida a familia como \textit{AF\_INET}.
+
+
 atraves desta familia que e implementado o tcp sobre ipv4 e o udp sobre ipv4 existe tb o sock\_raw que permite enviar pacotes directamente para o nivel de transporte ip ... 
 
 %\lstset{language=C}
@@ -117,16 +123,19 @@ O núcleo do \textit{linux} mantém a informação sobre quais as interfaces de 
 
  Falar sobre os controladores das interfaces de rede, e que definem um conjunto de funções para serem desencadeadas em determinados pontos do envio ou recepcao de frames ... ndo (netdevice operations) 
 
- Quando é registado um novo controlador de interface de rede é necessário definir quais as operações que irão ser executadas em certos eventos, tais como, recepção e/ou transmissão de frames, remoção da interface, etc.
- Estas operações são definidas através de uma interface comum \textit{struct netdev\_ops}.
+ No registo de um novo controlador de interface de rede definem-se as operações a executar em determinados eventos, tais como, recepção e/ou transmissão de frames, remoção da interface, etc.
+ Estas operações são definidas através de uma interface comum, a \textit{struct netdev\_ops}, permitindo definir a \textit{API} das interfaces de rede.
  
 \subsection{Estrutura de um sk\_buff}
  Os dados que são enviados ou recebidos pelos controladores de rede são os \textit{sk\_buff}. Uma estrutura com os diferentes cabeçalhos necessários à sua transmissão ou recepção.
-\lstset{language=C}
-\begin{lstlisting}
-
-\end{lstlisting}
-
+ Existem 4 apontadores para endereços de memória dentro da estrutura que definem os endereços de inicio e fim do pacote, bem como dos cabeçalhos.
+ Falta boneco com esta informação ... fica mais realista.
+ 
+%\lstset{language=C}
+%\begin{lstlisting}
+%
+%\end{lstlisting}
+%
 \subsection{NetFilter}
 
 O sistema de operação \textit{Linux} tem um sistema de \textit{firewall} que permite controlar os acessos dos processos aos sistemas de comunicação de rede.
