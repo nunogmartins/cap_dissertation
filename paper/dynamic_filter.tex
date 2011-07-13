@@ -396,7 +396,7 @@ Como se pode verificar a inserção de um elemento na árvore é inferior a 1 mi
 
 O tempo médio despendido para a procura do elemento com o menor valor de chave, nos 1024 elementos adicionados, foi de 1327 nanosegundos.
  Com este valor é possível verificar que fazer 10 iterações de procura na árvore incorre numa penalização de 1.3 microsegundos.
- Este valor permite identificar que, o tempo médio de procura de elementos na estrutura é inferior ou igual a 1.3 microsegundos.
+ Este valor permitiu identificar que, o tempo médio de procura de elementos na estrutura é inferior ou igual a 1.3 microsegundos.
 
 %\subsubsection{Desempenho do Sistema de instrumentação}
 %Sendo a instrumentação das chamadas ao sistema um ponto fundamental na execução da monitorização de uma aplicação, a análise ao seu comportamento é bastante importante, na medida em que é necessário verificar se a introdução deste tipo de sistema irá produzir uma elevada penalização sobre o sistema de operação. A análise efectuada foi colocar um \textit{KRetProbe} na chamada ao sistema \textit{getpid} e avaliar o tempo decorrido entre o inicio e o fim do total das chamadas, com e sem o \textit{KRetProbe} de forma a avaliar o overhead e verificar se coincide com o indicado pelos criadores do sistema.
@@ -424,11 +424,19 @@ O tempo médio despendido para a procura do elemento com o menor valor de chave,
 \label{sec:related_work}
 
 
-Este trabalho vem na sequência do trabalho efectuado por Nuno Farruca~\cite{Farruca:2009,duarte10}, que teve como objectivo monitorizar os processos de um sistema distribuído, tirando partido do libPCap e LSF existente em Linux. As dificuldades sentidas em obter apenas o tráfego respeitante à aplicação sob monitorização levou a duas soluções. A primeira, monitorizarando o comportamento de cada processo através da criação de uma biblioteca que mapeia as funções sobre sockets da biblioteca de C \textit{LibC} de forma a obter os seus parâmetros e assim comunicar ao monitor quais dos pacotes capturados pelo PCap são ou não relevantes. Esta biblioteca é ligada aos processos da aplicação, no seu arranque, por definição da variável LD\_PRELOAD.
- Uma outra forma foi obter os dados dos sockets pertencentes aos processos alvo através de consultas periódicas do sistema de ficheiros virtual \textit{ProcFs} e executar também depois a filtragem de quais os pacotes dizem respeito à aplicação alvo.  Estas soluções sofrem de grandes problemas de desempenho além de, para a segunda solução, não oferecer garantias de que todo o tráfego relevante era mantido.
+Este trabalho vem na sequência do trabalho efectuado por Nuno Farruca~\cite{Farruca:2009,duarte10}, que teve como objectivo monitorizar os processos de um sistema distribuído, tirando partido do \textit{LibPCap} e \textit{LSF} existente em \textit{Linux}.
+ As dificuldades sentidas em obter apenas o tráfego respeitante à aplicação sob monitorização levou a duas soluções.
+ A primeira, monitorizarando o comportamento de cada processo através da criação de uma biblioteca que mapeia as funções sobre sockets da biblioteca de C (\textit{LibC}), de forma a obter os seus parâmetros e assim comunicar ao monitor quais dos pacotes capturados pelo PCap são relevantes.
+ Esta biblioteca é ligada aos processos da aplicação, no seu arranque, por definição da variável \textit{LD\_PRELOAD}.
+ Uma outra forma foi obter os dados dos \textit{sockets} pertencentes aos processos alvo, através de consultas periódicas do sistema de ficheiros virtual \textit{ProcFs}, e posteriormente executar a filtragem, de quais dizem respeito à aplicação alvo.
+ Estas soluções sofrem de grandes problemas de desempenho, além de que, para a segunda solução, não oferece garantias que todo o tráfego relevante seja mantido.
 
-O trabalho de Byungjoon Lee~\cite{1688981} implementa a monitorização, utilizando o sistema de instrumentação \textit{KProbes} nas funções de transmissão e recepção de dados dentro do núcleo do sistema. Desta forma é possível monitorizar o uso da rede pelo processo alvo. Os dados recolhidos são analisados, pelo monitor, com o intuito de perceber se determinada porta e endereço são conhecidos e caso não sejam é adicionada a informação a uma tabela de dispersão e utilizada para redefinir o filtro usado no libPCap. O pacote capturado  é atrasado e re-injectado e forma a poder ser capturado pela biblioteca \textit{LibPCap} através do novo filtro.
-Apesar do sistema de instrumentação \textit{KProbes} ter uma sobrecarga relativamente baixa, as funções instrumentadas são utilizadas com muita frequência no sistema, penalizando no desempenho. A necessidade de atrasar as comunicações, agrava ainda mais a situação ao ter de reter um número elevado de pacotes em memória. Este sistema sofre ainda do problema de estar em grande parte implementado em modo utilizador, obrigando a transferências de dados e a trocas de contexto, para actualizar os filtros.
+O trabalho de Byungjoon Lee~\cite{1688981} implementa a monitorização, utilizando o sistema de instrumentação \textit{KProbes} nas funções de transmissão e recepção de dados dentro do núcleo do sistema.
+ Desta forma é possível monitorizar o uso da rede pelo processo alvo. Os dados recolhidos são analisados, pelo monitor, com o intuito de perceber se determinada porta e endereço são conhecidos e caso não sejam é adicionada a informação a uma tabela de dispersão e utilizada para redefinir o filtro usado no \textit{LibPCap}.
+ O pacote capturado  é atrasado e re-injectado de forma a poder ser capturado pela biblioteca \textit{LibPCap} através do novo filtro.
+ Apesar do sistema de instrumentação \textit{KProbes} ter uma sobrecarga relativamente baixa, as funções instrumentadas são utilizadas com muita frequência no sistema, penalizando no desempenho.
+ A necessidade de atrasar as comunicações, agrava ainda mais a situação ao ter de reter um número elevado de pacotes em memória.
+ Este sistema sofre ainda do problema de estar em grande parte implementado em modo utilizador, obrigando a transferências de dados e a trocas de contexto, para a actualização dos filtros.
 
 %\marginpar{apontar vantagens e defeitos!| vou ainda escrever sobre isto}
 
@@ -436,15 +444,19 @@ Apesar do sistema de instrumentação \textit{KProbes} ter uma sobrecarga relati
 \section{Conclusões}
 \label{sec:conclusions}
 
-Apresentámos o desenho e implementação de um sistema que estende o LSF, usado na captura de tráfego de rede usando o libPCap, por forma a permitir filtrar o tráfego de um único processo ou de um conjunto de processos. Este oferece a possibilidade de capturar só os pacotes pretendidos, facilitando as análises que se pretendam efectuar e como reduzindo o overhead deste tipo de sistemas. Deixa de ser necessário capturar mais do que o tráfego necessário e de necessitar de conhecer os protocolos e portos usados pela aplicação.
+Apresentámos o desenho e implementação de um sistema que estende o \textit{LSF}, usado na captura de tráfego de rede usando o \textit{LibPCap}, por forma a permitir filtrar o tráfego de um único processo ou de um conjunto de processos.
+ Este oferece a possibilidade de capturar só os pacotes pretendidos, facilitando as análises que se pretendam efectuar e como reduzindo o overhead deste tipo de sistemas.
+ Deixa de ser necessário capturar mais do que o tráfego necessário e de necessitar de conhecer os protocolos e portos usados pela aplicação.
 
-Esta funcionalidade é transparente para todas as ferramentas desenvolvidas com base no libpcap, podendo todas estas tirar partido deste sistema.
+Esta funcionalidade é transparente para todas as ferramentas desenvolvidas com base no \textit{Libpcap}, podendo todas estas tirar partido deste sistema.
 
-Em termos de overhead introduzido face à monitorização já existente, revelou-se insignificante, podendo mesmo melhorar essa situação nos casos em que o foco sobre o tráfego de um único processo leva e reduzir o trabalho realizado pelo LSF.
+Em termos de \textit{overhead} introduzido face à monitorização já existente, revelou-se insignificante, podendo mesmo melhorar essa situação nos casos em que o foco sobre o tráfego de um único processo leva a reduzir o trabalho realizado pelo \textit{LSF}.
 
 As vantagens do sistema criado tornam-se ainda mais notórias quando a máquina está sobre uma carga mais elevada de trabalho, ou grande volume de tráfego via rede, dado manter o uso dos recursos na proporção aproximada apenas do tráfego do processo alvo.
 
-Como trabalho futuro existe a possibilidade de integrar este trabalho no anterior trabalho \cite{Farruca:2009,duarte10}, formando uma ferramenta de monitorização distribuída com baixa sobrecarga. Como o sistema implementado permite apenas monitorizar protocolos que assentem sobre \textit{TCP} e \textit{UDP}, uma nova contribuição seria aumentar o número de protocolos que se possam monitorizar, focando a instrumentação apenas nas funções essenciais de forma a diminuir ainda mais a sobrecarga imposta pela monitorização. A partilha destas novas alterações, submetendo este sistema para análise, e possível implementação na versão principal do núcleo do \textit{Linux}.   
+Como trabalho futuro existe a possibilidade de integrar este trabalho no anterior trabalho \cite{Farruca:2009,duarte10}, formando uma ferramenta de monitorização distribuída com baixa sobrecarga.
+ Como o sistema implementado permite apenas monitorizar protocolos que assentem sobre \textit{TCP} e \textit{UDP}, uma nova contribuição seria aumentar o número de protocolos que se possam monitorizar, focando a instrumentação apenas nas funções essenciais de forma a diminuir ainda mais a sobrecarga imposta pela monitorização.
+ A partilha destas novas alterações, submetendo este sistema para análise, e possível implementação na versão principal do núcleo do \textit{Linux}.
 
 
 \bibliographystyle{plain}
