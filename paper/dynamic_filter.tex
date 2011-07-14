@@ -286,7 +286,7 @@ Para facilmente controlar e configurar o sistema desenvolvido foi definida uma i
 \label{sub:monitor_app}
 
 Para efectuar os testes de avaliação, foi criada uma ferramenta em nível utilizador que permite lançar a aplicação e configurar automaticamente o sistema a monitorizar.
- Esta verifica o identificador do processos e o quando se dá o inicio e fim da execução, de forma a iniciar e terminar a monitorização quando necessário.
+ Esta verifica o identificador do processos e quando se dá o inicio e fim da execução, de forma a iniciar e terminar a monitorização.
 
 %%%%%%%%%%%%%%%%%%%
 
@@ -295,7 +295,8 @@ Para efectuar os testes de avaliação, foi criada uma ferramenta em nível util
 \label{sec:evaluation}
 
 O sistema implementado foi avaliado funcionalmente através da utilização dos protocolos \textit{ftp} e \textit{http}.
- Para tal, recorreu-se a um conjunto alargado de testes, tendo como objectivo observar o seu desempenho, e mais importante, verificar a correcção do funcionamento e a sua capacidade de capturar todos os pacotes envolvidos nas comunicações de um processo alvo (e apenas esses pacotes). 
+ Para tal, recorreu-se a um conjunto alargado de testes, tendo como principal objectivo verificar a correcção do funcionamento, a sua capacidade de capturar todos os pacotes envolvidos nas comunicações do processo alvo (e apenas estes), bem como observar o seu desempenho.
+% Para tal, recorreu-se a um conjunto alargado de testes, tendo como objectivo observar o seu desempenho, sendo ainda mais importante, verificar a correcção do funcionamento e a sua capacidade de capturar todos os pacotes envolvidos nas comunicações de um processo alvo (e apenas esses pacotes). 
 
 %Através destes conjunto de testes, foi possível efectuar a captura dos pacotes resultantes da transferência de um ficheiro, a partir de um servidor ftp ou http. 
 
@@ -426,7 +427,7 @@ O tempo médio despendido para a procura do elemento com o menor valor de chave,
 
 Este trabalho vem na sequência do trabalho efectuado por Nuno Farruca~\cite{Farruca:2009,duarte10}, que teve como objectivo monitorizar os processos de um sistema distribuído, tirando partido do \textit{LibPCap} e \textit{LSF} existente em \textit{Linux}.
  As dificuldades sentidas em obter apenas o tráfego respeitante à aplicação sob monitorização levou a duas soluções.
- A primeira, monitorizarando o comportamento de cada processo através da criação de uma biblioteca que mapeia as funções sobre sockets da biblioteca de C (\textit{LibC}), de forma a obter os seus parâmetros e assim comunicar ao monitor quais dos pacotes capturados pelo PCap são relevantes.
+ A primeira, monitorizando o comportamento de cada processo através da criação de uma biblioteca que mapeia as funções sobre sockets da biblioteca de C (\textit{LibC}), de forma a obter os seus parâmetros e assim comunicar ao monitor quais dos pacotes capturados pelo PCap são relevantes.
  Esta biblioteca é ligada aos processos da aplicação, no seu arranque, por definição da variável \textit{LD\_PRELOAD}.
  Uma outra forma foi obter os dados dos \textit{sockets} pertencentes aos processos alvo, através de consultas periódicas do sistema de ficheiros virtual \textit{ProcFs}, e posteriormente executar a filtragem, de quais dizem respeito à aplicação alvo.
  Estas soluções sofrem de grandes problemas de desempenho, além de que, para a segunda solução, não oferece garantias que todo o tráfego relevante seja mantido.
