@@ -196,7 +196,8 @@ Estes filtros são uma forma de reduzir o volume de dados capturados, focando a 
  Nesta biblioteca existe um sistema de compilação e optimização da linguagem própria para descrever as regras que se pretende aplicar.
  Esta permite especificar tipos de pacotes, endereços e portas envolvidos, interfaces, etc.
 %frase nova % 
- O processo de modificação ou afectação de um filtro começa pela indicação das regras de filtragem, seguido da optimização, drenagem e por fim, afectação do novo filtro ao canal.
+ %O processo de modificação ou afectação de um filtro começa pela indicação das regras de filtragem, seguido da optimização, drenagem e por fim, afectação do novo filtro ao canal.
+ O processo de modificação ou afectação de um filtro, é iniciado pela indicação das regras de filtragem, seguido de optimização, paragem do sistema e drenagem do canal de filtragem, e por fim afectação do novo filtro ao canal.
 %end of frase nova
  Não existe qualquer forma de, a este nível, estabelecer uma relação com os processos envolvidos no tráfego de rede.
 
@@ -232,7 +233,7 @@ Para tal, o sistema criado está dividido em 4 componentes principais (ver figur
 
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics[scale=0.50]{interface.pdf} 
+\includegraphics[scale=0.5]{interface.pdf} 
 \caption{Arquitectura da solução}
 \label{arquitectura}
 \end{center}
@@ -271,7 +272,12 @@ O estado dos portos \textit{TCP} e \textit{UDP} em uso pelo processo alvo é man
 \label{sub:packet_filter}
 
 A função de filtragem  implementada neste sistema assenta no estado do processo alvo, mantido pelos módulos anteriormente descritos.
-Através da extensão do LSF com um hook, quando ligado, este invoca esta filtragem que devolve ao LSF se o pacote deve ser logo ignorado (não envolve nenhum dos portos do processo alvo) ou se se deve continuar a avaliar as restantes regras de filtragem definidas. Mantém-se assim a compatibilidade e continua-se a tirar partido dos benefícios da utilização do Linux Socket Filter.
+ Através da extensão do \textit{LSF} com um \textit{hook}, foi possível efectuar dinamicamente a filtragem sem ter de instalar novos filtros.
+ O \textit{hook} quando activo, pesquisa se o triplo (porto, protocolo e endereço) existe no repositório.
+ Se existir é reportado ao \textit{LSF} para continuar a análise dos filtros definidos estáticamente.
+ Caso contrário é reportado para ser rejeitado e aí termina o processamento deste pacote.
+ Desta forma mantem-se a compatibilidade e continua-se a tirar partido dos beneficios da utilização do \textit{Linux Socket Filter}.
+%Através da extensão do LSF com um hook, quando ligado, este invoca esta filtragem que devolve ao LSF se o pacote deve ser logo ignorado (não envolve nenhum dos portos do processo alvo) ou se se deve continuar a avaliar as restantes regras de filtragem definidas. Mantém-se assim a compatibilidade e continua-se a tirar partido dos benefícios da utilização do Linux Socket Filter.
 
 
 
@@ -376,9 +382,9 @@ O teste consistiu em obter o tempo antes de iniciar a inserção dos 1024 elemen
 \begin{table}
 \begin{center}
 
-\begin{tabular}{ | l | c | c | }
+\begin{tabular}{ | r | c | c | }
 \hline
-\hspace{1.2cm} Teste \hspace{1cm} & \hspace{1cm}Duração\hspace{1cm} &  Média por
+\hspace{1cm} Teste \hspace{1.5cm} & \hspace{1cm}Duração\hspace{1cm} &  Média por
 elemento \\
 \hline
 Adição de 1024 elementos & 869 244 & 848.8711 \\
