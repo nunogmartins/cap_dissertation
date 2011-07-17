@@ -7,23 +7,18 @@
 \section{Ferramenta}
 Considerações ...
 
-\subsection{Repositório de dados}
+\section{Repositório de dados}
 
-De forma a manter a informação sobre quais os endereços e portos que uma
-aplicação está a utilizar, sem que seja necessário consultar os sockets que
-esta está a utilizar, foi necessário criar um repositório de dados onde
-estivesse a informação relevante para as decisões do filtro de captura.
+De forma a manter a informação sobre quais os endereços e portos que uma aplicação está a utilizar, sem que seja necessário consultar os sockets que esta está a utilizar, foi necessário criar um repositório de dados onde estivesse a informação relevante para as decisões do filtro de captura.
 
-As abordagens para a criação de repositório de dados com base nas
-estruturas de dados:
+As abordagens para a criação de um repositório de dados com base nas estruturas de dados:
 
-\subsubsection{Bitmap}
+\subsection{Bitmap}
 
-\subsubsection{Listas duplamente ligadas}
+\subsection{Listas duplamente ligadas}
 
-\subsubsection{Árvore}
-Apesar de não ser necessário percorrer os elementos ou obter os indíces de
-forma ordenada. 
+\subsection{Árvore}
+Apesar de não ser necessário percorrer os elementos ou obter os indíces de forma ordenada. 
 
 \paragraph{Árvore Binária}
 
@@ -31,100 +26,133 @@ forma ordenada.
 \paragraph{Arvores Balanceadas}
 \textit{Red-black Tree} implementada no núcleo de operação permite efectuar
 
-Complexidade de inserção, procura e remoção é O(log n), sendo n o número de
-elementos da árvore.
+Complexidade de inserção, procura e remoção é O(log n), sendo n o número de elementos da árvore.
 
 Existe uma penalização no desempenho quando existe a necessidade de balancear a àrvore, mas os ganhos provenientes deste balanceamento face às àrvores não balanceadas é muito superior.
 
-\subsubsection{Tabela de dispersão}
+\subsection{Tabela de dispersão}
 Não existe nenhuma implementação 
 
-\subsubsection{Bloom Filter}
+\subsection{Bloom Filter}
 bloom filters ...
 
 \paragraph*{}
-A estrutura de dados escolhida para a criação do repositório de dados foi
-\textit{Red-black tree}. Esta escolha foi devido principalmente à boa
-performance e a existir uma implementação da estrutura de dados no núcleo do
-linux. Devido a esta estrutura estar presente no núcleo do \textit{linux}
-permitiu que a implementação da ferramenta tivesse um ciclo de implementação
-mais rápido devido à confiança na ``validação`` desta estrutura pelos
-responsáveis do núcleo do \textit{linux}.
+A estrutura de dados escolhida para a criação do repositório de dados foi \textit{Red-black tree}.
+ Esta escolha foi devido principalmente à boa performance e a existir uma implementação da estrutura de dados no núcleo do linux.
+ Devido a esta estrutura estar presente no núcleo do \textit{linux} permitiu que a implementação da ferramenta tivesse um ciclo de implementação mais rápido devido à confiança na ``validação`` desta estrutura pelos responsáveis do núcleo do \textit{linux}.
 
-\subsection{Funções a monitorizar}
+\subsection{\textit{API} de comunicação entre instrumentação e repositório}
 
-Como foi anteriormente descrito em \ref{subsection:network} sobre as chamadas
-aos sistema para utilizar as funcionalidades de rede
+ Foi criada uma \textit{API} que efectua uma validação dos parâmetros passados às funções do repositório de dados e que permite uma maior modularização na modificação da estrutura do repositório de dados.
 
-Foi necessário conhecer a \textit{ABI}\ref{ABI}\cite{ABI} referente a quais os
-registos que são utilizados nas arquitecturas \textit{x86} e \textit{x86\_64},
+Apesar de reduzir o desempenho, porque necessita de chamar os métodos especificos ao repositório, permite que outros reposiórios possam ser adicionados, permitindo modificar facilmente o código.
+
+Apesar dos processos monitorizados serem muito dinâmicos nas comunicações, a maior percentagem de operações sobre o reposiório serão consultas/verificações.
+ As restantes operações de inserção e remoção irão ter uma percentagem igual entre elas.
+ É esperado que para cada inserção exista uma remoção.
+ Uma monitorização a um processo durante toda a sua existência espera-se que no final o estado do reposiório seja igual ao inicio da monitorização.
+
+
+\section{Funções a monitorizar}
+
+Como foi anteriormente descrito em \ref{subsection:network} sobre as chamadas aos sistema para utilizar as funcionalidades de rede
+
+Foi necessário conhecer a \textit{ABI}\ref{ABI}\cite{ABI} referente a quais os registos que são utilizados nas arquitecturas \textit{x86} e \textit{x86\_64},
 para a passagem de parâmetros das chamadas aos sistema.
 
-O sistema de \textit{KProbes} permite consultar os registos do processador onde
-foi efectuada a chamada à função (neste caso a chamada ao sistema). Por isso
-foram definidos 6 \textit{KRetProbes} referentes às chamadas \textit{connect},
-\textit{bind}, \textit{accept}, \textit{sendto}, \textit{recvfrom} e
-\textit{close}. Para esta última $\left( \textit{close} \right)$ devido à
-elevada utilização desta chamada ao sistema por diferentes aplicações no
-sistema, foi utilizada a função \textit{qqq coisa ...  ????}
+O sistema de \textit{KProbes} permite consultar os registos do processador onde foi efectuada a chamada à função (neste caso a chamada ao sistema).
+ Por isso foram definidos 6 \textit{KRetProbes} referentes às chamadas \textit{connect}, \textit{bind}, \textit{accept}, \textit{sendto}, \textit{recvfrom} e
+\textit{close}.
+ Para esta última $\left( \textit{close} \right)$ devido à elevada utilização desta chamada ao sistema por diferentes aplicações no sistema, foi utilizada a função \textit{qqq coisa ...  ????}
 
-\subsection{Filtro}
+------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-Como foi apresentado na arquitectura, na secção \ref{subsec:Filter}, o
-\textit{overhead} acrescentado ao sistema mesmo sem a ferramenta estar activa é
+Para efectuar a monitorização das interacções de rede de um processo foi necessário recorrer à instrumentação de funções do núcleo.
+
+---------------------------------------------------
+
+A instrumentação das funções do núcleo permitiu manter o contexto da execução do processo.
+
+-----------------------------------------------------
+
+Como apresentado e concluído na secção \ref{}, o sistema de monitorização que melhor se adequa ao problema exposto é o \textit{KProbes}.
+ Deste sistema utilizou-se o \textit{KRetProbe}, de forma a instrumentar a entrada e retorno de funções.
+ Obter os parâmetros de entrada das funções, principalmente o \textit{file descriptor}, tornou-se essencial.
+ Para garantir que o repositório do estado do processo está coerente com o estado do núcleo, foi necessário obter o valor de retorno das funções.
+ Por estas razões e porque as chamadas ao sistema têm ciclos de modificação da bastante lentos, o que evidência elevada estabilidade e consistência do núcleo, e por ser ponto de entrada do processo no núcleo foram as funções instrumentadas.
+
+As subsecções \ref{} .... \ref{} apresentam as funções do núcleo que foram instrumentadas.
+
+%
+% faltam as subsecoes ... 
+%
+
+\subsection{Filtro de processos}
+A filtragem dos processos que efectuam as chamadas ao sistema de rede impôs um novo desafio.
+ Se apenas filtrar as chamadas de um processo/pid seria apenas verificar se o pid é igual ao que se pretende é trivial e com baixa sobrecarga.
+ Para um utilizador que queria analisar um processo, e não saiba qual dos fluxos do processo é responsável pela comunicação de rede, tornou-se complicado.
+ Para evitar aumentar a sobrecarga no núcleo instrumentando a chamada ao sistema \textit{clone} ou função semelhante, optou-se por uma filtragem dos processos através de 3 identificadores, \textit{pid}, \textit{ppid} e \textit{tgid}.
+
+Com esta abordagem ainda existe a possibilidade de não se obter todas as \textit{task} do processo, caso este tenha um àrvore com mais de 3 níveis, mas a sobrecarga sobre o sistema é inferior à situação de monitorização da criação de processos no sistema.
+ Estes três identificadores foram escolhidos pois permitem identificar até 3 níveis da árvore de um processo.
+
+Seria bom colocar uma imagem de uma àrvore de processo .... 
+
+Os identificadores têm de ser escritos para os ficheiros respectivos no \textit{DebugFs}, que serão explicados na secção \ref{}.
+
+
+
+\subsubsection{Identificadores}
+
+No núcleo do \textit{Linux} quando um processo é criado os identificadores \textit{pid} e \textit{tgid} são iguais.
+Os processos quando efectuam
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Filtro}
+
+Como foi apresentado na arquitectura, na secção \ref{subsec:Filter}, o \textit{overhead} acrescentado ao sistema mesmo sem a ferramenta estar activa é
 a verificação da activação deste \textit{hook}.
 
 \section{Informação dentro do núcleo}
 
-Devido à necessidade de obter algumas informações sobre o estado da computação
-dos diversos componentes da ferramenta foram criados alguns ficheiros no
+Devido à necessidade de obter algumas informações sobre o estado da computação dos diversos componentes da ferramenta foram criados alguns ficheiros no
 sistema de ficheiros virtual \textit{DebugFs}.
 
-Na verdade não foi só para obter o estado da computação foi também uma forma
-invocar o inicio da monitorização. Isto é, através dos ficheiros \textit{pid},
-\textit{ppid}, \textit{tgid} e \textit{option}. 
+Na verdade não foi só para obter o estado da computação foi também uma forma invocar o inicio da monitorização.
+ Isto é, através dos ficheiros \textit{pid}, \textit{ppid}, \textit{tgid} e \textit{option}. 
 
 \subsection{Informação do processo}
 
-Quando o módulo da ferramenta é executado os indicadores de \textit{pid},
-\textit{ppid} e \textit{tgid} são inicializados com o valor -1.
+Quando o módulo da ferramenta é executado os indicadores de \textit{pid}, \textit{ppid} e \textit{tgid} são inicializados com o valor -1.
 
-Esta ferramenta de monitorização só irá passar a analisar os dados das chamadas
-ao sistema quando estes valores estiverem definidos e identificarem o processo
-que efectuou a chamada.
+Esta ferramenta de monitorização só irá passar a analisar os dados das chamadas ao sistema quando estes valores estiverem definidos e identificarem o processo que efectuou a chamada.
 
 \subsubsection{Sistema de Ficheiros}
 
-Dentro do sistema de ficheiros onde os \textit{sockets} estão incorporados,
-como apenas estamos interessados em analisar os sockets construidos para a
-familia \textit{AF\_INET} todos os sockets que não pertencerem a esta familia e
-não forem do tipo \textit{TCP} ou \textit{UDP} não serão mais analisados. Os
-\textit{sockets} que pertencem é então inicializado uma estrutura do tipo
-\textit{não me lembro ??? ver código} onde estão definidos o porto, o endereço
+Dentro do sistema de ficheiros onde os \textit{sockets} estão incorporados, como apenas estamos interessados em analisar os sockets construidos para a
+familia \textit{AF\_INET} todos os sockets que não pertencerem a esta familia e não forem do tipo \textit{TCP} ou \textit{UDP} não serão mais analisados.
+ Os \textit{sockets} que pertencem é então inicializado uma estrutura do tipo \textit{não me lembro ??? ver código} onde estão definidos o porto, o endereço
 e se são do tipo \textit{UDP} ou \textit{TCP}.
 
-Dependendo da chamada ao sistema realizada entre a função definida na entrada
-e a definida no retorno do \textit{KRetProbe}, são passados parâmetros que irão
+Dependendo da chamada ao sistema realizada entre a função definida na entrada e a definida no retorno do \textit{KRetProbe}, são passados parâmetros que irão
 ser utilizados na função de retorno.
 
 
-\section{Ferramenta de testes}
+\section{Ferramenta de testes e}
+%Como efectuar a monitorização
 
 Foi desenvolvida uma aplicação para testar o desenvolvimento da ferramenta.
 Esta aplicação 
 
 \subsection{Test Unit}
 
-De forma a testar o repositório de dados foram efectuados diferentes
-\textit{unit tests}, de forma a assegurar que todas as alterações efectuadas na
-ferramenta ficavam de correctas.
+De forma a testar o repositório de dados foram efectuados diferentes \textit{unit tests}, de forma a assegurar que todas as alterações efectuadas na ferramenta ficavam de correctas.
 
 \subsection{Aplicação de testes de performance}
 
-Para ajudar na avaliação da ferramenta desenvolvida foi criado um conjunto de
-aplicações independentes $\left( scripts e aplicações \right)$ para monitorizar
-a actividade de algumas aplicações que se consideraram pertinentes no processo
-de avaliação do desempenho da ferramenta.
+Para ajudar na avaliação da ferramenta desenvolvida foi criado um conjunto de aplicações independentes ( scripts e aplicações ) para monitorizar a actividade de algumas aplicações que se consideraram pertinentes no processo de avaliação do desempenho da ferramenta.
 
 A aplicação desenvolvida \textit{manager} tem de ser executada sob o controlo
 do utilizador \textit{root}, devido à necessidade de executar processos que só
