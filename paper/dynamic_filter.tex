@@ -261,14 +261,14 @@ Para tal, o sistema criado está dividido em 4 componentes principais (ver figur
 Este sistema permite a captura dos pacotes de rede de um processo, sem que exista um conhecimento prévio sobre o(s) protocolo(s) ou portas utilizadas.
  A utilização de um sistema de instrumentação do núcleo foi necessária apenas para monitorizar as chamadas envolvendo \emph{sockets} e identificar o processo responsável, permitindo desta forma obter e manter permanentemente actualizada a informação sobre o estado respeitante ao processo alvo.
  De forma a minimizar as perturbações, todo o sistema foi desenvolvido dentro do núcleo do \textit{Linux}, sem alterações nas interfaces já existentes.
- Assim, ferramentas de façam uso da biblioteca \textit{LibPcap}, como o programa \textit{tcpdump} ou suas variantes, podem beneficiar desta extensão sem qualquer alteração e sem impacto relevante no seu desempenho
+ Assim, ferramentas que façam uso da biblioteca \textit{LibPcap}, como o programa \textit{tcpdump} ou suas variantes, podem beneficiar desta extensão sem qualquer alteração e sem impacto relevante no seu desempenho
 
 
 
 \subsection*{Instrumentação das chamadas ao sistema de rede}
 \label{sub:mon_syscalls}
 
-Um ponto importante deste sistema, constituiu na garantia que todas as interacções desencadeadas por um processo com o exterior fossem detectadas.
+Um ponto importante deste sistema, consiste na garantia que todas as interacções desencadeadas por um processo com o exterior fossem detectadas.
  Para tal, foi necessário recorrer à monitorização das chamadas ao sistema de rede ao nível do núcleo, permitindo assim, minimizar as cópias de dados e trocas de contexto.
  Tirando partido da utilização do sistema de monitorização \textit{KProbes} foi possível realizar a monitorização sob o pequeno conjunto de chamadas ao sistema relevantes, nomeadamente: \textit{sendto}, \textit{recvfrom}, \textit{bind}, \textit{accept}, \textit{connect} e \textit{close}.
  Na realidade verificou-se que a chamada ao sistema \textit{close}, ao ser utilizada intensivamente por todo o sistema de ficheiros, poderia degradar desnecessariamente o desempenho.
@@ -290,11 +290,11 @@ O estado dos portos \textit{TCP} e \textit{UDP} em uso pelo processo alvo, é ma
 \label{sub:packet_filter}
 
 A função de filtragem  implementada neste sistema assenta no estado do processo alvo, mantido pelos módulos anteriormente descritos.
- Através da extensão do \textit{LSF} com um \textit{hook}, foi possível efectuar dinamicamente a filtragem sem ter de instalar novos filtros.
+ Através da extensão do \textit{LSF} com um \textit{hook}, foi possível efectuar dinamicamente a filtragem sem ter que se instalar novos filtros.
  O \textit{hook} quando activo, pesquisa se o triplo (porto, protocolo e endereço) existe no repositório.
  Se existir é reportado ao \textit{LSF} para continuar a análise dos filtros definidos no \textit{pcap}.
  Caso contrário, é reportado para ser ignorado e terminar o processamento deste pacote.
- Desta forma apenas se analizam os pacotes da aplicação alvo e mantem-se a compatibilidade e continua-se a tirar partido do \textit{Linux Socket Filter}.
+ Desta forma apenas se analizam os pacotes da aplicação alvo e, mantem-se a compatibilidade e continua a tirar-se partido do \textit{Linux Socket Filter}.
 %Através da extensão do LSF com um hook, quando ligado, este invoca esta filtragem que devolve ao LSF se o pacote deve ser logo ignorado (não envolve nenhum dos portos do processo alvo) ou se se deve continuar a avaliar as restantes regras de filtragem definidas. Mantém-se assim a compatibilidade e continua-se a tirar partido dos benefícios da utilização do Linux Socket Filter.
 
 
@@ -317,7 +317,7 @@ Para facilmente controlar e configurar o sistema desenvolvido foi definida uma i
 \label{sub:monitor_app}
 
 Para efectuar os testes de avaliação, foi criada uma ferramenta em nível utilizador que permite lançar uma aplicação e configurar automaticamente o sistema para monitorizar.
- Esta verifica o identificador do processo e, quando se dá o inicio e o fim da execução, de forma a iniciar e, a terminar a monitorização.
+ Esta verifica o identificador do processo e, quando se dá o inicio e o fim da execução, de forma a iniciar e, terminar a monitorização.
 
 %%%%%%%%%%%%%%%%%%%
 
@@ -338,7 +338,7 @@ A análise funcional foi efectuada por meio de programas simples, que desencadei
  Estes dados poderam ser confirmados no sistema \textit{debugfs}, por consulta dos ficheiros existentes para esse efeito. Este ficheiro, quando acedido, contém toda a informação relativa aos portos e endereços em utilização por parte da aplicação monitorizada.
  Deste modo, para obter um grau de comparação dos dados produzidos e validar esta análise, foi utilizada a ferramenta \textit{netstat}, na qual indica os dados relativos aos portos e endereços utilizados pelos processos do sistema (esta ferramenta tira partido do sistema de ficheiros virtual \textit{ProcFs} para obter esses dados.
  Para além desta análise, foi efectuada a confirmação da correcção de que todos os pacotes pertencentes às comunicações foram de facto obtidos.
- Esta confirmação foi efectuada através da captura utilizando o \textit{tcpdump} com o módulo activo, e verificado que todo o tráfego respeitante ao protocolo (\textit{ftp} e \textit{http}) estava de facto completo e correcto, desde a abertura ao fecho das conexões, não existindo outros pacotes na captura.
+ Esta confirmação foi efectuada através da captura utilizando o \textit{tcpdump} com o módulo activo e, verificado que todo o tráfego respeitante ao protocolo (\textit{ftp} e \textit{http}) estava de facto completo e correcto, desde a abertura ao fecho das conexões, não existindo outros pacotes na captura.
  Esta validação foi verificada utilizando o programa \textit{wireshark}, que identificou os fluxos de dados dos protocolos.
 %\td{nao foi tambem feita a observação dos pacotes capturados com o tcpdump e wireshark e verificado que a captura era correcta??!}
 
@@ -349,7 +349,7 @@ Foram efectuados diversos testes para avaliar o \emph{overhead} introduzido por 
  Na máquina 1 foram efectuados os testes que em seguida serão apresentados.
  A versão do sistema de operação utilizado nas duas máquinas foi o 2.6.39, sendo que na máquina 1 introduziu-se a modificação para incluir o \textit{Hook} e suas funções auxiliares, enquanto que na máquina 2 executou-se o sistema original.
 
-Na execução destes testes, foram executadas 10 iterações para cada experiência considerada, de modo a obter um valor médio com um desvio padrão aceitável. Os resultados obtidos estão apresentados nas tabelas \ref{tab:desempenho} e \ref{tab:overhead}.
+Na execução destes testes, foram efectuadas 10 iterações para cada experiência considerada, de modo a obter um valor médio com um desvio padrão aceitável. Os resultados obtidos estão apresentados nas tabelas \ref{tab:desempenho} e \ref{tab:overhead}.
 
 Os testes identificados com os números de $^{1}$ a $^{4}$ foram efectuados utilizando apenas uma conexão ao servidor, enquanto que os testes $^{5}$ e $^{6}$ foram efectuados utilizando mais uma comunicação de forma a aumentar o peso sobre o processador e o número de pacotes a circular entre as máquinas, permitindo identificar a sobrecarga exercida quando o \textit{tcpdump} está a executar e a capturar todos os dados ou apenas um subconjunto destes (os pertencentes ao processo).
  A coluna "Original" é o resultado do tempo médio das execuções das transferências sem qualquer monitorização, a coluna "Com TcpDump" apresenta a média dos tempos de transferência com a captura total do tráfego, enquanto que a coluna identificada com "Com TcpDump e módulo" mostra a média dos tempos para a transferência com a captura pelo \textit{tcpdump} e o módulo desenvolvido no núcleo, de forma a apenas capturar o tráfego da transferência do processo alvo.
@@ -408,6 +408,7 @@ Nos testes $^{5}$ e $^{6}$, como o tráfego na interface é duplicado e o \texti
  Conclui-se que quando o fluxo de dados que não pretendemos capturar aumenta consideravelmente torna-se bastante mais vantajoso utilizar este sistema, do que capturar todos os pacotes, agravado ainda caso necessite depois de uma análise em nível utilizador para identificar e filtrar os pacotes pertencentes ao processo alvo.
 
 \subsubsection{Desempenho da estrutura de dados}
+
 Para além das avaliações descritas anteriormente, tornou-se essencial analisar o comportamento da estrutura de dados utilizada para manter o “estado do processo”, de modo a verificar o seu desempenho. 
 %e o espaço ocupado pela mesma.  <--- este esta em falta
 Assim, para esta análise, foi elaborado um teste que usa o sistema de alta resolução de temporizadores (HRTimer), contido no núcleo do sistema de operação.
