@@ -472,7 +472,7 @@ Este trabalho vem na sequência do trabalho efectuado por Nuno Farruca~\cite{Far
  As dificuldades sentidas em obter apenas o tráfego respeitante à aplicação sob monitorização levou a duas soluções.
  A primeira, monitorizando o comportamento de cada processo através da criação de uma biblioteca que mapeia as funções sobre sockets da biblioteca de C (\textit{LibC}), de forma a obter os seus parâmetros e assim comunicar ao monitor quais dos pacotes capturados pelo PCap são relevantes.
  Esta biblioteca é ligada aos processos da aplicação, no seu arranque, por definição da variável \textit{LD\_PRELOAD}.
- Uma outra forma foi obter os dados dos \textit{sockets} pertencentes aos processos alvo, através de consultas periódicas do sistema de ficheiros virtual \textit{ProcFs}, e posteriormente executar a filtragem, de quais dizem respeito à aplicação alvo.
+ Uma outra forma foi obter os dados dos \textit{sockets} pertencentes aos processos alvo, através de consultas periódicas do sistema de ficheiros virtual \textit{ProcFs} e, posteriormente executar a filtragem, de quais dizem respeito à aplicação alvo.
  Estas soluções sofrem de grandes problemas de desempenho, além de que, para a segunda solução, não oferece garantias que todo o tráfego relevante seja obtido.
 
 O trabalho de Byungjoon Lee~\cite{1688981} implementa a monitorização, utilizando o sistema de instrumentação \textit{KProbes} nas funções de transmissão e recepção de dados dentro do núcleo do sistema.
