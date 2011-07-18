@@ -411,8 +411,9 @@ Nos testes $^{5}$ e $^{6}$, como o tráfego na interface é duplicado e o \texti
 
 Para além das avaliações descritas anteriormente, tornou-se essencial analisar o comportamento da estrutura de dados utilizada para manter o “estado do processo”, de modo a verificar o seu desempenho. 
 %e o espaço ocupado pela mesma.  <--- este esta em falta
-Assim, para esta análise, foi elaborado um teste que usa o sistema de alta resolução de temporizadores (HRTimer), contido no núcleo do sistema de operação.
-O teste consistiu em obter o tempo antes de iniciar a inserção dos 1024 elementos, inserir os elementos, e obter novamente o tempo, permitindo assim obter o tempo decorrido. De igual forma foi efectuado o cálculo do tempo para a remoção dos 1024 elementos.
+ Assim, para esta análise, foi elaborado um teste que usa o sistema de alta resolução de temporizadores (HRTimer), contido no núcleo do sistema de operação.
+ O teste consistiu em obter o tempo antes da inserção dos 1024 elementos e, de seguida inserir os elementos, obter novamente o tempo, permitindo assim obter o tempo decorrido.
+ De igual forma foi efectuado o cálculo do tempo para a remoção dos 1024 elementos.
 
 \begin{table}
 \begin{center}
