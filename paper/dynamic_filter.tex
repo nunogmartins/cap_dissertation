@@ -173,7 +173,7 @@ Este sistema tem uma forma bem definida de criação e destruição dos pontos d
 
  Baseados neste sistema foram ainda desenvolvidos o \textit{JProbe} e o \textit{KRetProbe} que permitem uma interacção que facilita programar as acções a efectuar na entrada ou retorno de funções no núcleo do sistema.
 % \td{ confirmar que é isto que distingue estes do kprobes}  esta correcto.
- Como programar para o núcleo do \textit{Linux} pode ser complicado existem ferramentas para os utilizadores finais (como o \textit{SystemTap} ~\cite{Jones2009} e o \textit{DProbes} ~\cite{:DProbes}),  que facilitam a programação e monitorização do sistema, assim como oferecem alguma segurança e portabilidade entre diferentes  versões. Os utilizadores, utilizando as linguagens fornecidas por estas ferramentas, criam a sua instrumentação, gerando a ferramenta o respectivo módulo que permite a monitorização pretendida.
+ Como programar para o núcleo do \textit{Linux} pode ser complicado existem ferramentas para os utilizadores finais (como o \textit{SystemTap} ~\cite{Jones2009} e o \textit{DProbes} ~\cite{:DProbes}),  que facilitam a programação e monitorização do sistema, assim como oferecer alguma segurança e portabilidade entre diferentes  versões. Os utilizadores, utilizando as linguagens fornecidas por estas ferramentas, criam a sua instrumentação, gerando a ferramenta o respectivo módulo que permite a monitorização pretendida.
 
 \subsubsection{Monitorização de rede}
 \label{subsub:mon_network__with_dynamic_filters_linux}
@@ -218,7 +218,7 @@ Estes filtros são uma forma de reduzir o volume de dados capturados, focando a 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \paragraph{Firewall\\}
 
-Existe um sistema de \textit{firewall} no núcleo do sistema \textit{Linux}, o \textit{NetFilter} ~\cite{netfiltersite}, que gere o fluxo de dados de e para o exterior implementando as políticas de controlo desejadas pelo administrador.
+Existe um sistema de \textit{firewall} no núcleo do sistema \textit{Linux}, o \textit{NetFilter} ~\cite{netfiltersite}, que gere o fluxo de dados de, e para, o exterior implementando as políticas de controlo desejadas pelo administrador.
  A gestão do fluxo de dados é efectuada através de regras, que podem ser indicadas/alteradas em qualquer momento no \textit{NetFilter}.
  Estas regras baseiam-se nas características do tráfego, como seja, se é de entrada ou de saída ou de redirecionamento, ou outros parâmetros tais como portas e interfaces de rede.
 
@@ -231,7 +231,8 @@ O \textit{NetFilter} é implementado por vários módulos do núcleo, sendo um d
 
 Uma das desvantagens de todos estes sistemas é não ser possível indicar como critério de monitorização um determinado processo, mas sim necessitar de conhecer os protocolos ou portas usadas por este para tentar obter a informação relevante, mas sem garantias de se estar a obter apenas os dados do processo pretendido e obrigando a complicados processamentos ou filtragens da informação recolhida.
 
-No resto deste artigo apresenta-se na secção 2 o desenho e implementação de um sistema que estende o LSF por forma a permitir a captura de pacotes de um processo, na secção 3 apresenta-se a avaliação efectuada e na 4 apresentam-se trabalhos relacionados. Finalmente, na secção 6, são apresentadas algumas conclusões.
+No resto deste artigo apresenta-se na secção \ref{sec:architecture} o desenho e implementação de um sistema que estende o \textit{LSF} por forma a permitir a captura de pacotes de um processo, na secção \ref{sec:evaluation} apresenta-se a avaliação efectuada e na \ref{sec:related_work} apresentam-se trabalhos relacionados.
+ Finalmente, na secção \ref{sec:conclusions}, são apresentadas algumas conclusões.
 
 \section{Desenho e arquitectura}
 \label{sec:architecture}
