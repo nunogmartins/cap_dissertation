@@ -7,17 +7,17 @@
 \section{Ferramenta}
 Considerações ...
 
-\section{Repositório de dados}
+\section{Estado dos \textit{sockets}}
 
 De forma a manter a informação sobre quais os endereços e portos que uma aplicação está a utilizar, sem que seja necessário consultar os sockets que esta está a utilizar, foi necessário criar um repositório de dados onde estivesse a informação relevante para as decisões do filtro de captura.
 
 As abordagens para a criação de um repositório de dados com base nas estruturas de dados:
+\subsection{Com suporte no núcleo}
+%outro titulo alternativas disponíveis
+\subsubsection{Bitmap}
+\subsubsection{Listas duplamente ligadas}
+\subsubsection{Árvores}
 
-\subsection{Bitmap}
-
-\subsection{Listas duplamente ligadas}
-
-\subsection{Árvore}
 Apesar de não ser necessário percorrer os elementos ou obter os indíces de forma ordenada. 
 
 \paragraph{Árvore Binária}
@@ -26,54 +26,56 @@ Apesar de não ser necessário percorrer os elementos ou obter os indíces de fo
 \paragraph{Arvores Balanceadas}
 \textit{Red-black Tree} implementada no núcleo de operação permite efectuar
 
-Complexidade de inserção, procura e remoção é O(log n), sendo n o número de elementos da árvore.
+Complexidade de inserção, pesquisa e remoção é O(log n), sendo n o número de elementos da árvore.
 
 Existe uma penalização no desempenho quando existe a necessidade de balancear a àrvore, mas os ganhos provenientes deste balanceamento face às àrvores não balanceadas é muito superior.
 
-\subsection{Tabela de dispersão}
+\subsection{Sem Suporte no núcleo}
+
+\subsubsection{Tabela de dispersão}
 Não existe nenhuma implementação 
 
-\subsection{Bloom Filter}
+\subsubsection{Bloom Filter}
 bloom filters ...
 
 \paragraph*{}
 A estrutura de dados escolhida para a criação do repositório de dados foi \textit{Red-black tree}.
  Esta escolha foi devido principalmente à boa performance e a existir uma implementação da estrutura de dados no núcleo do linux.
  Devido a esta estrutura estar presente no núcleo do \textit{linux} permitiu que a implementação da ferramenta tivesse um ciclo de implementação mais rápido devido à confiança na ``validação`` desta estrutura pelos responsáveis do núcleo do \textit{linux}.
-
+ 
 \subsection{\textit{API} de comunicação entre instrumentação e repositório}
 
+Foi criada uma \textit{API} interna ao sistema para efectuar a comunicação entre os \textit{handlers} das funções instrumentadas e o repositório dos \textit{sockets} do processo.
+ Esta \textit{API} consiste nas funções de 
  Foi criada uma \textit{API} que efectua uma validação dos parâmetros passados às funções do repositório de dados e que permite uma maior modularização na modificação da estrutura do repositório de dados.
 
-Apesar de reduzir o desempenho, porque necessita de chamar os métodos especificos ao repositório, permite que outros reposiórios possam ser adicionados, permitindo modificar facilmente o código.
+Apesar de reduzir o desempenho, porque necessita de chamar os métodos especificos ao repositório, permite que outros repositórios possam ser adicionados, permitindo modificar facilmente o código.
 
 Apesar dos processos monitorizados serem muito dinâmicos nas comunicações, a maior percentagem de operações sobre o reposiório serão consultas/verificações.
  As restantes operações de inserção e remoção irão ter uma percentagem igual entre elas.
  É esperado que para cada inserção exista uma remoção.
  Uma monitorização a um processo durante toda a sua existência espera-se que no final o estado do reposiório seja igual ao inicio da monitorização.
 
-
-\section{Funções a monitorizar}
+\section{Instrumentação de funções do núcleo}
 
 Como foi anteriormente descrito em \ref{subsection:network} sobre as chamadas aos sistema para utilizar as funcionalidades de rede
 
-Foi necessário conhecer a \textit{ABI}\ref{ABI}\cite{ABI} referente a quais os registos que são utilizados nas arquitecturas \textit{x86} e \textit{x86\_64},
-para a passagem de parâmetros das chamadas aos sistema.
+Foi necessário conhecer a \textit{ABI}\ref{ABI}\cite{ABI} referente às arquitecturas suportadas, \textit{x86} e \textit{x86\_64}, para a passagem de parâmetros das chamadas aos sistema.
 
 O sistema de \textit{KProbes} permite consultar os registos do processador onde foi efectuada a chamada à função (neste caso a chamada ao sistema).
  Por isso foram definidos 6 \textit{KRetProbes} referentes às chamadas \textit{connect}, \textit{bind}, \textit{accept}, \textit{sendto}, \textit{recvfrom} e
 \textit{close}.
- Para esta última $\left( \textit{close} \right)$ devido à elevada utilização desta chamada ao sistema por diferentes aplicações no sistema, foi utilizada a função \textit{qqq coisa ...  ????}
+ Para esta última \textit{close} devido à elevada utilização desta chamada ao sistema por diferentes aplicações no sistema, foi utilizada a função \textit{qqq coisa ...  ????}
 
-------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
 
 Para efectuar a monitorização das interacções de rede de um processo foi necessário recorrer à instrumentação de funções do núcleo.
 
----------------------------------------------------
+------------------------------------------------------------------------------------------------------------
 
-A instrumentação das funções do núcleo permitiu manter o contexto da execução do processo.
+Através da instrumentação de funções do núcleo foi possível manter o contexto da execução do processo.
 
------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
 
 Como apresentado e concluído na secção \ref{}, o sistema de monitorização que melhor se adequa ao problema exposto é o \textit{KProbes}.
  Deste sistema utilizou-se o \textit{KRetProbe}, de forma a instrumentar a entrada e retorno de funções.
@@ -110,12 +112,12 @@ Os processos quando efectuam
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Filtro}
+\section{Filtro de pacotes, extensão ao LSF}
 
 Como foi apresentado na arquitectura, na secção \ref{subsec:Filter}, o \textit{overhead} acrescentado ao sistema mesmo sem a ferramenta estar activa é
 a verificação da activação deste \textit{hook}.
 
-\section{Informação dentro do núcleo}
+\section{Informação de análise e controlo}
 
 Devido à necessidade de obter algumas informações sobre o estado da computação dos diversos componentes da ferramenta foram criados alguns ficheiros no
 sistema de ficheiros virtual \textit{DebugFs}.
@@ -140,46 +142,11 @@ Dependendo da chamada ao sistema realizada entre a função definida na entrada 
 ser utilizados na função de retorno.
 
 
-\section{Ferramenta de testes e}
-%Como efectuar a monitorização
-
-Foi desenvolvida uma aplicação para testar o desenvolvimento da ferramenta.
-Esta aplicação 
-
-\subsection{Test Unit}
-
-De forma a testar o repositório de dados foram efectuados diferentes \textit{unit tests}, de forma a assegurar que todas as alterações efectuadas na ferramenta ficavam de correctas.
-
-\subsection{Aplicação de testes de performance}
-
-Para ajudar na avaliação da ferramenta desenvolvida foi criado um conjunto de aplicações independentes ( scripts e aplicações ) para monitorizar a actividade de algumas aplicações que se consideraram pertinentes no processo de avaliação do desempenho da ferramenta.
-
-A aplicação desenvolvida \textit{manager} tem de ser executada sob o controlo
-do utilizador \textit{root}, devido à necessidade de executar processos que só
-este utilizador tem acesso. Estes processos anteriormente mencionados são
-\textit{insmod}, \textit{rmmod} e \textit{tcpdump}.
-
-Os \textit{scripts} criandos e bash foram para poder obter o número de dados e
-pacotes que foram transferidos na interface, bem como fazer a separação dos
-tempos que as aplicações de testes correram para conseguir automatizar o
-processo de execução e recolha de dados dos testes.
-
 \subsection{DebugFs}
-
-Criação de alguns ficheiros no sistema virtual \textit{configFs} para poder
-observar o comportamento da monitorização e dos pacotes que chegaram ao sistema
-de filtragem.
-
-A forte restrição de apenas um valor por ficheiro do \textit{SysFs} obriga a
-que para obter diferentes valores do sistema tenha de abrir diferentes
-ficheiros. Como o sistema de ficheiros \textit{proc} se sitia principalmente
-para os processos seria um bom candidado para a colocação de informação sobre 
-
-\section{Temporizadores}
-
-Temporizadores no núcleo do sistema.
+Criação de alguns ficheiros no sistema virtual \textit{configFs} para poder observar o comportamento da monitorização e dos pacotes que chegaram ao sistema de filtragem.
+A forte restrição de apenas um valor por ficheiro do \textit{SysFs} obriga a que para obter diferentes valores do sistema tenha de abrir diferentes ficheiros.
+ Como o sistema de ficheiros \textit{proc} se sitia principalmente para os processos seria um bom candidado para a colocação de informação sobre 
 
 
-\subsection{Temporizadores de Alta-Resolução}
-
-\textit{HrTimer}
+\section{Dificuldades}
+ As chamadas ao sistema para o protocolo \textit{UDP} podem ser dificeis de analisar pois apesar de para o \textit{sendto} poder user utilizada a mesma técnica que foi utilizada para o \textit{connect}, para o \textit{recvfrom} pode ser mais dificil pois pode receber pacotes de multiplas fontes

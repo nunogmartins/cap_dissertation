@@ -1,0 +1,35 @@
+\chapter{Avaliação}
+\label{cap:avaliacao}
+
+\section{Ferramenta de testes e}
+%Como efectuar a monitorização
+
+Foi desenvolvida uma aplicação para testar o desenvolvimento da ferramenta.
+Esta aplicação 
+
+\subsection{Test Unit}
+
+De forma a testar o repositório de dados foram efectuados diferentes \textit{unit tests}, de forma a assegurar que todas as alterações efectuadas na ferramenta ficavam de correctas.
+
+\subsection{Aplicação Monitora}
+\label{sub:monitor_app}
+
+Para poder mais facilmente efectuar os testes de avaliação, foi criado uma ferramenta em nível utilizador que permite lançar a aplicação e configurar automaticamente o sistema para a monitorizar. Esta verifica o identificador do processos e o momento em que se dá o inicio e o fim da sua execução, de forma a iniciar e terminar a monitorização quando necessário.
+
+\subsection{Aplicação de testes de performance}
+
+Para ajudar na avaliação da ferramenta desenvolvida foi criado um conjunto de aplicações independentes ( scripts e aplicações ) para monitorizar a actividade de algumas aplicações que se consideraram pertinentes no processo de avaliação do desempenho da ferramenta.
+
+A aplicação desenvolvida \textit{manager} tem de ser executada sob o controlo do utilizador \textit{root}, devido à necessidade de executar processos que só este utilizador tem acesso. Estes processos anteriormente mencionados são \textit{insmod}, \textit{rmmod} e \textit{tcpdump}.
+
+Os \textit{scripts} criandos e bash serviram para obter o número de dados e pacotes transferidos na interface, bem como fazer a separação dos tempos que as aplicações de testes executaram para conseguir automatizar o processo de execução e recolha de dados dos testes.
+
+
+\section{Temporizadores}
+
+Temporizadores no núcleo do sistema.
+
+
+\subsection{Temporizadores de Alta-Resolução}
+
+\textit{HrTimer}
