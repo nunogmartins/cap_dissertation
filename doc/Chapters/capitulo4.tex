@@ -1,18 +1,23 @@
-\chapter{Estrutura}
+\chapter{Arquitectura}
 \label{cap:Estrutura}
 
-Para conceber a arquitectura do sistema de monitorização de rede de um processo, foi necessário conhecer como os processos comunicam com o exterior.
- Conhecendo a arquitectura de rede do \textit{Linux}, foi necessário perceber de que forma se processa a recepção e/ ou transmissão, bem como a monitorização de rede. 
+Para conceber a arquitectura do sistema de monitorização de rede orientado ao processo (MROP), foi necessário conhecer como os processos comunicam com o núcleo de forma a efectuar comunicações com o exterior.
+Após conhecer a arquitectura de rede do \textit{Linux}, foi necessário compreender de que forma se processa a comunicação, bem como a monitorização de rede.
 
-Neste capitulo vai ser apresentado a constituição do sistema de rede do \textit{Linux}, desde o momento em que a aplicação envia os dados, até ao momento em que estes chegam à interface de rede e vice-versa.
+Neste capitulo irá ser apresentado a constituição do sistema de rede do \textit{Linux}, desde o momento em que a aplicação envia os dados, até ao momento em que estes chegam à interface de rede e vice-versa.
 Como esta visão é muito abrangente, apenas serão focados os pontos essenciais da arquitectura.
-Após esta análise geral do sistema de rede do \textit{Linux}, será apresentado a arquitectura do projecto desenvolvido.
+Após esta visão geral do sistema de rede do \textit{Linux}, será apresentada a arquitectura do sistema (MROP).
 
 
 \section{Arquitectura de rede em \textit{Linux}}
 \label{sub:network}
- Um processo para comunicar remotamente com outro, utilizará as funcionalidades de rede do seu sistema de operação.
- 
+
+Os processos em um sistema são instâncias de um programa, que partilha recursos físicos e lógicos da máquina.
+Os processos para aceder a alguns recursos, podem necessitar de efectuar comunicações com instâncias de outros programas, estes podem estar localizados na mesma máquina (processos locais), ou estar em outra máquina (processos remotos).
+
+Um processo para comunicar com outro através, utilizará as funcionalidades de rede do seu sistema de operação.
+Pois apenas este sabe gerir correctamente os recursos de rede.
+
  %Para isto um processo tem de efectuar o inicio da comunicação enviando alguns pacotes de inicio de sessão (caso o protocolo de comunicação necessite).
  Um processo em \textit{Linux} é uma instância de um programa que partilha recursos da máquina, físicos ou lógicos.
  Os processos dentro do núcleo são instâncias de uma estrutura \textit{task\_struct} que contém diversos elementos pertencentes ao processo, tais como identificadores de processo, tabela de ficheiros abertos, zonas de memória atribuidas, etc.
@@ -43,6 +48,7 @@ As principais chamadas ao sistema para estabelecer, terminar e comunicar sobre \
 Os file descriptors (socket descriptors) são os identificadores para os sockets. Os sockets são mapeados em ficheiros e estes em descritores de ficheiros. 
 
 \subsection{Estrutura de um processo}
+% ou recursos de rede de um processo
 
 Um processo para executar tem de ser carregado para memória e posteriormente ser agendado para execução através do escalonador de processos do núcleo.
  Um processo para o núcleo é uma estrutura com a informação sobre as zonas de memória, descritores de ficheiros abertos, informações sobre os tempos de execução, informações sobre a hierarquia de processos pertencentes a este, etc.
@@ -215,7 +221,10 @@ O sistema proposto foi desenvolvido procurando cumprir os seguintes requisitos:
 \item a implementação deve envolver poucas alterações ao código do sistema, para facilitar a sua manutenção e evolução com as novas versões do sistema Linux.
 \end{itemize}
 
-Para tal, o sistema criado está dividido em 4 componentes principais (ver figura \ref{arquitectura}). A função de filtragem, invocada por um \textit{hook} que estende o LSF, permite que apenas o tráfego do processo alvo seja analisado pelo restante sistema de fitragem do LSF. Uma componente de instrumentação das chamadas ao sistema (ou outras funções contidas no sistema de rede) que actualiza o repositório de dados onde é mantido o estado das interacções via rede do(s) processo(s) alvo. Existe ainda um sistema para controlo/configuração e para obter informação do estado da monitorização.
+Para tal, o sistema criado está dividido em 4 componentes principais (ver figura \ref{arquitectura}).
+ A função de filtragem, invocada por um \textit{hook} que estende o LSF, permite que apenas o tráfego do processo alvo seja analisado pelo restante sistema de fitragem do LSF.
+ Uma componente de instrumentação das chamadas ao sistema (ou outras funções contidas no sistema de rede) que actualiza o repositório de dados onde é mantido o estado das interacções via rede do(s) processo(s) alvo.
+ Existe ainda um sistema para controlo/configuração e para obter informação do estado da monitorização.
 
 \begin{figure}[htbp]
 \begin{center}
@@ -226,21 +235,20 @@ Para tal, o sistema criado está dividido em 4 componentes principais (ver figur
 \end{figure}
 
 
-Este sistema permite que sejam capturados os pacotes de rede de um processo, sem que exista um conhecimento prévio sobre o(s) protocolo(s) ou portas utilizadas. A utilização de um sistema de instrumentação do núcleo foi necessária apenas para monitorizar as chamadas envolvendo \emph{sockets} e identificar o processo responsável, permitindo desta forma obter e manter permanentemente actualizada a informação sobre o estado respeitante ao processo alvo. De forma a minimizar a redução de desempenho, todo o sistema foi desenvolvido dentro do núcleo do \textit{Linux}, sem alterações nas interfaces já existentes.  Assim, ferramentas de façam uso da biblioteca \textit{LibPcap}, como o programa \textit{tcpdump} ou suas variantes, podem beneficiar desta extensão sem qualquer alteração e sem impacto relevante no seu desempenho.
+Este sistema permite que sejam capturados os pacotes de rede de um processo, sem que exista um conhecimento prévio sobre o(s) protocolo(s) ou portas utilizadas.
+ A utilização de um sistema de instrumentação do núcleo foi necessária apenas para monitorizar as chamadas envolvendo \emph{sockets} e identificar o processo responsável, permitindo desta forma obter e manter permanentemente actualizada a informação sobre o estado respeitante ao processo alvo.
+ De forma a minimizar a redução de desempenho, todo o sistema foi desenvolvido dentro do núcleo do \textit{Linux}, sem alterações nas interfaces já existentes.
+ Assim, ferramentas de façam uso da biblioteca \textit{LibPcap}, como o programa \textit{tcpdump} ou suas variantes, podem beneficiar desta extensão sem qualquer alteração e sem impacto relevante no seu desempenho.
 
 ---------------------------------------------------------------------------------------------------------
 
-A arquitectura foi pensada para ser executada de forma ortogonal ao sistema
-utilizado. Desta forma não existe a necessidade de recompilar programas
-antigos. Para além desta situação novas aplicações podem utilizar esta
-ferramenta de forma transparente.
+A arquitectura foi pensada para ser executada de forma ortogonal ao sistema utilizado.
+ Desta forma não existe a necessidade de recompilar programas antigos.
+ Para além desta situação novas aplicações podem utilizar esta ferramenta de forma transparente.
 
-Esta ferramenta foi desenvolvida para os processadores x86 e x86\_64 pois nestas
-arquitecturas existe suporte para o sistema de monitorização KProbes \ref{},
-sendo esta a unica dependência especifica que a ferramenta irá ter.
+Esta ferramenta foi desenvolvida para os processadores x86 e x86\_64 pois nestas arquitecturas existe suporte para o sistema de monitorização KProbes \ref{}, sendo esta a unica dependência especifica que a ferramenta irá ter.
 
-As diferentes partes da ferramenta foram desenvolvidas de forma a poderem ser
-modificadas em separado permitindo um melhor aproveitamento da modularização.
+As diferentes partes da ferramenta foram desenvolvidas de forma a poderem ser modificadas em separado permitindo um melhor aproveitamento da modularização.
 Este módulo foi desenvolvido em 4 subpartes. 
 
 ---------------------------------------------------------------------------------------------------------
@@ -265,23 +273,22 @@ O estado dos portos TCP e UDP em uso pelo processo alvo é mantido num repositó
 \label{sub:packet_filter}
 
 A função de filtragem  implementada neste sistema assenta no estado do processo alvo, mantido pelos módulos anteriormente descritos.
-Através da extensão do LSF com um hook, quando ligado, este invoca esta filtragem que devolve ao LSF se o pacote deve ser logo ignorado (não envolve nenhum dos portos do processo alvo) ou se se deve continuar a avaliar as restantes regras de filtragem definidas. Mantém-se assim a compatibilidade e continua-se a tirar partido dos benefícios da utilização do Linux Socket Filter.
+Através da extensão do LSF com um hook, quando ligado, este invoca esta filtragem que devolve ao LSF se o pacote deve ser logo ignorado (não envolve nenhum dos portos do processo alvo) ou se se deve continuar a avaliar as restantes regras de filtragem definidas.
+ Mantém-se assim a compatibilidade e continua-se a tirar partido dos benefícios da utilização do Linux Socket Filter.
 
 
 
 \subsection*{Controlo e Informação}
 \label{sub:data_information}
 
-Para facilmente controlar e configurar o sistema desenvolvido foi definida uma interface baseada em ficheiros virtuais (DebugFS). Estes ficheiros estão apenas acessíveis ao utilizador \textit{root}, controlando o acesso por parte dos utilizadores da máquina ao sistema de monitorização. Os ficheiros de controlo definidos foram \textit{option}, \textit{pid}, \textit{ppid} e \textit{tgid}. O primeiro ficheiro permite controlar a análise e a informação da árvore. Dependendo do valor a escrever em \textit{option} o sistema poderá proceder a uma análise dos \textit{sockets} do processo (identificado em \textit{pid, ppid, tgid}), e carregar essa informação para a àrvore do estado do processo, bem como poderá remover todos os elementos da àrvore se for essa a opção escrita para o ficheiro. Como foi indicado os restantes ficheiros permitem definir o(s) processo(s) a monitorizar. Pode ser indicado um processo ou todos os processos de um grupo. Os ficheiros de informação \textit{filter\_stats},  \textit{syscalls\_calls\_stats} e \textit{tree\_info} foram definidos para obter estatísticas dos pacotes analisados e das entradas/retornos das funções instrumentadas, bem como dos elementos presentes na árvore (dados dos sockets activos do processo).
-
-
-%%%%%%%%%%%%%%%%%
-\subsection{Aplicação Monitora}
-\label{sub:monitor_app}
-
-Para poder mais facilmente efectuar os testes de avaliação, foi criado uma ferramenta em nível utilizador que permite lançar a aplicação e configurar automaticamente o sistema para a monitorizar. Esta verifica o identificador do processos e o momento em que se dá o inicio e o fim da sua execução, de forma a iniciar e terminar a monitorização quando necessário.
-
-%%%%%%%%%%%%%%%%%%%
+Para facilmente controlar e configurar o sistema desenvolvido foi definida uma interface baseada em ficheiros virtuais (DebugFS).
+ Estes ficheiros estão apenas acessíveis ao utilizador \textit{root}, controlando o acesso por parte dos utilizadores da máquina ao sistema de monitorização.
+ Os ficheiros de controlo definidos foram \textit{option}, \textit{pid}, \textit{ppid} e \textit{tgid}.
+ O primeiro ficheiro permite controlar a análise e a informação da árvore.
+ Dependendo do valor a escrever em \textit{option} o sistema poderá proceder a uma análise dos \textit{sockets} do processo (identificado em \textit{pid, ppid, tgid}), e carregar essa informação para a àrvore do estado do processo, bem como poderá remover todos os elementos da àrvore se for essa a opção escrita para o ficheiro.
+ Como foi indicado os restantes ficheiros permitem definir o(s) processo(s) a monitorizar.
+ Pode ser indicado um processo ou todos os processos de um grupo.
+ Os ficheiros de informação \textit{filter\_stats},  \textit{syscalls\_calls\_stats} e \textit{tree\_info} foram definidos para obter estatísticas dos pacotes analisados e das entradas/retornos das funções instrumentadas, bem como dos elementos presentes na árvore (dados dos sockets activos do processo).
 
 
 -----------------------------------------------------------------------------
@@ -302,56 +309,29 @@ Para continuar a ser opaco para os diferentes sistemas de monitorização/captur
 %No caso de não existir a ligação a este \textit{hook} o sistema comporta-se de
 %forma a utilizar apenas o sistema anterior.
 
-\paragraph{Estruturas}
-
-A não criação de novas estruturas de dados, foi devido à existência das
-estruturas de dados existentes no código do núcleo do sistema de operação
-linux, que já foram bastante analisadas e existem com o propósito de serem
-utilizadas por outros programadores.
-
-\paragraph{Divisão do módulo} 
-
-O módulo subdivide-se em 4 partes, a monitorização, o ``reservatório'' de
-informação, o \textit{hook} da ligação com o \textit{bpf} e
-comunicação/\textit{debug}.
-
 \paragraph{Interacção com o LSF}
-O sistema interage também com o \textit{LSF} pois existe uma conjunção
-entre o filtro definido pelo utilizador e a captura do tráfego da aplicação a
-ser monitorizada.
+O sistema interage também com o \textit{LSF} pois existe uma conjunção entre o filtro definido pelo utilizador e a captura do tráfego da aplicação a ser monitorizada.
 
 \subsection{Arquitectura}
 
 \subsubsection{Monitorização da aplicação}
 
-Como foi apresentado no quadro \ref{tab:monitoring} o sistema de monitorização
-do núcleo do sistema linux que se adapta melhor para este problema é o
-KProbes\ref{sec:kprobes}. 
+Como foi apresentado no quadro \ref{tab:monitoring} o sistema de monitorização do núcleo do sistema linux que se adapta melhor para este problema é o KProbes\ref{sec:kprobes}. 
 
 \subsubsection{Repositório de dados}
 
-Para permitir a consulta dos pares número de porta endereço é necessário
-utilizar um repositório de dados. Este repositório de dados necessitará de alta
-performance mas facilidade de utilização e modificação. Terá de permitir as
-seguintes operações: adição, consulta e remoção de dados.
+Para permitir a consulta dos pares número de porta endereço é necessário utilizar um repositório de dados. Este repositório de dados necessitará de alta performance mas facilidade de utilização e modificação.
+ Terá de permitir as seguintes operações: adição, consulta e remoção de dados.
 
-Este repositório de dados irá ser a ponte entre o sistema de  monitorização e o
-sistema de filtragem de pacotes. 
+Este repositório de dados irá ser a ponte entre o sistema de  monitorização e o sistema de filtragem de pacotes. 
 
 \subsubsection{Filtragem de pacotes}
 
-Sistema que irá indicar à função run\_filter do \textit{LSF} se um pacote deverá
-ser capturado ou não. Irá ser definido um ponto \textit{hook} dentro do núcleo
-do sistema do linux, de forma a poder ser utilizada a funcionalidade de
-filtragem dinâmica apenas quando se deseje. O custo introduzido para estas
-modificação é apenas de uma verificação se o \textit{hook} está ligado ou não.
+Sistema que irá indicar à função run\_filter do \textit{LSF} se um pacote deverá ser capturado ou não.
+ Irá ser definido um ponto \textit{hook} dentro do núcleo do sistema do linux, de forma a poder ser utilizada a funcionalidade de filtragem dinâmica apenas quando se deseje.
+ O custo introduzido para estas modificação é apenas de uma verificação se o \textit{hook} está ligado ou não.
 
 
 \subsubsection{Recolha de informações}
 
-Utilizando um dos sistemas definidos em \ref{tab:transferencia_dados} é
-permitido o acesso a informações de análise dos diversos sistemas anteriormente
-mencionados.
-
-
-
+Utilizando um dos sistemas definidos em \ref{tab:transferencia_dados} é permitido o acesso a informações de análise dos diversos sistemas anteriormente mencionados.
