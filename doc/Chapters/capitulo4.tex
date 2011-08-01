@@ -20,12 +20,14 @@ Pois apenas este sabe gerir correctamente os recursos de rede.
 
  %Para isto um processo tem de efectuar o inicio da comunicação enviando alguns pacotes de inicio de sessão (caso o protocolo de comunicação necessite).
  Um processo em \textit{Linux} é uma instância de um programa que partilha recursos da máquina, físicos ou lógicos.
- Os processos dentro do núcleo são instâncias de uma estrutura \textit{task\_struct} que contém diversos elementos pertencentes ao processo, tais como identificadores de processo, tabela de ficheiros abertos, zonas de memória atribuidas, etc.
+\todo{muito pormenor}
+ Os processos dentro do núcleo são instâncias de uma estrutura \textit{task\_struct} que contém diversos elementos pertencentes ao processo, tais como identificadores de processo, tabela de ficheiros abertos, zonas de memória atribuidas, permissões, etc.
  
  Um processo para utilizar as funcionalidades de rede necessita criar uma instância de um \textit{socket}, que fica referênciado através de um descritor de ficheiros (descritor de \textit{socket}).
- Isto porque os \textit{sockets} de um processo são mapeados no sistema de ficheiros virtual, neste caso sobre a forma de \textit{sockets}, forma de comunicação sobre a rede.
- Estes descritores permitem ao processo identificar o \textit{socket}, para efectuar comunicações.
- Estas comunicações, bem como o estabelecimento destes canais de comunicação, são efectuadas através de chamadas ao sistema de operação.
+ Tal como os ficheiros são acedidos em nível utilizador através de descritores os \textit{sockets} também são acedidos e manipulados através destes, apenas com chamadas ao sistema próprias para controlo e comunicação nestes canais.
+ %Os \textit{sockets} são mapeados no sistema de ficheiros virtual, permitindo desta forma neste caso sobre a forma de \textit{sockets}, forma de comunicação sobre a rede.
+% Estes descritores permitem ao processo identificar o \textit{socket}, para efectuar as comunicações.
+ %Estas comunicações, bem como o estabelecimento destes canais de comunicação, são efectuadas através de chamadas ao sistema de operação.
 
 %Falar aqui sobre qq coisa da estrutura de rede ... 
 %Talvez tb imagem com um pouco da arquitectura ... básica 
@@ -33,19 +35,21 @@ Pois apenas este sabe gerir correctamente os recursos de rede.
 %Falta falar sobre o netfilter ... sobre tc trafic control
 
 %  Descrever um pouco esta parte ...
- A generalidade das aplicações utilizam os \textit{sockets} da familia \textit{AF\_INET} para efectuar as suas comunicações sobre redes.
- Nesta familia de \textit{sockets} os tipos mais utilizados são os \textit{INET\_STREAM} e \textit{INET\_DGRAM}, para comunicações com estado e sem estado, respectivamente.
- Outras familias de \textit{sockets} existem tais como \textit{AF\_NETLINK}, \textit{AF\_UNIX} entre outros. 
+ Os canais de comunicação de rede estão organizados em familias de endereços, sendo a familia de endereços \textit{AF\_INET} utilizada para efectuar comunicações sobre a internet.
+Outras familias de \textit{sockets} existentes são \textit{AF\_NETLINK}, \textit{AF\_UNIX}, etc.
+A chamada ao sistema \textit{socket} é composta pela familia de endereços, pelo tipo e pelo protocolo.
+Desta forma generica é possível mapear diferentes tipos de comunicação, tais como \textit{INET} , \textit{NETLINK}, \textit{UNIX LOCAL}, em uma estrutura, o \textit{BSD socket}.
 
-Estas chamadas aos sistema são genéricas de forma a poderem ser mapeadas nas diferentes instâncias dos protocolos de comunicação tais como \textit{INET} , \textit{NETLINK}, \textit{UNIX LOCAL}, etc.
+ A generalidade das aplicações utilizam os \textit{sockets} da familia \textit{AF\_INET}, para efectuar as suas comunicações sobre redes, sendo os principais tipos utilizados o \textit{INET\_STREAM} e \textit{INET\_DGRAM}.
+ Estes dois tipos oferecencem canais orientados à conexão com estado e sem estado, respectivamente.
 
-Os protocolos \textit{TCP} e \textit{UDP} têm formas diferentes de executar funcionalidades semelhantes e por isso estão descritos em instâncias diferentes.
 
 %Quando a chamada ao sistema \textit{socket} é efectuada, é criado uma nova instância de um socket e inicializados os respectivos campos com a informação dependente para a familia e tipo. 
 
-As principais chamadas ao sistema para estabelecer, terminar e comunicar sobre \textit{sockets} são: \textit{socket}, \textit{connect}, \textit{bind}, \textit{listen}, \textit{accept}, \textit{send}, \textit{recv}, \textit{sendto}, \textit{recvfrom} e \textit{close}. 
+As principais chamadas ao sistema para estabelecer, terminar e comunicar sobre \textit{sockets} são: \textit{socket}, \textit{close}, \textit{connect}, \textit{bind}, \textit{listen}, \textit{accept}, \textit{send}, \textit{recv}, \textit{sendto} e \textit{recvfrom}. 
 
-Os file descriptors (socket descriptors) são os identificadores para os sockets. Os sockets são mapeados em ficheiros e estes em descritores de ficheiros. 
+
+%Os file descriptors (socket descriptors) são os identificadores para os sockets. Os sockets são mapeados em ficheiros e estes em descritores de ficheiros. 
 
 \subsection{Estrutura de um processo}
 % ou recursos de rede de um processo
@@ -65,7 +69,6 @@ Um processo para poder comunicar com a interface de rede tem de abrir um canal e
  Esta função regista a abertura de um canal de comunicação entre o processo e o sistema de rede, sendo o descritor do \textit{socket} um identificador do sistema de ficheiros, que fica registado no descritor do processo dentro do núcleo.
  Esta é apenas a primeira das abstrações que o núcleo efectua sobre a arquitectura do sistema de rede.
   
-algures falar sobre o accept e o bind e o socket devido à estrutura interna que aguarda o indicador da porta igual ... tenho de verificar isto correctamente
 
 
 \subsection{Sockets e suas familias}
@@ -76,17 +79,25 @@ Como já foi indicado em \ref{sub:network}, um processo para comunicar tem de ut
  Os \textit{sockets} para comunicação de internet utilizam o domínio \textit{AF\_INET}, que permite utilizar diferentes tipos de protocolos, tais como \textit{UDP} e \textit{TCP}.
  Estes protocolos são utilizados pela generalidade das aplicações quando necessita de comunicar com outro processo que utilize os mesmos protocolos de comunicação.
 
+Na secções seguintes irão ser apresentadas diferentes familias de endereços suportadas no núcleo do \textit{Linux}, tendo especial ênfase nas familias \textit{INET} e \textit{PACKET}.
+
 %Address Family para o INET, internet sockets para ipv4 e AF\_INET6 para ipv6
 
 \subsubsection{AF\_INET}
 
 \textit{AF\_INET} é familia de endereços utilizada para comunicar através do protocolo \textit{IP versão 4}, protocolo este de nível rede para efectuar comunicações através da \textit{internet}.
-Existem diferentes tipos de protocolos de nível transporte sobre \textit{IPv4}, sendo alguns dos mais utilizados o \textit{TCP}, \textit{UDP}, \textit{ICMP}, etc.
-Estes protocolos podem ser utilizados através da chamada ao sistema \textit{socket}, indicando os valores \textit{SOCK\_STREAM}, \textit{SOCK\_DGRAM} e \textit{SOCK\_ICMP} na variável tipo, para os anteriormente indicados.
-Estes valores só têm correspondência caso tenha sido definida a familia como \textit{AF\_INET}.
+ Existem diferentes tipos de protocolos de nível transporte sobre \textit{IPv4}, sendo alguns dos mais utilizados o \textit{TCP}, \textit{UDP}, \textit{ICMP}, etc.
+ Estes protocolos podem ser utilizados através da chamada ao sistema \textit{socket}, indicando os valores \textit{SOCK\_STREAM}, \textit{SOCK\_DGRAM} e \textit{SOCK\_ICMP}, na variável tipo, para os anteriormente indicados.
+ Para além destes diferentes tipos existe também o \textit{SOCK\_RAW}, que permite acesso directo ao nível de transporte.
+ Este protocolo permite a criação de um canal que comunica directamente com o nível \textit{IP} da pilha de protocolos \textit{TCP\\IP}, desta forma é possível executar protocolos de comunicação em nível utilizador.
+ Alguns exemplos de protocolos que operam a este nível são: \todo{procurar}(existem alguns de routing ...)
 
 
-atraves desta familia que e implementado o tcp sobre ipv4 e o udp sobre ipv4 existe tb o sock\_raw que permite enviar pacotes directamente para o nivel de transporte ip ... 
+Os protocolos \textit{TCP} e \textit{UDP} têm formas diferentes de executar funcionalidades semelhantes e por isso estão descritos em instâncias diferentes.
+algures falar sobre o accept e o bind e o socket devido à estrutura interna que aguarda o indicador da porta igual ... tenho de verificar isto correctamente
+\subsubsection{AF\_PACKET}
+
+Aqui talvez algo mais generico pois este esta familia é a utilizada para o sniffing.
 
 %\lstset{language=C}
 %\begin{lstlisting}
@@ -124,24 +135,34 @@ atraves desta familia que e implementado o tcp sobre ipv4 e o udp sobre ipv4 exi
 
 \subsection{Interfaces de rede}
 
-O núcleo do \textit{linux} mantém a informação sobre quais as interfaces de rede que foram inicializadas pelos seus controladores, mesmo que não estando activas estas constantam de uma lista duplamente ligada de \textit{net\_devices}. 
- Em cada posição da lista está toda a informação referente a uma interface de rede e suas configurações, nomeadamente a informação sobre o seu endereço ip ou o seu mac address no caso de interfaces \textit{ethernet} ou mapeadas sobre \textit{ethernet} (como o caso das interfaces ponto-a-ponto).
+O núcleo mantém a informação sobre as interfaces de rede que foram inicializadas pelos seus controladores, mesmo não estando activas estas constantam de uma lista duplamente ligada de \textit{net\_devices}. 
+ Em cada posição desta lista existe está toda a informação referente a uma interface de rede e suas configurações, nomeadamente a informação sobre o seu endereço ip ou o seu mac address no caso de interfaces \textit{ethernet} ou mapeadas sobre \textit{ethernet} (como o caso das interfaces ponto-a-ponto).
+
+No registo de um novo controlador de interface de rede definem-se as operações a executar em determinados eventos, tais como, recepção e/ou transmissão de frames, remoção da interface, etc.
+ Estas operações são definidas através de uma interface comum, a \textit{struct netdev\_ops}, permitindo definir a \textit{API} das interfaces de rede.
 
  Falar sobre os controladores das interfaces de rede, e que definem um conjunto de funções para serem desencadeadas em determinados pontos do envio ou recepcao de frames ... ndo (netdevice operations) 
-
- No registo de um novo controlador de interface de rede definem-se as operações a executar em determinados eventos, tais como, recepção e/ou transmissão de frames, remoção da interface, etc.
- Estas operações são definidas através de uma interface comum, a \textit{struct netdev\_ops}, permitindo definir a \textit{API} das interfaces de rede.
  
 \subsection{Estrutura de um sk\_buff}
  Os dados que são enviados ou recebidos pelos controladores de rede são os \textit{sk\_buff}. Uma estrutura com os diferentes cabeçalhos necessários à sua transmissão ou recepção.
  Existem 4 apontadores para endereços de memória dentro da estrutura que definem os endereços de inicio e fim do pacote, bem como dos cabeçalhos.
  Falta boneco com esta informação ... fica mais realista.
  
-%\lstset{language=C}
-%\begin{lstlisting}
-%
-%\end{lstlisting}
-%
+\lstset{language=C}
+\begin{lstlisting}
+struct sk_buff {
+	...
+	struct net_device *dev;
+	struct sock *sk;
+	...
+	struct sk_buff_data_t tail;
+	struct sk_buff_data_t end;
+	unsigned char *head;
+	unsigned char *data;
+	...
+}
+\end{lstlisting}
+
 \subsection{NetFilter}
 
 O sistema de operação \textit{Linux} tem um sistema de \textit{firewall} que permite controlar os acessos dos processos aos sistemas de comunicação de rede.
@@ -155,6 +176,7 @@ O sistema de operação \textit{Linux} tem um sistema de \textit{firewall} que p
  Quando os protocolos de nível 3 vão enviar os dados, para a camada de nível 2, estes são armazenados em \textit{QDisks} para serem posteriormente serem enviados.
  Com a necessidade de diferenciar os diferentes tipos de dados os administradores de sistemas podem diferenciar o trafego e armazená-lo em diferentes \textit{QDisks}, de forma a poder efectuar \textit{Quality of Service}.
 Apesar de ter estrutra para controlo dos dados que chegam da interface de rede o principal propósito é controlo do dados que saem através das interface de rede.
+
 
 \subsection{AF\_PACKET}
 
@@ -170,7 +192,7 @@ A familia \textit{AF\_PACKET} permite comunicar directamente com o controlador d
  No entanto ficaram visíveis à monitorização pois esta é efectuada antes de chegar aos \textit{Hooks} do \textit{netfilter}.
  
 
- Podem ser utilizados os tipos \textit{SOCK\_DGRAM} ou \textit{SOCK\_RAW}. Em \textit{DGRAM}
+ Podem ser utilizados os tipos \textit{SOCK\_DGRAM} ou \textit{SOCK\_RAW}. Em \textit{SOCK\_DGRAM}
  
 %A forma para comunicar enviar e receber dados directamente da interface de rede é através da familia de protocolos \textit{AF\_PACKET}. 
 
@@ -210,7 +232,7 @@ Quando a aplicação está a executar e efectua uma chamada ao sistema de opera�
  Durante parte da execução da chamada ao sistema de operação é possível referenciar qual o processo que efectuou a chamada, pois caso a chamada seja sincrona, é agendada um processamento sobre os dados e a aplicação fica bloqueada à espera de ser re-escalonada através da função \textit{schedule}.
  O sistema de ficheiros mantém a referência sobre quais os ficheiros/sockets abertos para cada processo e é possível obter qual o processo a que cada descritor de ficheiros pertence. % back pointers ... nos sockets ... binded de uma porta a um processo ... pode nao ser a chamada bind ... 
 
-\section{Desenho e arquitectura}
+\section{Desenho e arquitectura do MROP}
 \label{sec:architecture}
 
 O sistema proposto foi desenvolvido procurando cumprir os seguintes requisitos:
@@ -288,50 +310,26 @@ Para facilmente controlar e configurar o sistema desenvolvido foi definida uma i
  Dependendo do valor a escrever em \textit{option} o sistema poderá proceder a uma análise dos \textit{sockets} do processo (identificado em \textit{pid, ppid, tgid}), e carregar essa informação para a àrvore do estado do processo, bem como poderá remover todos os elementos da àrvore se for essa a opção escrita para o ficheiro.
  Como foi indicado os restantes ficheiros permitem definir o(s) processo(s) a monitorizar.
  Pode ser indicado um processo ou todos os processos de um grupo.
- Os ficheiros de informação \textit{filter\_stats},  \textit{syscalls\_calls\_stats} e \textit{tree\_info} foram definidos para obter estatísticas dos pacotes analisados e das entradas/retornos das funções instrumentadas, bem como dos elementos presentes na árvore (dados dos sockets activos do processo).
+ Os ficheiros de informação \textit{filter\_stats}, \textit{syscalls\_calls\_stats} e \textit{tree\_info} foram definidos para obter estatísticas dos pacotes analisados e das entradas/retornos das funções instrumentadas, bem como dos elementos presentes na árvore (dados dos sockets activos do processo).
 
-
------------------------------------------------------------------------------
-
-
-
-\subsection{Módulos no espaço do núcleo}
+\subsubsection*{Mais info}
 %a não utilização de ioctl para o debug ... 
 A estratégia foi separar os diferentes componentes e a criação de um módulo de \textit{debug} para que pudesse existir uma forma de acesso à monitorização por parte do nível de utilizador, sem que exista a necessidade de criar ou alterar chamadas ao sistema ou suas opções.
 
 \subsection{Filtro}
 
-Para continuar a ser opaco para os diferentes sistemas de monitorização/captura de rede foi necessário colocar um ponto de ligação entre o sistema actual e o módulo desenvolvido. Quando não existe uma ligação efectuada, existe apenas um ligeiro decréscimo do desempenho, este deve-se à verificação da existência de ligação. Caso a ligação esteja activa o fluxo de controlo é passado para a função de filtro definida no módulo.
+Para continuar a ser opaco para os diferentes sistemas de monitorização/captura de rede foi necessário colocar um ponto de ligação entre o sistema actual e o módulo desenvolvido.
+ Quando não existe uma ligação(\textit{Hook}) activa, existe apenas um ligeiro decréscimo no desempenho, este deve-se apenas à verificação da existência se esta ligação está activa.
+ Caso a ligação esteja activa o fluxo de controlo é passado para a função de filtro definida no módulo.
+ Desta forma é possível criar funções que permitem controlar o fluxo de dados que devem ser processados ou descartados
 
-%Necessidade de registar um \textit{hook} para aceder directamente à função de
-%filtro. Caso este \textit{hook} não esteja ligado o \textit{overhead}
-%introduzido será o de um teste para verificar se existe ligação ou não.
-%No caso de não existir a ligação a este \textit{hook} o sistema comporta-se de
-%forma a utilizar apenas o sistema anterior.
+Necessidade de registar um \textit{hook} para aceder directamente à função de filtro.
+ Caso este \textit{hook} não esteja ligado o \textit{overhead} introduzido será o de um teste para verificar se existe ligação ou não.
+ No caso de não existir a ligação a este \textit{hook} o sistema comporta-se de forma a utilizar apenas o sistema anterior.
 
-\paragraph{Interacção com o LSF}
 O sistema interage também com o \textit{LSF} pois existe uma conjunção entre o filtro definido pelo utilizador e a captura do tráfego da aplicação a ser monitorizada.
 
-\subsection{Arquitectura}
+\section{Resumo}
 
-\subsubsection{Monitorização da aplicação}
+Algumas ideias para concluir este capitulo ...
 
-Como foi apresentado no quadro \ref{tab:monitoring} o sistema de monitorização do núcleo do sistema linux que se adapta melhor para este problema é o KProbes\ref{sec:kprobes}. 
-
-\subsubsection{Repositório de dados}
-
-Para permitir a consulta dos pares número de porta endereço é necessário utilizar um repositório de dados. Este repositório de dados necessitará de alta performance mas facilidade de utilização e modificação.
- Terá de permitir as seguintes operações: adição, consulta e remoção de dados.
-
-Este repositório de dados irá ser a ponte entre o sistema de  monitorização e o sistema de filtragem de pacotes. 
-
-\subsubsection{Filtragem de pacotes}
-
-Sistema que irá indicar à função run\_filter do \textit{LSF} se um pacote deverá ser capturado ou não.
- Irá ser definido um ponto \textit{hook} dentro do núcleo do sistema do linux, de forma a poder ser utilizada a funcionalidade de filtragem dinâmica apenas quando se deseje.
- O custo introduzido para estas modificação é apenas de uma verificação se o \textit{hook} está ligado ou não.
-
-
-\subsubsection{Recolha de informações}
-
-Utilizando um dos sistemas definidos em \ref{tab:transferencia_dados} é permitido o acesso a informações de análise dos diversos sistemas anteriormente mencionados.
