@@ -81,20 +81,25 @@ Nas subsecções seguintes irão ser apresentados diferentes constituintes da es
 
 Um processo é a instânciação de um programa, sendo também uma unidade de escalonamento de execução (\textit{task}) no sistema.
 Consome recursos (físicos e lógicos) partilhados com outros processos num sistema multiprogramado.
+O núcleo para cada processo gere uma entidade, \textit{task}, onde estão identificados todos os recursos atribuidos a este.
+Esta estrutura contém apontadores para diversos recursos tais como: zonas de memória requisitadas, canais abertos (ficheiros, \textit{sockets}, entre outros), contabilização de utilização de \textit{cpu}, apontadores para a sua àrvore geneológica (pai, irmãos e filhos), etc.
+
 Um dos recursos partilhados pelos diferentes processos é o acesso à rede, permitindo desta forma a comunicação com o exterior.
-Para serem efectuadas comunicações é necessário criar canais de comunicação, por isso o sistema de operação tem uma \textit{API} de comunicação que permite a criação, destruição e a utilização de canais.
-Quando um processo cria um canal, o sistema devolve-lhe um identificador, para que este possa efectuar controlar e comunicar através do canal.
+Para serem efectuadas comunicações é necessário a alocação de canais de comunicação, por isso o sistema de operação tem uma \textit{API} de comunicação que permite a criação, destruição e a utilização destes.
+Quando um processo cria um canal, o sistema devolve-lhe um identificador.
+Este identificador serve para o processo referênciar o canal, dentro do núcleo, de forma a efectuar as suas futuras comunicações, bem como o controlo deste.
+Dentro do núcleo, este identificador é gerido na estrutura que identifica os canais abertos, pelo processo.
 
 
 
 
-Um processo para executar tem de ser carregado para memória e posteriormente ser agendado para execução através do escalonador de processos do núcleo.
- Um processo para o núcleo é uma estrutura com a informação sobre as zonas de memória, descritores de ficheiros abertos, informações sobre os tempos de execução, informações sobre a hierarquia de processos pertencentes a este, etc.
- Nos descritores de ficheiros abertos são também incluidos os descritores de \textit{sockets} abertos para comunicação. 
+%Um processo para executar tem de ser carregado para memória e posteriormente ser agendado para execução através do escalonador de processos do núcleo.
+% Um processo para o núcleo é uma estrutura com a informação sobre as zonas de memória, descritores de ficheiros abertos, informações sobre os tempos de execução, informações sobre a hierarquia de processos pertencentes a este, etc.
+% Nos descritores de ficheiros abertos são também incluidos os descritores de \textit{sockets} abertos para comunicação. 
 
- Dentro do núcleo do linux a estrutura que tém a informação sobre um processo (\textit{task}), é a \textit{struct task\_struct}. 
- Nesta estrutura existe a informação sobre quais os ficheiros que a aplicação abriu.
- Como os \textit{sockets} são mapeados sob a forma de ficheiros, estes também se encontram nesta estrutura.
+% Dentro do núcleo do linux a estrutura que tém a informação sobre um processo (\textit{task}), é a \textit{struct task\_struct}. 
+% Nesta estrutura existe a informação sobre quais os ficheiros que a aplicação abriu.
+% Como os \textit{sockets} são mapeados sob a forma de ficheiros, estes também se encontram nesta estrutura.
 
 \subsection{Sistema de ficheiros}
 
@@ -131,89 +136,7 @@ Na secções seguintes irão ser apresentadas diferentes familias de endereços 
 Os protocolos \textit{TCP} e \textit{UDP} têm formas diferentes de executar funcionalidades semelhantes e por isso estão descritos em instâncias diferentes.
 algures falar sobre o accept e o bind e o socket devido à estrutura interna que aguarda o indicador da porta igual ... tenho de verificar isto correctamente
 \subsubsection{AF\_PACKET}
-
-Aqui talvez algo mais generico pois este esta familia é a utilizada para o sniffing.
-
-%\lstset{language=C}
-%\begin{lstlisting}
-%struct proto {
-%	void			(*close)(struct sock *sk, 
-%                        long timeout);
-%	int				(*connect)(struct sock *sk,
-%                        struct sockaddr *uaddr, int addr_len);
-%	int				(*disconnect)(struct sock *sk, int flags);
-% 
-%	struct sock *	(*accept) (struct sock *sk, int flags, int *err)
-%	int				(*ioctl)(struct sock *sk, int cmd, unsigned long arg);
-%	int				(*init)(struct sock *sk);
-%	void			(*destroy)(struct sock *sk);
-%	void			(*shutdown)(struct sock *sk, int how);
-%	int				(*setsockopt)(struct sock *sk, int level, int optname, 
-%						char __user *optval, unsigned int optlen);
-%	int				(*getsockopt)(struct sock *sk, int level, int optname, 
-%						char __user *optval, int __user *option);     
-%						
-% 									...
-%
-%	int				(*sendmsg)(struct kiocb *iocb, struct sock *sk,
-%						struct msghdr *msg, size_t len);
-%	int				(*recvmsg)(struct kiocb *iocb, struct sock *sk,
-%						struct msghdr *msg, size_t len, int noblock, int flags, 
-%						int *addr_len);
-%	int				(*sendpage)(struct sock *sk, struct page *page,
-%						int offset, size_t size, int flags);
-%	int				(*bind)(struct sock *sk, struct sockaddr *uaddr, int addr_len);
-% 
-%									...
-%};
-%\end{lstlisting}
-
-\subsection{Interfaces de rede}
-
-O núcleo mantém a informação sobre as interfaces de rede que foram inicializadas pelos seus controladores, mesmo não estando activas estas constantam de uma lista duplamente ligada de \textit{net\_devices}. 
- Em cada posição desta lista existe está toda a informação referente a uma interface de rede e suas configurações, nomeadamente a informação sobre o seu endereço ip ou o seu mac address no caso de interfaces \textit{ethernet} ou mapeadas sobre \textit{ethernet} (como o caso das interfaces ponto-a-ponto).
-
-No registo de um novo controlador de interface de rede definem-se as operações a executar em determinados eventos, tais como, recepção e/ou transmissão de frames, remoção da interface, etc.
- Estas operações são definidas através de uma interface comum, a \textit{struct netdev\_ops}, permitindo definir a \textit{API} das interfaces de rede.
-
- Falar sobre os controladores das interfaces de rede, e que definem um conjunto de funções para serem desencadeadas em determinados pontos do envio ou recepcao de frames ... ndo (netdevice operations) 
- 
-\subsection{Estrutura de um sk\_buff}
- Os dados que são enviados ou recebidos pelos controladores de rede são os \textit{sk\_buff}. Uma estrutura com os diferentes cabeçalhos necessários à sua transmissão ou recepção.
- Existem 4 apontadores para endereços de memória dentro da estrutura que definem os endereços de inicio e fim do pacote, bem como dos cabeçalhos.
- Falta boneco com esta informação ... fica mais realista.
- 
-\lstset{language=C}
-\begin{lstlisting}
-struct sk_buff {
-	...
-	struct net_device *dev;
-	struct sock *sk;
-	...
-	struct sk_buff_data_t tail;
-	struct sk_buff_data_t end;
-	unsigned char *head;
-	unsigned char *data;
-	...
-}
-\end{lstlisting}
-
-\subsection{NetFilter}
-
-O sistema de operação \textit{Linux} tem um sistema de \textit{firewall} que permite controlar os acessos dos processos aos sistemas de comunicação de rede.
- Este sistema é o \textit{NetFilter}, está presente no núcleo do sistema operação permitindo controlar o fluxo de dados dos processos para as interfaces de rede, bem como no sentido oposto.
- O \textit{NetFilter} está presente na \textit{stack TCP/IP} em 5 pontos apenas e desta forma consegue de uma forma simples controlar o fluxo dos dados.
- O \textit{NetFilter} pode ser controlado pelo \textit{iptables}, uma ferramenta em nível utilizador que através de regras define o acesso dos dados das comunicações rede.
-
-\subsection{Traffic Control}
- Dentro do núcleo do \textit{Linux} para além da \textit{firewall NetFilter} existe um mecanismo de controlo sobre os dados que circulam nas interfaces de rede.
- O principal propósito deste sistema é controlar a transmissão de dados, \textit{egress data transfer}.
- Quando os protocolos de nível 3 vão enviar os dados, para a camada de nível 2, estes são armazenados em \textit{QDisks} para serem posteriormente serem enviados.
- Com a necessidade de diferenciar os diferentes tipos de dados os administradores de sistemas podem diferenciar o trafego e armazená-lo em diferentes \textit{QDisks}, de forma a poder efectuar \textit{Quality of Service}.
-Apesar de ter estrutra para controlo dos dados que chegam da interface de rede o principal propósito é controlo do dados que saem através das interface de rede.
-
-
-\subsection{AF\_PACKET}
+\label{subsub:af_packet}
 
 A familia \textit{AF\_PACKET} permite comunicar directamente com o controlador de rede, por isso esta é a forma efectuar a monitorização de rede. 
  Tal como nas anteriores familias apresentadas em \ref{} e \ref{}, esta familia permite definir diferentes formas de comunicação, em função do tipo e protocolo associados ao \textit{socket}.
@@ -239,6 +162,43 @@ A familia \textit{AF\_PACKET} permite comunicar directamente com o controlador d
  A utilização de \textit{lazy cloning}, isto é apenas efectuar a cópia caso seja necessária, permitindo assim diminuir a perda de eficiência do sistema quando está a monitorizar os pacotes de rede.
  Por isso primeiro são avaliados para o processo de captura, caso sejam para captura a função \textit{blah blah} efectua a cópia da estrutura sk\_buffer e serão então adicionados ao \textit{ring buffer}.
  Se no \textit{ring buffer} não existir espaço para o número de bytes que devem ser capturados, é então descartado a cópia (libertado o espaço) e incrementado o valor de pacotes descartados pelo núcleo de sistema.
+
+
+Aqui talvez algo mais generico pois este esta familia é a utilizada para o sniffing.
+
+
+\subsection{Interfaces de rede}
+
+O núcleo mantém a informação sobre as interfaces de rede que foram inicializadas pelos seus controladores, mesmo não estando activas estas constantam de uma lista duplamente ligada de \textit{net\_devices}. 
+ Em cada posição desta lista existe está toda a informação referente a uma interface de rede e suas configurações, nomeadamente a informação sobre o seu endereço ip ou o seu mac address no caso de interfaces \textit{ethernet} ou mapeadas sobre \textit{ethernet} (como o caso das interfaces ponto-a-ponto).
+
+No registo de um novo controlador de interface de rede definem-se as operações a executar em determinados eventos, tais como, recepção e/ou transmissão de frames, remoção da interface, etc.
+ Estas operações são definidas através de uma interface comum, a \textit{struct netdev\_ops}, permitindo definir a \textit{API} das interfaces de rede.
+
+ Falar sobre os controladores das interfaces de rede, e que definem um conjunto de funções para serem desencadeadas em determinados pontos do envio ou recepcao de frames ... ndo (netdevice operations) 
+ 
+\subsubsection{Estrutura de um sk\_buff}
+\label{subsub:sk_buff}
+ Os dados que são enviados ou recebidos pelos controladores de rede são os \textit{sk\_buff}. Uma estrutura com os diferentes cabeçalhos necessários à sua transmissão ou recepção.
+ Existem 4 apontadores para endereços de memória dentro da estrutura que definem os endereços de inicio e fim do pacote, bem como dos cabeçalhos.
+ Falta boneco com esta informação ... fica mais realista.
+ 
+
+\subsection{NetFilter}
+
+O sistema de operação \textit{Linux} tem um sistema de \textit{firewall} que permite controlar os acessos dos processos aos sistemas de comunicação de rede.
+ Este sistema é o \textit{NetFilter}, está presente no núcleo do sistema operação permitindo controlar o fluxo de dados dos processos para as interfaces de rede, bem como no sentido oposto.
+ O \textit{NetFilter} está presente na \textit{stack TCP/IP} em 5 pontos apenas e desta forma consegue de uma forma simples controlar o fluxo dos dados.
+ O \textit{NetFilter} pode ser controlado pelo \textit{iptables}, uma ferramenta em nível utilizador que através de regras define o acesso dos dados das comunicações rede.
+
+\subsection{Traffic Control}
+ Dentro do núcleo do \textit{Linux} para além da \textit{firewall NetFilter} existe um mecanismo de controlo sobre os dados que circulam nas interfaces de rede.
+ O principal propósito deste sistema é controlar a transmissão de dados, \textit{egress data transfer}.
+ Quando os protocolos de nível 3 vão enviar os dados, para a camada de nível 2, estes são armazenados em \textit{QDisks} para serem posteriormente serem enviados.
+ Com a necessidade de diferenciar os diferentes tipos de dados os administradores de sistemas podem diferenciar o trafego e armazená-lo em diferentes \textit{QDisks}, de forma a poder efectuar \textit{Quality of Service}.
+Apesar de ter estrutra para controlo dos dados que chegam da interface de rede o principal propósito é controlo do dados que saem através das interface de rede.
+
+
 
 \subsection{Recepção de dados}
 
@@ -267,8 +227,8 @@ Quando a aplicação está a executar e efectua uma chamada ao sistema de opera�
  Durante parte da execução da chamada ao sistema de operação é possível referenciar qual o processo que efectuou a chamada, pois caso a chamada seja sincrona, é agendada um processamento sobre os dados e a aplicação fica bloqueada à espera de ser re-escalonada através da função \textit{schedule}.
  O sistema de ficheiros mantém a referência sobre quais os ficheiros/sockets abertos para cada processo e é possível obter qual o processo a que cada descritor de ficheiros pertence. % back pointers ... nos sockets ... binded de uma porta a um processo ... pode nao ser a chamada bind ... 
 
-\section{Desenho e arquitectura do MROP}
-\label{sec:architecture}
+\section{Desenho e arquitectura do MRoP}
+\label{sec:mrop_architecture}
 
 O sistema proposto foi desenvolvido procurando cumprir os seguintes requisitos:
 \begin{itemize}
