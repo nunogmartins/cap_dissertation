@@ -1,30 +1,55 @@
 \chapter{Arquitectura}
 \label{cap:Estrutura}
 
-Para conceber a arquitectura do sistema de monitorização de rede orientado ao processo (MROP), foi necessário conhecer como os processos comunicam com o núcleo de forma a efectuar comunicações com o exterior.
+Para conceber a arquitectura do sistema de Monitorização de Rede orientado ao Processo (MRoP), foi necessário conhecer como os processos comunicam com o núcleo de forma a efectuar comunicações com o exterior.
 Após conhecer a arquitectura de rede do \textit{Linux}, foi necessário compreender de que forma se processa a comunicação, bem como a monitorização de rede.
 
 Neste capitulo irá ser apresentado a constituição do sistema de rede do \textit{Linux}, desde o momento em que a aplicação envia os dados, até ao momento em que estes chegam à interface de rede e vice-versa.
 Como esta visão é muito abrangente, apenas serão focados os pontos essenciais da arquitectura.
-Após esta visão geral do sistema de rede do \textit{Linux}, será apresentada a arquitectura do sistema (MROP).
+Após esta visão geral do sistema de rede do \textit{Linux}, será apresentada a arquitectura do sistema (MRoP).
 
 
 \section{Arquitectura de rede em \textit{Linux}}
 \label{sub:network}
 
-Os processos em um sistema são instâncias de um programa, que partilha recursos físicos e lógicos da máquina.
-Os processos para aceder a alguns recursos, podem necessitar de efectuar comunicações com instâncias de outros programas, estes podem estar localizados na mesma máquina (processos locais), ou estar em outra máquina (processos remotos).
+Um processo é uma instância de um programa, este num sistema multiprogramado partilha recursos do sistema com outros processos.
+Os processos necessitam de comunicar com outros processos, para obter dados, de forma a completar as suas execuções.
+Estas comunicações podem ser efectuadas dentro do mesmo sistema ou externas.
+Em geral as comunicaçoes externas são efectuadas via rede, sendo necessário para isso criar canais de comunicação.
+A(s) interface(s) de rede são partilhadas pelos diversos processos, sendo esta partilha efectuada pelo núcleo, pois apenas este é capaz de efectuar uma partilha correcta deste recurso.
 
-Um processo para comunicar com outro através, utilizará as funcionalidades de rede do seu sistema de operação.
-Pois apenas este sabe gerir correctamente os recursos de rede.
+A criação de canais de comunicação é efectuada através da chamada ao sistema \textit{socket}.
+
+----------- --------- ----------- qualquer coisa sobre a Norma posix ------------
+
+A chamada ao sistema \textit{socket} é efectuada para a criação do canal e dependendo dos parâmetros instânciados para este, varia o tipo e o protocolo utilizado.
+Existe um agrupamento em familia de endereços (\textit{Address Family}), este podem ser para comunicação remota ou local.
+As comunicações locais podem ser entre processos (\textit{AF\_UNIX}), ou entre processos e o núcleo (\textit{AF\_NETLINK}).
+As remotas podem ser efectuadas sobre a internet, existindo também para estas uma familia própria, a \textit{AF\_INET}.
+Os canais têm um conjunto de funções (\textit{API}) bem definidas para utilização e controlo, permintindo assim criar uma forma estruturada de comunicação.
+
+Os administradores de sistemas necessitam de filtrar o fluxo de informação que circula nas suas redes, por isso têm sido desenvolvidos sistemas de filtragem de comunicações, também conhecidas com \textit{firewalls}.
+Sendo o \textit{Linux} um sistema de operação utilizado em larga escala em ambientes de servidores, necessitou também deste controlo. Tem sido desenvolvido o \textit{NetFilter}, uma \textit{Firewall} que filtra o fluxo de dados que circula entre o sistema e a periferia deste, via rede.
+
+Para além da filtragem do fluxo de dados, existe também um sistema de controlo do tráfego (\textit{Traffic Control}).
+Este sistema permite ao administrador indicar quais os fluxos de dados prioritários, ou que necessitam de uma determinada largura de banda e assim efectuar uma reserva anticipada para estes.
+Quer o \textit{NetFilter} como o \textit{Traffic Control} são ambos definidos dentro do núcleo.
+ 
+Nas subsecções seguintes irão ser apresentados diferentes constituintes da estrutura de rede do \textit{Linux}, começando pelo processo em nível utilizador até aos controladores de interfaces de rede. As últimas duas subsecções apresentarão a visão geral do fluxo de um canal de comunicação, envio e recepção, respectivamente.
+
+%Os processos em um sistema são instâncias de um programa, que partilha recursos físicos e lógicos da máquina.
+%Os processos para aceder a alguns recursos, podem necessitar de efectuar comunicações com instâncias de outros programas, estes podem estar localizados na mesma máquina (processos locais), ou estar em outra máquina (processos remotos).
+
+%Um processo para comunicar com outro através, utilizará as funcionalidades de rede do seu sistema de operação.
+%Pois apenas este sabe gerir correctamente os recursos de rede.
 
  %Para isto um processo tem de efectuar o inicio da comunicação enviando alguns pacotes de inicio de sessão (caso o protocolo de comunicação necessite).
- Um processo em \textit{Linux} é uma instância de um programa que partilha recursos da máquina, físicos ou lógicos.
-\todo{muito pormenor}
- Os processos dentro do núcleo são instâncias de uma estrutura \textit{task\_struct} que contém diversos elementos pertencentes ao processo, tais como identificadores de processo, tabela de ficheiros abertos, zonas de memória atribuidas, permissões, etc.
+% Um processo em \textit{Linux} é uma instância de um programa que partilha recursos da máquina, físicos ou lógicos.
+%\todo{muito pormenor}
+% Os processos dentro do núcleo são instâncias de uma estrutura \textit{task\_struct} que contém diversos elementos pertencentes ao processo, tais como identificadores de processo, tabela de ficheiros abertos, zonas de memória atribuidas, permissões, etc.
  
- Um processo para utilizar as funcionalidades de rede necessita criar uma instância de um \textit{socket}, que fica referênciado através de um descritor de ficheiros (descritor de \textit{socket}).
- Tal como os ficheiros são acedidos em nível utilizador através de descritores os \textit{sockets} também são acedidos e manipulados através destes, apenas com chamadas ao sistema próprias para controlo e comunicação nestes canais.
+% Um processo para utilizar as funcionalidades de rede necessita criar uma instância de um \textit{socket}, que fica referênciado através de um descritor de ficheiros (descritor de \textit{socket}).
+% Tal como os ficheiros são acedidos em nível utilizador através de descritores os \textit{sockets} também são acedidos e manipulados através destes, apenas com chamadas ao sistema próprias para controlo e comunicação nestes canais.
  %Os \textit{sockets} são mapeados no sistema de ficheiros virtual, permitindo desta forma neste caso sobre a forma de \textit{sockets}, forma de comunicação sobre a rede.
 % Estes descritores permitem ao processo identificar o \textit{socket}, para efectuar as comunicações.
  %Estas comunicações, bem como o estabelecimento destes canais de comunicação, são efectuadas através de chamadas ao sistema de operação.
@@ -35,24 +60,33 @@ Pois apenas este sabe gerir correctamente os recursos de rede.
 %Falta falar sobre o netfilter ... sobre tc trafic control
 
 %  Descrever um pouco esta parte ...
- Os canais de comunicação de rede estão organizados em familias de endereços, sendo a familia de endereços \textit{AF\_INET} utilizada para efectuar comunicações sobre a internet.
-Outras familias de \textit{sockets} existentes são \textit{AF\_NETLINK}, \textit{AF\_UNIX}, etc.
-A chamada ao sistema \textit{socket} é composta pela familia de endereços, pelo tipo e pelo protocolo.
-Desta forma generica é possível mapear diferentes tipos de comunicação, tais como \textit{INET} , \textit{NETLINK}, \textit{UNIX LOCAL}, em uma estrutura, o \textit{BSD socket}.
+% Os canais de comunicação de rede estão organizados em familias de endereços, sendo a familia de endereços \textit{AF\_INET} utilizada para efectuar comunicações sobre a internet.
+%Outras familias de \textit{sockets} existentes são \textit{AF\_NETLINK}, \textit{AF\_UNIX}, etc.
+%A chamada ao sistema \textit{socket} é composta pela familia de endereços, pelo tipo e pelo protocolo.
+%Desta forma generica é possível mapear diferentes tipos de comunicação, tais como \textit{INET} , \textit{NETLINK}, \textit{UNIX LOCAL}, em uma estrutura, o \textit{BSD socket}.
 
- A generalidade das aplicações utilizam os \textit{sockets} da familia \textit{AF\_INET}, para efectuar as suas comunicações sobre redes, sendo os principais tipos utilizados o \textit{INET\_STREAM} e \textit{INET\_DGRAM}.
- Estes dois tipos oferecencem canais orientados à conexão com estado e sem estado, respectivamente.
+% A generalidade das aplicações utilizam os \textit{sockets} da familia \textit{AF\_INET}, para efectuar as suas comunicações sobre redes, sendo os principais tipos utilizados o \textit{INET\_STREAM} e \textit{INET\_DGRAM}.
+% Estes dois tipos oferecencem canais orientados à conexão com estado e sem estado, respectivamente.
 
 
 %Quando a chamada ao sistema \textit{socket} é efectuada, é criado uma nova instância de um socket e inicializados os respectivos campos com a informação dependente para a familia e tipo. 
 
-As principais chamadas ao sistema para estabelecer, terminar e comunicar sobre \textit{sockets} são: \textit{socket}, \textit{close}, \textit{connect}, \textit{bind}, \textit{listen}, \textit{accept}, \textit{send}, \textit{recv}, \textit{sendto} e \textit{recvfrom}. 
+%As principais chamadas ao sistema para estabelecer, terminar e comunicar sobre \textit{sockets} são: \textit{socket}, \textit{close}, \textit{connect}, \textit{bind}, \textit{listen}, \textit{accept}, \textit{send}, \textit{recv}, \textit{sendto} e \textit{recvfrom}. 
 
 
 %Os file descriptors (socket descriptors) são os identificadores para os sockets. Os sockets são mapeados em ficheiros e estes em descritores de ficheiros. 
 
 \subsection{Estrutura de um processo}
 % ou recursos de rede de um processo
+
+Um processo é a instânciação de um programa, sendo também uma unidade de escalonamento de execução (\textit{task}) no sistema.
+Consome recursos (físicos e lógicos) partilhados com outros processos num sistema multiprogramado.
+Um dos recursos partilhados pelos diferentes processos é o acesso à rede, permitindo desta forma a comunicação com o exterior.
+Para serem efectuadas comunicações é necessário criar canais de comunicação, por isso o sistema de operação tem uma \textit{API} de comunicação que permite a criação, destruição e a utilização de canais.
+Quando um processo cria um canal, o sistema devolve-lhe um identificador, para que este possa efectuar controlar e comunicar através do canal.
+
+
+
 
 Um processo para executar tem de ser carregado para memória e posteriormente ser agendado para execução através do escalonador de processos do núcleo.
  Um processo para o núcleo é uma estrutura com a informação sobre as zonas de memória, descritores de ficheiros abertos, informações sobre os tempos de execução, informações sobre a hierarquia de processos pertencentes a este, etc.
@@ -72,7 +106,7 @@ Um processo para poder comunicar com a interface de rede tem de abrir um canal e
 
 
 \subsection{Sockets e suas familias}
-\label{sub:af_inet}
+\label{sub:sockets}
 
 Como já foi indicado em \ref{sub:network}, um processo para comunicar tem de utlizar um \textit{socket}.
  Os \textit{sockets} para se diferenciarem devido às suas diferentes utilidades são definidos em  familias de endereços.
@@ -84,8 +118,9 @@ Na secções seguintes irão ser apresentadas diferentes familias de endereços 
 %Address Family para o INET, internet sockets para ipv4 e AF\_INET6 para ipv6
 
 \subsubsection{AF\_INET}
+\label{subsub:af_inet}
 
-\textit{AF\_INET} é familia de endereços utilizada para comunicar através do protocolo \textit{IP versão 4}, protocolo este de nível rede para efectuar comunicações através da \textit{internet}.
+\textit{AF\_INET} é familia de endereços utilizada para comunicar através do protocolo \textit{IP versão 4}, protocolo este de nível rede, para efectuar comunicações através da \textit{internet}.
  Existem diferentes tipos de protocolos de nível transporte sobre \textit{IPv4}, sendo alguns dos mais utilizados o \textit{TCP}, \textit{UDP}, \textit{ICMP}, etc.
  Estes protocolos podem ser utilizados através da chamada ao sistema \textit{socket}, indicando os valores \textit{SOCK\_STREAM}, \textit{SOCK\_DGRAM} e \textit{SOCK\_ICMP}, na variável tipo, para os anteriormente indicados.
  Para além destes diferentes tipos existe também o \textit{SOCK\_RAW}, que permite acesso directo ao nível de transporte.
@@ -329,7 +364,7 @@ Necessidade de registar um \textit{hook} para aceder directamente à função de
 
 O sistema interage também com o \textit{LSF} pois existe uma conjunção entre o filtro definido pelo utilizador e a captura do tráfego da aplicação a ser monitorizada.
 
-\section{Resumo}
+\section{Conclusão}
 
 Algumas ideias para concluir este capitulo ...
 
