@@ -90,8 +90,15 @@ Quando um processo cria um canal, o sistema devolve-lhe um identificador.
 Este identificador serve para o processo referênciar o canal, dentro do núcleo, de forma a efectuar as suas futuras comunicações, bem como o controlo deste.
 Dentro do núcleo, este identificador é gerido na estrutura que identifica os canais abertos, pelo processo.
 
-
-
+\subsubsection{Canais abertos}
+A estrutura de canais abertos, permite abstrair qual o canal que foi aberto, se foi um ficheiro, um socket, um \textit{pipe}, etc.
+Para reconhecer qual o tipo do canal aberto existem algumas funções especificas que analisam qual o tipo e permite efectuar diferentes tipos de operações consoante o canal.
+Por exemplo ao manipular um ficheiro existe a possibilidade de avançar e recuar, sobre um determinado ponto dentro do ficheiro.
+Esta situação não faz sentido quando se controla um \textit{socket} ou um \textit{pipe}, pois as comunicações nestes são destruidas quando consumidas, enquanto que isso não acontece num ficheiro.
+ 
+\subsubsection{Árvore Geneológica}
+Na estrutura do processo existem apontadores para a árvore geneológica do processo, apontador para o pai (aquele que lhe deu origem), a lista de irmãos e de descententes.
+Cada um dos elementos da lista ou o pai, são também eles estruturas do tipo \textit{stack\_struct}, o que permite navegar pela árvore geneológica do processo.
 
 %Um processo para executar tem de ser carregado para memória e posteriormente ser agendado para execução através do escalonador de processos do núcleo.
 % Um processo para o núcleo é uma estrutura com a informação sobre as zonas de memória, descritores de ficheiros abertos, informações sobre os tempos de execução, informações sobre a hierarquia de processos pertencentes a este, etc.
@@ -100,14 +107,6 @@ Dentro do núcleo, este identificador é gerido na estrutura que identifica os c
 % Dentro do núcleo do linux a estrutura que tém a informação sobre um processo (\textit{task}), é a \textit{struct task\_struct}. 
 % Nesta estrutura existe a informação sobre quais os ficheiros que a aplicação abriu.
 % Como os \textit{sockets} são mapeados sob a forma de ficheiros, estes também se encontram nesta estrutura.
-
-\subsection{Sistema de ficheiros}
-
-Um processo para poder comunicar com a interface de rede tem de abrir um canal entre o processo e o núcleo de operação que por sua vez comunica com a interface de rede.
- Este canal nos sistemas de operação \textit{Linux} é efectuado através da chamada ao sistema \textit{socket}.
- Esta função regista a abertura de um canal de comunicação entre o processo e o sistema de rede, sendo o descritor do \textit{socket} um identificador do sistema de ficheiros, que fica registado no descritor do processo dentro do núcleo.
- Esta é apenas a primeira das abstrações que o núcleo efectua sobre a arquitectura do sistema de rede.
-  
 
 
 \subsection{Sockets e suas familias}
