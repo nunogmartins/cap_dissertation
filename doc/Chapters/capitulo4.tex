@@ -97,8 +97,8 @@ Por exemplo ao manipular um ficheiro existe a possibilidade de avançar e recuar
 Esta situação não faz sentido quando se controla um \textit{socket} ou um \textit{pipe}, pois as comunicações nestes são destruidas quando consumidas, enquanto que isso não acontece num ficheiro.
  
 \subsubsection{Árvore Geneológica}
-Na estrutura do processo existem apontadores para a árvore geneológica do processo, apontador para o pai (aquele que lhe deu origem), a lista de irmãos e de descententes.
-Cada um dos elementos da lista ou o pai, são também eles estruturas do tipo \textit{stack\_struct}, o que permite navegar pela árvore geneológica do processo.
+Na estrutura do processo existem apontadores para a árvore geneológica do processo, apontador para o pai (o processo que efectuou um \textit{fork}, para lhe dar origem), a lista de irmãos e de descententes.
+Cada um dos elementos da lista ou o pai, são também eles estruturas do tipo \textit{task\_struct}, o que permite navegar pela árvore geneológica do processo.
 
 %Um processo para executar tem de ser carregado para memória e posteriormente ser agendado para execução através do escalonador de processos do núcleo.
 % Um processo para o núcleo é uma estrutura com a informação sobre as zonas de memória, descritores de ficheiros abertos, informações sobre os tempos de execução, informações sobre a hierarquia de processos pertencentes a este, etc.
@@ -112,59 +112,77 @@ Cada um dos elementos da lista ou o pai, são também eles estruturas do tipo \t
 \subsection{Sockets e suas familias}
 \label{sub:sockets}
 
-Como já foi indicado em \ref{sub:network}, um processo para comunicar tem de utlizar um \textit{socket}.
- Os \textit{sockets} para se diferenciarem devido às suas diferentes utilidades são definidos em  familias de endereços.
- Os \textit{sockets} para comunicação de internet utilizam o domínio \textit{AF\_INET}, que permite utilizar diferentes tipos de protocolos, tais como \textit{UDP} e \textit{TCP}.
- Estes protocolos são utilizados pela generalidade das aplicações quando necessita de comunicar com outro processo que utilize os mesmos protocolos de comunicação.
+Como anteriormente referido em \ref{sub:network}, um processo para comunicar via rede, tem de criar um canal.
+Os canais são criados para comunicar com diferentes pontos, uns localmente e outros com o exterior.
+Desta forma os canais são diferentes e apesar das acções que podem ser efectuadas serem comuns, o meio de transmissão é diferente e por isso diferentes formas devem ser utilizadas.
 
-Na secções seguintes irão ser apresentadas diferentes familias de endereços suportadas no núcleo do \textit{Linux}, tendo especial ênfase nas familias \textit{INET} e \textit{PACKET}.
+Os \textit{sockets} podem ser agrupados pelas familias de endereços \textit{Address Family}, que permitem especificar qual a forma de comunicação utilizada (local ou remota).
+Para caracterizar o canal não é apenas necessário a especificação da familia, é também necessário especificar o tipo de canal e o protocolo que se irá utilizar.
+Diferentes combinações de valores para estes parâmetros, permitem especificar canais com diferentes funcionalidades.
+
+Nas subsecções seguintes irão ser apresentadas diferentes familias de endereços suportadas no núcleo do \textit{Linux}, tendo especial ênfase nas familias \textit{INET}, \textit{NETLINK} e \textit{PACKET}.
+
+
+%Como já foi indicado em \ref{sub:network}, um processo para comunicar tem de utlizar um \textit{socket}.
+% Os \textit{sockets} para se diferenciarem devido às suas diferentes utilidades são definidos em  familias de endereços.
+% Os \textit{sockets} para comunicação de internet utilizam o domínio \textit{AF\_INET}, que permite utilizar diferentes tipos de protocolos, tais como \textit{UDP} e \textit{TCP}.
+% Estes protocolos são utilizados pela generalidade das aplicações quando necessita de comunicar com outro processo que utilize os mesmos protocolos de comunicação.
+
 
 %Address Family para o INET, internet sockets para ipv4 e AF\_INET6 para ipv6
 
 \subsubsection{AF\_INET}
 \label{subsub:af_inet}
 
-\textit{AF\_INET} é familia de endereços utilizada para comunicar através do protocolo \textit{IP versão 4}, protocolo este de nível rede, para efectuar comunicações através da \textit{internet}.
- Existem diferentes tipos de protocolos de nível transporte sobre \textit{IPv4}, sendo alguns dos mais utilizados o \textit{TCP}, \textit{UDP}, \textit{ICMP}, etc.
- Estes protocolos podem ser utilizados através da chamada ao sistema \textit{socket}, indicando os valores \textit{SOCK\_STREAM}, \textit{SOCK\_DGRAM} e \textit{SOCK\_ICMP}, na variável tipo, para os anteriormente indicados.
- Para além destes diferentes tipos existe também o \textit{SOCK\_RAW}, que permite acesso directo ao nível de transporte.
- Este protocolo permite a criação de um canal que comunica directamente com o nível \textit{IP} da pilha de protocolos \textit{TCP\\IP}, desta forma é possível executar protocolos de comunicação em nível utilizador.
- Alguns exemplos de protocolos que operam a este nível são: \todo{procurar}(existem alguns de routing ...)
+\textit{AF\_INET} é a familia de endereços utilizada para comunicar através da \textit{internet}, utilizando para isso o protocolo \textit{IP versão 4} (ver figura \ref{}
+
+ (ainda tem de ser colocada stack tcp ip).
+
+A estruturação por camadas permite que a implementação de protocolos seja efectuada de forma mais rápida e simples.
+Existem diferentes vários protocolos de nível transporte sobre \textit{IPv4}, sendo os mais utilizados o \textit{TCP} e \textit{UDP}.
+A criação de canais sobre o nível de transporte é efectuado utilizando a chamada ao sistema \textit{socket}, indicando como valores \textit{SOCK\_STREAM} ou \textit{SOCK\_DGRAM}, respectivamente, para o parâmetro tipo.
+Cada protocolo tem a sua especificidade, permitindo assim efectuar comunicações de forma distinta.
+O \textit{TCP} é utilizado para canais que necessitem de efectuar comunicações sem perdas de pacotes.
+Para este protocolo é efectuado um controlo na transferência e recepção dos pacotes, permitindo adequar o ritmo de transmissão ao meio subjacente.
+O \textit{UDP} é um protocolo mais leve que o \textit{TCP}, pois não utiliza o controlo anteriormente mencionado, sendo habitualmente utilizado quando existe a possibilidade de perda de pacotes durante a transmissão, ou quando o controlo da retransmissão de pacotes é efectuada em camadas superiores.
+
+Para além destes protocolos existe também o \textit{SOCK\_RAW}, que permite acesso directo ao nível rede.
+Este protocolo permite a criação de um canal que comunica directamente com o nível rede, da pilha de protocolos \textit{TCP/IP}, permitindo assim executar protocolos de comunicação em nível utilizador.
 
 
-Os protocolos \textit{TCP} e \textit{UDP} têm formas diferentes de executar funcionalidades semelhantes e por isso estão descritos em instâncias diferentes.
-algures falar sobre o accept e o bind e o socket devido à estrutura interna que aguarda o indicador da porta igual ... tenho de verificar isto correctamente
+
 \subsubsection{AF\_PACKET}
 \label{subsub:af_packet}
 
-A familia \textit{AF\_PACKET} permite comunicar directamente com o controlador de rede, por isso esta é a forma efectuar a monitorização de rede. 
- Tal como nas anteriores familias apresentadas em \ref{} e \ref{}, esta familia permite definir diferentes formas de comunicação, em função do tipo e protocolo associados ao \textit{socket}.
- A utilização destes \textit{sockets} requer uma autorização de \textit{CAP\_NET\_RAW}.
- Esta situação serve para evitar que utilizadores não autorizados possam monitorizar, ou injectar pacotes na rede, influenciando o comportamento da(s) rede(s).
- Como permite enviar pacotes directamente para o controlador de rede, uma das utilizações é a implementação de protocolos de rede em nível utilizador.
- É frequentemente utilizada para sistemas de detecção de intrusos, dado que permite analisar as frames e detectar falhas na correcta formatação destas.
+A familia \textit{AF\_PACKET} permite comunicar directamente com o controlador de rede, permitindo assim efectuar a monitorização de rede.
+Tal como em anteriores familias apresentadas, esta familia permite definir diferentes formas de comunicação, em função do tipo e protocolo associados ao \textit{socket}.
+A utilização destes \textit{sockets} requer uma autorização de \textit{CAP\_NET\_RAW}.
+Esta verificação previne que utilizadores não autorizados possam monitorizar, ou injectar pacotes na rede, influenciando o comportamento desta.
+Como permite enviar pacotes directamente para o controlador de rede, uma das utilizações é a implementação de protocolos de rede em nível utilizador, .
+A utilização de canais da familia \textit{AF\_PACKET} é frequentemente utilizado para sistemas de detecção de intrusos, dado que permite analisar os pacotes e detectar falhas na correcta formatação destes.
 
- Como a obtenção das frames é efectuada a um nível mais baixo que a recepção dos dados pelas aplicações é possível obter mais frames que aquelas que a aplicação recebe. 
- Esta situação deve-se a que se o \textit{netfilter} estiver activo e a bloquear alguns acessos a portos ou a determinadas frames, estas não chegam à aplicação.
- No entanto ficaram visíveis à monitorização pois esta é efectuada antes de chegar aos \textit{Hooks} do \textit{netfilter}.
+Como a obtenção dos pacotes por estes canais, é efectuada primeiro que a recepção dos dados pelas aplicações, é possível obter mais pacotes que aqueles que a aplicação recebe.
+Por isso se o \textit{NetFilter} bloquear a recepção de alguns pacotes, as aplicações não os irão receber, mas, este canal já os terá recebido para análise.
+%Esta situação é devida ao posicionamento do \textit{NetFilter} em relação à monitorização de rede.
+%No entanto ficaram visíveis à monitorização pois esta é efectuada antes de chegar aos \textit{Hooks} do \textit{netfilter}.
  
-
- Podem ser utilizados os tipos \textit{SOCK\_DGRAM} ou \textit{SOCK\_RAW}. Em \textit{SOCK\_DGRAM}
+%Podem ser utilizados dois tipos \textit{SOCK\_DGRAM} ou \textit{SOCK\_RAW}.
  
-%A forma para comunicar enviar e receber dados directamente da interface de rede é através da familia de protocolos \textit{AF\_PACKET}. 
+%A utilização destes \textit{sockets} permitem a implementação de protocolos de rede, sem recorrer à \textit{stack} de protocolos IP dentro do núcleo.
+% Para além desta funcionalidade esta é a forma de capturar os pacotes que circulam na interface de rede, permitindo assim efectuar uma análise do tráfego.
 
- A utilização destes \textit{sockets} permitem a implementação de protocolos de rede, sem recorrer à \textit{stack} de protocolos IP dentro do núcleo.
- Para além desta funcionalidade esta é a forma de capturar os pacotes que circulam na interface de rede, permitindo assim efectuar uma análise do tráfego.
+Como todos os pacotes recebidos pela interface(s) de rede são recebidos por este canal, existe a necessidade de efectuar uma cópia destes e fornece-los à aplicação em nível utilizador.
+Esta monitorização implica um peso extra na computação, por isso diversas técnicas tem sido desenvolvidas para minimiza-lo.
+A utilização de \textit{lazy cloning}, isto é, apenas efectuar a cópia caso seja realmente necessária, permitindo assim diminuir a perda de eficiência do sistema quando está a monitorizar os pacotes de rede.
+A cópia do pacote é efectuada caso a avaliação do filtro indique que este deve ser copiado, caso contrário é terminada a execução em relação a esse pacote.
 
- Esta camada situa-se junto aos controladores de rede permitindo assim capturar dados que podem não chegar às aplicações devido à utilização de regras na \textit{firewall} (netfilter) do \textit{linux}.
-
- A utilização de \textit{lazy cloning}, isto é apenas efectuar a cópia caso seja necessária, permitindo assim diminuir a perda de eficiência do sistema quando está a monitorizar os pacotes de rede.
- Por isso primeiro são avaliados para o processo de captura, caso sejam para captura a função \textit{blah blah} efectua a cópia da estrutura sk\_buffer e serão então adicionados ao \textit{ring buffer}.
- Se no \textit{ring buffer} não existir espaço para o número de bytes que devem ser capturados, é então descartado a cópia (libertado o espaço) e incrementado o valor de pacotes descartados pelo núcleo de sistema.
+% Por isso primeiro são avaliados para o processo de captura, caso sejam para captura a função \textit{blah blah} efectua a cópia da estrutura sk\_buffer e serão então adicionados ao \textit{ring buffer}.
+% Se no \textit{ring buffer} não existir espaço para o número de bytes que devem ser capturados, é então descartado a cópia (libertado o espaço) e incrementado o valor de pacotes descartados pelo núcleo de sistema.
 
 
-Aqui talvez algo mais generico pois este esta familia é a utilizada para o sniffing.
+\subsubsection{AF\_UNIX}
 
+\subsubsection{AF\_NETLINK}
 
 \subsection{Interfaces de rede}
 
@@ -201,16 +219,18 @@ Apesar de ter estrutra para controlo dos dados que chegam da interface de rede o
 
 \subsection{Recepção de dados}
 
-A chegada de um pacote de dados à interface de rede desencadeia uma acção de interrupção da actividade do processador, permitindo quer este seja transferido para o sistema o mais cedo possível. Esta interrupção é efectuada através de um \textit{irq} pré-definido entre o controlador e a interface de rede. As interrupções são atendidas no processador desligando a atenção a todas as outras interrupções provenientes de outros dispositivos. %esta frase está ruim ...
+A chegada de um pacote de dados à interface de rede desencadeia uma acção de interrupção da actividade do processador, permitindo quer este seja transferido para o sistema o mais cedo possível.
+Esta interrupção é efectuada através de um \textit{irq} pré-definido entre o controlador e a interface de rede. As interrupções são atendidas no processador desligando a atenção a todas as outras interrupções provenientes de outros dispositivos. %esta frase está ruim ...
 O processador deve estar o menor intervalo de tempo possível com as interrupções desligadas, antes de retornar da interrupção o sistema agenda a execução de uma função que irá terminar a recepção do pacote para a camada correcta da \textit{stack TCP/IP}.%ainda falta falar sobre DMA, interrupt mode too exclusive deve ser breve, encaminhar pelo processamento da stack tcp/ip 
 
-No processo de recepção da \textit{frame} é verificado se existem \textit{sniffers} registados, caso existam é passada uma referência sobre a frame, de forma a efectuar apenas a cópia da frame quando necessária. Esta situação é devida à possível existência de um filtro sobre a \textit{frame}, em que se não for necessário capturá-la, a cópia dos dados seja desnecessária, permitindo efectuar trabalho útil.
+No processo de recepção da \textit{frame} é verificado se existem \textit{sniffers} registados, caso existam é passada uma referência sobre a frame, de forma a efectuar apenas a cópia da frame quando necessária.
+Esta situação é devida à possível existência de um filtro sobre a \textit{frame}, em que se não for necessário capturá-la, a cópia dos dados seja desnecessária, permitindo efectuar trabalho útil.
 
-%Faltar falar que a frame segue para a stack tcp ip de forma normal ...
+Faltar falar que a frame segue para a stack tcp ip de forma normal ...
 
-%Falta falar sobre o netfilter ... firewall do linux que existem 5 pontos de "entrada" onde existe algumas verificações .... 
+Falta falar sobre o netfilter ... firewall do linux que existem 5 pontos de "entrada" onde existe algumas verificações .... 
 
-% Faltar indicar que o processo está bloqueado à espera de input que lhe é copiado entre o nucleo e o processo em nivel utilizador por meio de o kiovec (talvez kernel io vector ...) 
+Faltar indicar que o processo está bloqueado à espera de input que lhe é copiado entre o nucleo e o processo em nivel utilizador por meio de o kiovec (talvez kernel io vector ...) 
 
 
 A variável global \textit{ptype\_base} do núcleo é uma tabela de dispersão aberta, que contém os tipos de controladores de protocolos de rede. Os diferentes protocolos endereçam uma função que recebe o pacote e sabe o que fazer com ele, passando pela \textit{firewall netfilter} terminando na cópia dos dados dos \textit{buffers} do núcleo para os do processo, que ficou bloqueado numa lista de espera através da chamada ao sistema de operação \textit{recv}, \textit{recvfrom} ou \textit{recvmsg}.
