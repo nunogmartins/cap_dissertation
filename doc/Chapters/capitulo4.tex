@@ -182,23 +182,34 @@ A cópia do pacote é efectuada caso a avaliação do filtro indique que este de
 
 \subsubsection{AF\_UNIX}
 
+Esta familia de \textit{sockets} é utilizada para efectuar a comunicação entre processos dentro da mesma máquina.
+É um dos sistemas de \textit{Inter Process Communication (IPC)}, utilizado em sistemas Unix.
+Permite utilizar um ficheiro no sistema de ficheiros, como um canal de comunicações.
+
 \subsubsection{AF\_NETLINK}
 
 \subsection{Interfaces de rede}
 
-O núcleo mantém a informação sobre as interfaces de rede que foram inicializadas pelos seus controladores, mesmo não estando activas estas constantam de uma lista duplamente ligada de \textit{net\_devices}. 
- Em cada posição desta lista existe está toda a informação referente a uma interface de rede e suas configurações, nomeadamente a informação sobre o seu endereço ip ou o seu mac address no caso de interfaces \textit{ethernet} ou mapeadas sobre \textit{ethernet} (como o caso das interfaces ponto-a-ponto).
+A interface de rede é o dispositivo que envia e recebe os pacotes de dados na rede.
+Do ponto de vista da interface de rede, apenas executa pedidos de interrupção ao processador.
+O controlador de rede faz a ponte entre as funcionalidades de rede do núcleo e a interface de rede.
+
+O núcleo mantém a informação sobre as interfaces de rede, inicializadas pelos seus controladores, e que mesmo não estando activas, constantam de uma lista duplamente ligada de \textit{net\_devices}.
+Em cada posição desta lista existe a informação referente a uma interface de rede e suas configurações, nomeadamente a informação sobre o seu endereço ip ou o seu \textit{mac address}, no caso de interfaces \textit{ethernet} ou mapeadas sobre \textit{ethernet} (como o caso de interfaces ponto-a-ponto).
 
 No registo de um novo controlador de interface de rede definem-se as operações a executar em determinados eventos, tais como, recepção e/ou transmissão de frames, remoção da interface, etc.
  Estas operações são definidas através de uma interface comum, a \textit{struct netdev\_ops}, permitindo definir a \textit{API} das interfaces de rede.
 
- Falar sobre os controladores das interfaces de rede, e que definem um conjunto de funções para serem desencadeadas em determinados pontos do envio ou recepcao de frames ... ndo (netdevice operations) 
+ Falar sobre os controladores das interfaces de rede, que definem um conjunto de funções para serem desencadeadas em determinados pontos do envio ou recepcao de frames ... ndo (netdevice operations) 
  
 \subsubsection{Estrutura de um sk\_buff}
 \label{subsub:sk_buff}
- Os dados que são enviados ou recebidos pelos controladores de rede são os \textit{sk\_buff}. Uma estrutura com os diferentes cabeçalhos necessários à sua transmissão ou recepção.
- Existem 4 apontadores para endereços de memória dentro da estrutura que definem os endereços de inicio e fim do pacote, bem como dos cabeçalhos.
- Falta boneco com esta informação ... fica mais realista.
+
+Os dados envolvidos no fluxo de comunicação e utilizados pelos controladores são os \textit{socket buffers}, estruturas do tipo \textit{sk\_buff}.
+Esta estrutura contém diversos elementos, sendo alguns dos principais elementos os apontadores para a estrutura de rede do controlador, apontadores para secoções do pacote (os diversos cabeçalhos pertencentes ao nível de rede e transporte), bem como distância ou tamanho dos espaços alocados para estes e outros apontadores.
+Uma estrutura com os diferentes cabeçalhos necessários à sua transmissão ou recepção.
+Existem 4 apontadores para endereços de memória dentro da estrutura que definem os endereços de inicio e fim do pacote, bem como dos cabeçalhos.
+Falta boneco com esta informação ... fica mais realista.
  
 
 \subsection{NetFilter}
@@ -211,7 +222,7 @@ O sistema de operação \textit{Linux} tem um sistema de \textit{firewall} que p
 \subsection{Traffic Control}
  Dentro do núcleo do \textit{Linux} para além da \textit{firewall NetFilter} existe um mecanismo de controlo sobre os dados que circulam nas interfaces de rede.
  O principal propósito deste sistema é controlar a transmissão de dados, \textit{egress data transfer}.
- Quando os protocolos de nível 3 vão enviar os dados, para a camada de nível 2, estes são armazenados em \textit{QDisks} para serem posteriormente serem enviados.
+ Quando os protocolos de nível 3 vão enviar os dados, para a camada de nível 2, estes são armazenados em \textit{QDisks} para posteriormente serem enviados.
  Com a necessidade de diferenciar os diferentes tipos de dados os administradores de sistemas podem diferenciar o trafego e armazená-lo em diferentes \textit{QDisks}, de forma a poder efectuar \textit{Quality of Service}.
 Apesar de ter estrutra para controlo dos dados que chegam da interface de rede o principal propósito é controlo do dados que saem através das interface de rede.
 
