@@ -1,4 +1,4 @@
-\chapter{Arquitectura}
+\chapter{Sistema Proposto}
 \label{cap:Estrutura}
 
 Para conceber a arquitectura do sistema de Monitorização de Rede orientado ao Processo (MRoP), foi necessário conhecer como os processos comunicam com o núcleo de forma a efectuar comunicações com o exterior.
@@ -80,9 +80,12 @@ Nas subsecções seguintes irão ser apresentados diferentes constituintes da es
 % ou recursos de rede de um processo
 
 Um processo é a instânciação de um programa, sendo também uma unidade de escalonamento de execução (\textit{task}) no sistema.
-Consome recursos (físicos e lógicos) partilhados com outros processos num sistema multiprogramado.
-O núcleo para cada processo gere uma entidade, \textit{task}, onde estão identificados todos os recursos atribuidos a este.
+Este consome recursos (físicos e lógicos), partilhados com outros processos num sistema multiprogramado.
+O núcleo para cada processo gere uma estrutura, \textit{struct\_task}, onde estão identificados todos os recursos atribuidos a este.
 Esta estrutura contém apontadores para diversos recursos tais como: zonas de memória requisitadas, canais abertos (ficheiros, \textit{sockets}, entre outros), contabilização de utilização de \textit{cpu}, apontadores para a sua àrvore geneológica (pai, irmãos e filhos), etc.
+
+Os apontadores para a sua árvore geneológica são: apontador para o pai (o processo que efectuou um \textit{fork}, para lhe dar origem), a lista de irmãos e de descententes.
+Cada um dos elementos da lista, ou o pai, são também eles estruturas do tipo \textit{task\_struct}, o que permite navegar pela árvore geneológica do processo.
 
 Um dos recursos partilhados pelos diferentes processos é o acesso à rede, permitindo desta forma a comunicação com o exterior.
 Para serem efectuadas comunicações é necessário a alocação de canais de comunicação, por isso o sistema de operação tem uma \textit{API} de comunicação que permite a criação, destruição e a utilização destes.
@@ -90,15 +93,11 @@ Quando um processo cria um canal, o sistema devolve-lhe um identificador.
 Este identificador serve para o processo referênciar o canal, dentro do núcleo, de forma a efectuar as suas futuras comunicações, bem como o controlo deste.
 Dentro do núcleo, este identificador é gerido na estrutura que identifica os canais abertos, pelo processo.
 
-\subsubsection{Canais abertos}
 A estrutura de canais abertos, permite abstrair qual o canal que foi aberto, se foi um ficheiro, um socket, um \textit{pipe}, etc.
 Para reconhecer qual o tipo do canal aberto existem algumas funções especificas que analisam qual o tipo e permite efectuar diferentes tipos de operações consoante o canal.
 Por exemplo ao manipular um ficheiro existe a possibilidade de avançar e recuar, sobre um determinado ponto dentro do ficheiro.
 Esta situação não faz sentido quando se controla um \textit{socket} ou um \textit{pipe}, pois as comunicações nestes são destruidas quando consumidas, enquanto que isso não acontece num ficheiro.
  
-\subsubsection{Árvore Geneológica}
-Na estrutura do processo existem apontadores para a árvore geneológica do processo, apontador para o pai (o processo que efectuou um \textit{fork}, para lhe dar origem), a lista de irmãos e de descententes.
-Cada um dos elementos da lista ou o pai, são também eles estruturas do tipo \textit{task\_struct}, o que permite navegar pela árvore geneológica do processo.
 
 %Um processo para executar tem de ser carregado para memória e posteriormente ser agendado para execução através do escalonador de processos do núcleo.
 % Um processo para o núcleo é uma estrutura com a informação sobre as zonas de memória, descritores de ficheiros abertos, informações sobre os tempos de execução, informações sobre a hierarquia de processos pertencentes a este, etc.
@@ -149,8 +148,6 @@ O \textit{UDP} é um protocolo mais leve que o \textit{TCP}, pois não utiliza o
 Para além destes protocolos existe também o \textit{SOCK\_RAW}, que permite acesso directo ao nível rede.
 Este protocolo permite a criação de um canal que comunica directamente com o nível rede, da pilha de protocolos \textit{TCP/IP}, permitindo assim executar protocolos de comunicação em nível utilizador.
 
-
-
 \subsubsection{AF\_PACKET}
 \label{subsub:af_packet}
 
@@ -188,6 +185,22 @@ Permite utilizar um ficheiro no sistema de ficheiros, como um canal de comunica�
 
 \subsubsection{AF\_NETLINK}
 
+
+
+\subsection{NetFilter}
+
+O sistema de operação \textit{Linux} tem um sistema de \textit{firewall} que permite controlar os acessos dos processos aos sistemas de comunicação de rede.
+ Este sistema é o \textit{NetFilter}, está presente no núcleo do sistema operação permitindo controlar o fluxo de dados dos processos para as interfaces de rede, bem como no sentido oposto.
+ O \textit{NetFilter} está presente na \textit{stack TCP/IP} em 5 pontos apenas e desta forma consegue de uma forma simples controlar o fluxo dos dados.
+ O \textit{NetFilter} pode ser controlado pelo \textit{iptables}, uma ferramenta em nível utilizador que através de regras define o acesso dos dados das comunicações rede.
+
+\subsection{Traffic Control}
+ Dentro do núcleo do \textit{Linux} para além da \textit{firewall NetFilter} existe um mecanismo de controlo sobre os dados que circulam nas interfaces de rede.
+ O principal propósito deste sistema é controlar a transmissão de dados, \textit{egress data transfer}.
+ Quando os protocolos de nível 3 vão enviar os dados, para a camada de nível 2, estes são armazenados em \textit{QDisks} para posteriormente serem enviados.
+ Com a necessidade de diferenciar os diferentes tipos de dados os administradores de sistemas podem diferenciar o trafego e armazená-lo em diferentes \textit{QDisks}, de forma a poder efectuar \textit{Quality of Service}.
+Apesar de ter estrutra para controlo dos dados que chegam da interface de rede o principal propósito é controlo do dados que saem através das interface de rede.
+
 \subsection{Interfaces de rede}
 
 A interface de rede é o dispositivo que envia e recebe os pacotes de dados na rede.
@@ -210,23 +223,6 @@ Esta estrutura contém diversos elementos, sendo alguns dos principais elementos
 Uma estrutura com os diferentes cabeçalhos necessários à sua transmissão ou recepção.
 Existem 4 apontadores para endereços de memória dentro da estrutura que definem os endereços de inicio e fim do pacote, bem como dos cabeçalhos.
 Falta boneco com esta informação ... fica mais realista.
- 
-
-\subsection{NetFilter}
-
-O sistema de operação \textit{Linux} tem um sistema de \textit{firewall} que permite controlar os acessos dos processos aos sistemas de comunicação de rede.
- Este sistema é o \textit{NetFilter}, está presente no núcleo do sistema operação permitindo controlar o fluxo de dados dos processos para as interfaces de rede, bem como no sentido oposto.
- O \textit{NetFilter} está presente na \textit{stack TCP/IP} em 5 pontos apenas e desta forma consegue de uma forma simples controlar o fluxo dos dados.
- O \textit{NetFilter} pode ser controlado pelo \textit{iptables}, uma ferramenta em nível utilizador que através de regras define o acesso dos dados das comunicações rede.
-
-\subsection{Traffic Control}
- Dentro do núcleo do \textit{Linux} para além da \textit{firewall NetFilter} existe um mecanismo de controlo sobre os dados que circulam nas interfaces de rede.
- O principal propósito deste sistema é controlar a transmissão de dados, \textit{egress data transfer}.
- Quando os protocolos de nível 3 vão enviar os dados, para a camada de nível 2, estes são armazenados em \textit{QDisks} para posteriormente serem enviados.
- Com a necessidade de diferenciar os diferentes tipos de dados os administradores de sistemas podem diferenciar o trafego e armazená-lo em diferentes \textit{QDisks}, de forma a poder efectuar \textit{Quality of Service}.
-Apesar de ter estrutra para controlo dos dados que chegam da interface de rede o principal propósito é controlo do dados que saem através das interface de rede.
-
-
 
 \subsection{Recepção de dados}
 
