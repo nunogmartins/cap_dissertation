@@ -130,10 +130,19 @@ Nas subsecções seguintes irão ser apresentadas diferentes familias de endere�
 
 %Address Family para o INET, internet sockets para ipv4 e AF\_INET6 para ipv6
 
+\subsubsection{AF\_UNIX}
+
+Esta familia de \textit{sockets} é utilizada para efectuar a comunicação entre processos dentro da mesma máquina.
+É um dos sistemas de \textit{Inter Process Communication (IPC)}, utilizado em sistemas Unix.
+Permite utilizar um ficheiro no sistema de ficheiros, como um canal de comunicações.
+
+\subsubsection{AF\_NETLINK}
+
+
 \subsubsection{AF\_INET}
 \label{subsub:af_inet}
 
-\textit{AF\_INET} é a familia de endereços utilizada para comunicar através da \textit{internet}, utilizando para isso o protocolo \textit{IP versão 4} (ver figura \ref{}
+\textit{AF\_INET} é a familia de endereços utilizada na comunicação através da \textit{internet}, utilizando para isso o protocolo \textit{IP versão 4} (ver figura \ref{}
 
  (ainda tem de ser colocada stack tcp ip).
 
@@ -177,16 +186,6 @@ A cópia do pacote é efectuada caso a avaliação do filtro indique que este de
 % Se no \textit{ring buffer} não existir espaço para o número de bytes que devem ser capturados, é então descartado a cópia (libertado o espaço) e incrementado o valor de pacotes descartados pelo núcleo de sistema.
 
 
-\subsubsection{AF\_UNIX}
-
-Esta familia de \textit{sockets} é utilizada para efectuar a comunicação entre processos dentro da mesma máquina.
-É um dos sistemas de \textit{Inter Process Communication (IPC)}, utilizado em sistemas Unix.
-Permite utilizar um ficheiro no sistema de ficheiros, como um canal de comunicações.
-
-\subsubsection{AF\_NETLINK}
-
-
-
 \subsection{NetFilter}
 
 O sistema de operação \textit{Linux} tem um sistema de \textit{firewall} que permite controlar os acessos dos processos aos sistemas de comunicação de rede.
@@ -211,9 +210,9 @@ O núcleo mantém a informação sobre as interfaces de rede, inicializadas pelo
 Em cada posição desta lista existe a informação referente a uma interface de rede e suas configurações, nomeadamente a informação sobre o seu endereço ip ou o seu \textit{mac address}, no caso de interfaces \textit{ethernet} ou mapeadas sobre \textit{ethernet} (como o caso de interfaces ponto-a-ponto).
 
 No registo de um novo controlador de interface de rede definem-se as operações a executar em determinados eventos, tais como, recepção e/ou transmissão de frames, remoção da interface, etc.
- Estas operações são definidas através de uma interface comum, a \textit{struct netdev\_ops}, permitindo definir a \textit{API} das interfaces de rede.
+Estas operações são definidas através de uma interface comum, a \textit{struct netdev\_ops}, permitindo definir a \textit{API} das interfaces de rede.
 
- Falar sobre os controladores das interfaces de rede, que definem um conjunto de funções para serem desencadeadas em determinados pontos do envio ou recepcao de frames ... ndo (netdevice operations) 
+Falar sobre os controladores das interfaces de rede, que definem um conjunto de funções para serem desencadeadas em determinados pontos do envio ou recepcao de frames ... ndo (netdevice operations) 
  
 \subsubsection{Estrutura de um sk\_buff}
 \label{subsub:sk_buff}
@@ -225,7 +224,7 @@ Existem 4 apontadores para endereços de memória dentro da estrutura que define
 Falta boneco com esta informação ... fica mais realista.
 
 \subsection{Recepção de dados}
-
+---------------------------------------OLD-----------------------------------------------------------
 A chegada de um pacote de dados à interface de rede desencadeia uma acção de interrupção da actividade do processador, permitindo quer este seja transferido para o sistema o mais cedo possível.
 Esta interrupção é efectuada através de um \textit{irq} pré-definido entre o controlador e a interface de rede. As interrupções são atendidas no processador desligando a atenção a todas as outras interrupções provenientes de outros dispositivos. %esta frase está ruim ...
 O processador deve estar o menor intervalo de tempo possível com as interrupções desligadas, antes de retornar da interrupção o sistema agenda a execução de uma função que irá terminar a recepção do pacote para a camada correcta da \textit{stack TCP/IP}.%ainda falta falar sobre DMA, interrupt mode too exclusive deve ser breve, encaminhar pelo processamento da stack tcp/ip 
@@ -241,6 +240,18 @@ Faltar indicar que o processo está bloqueado à espera de input que lhe é copi
 
 
 A variável global \textit{ptype\_base} do núcleo é uma tabela de dispersão aberta, que contém os tipos de controladores de protocolos de rede. Os diferentes protocolos endereçam uma função que recebe o pacote e sabe o que fazer com ele, passando pela \textit{firewall netfilter} terminando na cópia dos dados dos \textit{buffers} do núcleo para os do processo, que ficou bloqueado numa lista de espera através da chamada ao sistema de operação \textit{recv}, \textit{recvfrom} ou \textit{recvmsg}.
+----------------------------------------END OF OLD----------------------------------------------------
+
+O processo de recepção de pacotes pelas aplicações através de interfaces de rede, atravessa as diversas componentes apresentadas anteriormente em .... , ... e ... .
+
+O sistema de monitorização de rede opera de forma opoca à normal utilização de rede, pelas aplicações.
+Quando um pacote chega à interface de rede, esta envia um pedido de interrupção da computação ao cpu, de forma que este atenda o pedido da interface de rede.
+Neste ponto é desligada a atenção do processador a novas interrupções e a computação passa para o controlador da interface de rede.
+Uma vez que a atenção do processador a novas interrupções está desligada, a computação deve ser o mais breve possível de forma a poder ligar novamente a atenção do processador a interrupções, para que o normal funcionamento seja retomado, por isso apenas a computação crítica é efectuada e é registada a necessidade de invocação de um \textit{softirq}, para que seja terminado o tratamento dos pacotes que chegaram à interface.
+A invocação do \textit{softirq} é utilizado de forma que a computação seja terminada e que possam ser atendidos novos eventos no processador, o que permite uma maior actividade por parte deste.
+O \textit{softirq} escalonado opera sobre o pacote recebido pela interface de rede, de modo que seja possível analisá-lo.
+Antes de ser analisado pelo \textit{packet handler} respectivo, este é passado para os \textit{sniffers} registados no sistema.
+Estes \textit{sniffers} são a forma de monitorizar a rede
 
 \subsection{Transmissão de dados}
 
@@ -319,6 +330,16 @@ A função de filtragem  implementada neste sistema assenta no estado do process
 Através da extensão do LSF com um hook, quando ligado, este invoca esta filtragem que devolve ao LSF se o pacote deve ser logo ignorado (não envolve nenhum dos portos do processo alvo) ou se se deve continuar a avaliar as restantes regras de filtragem definidas.
  Mantém-se assim a compatibilidade e continua-se a tirar partido dos benefícios da utilização do Linux Socket Filter.
 
+Para continuar a ser opaco para os diferentes sistemas de monitorização/captura de rede foi necessário colocar um ponto de ligação entre o sistema actual e o módulo desenvolvido.
+ Quando não existe uma ligação(\textit{Hook}) activa, existe apenas um ligeiro decréscimo no desempenho, este deve-se apenas à verificação da existência se esta ligação está activa.
+ Caso a ligação esteja activa o fluxo de controlo é passado para a função de filtro definida no módulo.
+ Desta forma é possível criar funções que permitem controlar o fluxo de dados que devem ser processados ou descartados
+
+Necessidade de registar um \textit{hook} para aceder directamente à função de filtro.
+ Caso este \textit{hook} não esteja ligado o \textit{overhead} introduzido será o de um teste para verificar se existe ligação ou não.
+ No caso de não existir a ligação a este \textit{hook} o sistema comporta-se de forma a utilizar apenas o sistema anterior.
+
+O sistema interage também com o \textit{LSF} pois existe uma conjunção entre o filtro definido pelo utilizador e a captura do tráfego da aplicação a ser monitorizada.
 
 
 \subsection*{Controlo e Informação}
@@ -337,18 +358,7 @@ Para facilmente controlar e configurar o sistema desenvolvido foi definida uma i
 %a não utilização de ioctl para o debug ... 
 A estratégia foi separar os diferentes componentes e a criação de um módulo de \textit{debug} para que pudesse existir uma forma de acesso à monitorização por parte do nível de utilizador, sem que exista a necessidade de criar ou alterar chamadas ao sistema ou suas opções.
 
-\subsection{Filtro}
 
-Para continuar a ser opaco para os diferentes sistemas de monitorização/captura de rede foi necessário colocar um ponto de ligação entre o sistema actual e o módulo desenvolvido.
- Quando não existe uma ligação(\textit{Hook}) activa, existe apenas um ligeiro decréscimo no desempenho, este deve-se apenas à verificação da existência se esta ligação está activa.
- Caso a ligação esteja activa o fluxo de controlo é passado para a função de filtro definida no módulo.
- Desta forma é possível criar funções que permitem controlar o fluxo de dados que devem ser processados ou descartados
-
-Necessidade de registar um \textit{hook} para aceder directamente à função de filtro.
- Caso este \textit{hook} não esteja ligado o \textit{overhead} introduzido será o de um teste para verificar se existe ligação ou não.
- No caso de não existir a ligação a este \textit{hook} o sistema comporta-se de forma a utilizar apenas o sistema anterior.
-
-O sistema interage também com o \textit{LSF} pois existe uma conjunção entre o filtro definido pelo utilizador e a captura do tráfego da aplicação a ser monitorizada.
 
 \section{Conclusão}
 
