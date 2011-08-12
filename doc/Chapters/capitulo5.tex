@@ -158,8 +158,11 @@ Uma das possíbilidades foi a criação de um repositório com a informação so
 Este repositório teria de conter a estrutura genológica do processo a monitorizar, bem como um componente que actualize esta informação.
 A actualização desta estrutura poderia ser efectuada através da instrumentação da chamada ao sistema \textit{fork} ou \textit{clone}.
 Para cada vez que fossem invocadas as funções, anteriormente mencionadas, seria efectuado uma consulta ao repositório e apartir da informação obtida neste seria ou não actualizado o repositório.
-Esta possibilidade ao contemplar a remoção de dados do repositório, necessitaria também instrumentar mais uma função, ???? exit ?? quando o processo termina.
-A actualização dinamica deste repositório, sem alterar código no núcleo, necessitaria de instrumentar algumas funções no núcleo o que iria afectar o desempenho do sistema não sua totalidade, pois a criação e destruição de processos pode ser algo elevada.
+Esta possibilidade, ao contemplar a remoção de dados do repositório, necessitaria também de instrumentar a função de termino de processos.
+A actualização dinamica deste repositório, sem alterar código no núcleo, necessitaria de instrumentar algumas funções no núcleo o que iria afectar o desempenho do sistema não sua totalidade, pois a criação e destruição de processos pode ser elevada.
+
+Em alternativa à anterior possibilidade, efectuou-se uma análise aos campos das estrutura que descreve um processo, a \textit{task\_struct}, para perceber de que forma estes dados se relacionam com os membros da àrvore genelógica do processo.
+Desta análise obteve-se que os identificadores \textit{pid}, \textit{tid} e \textit{ppid} permitem, na grande maioria das aplicações, obter toda a àrvore, uma vez que não costumam ter uma àrvore geneológica extensa.
 
 
 
