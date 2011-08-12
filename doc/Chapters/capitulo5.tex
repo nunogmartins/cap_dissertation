@@ -137,7 +137,6 @@ As subsecções \ref{} .... \ref{} apresentam as funções do núcleo que foram 
 A filtragem dos processos que efectuam as chamadas ao sistema de rede impôs um novo desafio.
  Se apenas filtrar as chamadas de um processo/pid seria apenas verificar se o pid é igual ao que se pretende é trivial e com baixa sobrecarga.
  Para um utilizador que queria analisar um processo, e não saiba qual dos fluxos do processo é responsável pela comunicação de rede, tornou-se complicado.
- Para evitar aumentar a sobrecarga no núcleo instrumentando a chamada ao sistema \textit{clone} ou função semelhante, optou-se por uma filtragem dos processos através de 3 identificadores, \textit{pid}, \textit{ppid} e \textit{tgid}.
 
 Com esta abordagem ainda existe a possibilidade de não se obter todas as \textit{task} do processo, caso este tenha um àrvore com mais de 3 níveis, mas a sobrecarga sobre o sistema é inferior à situação de monitorização da criação de processos no sistema.
  Estes três identificadores foram escolhidos pois permitem identificar até 3 níveis da árvore de um processo.
@@ -161,10 +160,8 @@ Para cada vez que fossem invocadas as funções, anteriormente mencionadas, seri
 Esta possibilidade, ao contemplar a remoção de dados do repositório, necessitaria também de instrumentar a função de termino de processos.
 A actualização dinamica deste repositório, sem alterar código no núcleo, necessitaria de instrumentar algumas funções no núcleo o que iria afectar o desempenho do sistema não sua totalidade, pois a criação e destruição de processos pode ser elevada.
 
-Em alternativa à anterior possibilidade, efectuou-se uma análise aos campos das estrutura que descreve um processo, a \textit{task\_struct}, para perceber de que forma estes dados se relacionam com os membros da àrvore genelógica do processo.
-Desta análise obteve-se que os identificadores \textit{pid}, \textit{tid} e \textit{ppid} permitem, na grande maioria das aplicações, obter toda a àrvore, uma vez que não costumam ter uma àrvore geneológica extensa.
-
-
+Em alternativa, efectuou-se uma análise aos campos da estrutura que descreve um processo, a \textit{task\_struct}, de forma a compreender que forma estes dados se relacionam com os identificadores dos membros da àrvore genelógica do processo.
+Desta análise obteve-se que, os identificadores \textit{pid}, \textit{tid} e \textit{ppid} permitem na grande maioria das aplicações, identificar toda a àrvore geneológica.
 
 
 \subsubsection{Identificadores}
