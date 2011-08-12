@@ -148,6 +148,20 @@ Os identificadores têm de ser escritos para os ficheiros respectivos no \textit
 
 -----------------------------------------------------------------------------------------------------
 
+O \textit{KProbes} é um sistema de instrumentação do núcleo, que não efectua distinção entre que funções, não inline, está a efectuar a instrumentação.
+Não existindo suporte no \textit{KProbes} para filtrar o processo que está a efectuar uma chamada ao sistema, foi necessário desenvolver uma metodologia que permitisse reduzir a sobrecarga desnecessária, quando a monitorizaçãoe efectuada sobre um processo que não o desejado.
+
+Os pontos principais continuariam a ser reduzida sobrecarga e actualização permanente do(s) processo(s) a monitorizar.
+Tendo estas caracteristicas como base algumas possíbilidades foram tidas em consideração, onde o principal desafio foi conseguir manter a informação actualizada.
+
+Uma das possíbilidades foi a criação de um repositório com a informação sobre os identificadores dos processos a monitorizar, sendo necessário novamente uma estrutura de suporte a este repositório bem como funcionalidades de adição, remoção, actualização e consulta.
+Este repositório teria de conter a estrutura genológica do processo a monitorizar, bem como um componente que actualize esta informação.
+A actualização desta estrutura poderia ser efectuada através da instrumentação da chamada ao sistema \textit{fork} ou \textit{clone}.
+Para cada vez que fossem invocadas as funções, anteriormente mencionadas, seria efectuado uma consulta ao repositório e apartir da informação obtida neste seria ou não actualizado o repositório.
+Esta possibilidade ao contemplar a remoção de dados do repositório, necessitaria também instrumentar mais uma função, ???? exit ?? quando o processo termina.
+A actualização dinamica deste repositório, sem alterar código no núcleo, necessitaria de instrumentar algumas funções no núcleo o que iria afectar o desempenho do sistema não sua totalidade, pois a criação e destruição de processos pode ser algo elevada.
+
+
 
 
 \subsubsection{Identificadores}
