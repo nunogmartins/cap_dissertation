@@ -194,11 +194,26 @@ O sistema de operação \textit{Linux} tem um sistema de \textit{firewall} que p
  O \textit{NetFilter} pode ser controlado pelo \textit{iptables}, uma ferramenta em nível utilizador que através de regras define o acesso dos dados das comunicações rede.
 
 \subsection{Traffic Control}
+
+------------------------------------------------------------------------------------------------------------
  Dentro do núcleo do \textit{Linux} para além da \textit{firewall NetFilter} existe um mecanismo de controlo sobre os dados que circulam nas interfaces de rede.
  O principal propósito deste sistema é controlar a transmissão de dados, \textit{egress data transfer}.
  Quando os protocolos de nível 3 vão enviar os dados, para a camada de nível 2, estes são armazenados em \textit{QDisks} para posteriormente serem enviados.
  Com a necessidade de diferenciar os diferentes tipos de dados os administradores de sistemas podem diferenciar o trafego e armazená-lo em diferentes \textit{QDisks}, de forma a poder efectuar \textit{Quality of Service}.
 Apesar de ter estrutra para controlo dos dados que chegam da interface de rede o principal propósito é controlo do dados que saem através das interface de rede.
+------------------------------------------------------------------------------------------------------------
+
+No núcleo para além do \textit{NetFilter}, que controla o fluxo de dados na rede, existe o \textit{Traffic Control} que efectua o escalonamento da transferências de dados para o exterior da rede.
+O escalonamento do tráfego de rede é particularmente importante para os Administradores de rede, pois permite gerir de forma eficiente a largura de banda da interface de rede.
+Como a largura de banda é um recurso limitado, a sua gestão é particularmente importante para os Administradores de rede.
+Através do \textit{Traffic Control} é possível gerir o fluxo de dados de saída da interface de rede.
+A gestão é efectuada através de regras definidas pelo Administrador, que permitem efectuar a diferenciação do tráfego de rede através da definição de classes.
+É possível afectar diferentes algoritmos de escalonamento de forma a efectuar uma gestão da rede mais eficiente.
+As regras são definidas em função da largura de banda, ou do ritmo de envio.
+
+Quando um pacote \textit{IP} está prestes a ser enviado pela função \textit{ip\_output}, é enviado para o \textit{Traffic Control}, onde o pacote é marcado com a respectiva \textit{tag} da respectiva classe, para posteriormente ser adicionado ao \textit{QDisk} correspondente à sua classe.
+O \textit{QDisk} é a estrutura de suporte à transmissão de dados efectuada pelo \textit{Traffic Control}, onde cada elemento desta estrutura é um \textit{sk\_buff}.
+
 
 \subsection{Interfaces de rede}
 
@@ -276,9 +291,9 @@ O sistema proposto foi desenvolvido procurando cumprir os seguintes requisitos:
 \end{itemize}
 
 Para tal, o sistema criado está dividido em 4 componentes principais (ver figura \ref{arquitectura}).
- A função de filtragem, invocada por um \textit{hook} que estende o LSF, permite que apenas o tráfego do processo alvo seja analisado pelo restante sistema de fitragem do LSF.
- Uma componente de instrumentação das chamadas ao sistema (ou outras funções contidas no sistema de rede) que actualiza o repositório de dados onde é mantido o estado das interacções via rede do(s) processo(s) alvo.
- Existe ainda um sistema para controlo/configuração e para obter informação do estado da monitorização.
+A função de filtragem, invocada por um \textit{hook} que estende o \textit{LSF}, permite que apenas o tráfego do processo alvo seja analisado pelo restante sistema de fitragem do LSF.
+Uma componente de instrumentação das chamadas ao sistema (ou outras funções contidas no sistema de rede) que actualiza o repositório de dados onde é mantido o estado das interacções via rede do(s) processo(s) alvo.
+Existe ainda um sistema para controlo/configuração e para obter informação do estado da monitorização.
 
 \begin{figure}[htbp]
 \begin{center}
