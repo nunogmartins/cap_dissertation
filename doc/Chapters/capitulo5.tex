@@ -1,46 +1,88 @@
-\chapter{Implementação}
+\chapter{Implementação da solução proposta}
 \label{cap:Implementacao}
 
 % falta falar sobre filesystem vfs e como chegar ao socket file private\_data para alem da parte de interrupts, tasklets e bottomhalfs bem como sobre os contextos de execucao
+Falta falar sobre os motivos e a estrutura desejada para esta implementação
 
+\section{MRoP e sua implementação}
+\label{sec:mrop_implementation}
 
-\section{Ferramenta}
-Considerações ...
+A implementação da solução MRoP teve em consideração vários aspectos: desenvolvimento de código minimalista, a menor perturbação de código no núcleo, utilização de API's internas, ser opaca às implementações da biblioteca \textit{PCap}.
+A implementação deverá ser contida em um modulo de modo a poder ser carregado e libertado do núcleo pelo administrador.
+Possibilidade de separação das diversas componentes para que cada uma possam ser melhorada em separado e a utilização de separation of concerns e reutilização de código, elementos base de qualquer programa informático.
+
+Por cada pacote ter de atravessar toda a arquitectura de rede incluida no \textit{vfs} seria demasiado pesado para o sistema.
+
+------- apresentar as diversas seccoes ao leitor ----------------
+
+Nas subsecções seguintes irão ser apresentados os 4 subcomponentes do MRoP.
+
 
 \section{Estado dos \textit{sockets}}
 
 De forma a manter a informação sobre quais os endereços e portos que uma aplicação está a utilizar, sem que seja necessário consultar os sockets que esta está a utilizar, foi necessário criar um repositório de dados onde estivesse a informação relevante para as decisões do filtro de captura.
 
 As abordagens para a criação de um repositório de dados com base nas estruturas de dados:
+
+Necessidades de inserção, remoção e consulta. Qualquer uma destas operações deverá ser efectuada com celeridade procurando estruturas que tenham uma complexidade temporal BigO O(1) ou O(log n).
+
 \subsection{Com suporte no núcleo}
 %outro titulo alternativas disponíveis
-\subsubsection{Bitmap}
-\subsubsection{Listas duplamente ligadas}
-\subsubsection{Árvores}
 
+\begin{description}
+
+\item[BitMap]
+%\subsubsection{Bitmap}
+
+A utilização de um mapa de bits permitiria de uma modo bastante rápido e com uma reduzida utilização de memória, saber se um determinado porto estaria a ser utilizado por um determinado processo.
+O núcleo tem suporte para tratamento de mapas de bits, ou seja verificação de um determinado bit num endereço de memória está activo ou não, o mesmo para afectação de um determinado bit em um endereço.
+Este processo apesar de extremamente rápido, carece de modularidade na utilização de multiplos endereços, pois apenas sabemos quais os portos, mas não se sabe se são tcp, udp, por que endereço local é que estão expostos. 
+Uma solução seria agrupar os diferentes mapas de bits sob a terminologia de um endereço, mas e se fosse udp ou tcp ?
+E quando um processo efectua um bind sob todas as interfaces do sistema ? 
+E quando é utilizada mais uma interface virtual sob uma real ? .....
+
+
+\item[Listas]
+
+
+
+
+
+%\subsubsection{Listas duplamente ligadas}
+%\subsubsection{Árvores}
+
+\item[Árvores]
 Apesar de não ser necessário percorrer os elementos ou obter os indíces de forma ordenada. 
 
-\paragraph{Árvore Binária}
+%\paragraph{Árvore Binária}
 
+\item[Árvore Binária]
 
-\paragraph{Arvores Balanceadas}
+%\paragraph{Arvores Balanceadas}
+\item[Árvore Balanceada]
 \textit{Red-black Tree} implementada no núcleo de operação permite efectuar
 
 Complexidade de inserção, pesquisa e remoção é O(log n), sendo n o número de elementos da árvore.
 
-Existe uma penalização no desempenho quando existe a necessidade de balancear a àrvore, mas os ganhos provenientes deste balanceamento face às àrvores não balanceadas é muito superior.
+Pode existir uma penalização no desempenho, devido à necessidade de balancear a àrvore.
+Os ganhos provenientes deste balanceamento, face às àrvores não balanceadas, permite manter a complexidade média de acesso aos dados em O(log(n)), ao invés de um possível decremento até O(n), ou seja a árvore degenerar em uma lista.
+\end{description}
 
 \subsection{Sem Suporte no núcleo}
 
-\subsubsection{Tabela de dispersão}
+\begin{description}
+%\subsubsection{Tabela de dispersão}
+\item[Tabela de Dispersão]
 Não existe nenhuma implementação 
 
-\subsubsection{Bloom Filter}
+%\subsubsection{Bloom Filter}
+\item[Bloom Filter]
 bloom filters ...
 
+\end{description}
 \paragraph*{}
-A estrutura de dados escolhida para a criação do repositório de dados foi \textit{Red-black tree}.
- Esta escolha foi devido principalmente à boa performance e a existir uma implementação da estrutura de dados no núcleo do linux.
+A estrutura de dados escolhida para a criação do repositório de dados da componente Estado dos \textit{sockets} foi a \textit{Red-black tree}.
+ Esta escolha foi principalmente à performance e à existência da implementação da estrutura no núcleo do \textit{Linux}.
  Devido a esta estrutura estar presente no núcleo do \textit{linux} permitiu que a implementação da ferramenta tivesse um ciclo de implementação mais rápido devido à confiança na ``validação`` desta estrutura pelos responsáveis do núcleo do \textit{linux}.
  
 \subsection{\textit{API} de comunicação entre instrumentação e repositório}
@@ -90,6 +132,8 @@ As subsecções \ref{} .... \ref{} apresentam as funções do núcleo que foram 
 %
 
 \subsection{Filtro de processos}
+------------------------------------------------------------------------------------------------
+
 A filtragem dos processos que efectuam as chamadas ao sistema de rede impôs um novo desafio.
  Se apenas filtrar as chamadas de um processo/pid seria apenas verificar se o pid é igual ao que se pretende é trivial e com baixa sobrecarga.
  Para um utilizador que queria analisar um processo, e não saiba qual dos fluxos do processo é responsável pela comunicação de rede, tornou-se complicado.
@@ -101,6 +145,8 @@ Com esta abordagem ainda existe a possibilidade de não se obter todas as \texti
 Seria bom colocar uma imagem de uma àrvore de processo .... 
 
 Os identificadores têm de ser escritos para os ficheiros respectivos no \textit{DebugFs}, que serão explicados na secção \ref{}.
+
+-----------------------------------------------------------------------------------------------------
 
 
 
