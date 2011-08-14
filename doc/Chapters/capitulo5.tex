@@ -103,7 +103,32 @@ O repositório criado através de uma árvore \textit{Red and Black} contém ele
 Esta estrutura tem de ter pelo menos um elemento, um \textit{rb\_node}, para que seja possível manipular a árvore, um elemento para comparar que serve de chave.
 A estrutura anteriormente descrita contém outros elementos para além daqueles indicados, que serão descritos em seguida.
 
+\begin{figure}[ht]
+\begin{minipage}[b]{0.5\linewidth}
+\centering
+\includegraphics[scale=0.5]{portInfo_structure.pdf}
+\caption{Elemento da árvore}
+\label{fig:portInfo}
+\end{minipage}
+\hspace{0.5cm}
+\begin{minipage}[b]{0.5\linewidth}
+\centering
+\includegraphics[scale=0.5]{local_address_list}
+\caption{Lista de endereços}
+\label{fig:local_address_list}
+\end{minipage}
+\end{figure}
 
+Na figura \ref{fig:portInfo} está apresentada a disposição dos elementos da estrutura que \textit{portInfo}, sendo que a lista de endereços \textit{IP} das interfaces de rede são adicionados através da estrutura apresentada na figura \ref{fig:local_address_list}.
+Os elementos do repositório, são instâncias da estrutura \textit{PortInfo}, adicionados através dos \textit{handlers} das funções instrumentadas.
+
+
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.7]{repositorio_exemplo.pdf}
+\caption{exemplo}
+\label{fig:repo_example}
+\end{figure}
 
 \subsection{\textit{API} de comunicação interna do MRoP}
 \label{sub:repo_api}
