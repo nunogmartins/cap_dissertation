@@ -7,9 +7,9 @@ Falta falar sobre os motivos e a estrutura desejada para esta implementação
 \section{MRoP e sua implementação}
 \label{sec:mrop_implementation}
 
-A implementação da solução MRoP teve em consideração vários aspectos: desenvolvimento de código minimalista, a menor perturbação de código no núcleo, utilização de API's internas, ser opaca às implementações da biblioteca \textit{PCap}.
-A implementação deverá ser contida em um modulo de modo a poder ser carregado e libertado do núcleo pelo administrador.
-Possibilidade de separação das diversas componentes para que cada uma possam ser melhorada em separado e a utilização de separation of concerns e reutilização de código, elementos base de qualquer programa informático.
+A implementação da solução MRoP teve em consideração vários aspectos: desenvolvimento de código minimalista, reduzida alteração do código do núcleo, utilização de \textit{APIs} internas, opaco à implementação da biblioteca \textit{PCap}, de forma a poder ser integrada nesta.
+A implementação autocontida em um módulo, de modo a poder ser carregado e libertado do núcleo pelo administrador.
+Modulariazação das diversas componentes, permitindo assim um desenvolvimento de cada subcomponente de forma autónoma.
 
 Por cada pacote ter de atravessar toda a arquitectura de rede incluida no \textit{vfs} seria demasiado pesado para o sistema.
 
@@ -100,6 +100,8 @@ Apesar dos processos monitorizados serem muito dinâmicos nas comunicações, a 
 
 \section{Instrumentação de funções do núcleo}
 
+----------------------------------------------------------------------------------------------------------
+
 Como foi anteriormente descrito em \ref{subsection:network} sobre as chamadas aos sistema para utilizar as funcionalidades de rede
 
 Foi necessário conhecer a \textit{ABI}\ref{ABI}\cite{ABI} referente às arquitecturas suportadas, \textit{x86} e \textit{x86\_64}, para a passagem de parâmetros das chamadas aos sistema.
@@ -109,15 +111,9 @@ O sistema de \textit{KProbes} permite consultar os registos do processador onde 
 \textit{close}.
  Para esta última \textit{close} devido à elevada utilização desta chamada ao sistema por diferentes aplicações no sistema, foi utilizada a função \textit{qqq coisa ...  ????}
 
-------------------------------------------------------------------------------------------------------------
-
 Para efectuar a monitorização das interacções de rede de um processo foi necessário recorrer à instrumentação de funções do núcleo.
 
-------------------------------------------------------------------------------------------------------------
-
 Através da instrumentação de funções do núcleo foi possível manter o contexto da execução do processo.
-
-------------------------------------------------------------------------------------------------------------
 
 Como apresentado e concluído na secção \ref{}, o sistema de monitorização que melhor se adequa ao problema exposto é o \textit{KProbes}.
  Deste sistema utilizou-se o \textit{KRetProbe}, de forma a instrumentar a entrada e retorno de funções.
@@ -130,6 +126,30 @@ As subsecções \ref{} .... \ref{} apresentam as funções do núcleo que foram 
 %
 % faltam as subsecoes ... 
 %
+
+----------------------------------------------------------------------------------------------------------
+
+A metodologia aplicada à resolução deste problema de desempenho, tem tido como base o desenvolvimento de uma componente que efectue uma análise aos canais, de comunicação de rede (\textit{sockets}), utilizados por um processo.
+
+Dos diferentes sistemas analisados na secção \ref{}, aquele que sendo dinamico permitia ter uma menor sobrecarga, foi o \textit{KProbes}.
+Os outros sistemas tinham componentes de \textit{logging}, que para a realização deste trabalho, teria uma sobrecarga desnecessária, afectando negativamente o desempenho.
+
+Para além de se ter tido em consideração o sistema de instrumentação utilizado, foi também tido em consideração o número de funções a instrumentar.
+A sobrecarga total exercida por esta componente é também em função do número de funções que são instrumentadas, bem como do número de vezes que estas funções são executadas.
+
+A análise efectuada no capítulo \ref{cap:Estrutura} sobre a \textit{Arquitectura de rede em Linux}, permitiu obter uma melhor análise deste.
+
+O MRoP, instrumenta um reduzido número de funções do núcleo pertencentes ao subsistema de rede do \textit{Linux}.
+Este novo sistema foi criado monitorizar a utilização de canais da familia \textit{inet} para comunicação, tendo como particularidade a utilização de canais baseados nos protocolos \textit{tcp} e \textit{udp}.
+
+
+Estes dois protocolos têm em comum algumas funções com outros protocolos de outras familias, principalmente quando as funções são as chamadas ao sistema.
+De forma a dimínuir o número de funções a instrumentar, decidiu-se instrumentar as chamadas ao sistema, obtendo assim um maior nível de abstração mas também um controlo directo com o efectuado nos processos.
+As chamadas ao sistema instrumentadas foram: \textit{sendto}, \textit{recvfrom}, \textit{connect}, \textit{bind}, \textit{accept} e \textit{close}.
+As primeiras análises efectuadas demonstraram que apenas a chamada ao sistema \textit{close}, era executada demasiadas vezes, dimínuindo assim o desempenho global do sistema.
+Esta situação é facilmente explicável, pois a chamada ao sistema \textit{close}, é utilizada extensivamente para fechar canais, sejam eles ficheiros, \textit{sockets}, \textit{pipes}, etc.
+Por esta razão foi necessário encontrar a função que lida com o fecho de \textit{sockets}, permitindo desta forma reduzir a sobrecarga imposta pela instrumentação.
+
 
 \subsection{Filtro de processos}
 ------------------------------------------------------------------------------------------------
