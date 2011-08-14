@@ -11,6 +11,16 @@ A implementação da solução MRoP teve em consideração vários aspectos: des
 A implementação autocontida em um módulo, de modo a poder ser carregado e libertado do núcleo pelo administrador.
 Modulariazação das diversas componentes, permitindo assim um desenvolvimento de cada subcomponente de forma autónoma.
 
+No capítulo \ref{} foram apresentados alguns sistemas que permitem efectuar monitorização ou filtragem de pacotes com indicação de um processo.
+No MRoP, apesar de utilizar o sistema de instrumentação do núcleo \textit{KProbes}, diferencia-se das soluções apresentadas, sendo totalmente implementado dentro do núcleo, com uma reduzida utilização de memória e uma reduzida perturbação do sistema.
+
+Como apresentado na secção \ref{}, o sistema de monitorização de rede é utilizado para cada pacote que entra ou saí do sistema.
+
+
+
+
+
+
 Por cada pacote ter de atravessar toda a arquitectura de rede incluida no \textit{vfs} seria demasiado pesado para o sistema.
 
 ------- apresentar as diversas seccoes ao leitor ----------------
@@ -20,7 +30,7 @@ Nas subsecções seguintes irão ser apresentados os 4 subcomponentes do MRoP.
 
 \section{Estado dos \textit{sockets}}
 
-De forma a manter a informação sobre quais os endereços e portos que uma aplicação está a utilizar, sem que seja necessário consultar os sockets que esta está a utilizar, foi necessário criar um repositório de dados onde estivesse a informação relevante para as decisões do filtro de captura.
+De forma a manter a informação sobre os endereços e portos que uma aplicação está a utilizar, sem que seja necessário consultar os sockets que esta está a utilizar, foi necessário criar um repositório de dados onde estivesse a informação relevante para as decisões do filtro de captura.
 
 As abordagens para a criação de um repositório de dados com base nas estruturas de dados:
 
@@ -34,9 +44,10 @@ Necessidades de inserção, remoção e consulta. Qualquer uma destas operaçõe
 \item[BitMap]
 %\subsubsection{Bitmap}
 
-A utilização de um mapa de bits permitiria de uma modo bastante rápido e com uma reduzida utilização de memória, saber se um determinado porto estaria a ser utilizado por um determinado processo.
-O núcleo tem suporte para tratamento de mapas de bits, ou seja verificação de um determinado bit num endereço de memória está activo ou não, o mesmo para afectação de um determinado bit em um endereço.
-Este processo apesar de extremamente rápido, carece de modularidade na utilização de multiplos endereços, pois apenas sabemos quais os portos, mas não se sabe se são tcp, udp, por que endereço local é que estão expostos. 
+A utilização de um mapa de bits permitiria de uma modo bastante rápido e com uma reduzida utilização de memória, saber se um determinado porto estaria em utilização por um determinado processo.
+O núcleo tem suporte para tratamento de mapas de bits, ou seja, verifica se um determinado bit em um conjunto de memória está activo ou não, permitindo também afectar um determinado bit em um conjunto de memória.
+Este processo apesar de extremamente rápido, carece de modularidade na utilização de multiplos endereços de rede, pois apenas controlam-se os portos, não tendo suporte para protocolos ou multiplos endereços de rede.
+ 
 Uma solução seria agrupar os diferentes mapas de bits sob a terminologia de um endereço, mas e se fosse udp ou tcp ?
 E quando um processo efectua um bind sob todas as interfaces do sistema ? 
 E quando é utilizada mais uma interface virtual sob uma real ? .....
@@ -85,11 +96,17 @@ A estrutura de dados escolhida para a criação do repositório de dados da comp
  Esta escolha foi principalmente à performance e à existência da implementação da estrutura no núcleo do \textit{Linux}.
  Devido a esta estrutura estar presente no núcleo do \textit{linux} permitiu que a implementação da ferramenta tivesse um ciclo de implementação mais rápido devido à confiança na ``validação`` desta estrutura pelos responsáveis do núcleo do \textit{linux}.
  
-\subsection{\textit{API} de comunicação entre instrumentação e repositório}
+\subsection{Estrutura utilizada}
+\label{sub:repo_structure}
 
-Foi criada uma \textit{API} interna ao sistema para efectuar a comunicação entre os \textit{handlers} das funções instrumentadas e o repositório dos \textit{sockets} do processo.
- Esta \textit{API} consiste nas funções de 
- Foi criada uma \textit{API} que efectua uma validação dos parâmetros passados às funções do repositório de dados e que permite uma maior modularização na modificação da estrutura do repositório de dados.
+\subsection{\textit{API} de comunicação interna do MRoP}
+
+Foi criada uma \textit{API} interna ao MRoP, para permitir efectuar a inserção, consulta e remoção dos dados do repositório.
+A utilização desta \textit{API} permite efectuar uma validação dos parâmetros passados às funções do repositório de dados.
+Foi possível separar as componentes do MRoP através desta \textit{API}, melhorando assim a modularidade do código.
+
+Esta \textit{API} permite que os \textit{handlers} das funções instrumentadas, consigam efectuar estas operações.
+A operação de consulta é importante para a função que filtra os pacotes das interfaces de rede.
 
 Apesar de reduzir o desempenho, porque necessita de chamar os métodos especificos ao repositório, permite que outros repositórios possam ser adicionados, permitindo modificar facilmente o código.
 
