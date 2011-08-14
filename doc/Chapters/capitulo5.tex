@@ -99,7 +99,14 @@ A estrutura de dados escolhida para a criação do repositório de dados da comp
 \subsection{Estrutura utilizada}
 \label{sub:repo_structure}
 
+O repositório criado através de uma árvore \textit{Red and Black} contém elementos com uma estrutura bem definida.
+Esta estrutura tem de ter pelo menos um elemento, um \textit{rb\_node}, para que seja possível manipular a árvore, um elemento para comparar que serve de chave.
+A estrutura anteriormente descrita contém outros elementos para além daqueles indicados, que serão descritos em seguida.
+
+
+
 \subsection{\textit{API} de comunicação interna do MRoP}
+\label{sub:repo_api}
 
 Foi criada uma \textit{API} interna ao MRoP, para permitir efectuar a inserção, consulta e remoção dos dados do repositório.
 A utilização desta \textit{API} permite efectuar uma validação dos parâmetros passados às funções do repositório de dados.
