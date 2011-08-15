@@ -16,6 +16,12 @@ No MRoP, apesar de utilizar o sistema de instrumentação do núcleo \textit{KPr
 
 Como apresentado na secção \ref{}, o sistema de monitorização de rede é utilizado para cada pacote que entra ou saí do sistema.
 
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.5]{arquitectura.pdf}
+\caption{Arquitectura geral}
+\label{fig:general_architecture}
+\end{figure}
 
 
 
@@ -245,9 +251,6 @@ Desta análise obteve-se que, os identificadores \textit{pid}, \textit{tid} e \t
 No núcleo do \textit{Linux} quando um processo é criado os identificadores \textit{pid} e \textit{tgid} são iguais.
 Os processos quando efectuam
 
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Filtro de pacotes, extensão ao LSF}
 
 No sistema de monitorização de rede um dos componentes é uma função que serve de máquina virtual às instruções do \textit{LSF}.
@@ -261,7 +264,7 @@ Possivelmente o sistema de instrumentação do núcleo, \textit{KProbes} , poder
 Devido ao elevado número de vezes que a função de filtragem é invocada (uma para cada pacote, recebido ou enviado), a sobrecarga da utilização do \textit{KProbes} seria inaceitável.
 Por esta razão, a única alteração efectuada ao código do \textit{Linux}, foi na função \textit{sk\_run\_filter} e a definição de um \textit{hook} para activação e desactivação deste novo sistema, ambos definidos no do ficheiro \textit{filter.c}.
 Esta alteração permitiu adicionar uma nova funcionalidade à custa de uma sobrecarga muito reduzida, no sistema de monitorização, mesmo quando não estando activa a funcionalidade.
-A sobrecarga introduzida foi a verificação de que se o \textit{hook} está activo, e em caso afirmativo passar o controlo para a função definida no \textit{hook}.
+Quando monitorização de rede está activa, sem a componente MRoP, a sobrecarga introduzida é apenas a verificação se o \textit{hook} está activo ou não.
 
 \begin{figure}[ht]
 \centering
@@ -281,29 +284,35 @@ Na verdade não foi só para obter o estado da computação foi também uma form
 
 \subsection{Informação do processo}
 
-Quando o módulo da ferramenta é executado os indicadores de \textit{pid}, \textit{ppid} e \textit{tgid} são inicializados com o valor -1.
 
-Esta ferramenta de monitorização só irá passar a analisar os dados das chamadas ao sistema quando estes valores estiverem definidos e identificarem o processo que efectuou a chamada.
+O MRoP foi desenhado para ser práticamente autónomo, apenas necessitando de configuração de alguns parâmetros essenciais ao seu funcionamento.
+A componente \textit{Informação de análise e controlo}, permite efectuar o controlo sobre aspectos da instrumentação e do repositório.
+A informação de análise é apenas adicionada, se o suporte para análise for activado na compilação, permitindo assim obter métricas sobre os diferentes componentes internos do MRoP.
 
-\subsubsection{Sistema de Ficheiros}
-
-Dentro do sistema de ficheiros onde os \textit{sockets} estão incorporados, como apenas estamos interessados em analisar os sockets construidos para a
-familia \textit{AF\_INET} todos os sockets que não pertencerem a esta familia e não forem do tipo \textit{TCP} ou \textit{UDP} não serão mais analisados.
- Os \textit{sockets} que pertencem é então inicializado uma estrutura do tipo \textit{não me lembro ??? ver código} onde estão definidos o porto, o endereço
-e se são do tipo \textit{UDP} ou \textit{TCP}.
-
-Dependendo da chamada ao sistema realizada entre a função definida na entrada e a definida no retorno do \textit{KRetProbe}, são passados parâmetros que irão
-ser utilizados na função de retorno.
+O sistema de comunicação, entre o nível utilizador e o núcleo, utilizado foi o \textit{DebugFs}, anteriormente analisado em \ref{}.
 
 
-\subsection{DebugFs}
-Criação de alguns ficheiros no sistema virtual \textit{configFs} para poder observar o comportamento da monitorização e dos pacotes que chegaram ao sistema de filtragem.
-A forte restrição de apenas um valor por ficheiro do \textit{SysFs} obriga a que para obter diferentes valores do sistema tenha de abrir diferentes ficheiros.
- Como o sistema de ficheiros \textit{proc} se sitia principalmente para os processos seria um bom candidado para a colocação de informação sobre 
+
+%Quando o módulo da ferramenta é executado os indicadores de \textit{pid}, \textit{ppid} e \textit{tgid} são inicializados com o valor -1.
+
+%Esta ferramenta de monitorização só irá passar a analisar os dados das chamadas ao sistema quando estes valores estiverem definidos e identificarem o processo que efectuou a chamada.
+
+%\subsubsection{Sistema de Ficheiros}
+
+%Dentro do sistema de ficheiros onde os \textit{sockets} estão incorporados, como apenas estamos interessados em analisar os sockets construidos para a familia \textit{AF\_INET} todos os sockets que não pertencerem a esta familia e não forem do tipo \textit{TCP} ou \textit{UDP} não serão mais analisados.
+% Os \textit{sockets} que pertencem é então inicializado uma estrutura do tipo \textit{não me lembro ??? ver código} onde estão definidos o porto, o endereço e se são do tipo \textit{UDP} ou \textit{TCP}.
+
+%Dependendo da chamada ao sistema realizada entre a função definida na entrada e a definida no retorno do \textit{KRetProbe}, são passados parâmetros que irão ser utilizados na função de retorno.
 
 
-\section{Dificuldades}
- As chamadas ao sistema para o protocolo \textit{UDP} podem ser dificeis de analisar pois apesar de para o \textit{sendto} poder user utilizada a mesma técnica que foi utilizada para o \textit{connect}, para o \textit{recvfrom} pode ser mais dificil pois pode receber pacotes de multiplas fontes
+%\subsection{DebugFs}
+%Criação de alguns ficheiros no sistema virtual \textit{configFs} para poder observar o comportamento da monitorização e dos pacotes que chegaram ao sistema de filtragem.
+%A forte restrição de apenas um valor por ficheiro do \textit{SysFs} obriga a que para obter diferentes valores do sistema tenha de abrir diferentes ficheiros.
+% Como o sistema de ficheiros \textit{proc} se sitia principalmente para os processos seria um bom candidado para a colocação de informação sobre 
+
+
+%\section{Dificuldades}
+% As chamadas ao sistema para o protocolo \textit{UDP} podem ser dificeis de analisar pois apesar de para o \textit{sendto} poder user utilizada a mesma técnica que foi utilizada para o \textit{connect}, para o \textit{recvfrom} pode ser mais dificil pois pode receber pacotes de multiplas fontes
 
 \section{Conclusão}
 \label{sec:implement_conclusion}
