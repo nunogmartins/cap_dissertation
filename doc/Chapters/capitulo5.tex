@@ -144,15 +144,15 @@ Foi possível separar as componentes do MRoP através desta \textit{API}, melhor
 \label{fig:api_connect}
 \end{figure}
 
-Esta \textit{API} permite que os \textit{handlers} das funções instrumentadas, consigam efectuar estas operações.
-A operação de consulta é importante para a função que filtra os pacotes das interfaces de rede.
+Esta \textit{API} permite aos \textit{handlers}, das funções instrumentadas, efectuar as operações de inserção e remoção sobre a componente \textit{Estado dos sockets}.
+A operação de consulta é principalmente importante para a filtragem de pacotes das interfaces de rede.
 
 Apesar de reduzir o desempenho, porque necessita de chamar os métodos especificos ao repositório, permite que outros repositórios possam ser adicionados, permitindo modificar facilmente o código.
 
-Apesar dos processos monitorizados serem muito dinâmicos nas comunicações, a maior percentagem de operações sobre o reposiório serão consultas/verificações.
- As restantes operações de inserção e remoção irão ter uma percentagem igual entre elas.
- É esperado que para cada inserção exista uma remoção.
- Uma monitorização a um processo durante toda a sua existência espera-se que no final o estado do reposiório seja igual ao inicio da monitorização.
+Apesar dos processos monitorizados terem um elevado dinamismo nas comunicações, a maior percentagem de operações sobre o reposiório serão de consultas.
+As restantes operações de inserção e remoção irão ter uma percentagem igual entre elas.
+É esperado que para cada inserção exista uma remoção.
+Após a monitorização de um processo é esperado que a componente \textit{Estado dos Sockets}, esteja com o mesmo número de elementos, que antecedeu a monitorização.
 
 \section{Instrumentação de funções do núcleo}
 
@@ -185,7 +185,7 @@ As subsecções \ref{} .... \ref{} apresentam as funções do núcleo que foram 
 
 ----------------------------------------------------------------------------------------------------------
 
-A metodologia aplicada à resolução deste problema de desempenho, tem tido como base o desenvolvimento de uma componente que efectue uma análise aos canais, de comunicação de rede (\textit{sockets}), utilizados por um processo.
+A metodologia aplicada à resolução deste problema de desempenho, teve como base o desenvolvimento de uma componente que efectue uma análise aos canais, de comunicação de rede (\textit{sockets}) utilizados por um processo, inserir a informação necessária num repositório, e quando o pacote chegar ao sistema de monitorização utilizar o repositório para capturar ou não o pacote.
 
 Dos diferentes sistemas analisados na secção \ref{}, aquele que sendo dinamico permitia ter uma menor sobrecarga, foi o \textit{KProbes}.
 Os outros sistemas tinham componentes de \textit{logging}, que para a realização deste trabalho, teria uma sobrecarga desnecessária, afectando negativamente o desempenho.
@@ -249,12 +249,6 @@ Os processos quando efectuam
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Filtro de pacotes, extensão ao LSF}
-------------------------------------------------------------------------------
-
-Como foi apresentado na arquitectura, na secção \ref{subsec:Filter}, o \textit{overhead} acrescentado ao sistema mesmo sem a ferramenta estar activa é
-a verificação da activação deste \textit{hook}.
-
----------------------------------------------------------------------
 
 No sistema de monitorização de rede um dos componentes é uma função que serve de máquina virtual às instruções do \textit{LSF}.
 Esta função itera sobre o filtro executando instrução a instrução, sobre o pacote (recebido ou enviado), até encontrar uma instrução de return (\textit{BPF\_RET} ou \textit{BPF\_RET\_A}).
@@ -269,6 +263,12 @@ Por esta razão, a única alteração efectuada ao código do \textit{Linux}, fo
 Esta alteração permitiu adicionar uma nova funcionalidade à custa de uma sobrecarga muito reduzida, no sistema de monitorização, mesmo quando não estando activa a funcionalidade.
 A sobrecarga introduzida foi a verificação de que se o \textit{hook} está activo, e em caso afirmativo passar o controlo para a função definida no \textit{hook}.
 
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.7]{run_filter.pdf}
+\caption{Execução de filtragem de pacotes}
+\label{fig:run_filter}
+\end{figure}
 
 
 \section{Informação de análise e controlo}
@@ -304,3 +304,6 @@ A forte restrição de apenas um valor por ficheiro do \textit{SysFs} obriga a q
 
 \section{Dificuldades}
  As chamadas ao sistema para o protocolo \textit{UDP} podem ser dificeis de analisar pois apesar de para o \textit{sendto} poder user utilizada a mesma técnica que foi utilizada para o \textit{connect}, para o \textit{recvfrom} pode ser mais dificil pois pode receber pacotes de multiplas fontes
+
+\section{Conclusão}
+\label{sec:implement_conclusion}
