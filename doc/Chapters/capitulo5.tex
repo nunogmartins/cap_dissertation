@@ -107,8 +107,8 @@ A estrutura de dados escolhida para a criação do repositório de dados, da com
 \label{sub:repo_structure}
 
 O repositório criado através de uma árvore \textit{Red and Black} contém elementos com uma estrutura bem definida.
-Esta estrutura tem de ter pelo menos um elemento, um \textit{rb\_node}, para que seja possível manipular a árvore, um elemento para comparar que serve de chave.
-A estrutura anteriormente descrita contém outros elementos para além daqueles indicados, que serão descritos em seguida.
+Esta estrutura contém obrigatoriamente um elemento \textit{rb\_node}, para que seja possível manipular a árvore e um elemento comparativo utilizado como chave.
+A estrutura anteriormente descrita contém outros elementos para além dos indicados, que serão descritos em seguida.
 
 \begin{figure}[ht]
 \begin{minipage}[b]{0.5\linewidth}
@@ -126,9 +126,8 @@ A estrutura anteriormente descrita contém outros elementos para além daqueles 
 \end{minipage}
 \end{figure}
 
-Na figura \ref{fig:portInfo} está apresentada a disposição dos elementos da estrutura que \textit{portInfo}, sendo que a lista de endereços \textit{IP} das interfaces de rede são adicionados através da estrutura apresentada na figura \ref{fig:local_address_list}.
+Na figura \ref{fig:portInfo} apresenta-se a disposição dos elementos da estrutura \textit{PortInfo}, sendo que a lista de endereços \textit{IP} das interfaces de rede são adicionados através da estrutura apresentada na figura \ref{fig:local_address_list}.
 Os elementos do repositório, são instâncias da estrutura \textit{PortInfo}, adicionados através dos \textit{handlers} das funções instrumentadas.
-
 
 \begin{figure}[ht]
 \centering
@@ -140,8 +139,8 @@ Os elementos do repositório, são instâncias da estrutura \textit{PortInfo}, a
 \subsection{\textit{API} de comunicação interna do MRoP}
 \label{sub:repo_api}
 
-Foi criada uma \textit{API} interna ao MRoP, para permitir efectuar a inserção, consulta e remoção dos dados do repositório.
-A utilização desta \textit{API} permite efectuar uma validação dos parâmetros passados às funções do repositório de dados.
+Foi criada uma \textit{API} interna ao MRoP, com o objectivo de efectuar inserções, consultas e remoções dos dados do repositório.
+A utilização desta \textit{API} permite uma validação dos parâmetros passados às funções do repositório de dados.
 Foi possível separar as componentes do MRoP através desta \textit{API}, melhorando assim a modularidade do código.
 
 \begin{figure}[ht]
@@ -151,12 +150,12 @@ Foi possível separar as componentes do MRoP através desta \textit{API}, melhor
 \label{fig:api_connect}
 \end{figure}
 
-Esta \textit{API} permite aos \textit{handlers}, das funções instrumentadas, efectuar as operações de inserção e remoção sobre a componente \textit{Estado dos sockets}.
+Esta \textit{API} permite aos \textit{handlers} das funções instrumentadas, efectuar as operações de inserção e remoção sobre a componente \textit{Estado dos Sockets}.
 A operação de consulta é principalmente importante para a filtragem de pacotes das interfaces de rede.
 
 Apesar de reduzir o desempenho, porque necessita de chamar os métodos especificos ao repositório, permite que outros repositórios possam ser adicionados, permitindo modificar facilmente o código.
 
-Apesar dos processos monitorizados terem um elevado dinamismo nas comunicações, a maior percentagem de operações sobre o reposiório serão de consultas.
+Apesar dos processos monitorizados terem um elevado dinamismo nas comunicações, a maior percentagem de operações sobre o repositório serão de consulta.
 As restantes operações de inserção e remoção irão ter uma percentagem igual entre elas.
 É esperado que para cada inserção exista uma remoção.
 Após a monitorização de um processo é esperado que a componente \textit{Estado dos Sockets}, esteja com o mesmo número de elementos, que antecedeu a monitorização.
@@ -192,9 +191,9 @@ As subsecções \ref{} .... \ref{} apresentam as funções do núcleo que foram 
 
 ----------------------------------------------------------------------------------------------------------
 
-A metodologia aplicada à resolução deste problema de desempenho, teve como base o desenvolvimento de uma componente que efectue uma análise aos canais, de comunicação de rede (\textit{sockets}) utilizados por um processo, inserir a informação necessária num repositório, e quando o pacote chegar ao sistema de monitorização utilizar o repositório para capturar ou não o pacote.
+A metodologia aplicada à resolução do problema de desempenho, teve como base o desenvolvimento de uma componente que efectue uma análise aos canais de comunicação de rede, utilizados por um processo, insira a informação necessária num repositório e, quando o pacote chegar ao sistema de monitorização, utilize o repositório para capturar, ou não, o pacote.
 
-Dos diferentes sistemas analisados na secção \ref{}, aquele que sendo dinamico permitia ter uma menor sobrecarga, foi o \textit{KProbes}.
+Dos diferentes sistemas analisados na secção \ref{}, aquele que sendo dinâmico permitia ter uma menor sobrecarga, foi o \textit{KProbes}.
 Os outros sistemas tinham componentes de \textit{logging}, que para a realização deste trabalho, teria uma sobrecarga desnecessária, afectando negativamente o desempenho.
 
 Para além de se ter tido em consideração o sistema de instrumentação utilizado, foi também tido em consideração o número de funções a instrumentar.
@@ -215,6 +214,7 @@ Por esta razão foi necessário encontrar a função que lida com o fecho de \te
 
 
 \subsection{Filtro de processos}
+
 ------------------------------------------------------------------------------------------------
 
 A filtragem dos processos que efectuam as chamadas ao sistema de rede impôs um novo desafio.
