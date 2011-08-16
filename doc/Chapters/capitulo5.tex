@@ -4,17 +4,18 @@
 % falta falar sobre filesystem vfs e como chegar ao socket file private\_data para alem da parte de interrupts, tasklets e bottomhalfs bem como sobre os contextos de execucao
 Falta falar sobre os motivos e a estrutura desejada para esta implementação
 
-\section{MRoP e sua implementação}
+\section{MRoP e a sua implementação}
 \label{sec:mrop_implementation}
 
-A implementação da solução MRoP teve em consideração vários aspectos: desenvolvimento de código minimalista, reduzida alteração do código do núcleo, utilização de \textit{APIs} internas, opaco à implementação da biblioteca \textit{PCap}, de forma a poder ser integrada nesta.
-A implementação autocontida em um módulo, de modo a poder ser carregado e libertado do núcleo pelo administrador.
-Modulariazação das diversas componentes, permitindo assim um desenvolvimento de cada subcomponente de forma autónoma.
+A implementação da solução MRoP teve em consideração vários aspectos tais como o desenvolvimento de código minimalista, reduzida alteração do código do núcleo, utilização de \textit{APIs} internas.
+É opaco à implementação da biblioteca \textit{PCap}, de forma a poder ser integrada nesta.
+A implementação é autocontida num módulo, de modo a poder ser carregada e libertada do núcleo pelo administrador.
+Modularização das diversas componentes, permitindo assim um desenvolvimento de cada subcomponente de forma autónoma.
 
-No capítulo \ref{} foram apresentados alguns sistemas que permitem efectuar monitorização ou filtragem de pacotes com indicação de um processo.
-No MRoP, apesar de utilizar o sistema de instrumentação do núcleo \textit{KProbes}, diferencia-se das soluções apresentadas, sendo totalmente implementado dentro do núcleo, com uma reduzida utilização de memória e uma reduzida perturbação do sistema.
+No capítulo \ref{} foram apresentados, a título exemplificativo, alguns sistemas que permitem efectuar monitorização ou filtragem de pacotes com indicação de um processo.
+No MRoP, apesar de utilizar o sistema de instrumentação do núcleo \textit{KProbes}, diferencia-se das soluções apresentadas, sendo totalmente implementado no núcleo, com reduzida utilização de memória e perturbação do sistema.
 
-Como apresentado na secção \ref{}, o sistema de monitorização de rede é utilizado para cada pacote que entra ou saí do sistema.
+Como apresentado na secção \ref{}, o sistema de monitorização de rede é utilizado para cada pacote que circula na rede.
 
 \begin{figure}[ht]
 \centering
@@ -27,16 +28,16 @@ Como apresentado na secção \ref{}, o sistema de monitorização de rede é uti
 
 
 
-Por cada pacote ter de atravessar toda a arquitectura de rede incluida no \textit{vfs} seria demasiado pesado para o sistema.
+%Por cada pacote ter de atravessar toda a arquitectura de rede incluida no \textit{vfs} seria demasiado pesado para o sistema.
 
 ------- apresentar as diversas seccoes ao leitor ----------------
 
-Nas subsecções seguintes irão ser apresentados os 4 subcomponentes do MRoP.
+Nas subsecções seguintes irão ser apresentados os quatro subcomponentes do MRoP.
 
 
 \section{Estado dos \textit{sockets}}
 
-De forma a manter a informação sobre os endereços e portos que uma aplicação está a utilizar, sem que seja necessário consultar os sockets que esta está a utilizar, foi necessário criar um repositório de dados onde estivesse a informação relevante para as decisões do filtro de captura.
+Para manter a informação sobre os endereços e portos que uma aplicação está a utilizar, sem que seja necessário consultar os canais de rede, foi necessário criar um repositório de dados que contivesse informações relevantes para as decisões do filtro de captura.
 
 As abordagens para a criação de um repositório de dados com base nas estruturas de dados:
 
@@ -98,9 +99,9 @@ bloom filters ...
 
 \end{description}
 \paragraph*{}
-A estrutura de dados escolhida para a criação do repositório de dados da componente Estado dos \textit{sockets} foi a \textit{Red-black tree}.
- Esta escolha foi principalmente à performance e à existência da implementação da estrutura no núcleo do \textit{Linux}.
- Devido a esta estrutura estar presente no núcleo do \textit{linux} permitiu que a implementação da ferramenta tivesse um ciclo de implementação mais rápido devido à confiança na ``validação`` desta estrutura pelos responsáveis do núcleo do \textit{linux}.
+A estrutura de dados escolhida para a criação do repositório de dados, da componente Estado dos \textit{sockets}, foi a \textit{Red-black tree}.
+ Esta escolha deve-se principalmente ao desempenho e à existência de implementação da estrutura no núcleo do \textit{Linux}.
+ Por esta estrutura se encontrar no núcleo do \textit{Linux}, permitiu que a implementação da MRoP, fosse efectuada com um ciclo de implementação mais rápido, devido à confiança na "validação" da \textit{Red-black Tree}, pelos responsáveis do \textit{Linux}.
  
 \subsection{Estrutura utilizada}
 \label{sub:repo_structure}
