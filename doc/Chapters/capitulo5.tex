@@ -193,24 +193,24 @@ As subsecções \ref{} .... \ref{} apresentam as funções do núcleo que foram 
 
 A metodologia aplicada à resolução do problema de desempenho, teve como base o desenvolvimento de uma componente que efectue uma análise aos canais de comunicação de rede, utilizados por um processo, insira a informação necessária num repositório e, quando o pacote chegar ao sistema de monitorização, utilize o repositório para capturar, ou não, o pacote.
 
-Dos diferentes sistemas analisados na secção \ref{}, aquele que sendo dinâmico permitia ter uma menor sobrecarga, foi o \textit{KProbes}.
+Dos diferentes sistemas analisados na secção \ref{} aquele, que sendo dinâmico, permitia uma menor sobrecarga, foi o \textit{KProbes}.
 Os outros sistemas tinham componentes de \textit{logging}, que para a realização deste trabalho, teria uma sobrecarga desnecessária, afectando negativamente o desempenho.
 
 Para além de se ter tido em consideração o sistema de instrumentação utilizado, foi também tido em consideração o número de funções a instrumentar.
-A sobrecarga total exercida por esta componente é também em função do número de funções que são instrumentadas, bem como do número de vezes que estas funções são executadas.
+A sobrecarga total exercida por esta componente tem em conta o número de funções que são instrumentadas, bem como o número de vezes que estas são executadas.
 
 A análise efectuada no capítulo \ref{cap:Estrutura} sobre a \textit{Arquitectura de rede em Linux}, permitiu obter uma melhor análise deste.
 
 O MRoP, instrumenta um reduzido número de funções do núcleo pertencentes ao subsistema de rede do \textit{Linux}.
-Este novo sistema foi criado monitorizar a utilização de canais da familia \textit{inet} para comunicação, tendo como particularidade a utilização de canais baseados nos protocolos \textit{tcp} e \textit{udp}.
+Este novo sistema foi criado para monitorizar a utilização de canais da familia \textit{inet} para comunicação, tendo como particularidade a utilização de canais baseados nos protocolos \textit{tcp} e \textit{udp}.
 
-
-Estes dois protocolos têm em comum algumas funções com outros protocolos de outras familias, principalmente quando as funções são as chamadas ao sistema.
-De forma a dimínuir o número de funções a instrumentar, decidiu-se instrumentar as chamadas ao sistema, obtendo assim um maior nível de abstração mas também um controlo directo com o efectuado nos processos.
+O \textit{tcp} e o \textit{udp} têm em comum algumas funções com protocolos de outras familias, principalmente quando o nível de abstracção é elevado (chamadas ao sistema).
+De forma a dimínuir o número de funções a instrumentar, decidiu-se pelas chamadas ao sistema, obtendo assim um maior nível de abstração e também um controlo directo dos processos em nível utilizador.
 As chamadas ao sistema instrumentadas foram: \textit{sendto}, \textit{recvfrom}, \textit{connect}, \textit{bind}, \textit{accept} e \textit{close}.
-As primeiras análises efectuadas demonstraram que apenas a chamada ao sistema \textit{close}, era executada demasiadas vezes, dimínuindo assim o desempenho global do sistema.
-Esta situação é facilmente explicável, pois a chamada ao sistema \textit{close}, é utilizada extensivamente para fechar canais, sejam eles ficheiros, \textit{sockets}, \textit{pipes}, etc.
-Por esta razão foi necessário encontrar a função que lida com o fecho de \textit{sockets}, permitindo desta forma reduzir a sobrecarga imposta pela instrumentação.
+
+As primeiras análises efectuadas demonstraram que apenas a chamada ao sistema \textit{close}, era executada demasiadas vezes, dimínuindo o desempenho global do sistema.
+Esta situação é explicada por a chamada ao sistema \textit{close}, é utilizada extensivamente para fechar canais, sejam eles ficheiros, \textit{sockets}, \textit{pipes}, etc.
+Por este motivo foi necessário encontrar a função que lida com o fecho de \textit{sockets}, permitindo reduzir a sobrecarga imposta pela instrumentação.
 
 
 \subsection{Filtro de processos}
