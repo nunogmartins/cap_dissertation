@@ -1,12 +1,14 @@
 \chapter{Sistema Proposto}
 \label{cap:Estrutura}
 
-Para conceber a arquitectura do sistema de Monitorização de Rede orientado ao Processo (MRoP), foi necessário conhecer como os processos comunicam com o núcleo de forma a efectuar comunicações com o exterior.
+Para conceber a arquitectura do sistema de Monitorização de Rede orientado ao Processo (MRoP), foi necessário conhecer como os processos comunicam com o exterior.
 Após conhecer a arquitectura de rede do \textit{Linux}, foi necessário compreender de que forma se processa a comunicação, bem como a monitorização de rede.
 
 Neste capitulo irá ser apresentado a constituição do sistema de rede do \textit{Linux}, desde o momento em que a aplicação envia os dados, até ao momento em que estes chegam à interface de rede e vice-versa.
 Como esta visão é muito abrangente, apenas serão focados os pontos essenciais da arquitectura.
-Após esta visão geral do sistema de rede do \textit{Linux}, será apresentada a arquitectura do sistema (MRoP).
+
+Após esta visão geral do sistema de rede do \textit{Linux}, será apresentada a arquitectura proposta para o sistema de Monitorização de Rede orientado ao Processo (MRoP).
+
 
 
 \section{Arquitectura de rede em \textit{Linux}}
@@ -15,12 +17,19 @@ Após esta visão geral do sistema de rede do \textit{Linux}, será apresentada 
 Um processo é uma instância de um programa, este num sistema multiprogramado partilha recursos do sistema com outros processos.
 Os processos necessitam de comunicar com outros processos, para obter dados, de forma a completar as suas execuções.
 Estas comunicações podem ser efectuadas dentro do mesmo sistema ou externas.
-Em geral as comunicaçoes externas são efectuadas via rede, sendo necessário para isso criar canais de comunicação.
-A(s) interface(s) de rede são partilhadas pelos diversos processos, sendo esta partilha efectuada pelo núcleo, pois apenas este é capaz de efectuar uma partilha correcta deste recurso.
+Em geral as comunicaçoes externas são efectuadas através de uma interface de rede, sendo necessário para isso criar canais de comunicação.
+A(s) interface(s) de rede são recursos do sistema e por isso partilhadas pelos diversos processos, sendo esta partilha efectuada pelo núcleo, pois apenas este é capaz de efectuar uma partilha correcta deste recurso.
 
 A criação de canais de comunicação é efectuada através da chamada ao sistema \textit{socket}.
 
 ----------- --------- ----------- qualquer coisa sobre a Norma posix ------------
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[scale=0.5]{network_arch.pdf} 
+\caption{Arquitectura parcial de sockets do Linux}
+\label{fig:network_arch}
+\end{figure}
 
 A chamada ao sistema \textit{socket} é efectuada para a criação do canal e dependendo dos parâmetros instânciados para este, varia o tipo e o protocolo utilizado.
 Existe um agrupamento em familia de endereços (\textit{Address Family}), este podem ser para comunicação remota ou local.
@@ -196,11 +205,13 @@ O sistema de operação \textit{Linux} tem um sistema de \textit{firewall} que p
 \subsection{Traffic Control}
 
 ------------------------------------------------------------------------------------------------------------
+
  Dentro do núcleo do \textit{Linux} para além da \textit{firewall NetFilter} existe um mecanismo de controlo sobre os dados que circulam nas interfaces de rede.
  O principal propósito deste sistema é controlar a transmissão de dados, \textit{egress data transfer}.
  Quando os protocolos de nível 3 vão enviar os dados, para a camada de nível 2, estes são armazenados em \textit{QDisks} para posteriormente serem enviados.
  Com a necessidade de diferenciar os diferentes tipos de dados os administradores de sistemas podem diferenciar o trafego e armazená-lo em diferentes \textit{QDisks}, de forma a poder efectuar \textit{Quality of Service}.
 Apesar de ter estrutra para controlo dos dados que chegam da interface de rede o principal propósito é controlo do dados que saem através das interface de rede.
+
 ------------------------------------------------------------------------------------------------------------
 
 No núcleo para além do \textit{NetFilter}, que controla o fluxo de dados na rede, existe o \textit{Traffic Control} que efectua o escalonamento da transferências de dados para o exterior da rede.
@@ -217,15 +228,16 @@ O \textit{QDisk} é a estrutura de suporte à transmissão de dados efectuada pe
 
 \subsection{Interfaces de rede}
 
-A interface de rede é o dispositivo que envia e recebe os pacotes de dados na rede.
-Do ponto de vista da interface de rede, apenas executa pedidos de interrupção ao processador.
+A interface de rede é o dispositivo que efectua a transmissão e recepção de dados na rede.
+Do ponto de vista do cpu, a interface de rede apenas efectua pedidos de interrupção, sendo que o restante trabalho é efectuado pelo controlador de rede.
 O controlador de rede faz a ponte entre as funcionalidades de rede do núcleo e a interface de rede.
 
-O núcleo mantém a informação sobre as interfaces de rede, inicializadas pelos seus controladores, e que mesmo não estando activas, constantam de uma lista duplamente ligada de \textit{net\_devices}.
-Em cada posição desta lista existe a informação referente a uma interface de rede e suas configurações, nomeadamente a informação sobre o seu endereço ip ou o seu \textit{mac address}, no caso de interfaces \textit{ethernet} ou mapeadas sobre \textit{ethernet} (como o caso de interfaces ponto-a-ponto).
+O núcleo mantém a informação sobre as interfaces de rede, inicializadas pelos seus controladores.
+Estas mesmo não estando activas, constantam de uma lista duplamente ligada de \textit{net\_devices}.
+Em cada posição desta lista existe a informação referente a uma interface de rede e suas configurações, nomeadamente a informação sobre o seu endereço \textit{IP}, o seu \textit{MAC address}, etc.
 
 No registo de um novo controlador de interface de rede definem-se as operações a executar em determinados eventos, tais como, recepção e/ou transmissão de frames, remoção da interface, etc.
-Estas operações são definidas através de uma interface comum, a \textit{struct netdev\_ops}, permitindo definir a \textit{API} das interfaces de rede.
+Estas operações são definidas através de uma interface comum, a \textit{struct netdev\_ops}, que permite afectar funções presentes nos módulos dos controladores, a esta estrutura de forma a serem efectuadas as acções necessárias à utilização da interface de rede.
 
 Falar sobre os controladores das interfaces de rede, que definem um conjunto de funções para serem desencadeadas em determinados pontos do envio ou recepcao de frames ... ndo (netdevice operations) 
  
@@ -239,7 +251,9 @@ Existem 4 apontadores para endereços de memória dentro da estrutura que define
 Falta boneco com esta informação ... fica mais realista.
 
 \subsection{Recepção de dados}
+
 ---------------------------------------OLD-----------------------------------------------------------
+
 A chegada de um pacote de dados à interface de rede desencadeia uma acção de interrupção da actividade do processador, permitindo quer este seja transferido para o sistema o mais cedo possível.
 Esta interrupção é efectuada através de um \textit{irq} pré-definido entre o controlador e a interface de rede. As interrupções são atendidas no processador desligando a atenção a todas as outras interrupções provenientes de outros dispositivos. %esta frase está ruim ...
 O processador deve estar o menor intervalo de tempo possível com as interrupções desligadas, antes de retornar da interrupção o sistema agenda a execução de uma função que irá terminar a recepção do pacote para a camada correcta da \textit{stack TCP/IP}.%ainda falta falar sobre DMA, interrupt mode too exclusive deve ser breve, encaminhar pelo processamento da stack tcp/ip 
@@ -255,6 +269,7 @@ Faltar indicar que o processo está bloqueado à espera de input que lhe é copi
 
 
 A variável global \textit{ptype\_base} do núcleo é uma tabela de dispersão aberta, que contém os tipos de controladores de protocolos de rede. Os diferentes protocolos endereçam uma função que recebe o pacote e sabe o que fazer com ele, passando pela \textit{firewall netfilter} terminando na cópia dos dados dos \textit{buffers} do núcleo para os do processo, que ficou bloqueado numa lista de espera através da chamada ao sistema de operação \textit{recv}, \textit{recvfrom} ou \textit{recvmsg}.
+
 ----------------------------------------END OF OLD----------------------------------------------------
 
 O processo de recepção de pacotes pelas aplicações através de interfaces de rede, atravessa as diversas componentes apresentadas anteriormente em .... , ... e ... .
@@ -297,12 +312,11 @@ Existe ainda um sistema para controlo/configuração e para obter informação d
 
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics[scale=0.5]{interface.pdf} 
+\includegraphics[scale=0.5]{arquitectura.pdf} 
 \caption{Arquitectura da solução}
 \label{arquitectura}
 \end{center}
 \end{figure}
-
 
 Este sistema permite que sejam capturados os pacotes de rede de um processo, sem que exista um conhecimento prévio sobre o(s) protocolo(s) ou portas utilizadas.
  A utilização de um sistema de instrumentação do núcleo foi necessária apenas para monitorizar as chamadas envolvendo \emph{sockets} e identificar o processo responsável, permitindo desta forma obter e manter permanentemente actualizada a informação sobre o estado respeitante ao processo alvo.
