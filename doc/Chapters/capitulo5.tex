@@ -230,41 +230,44 @@ Os identificadores têm de ser escritos para os ficheiros respectivos no \textit
 
 -----------------------------------------------------------------------------------------------------
 
-O \textit{KProbes} é um sistema de instrumentação do núcleo, que não efectua distinção entre que funções, não inline, está a efectuar a instrumentação.
-Não existindo suporte no \textit{KProbes} para filtrar o processo que está a efectuar uma chamada ao sistema, foi necessário desenvolver uma metodologia que permitisse reduzir a sobrecarga desnecessária, quando a monitorizaçãoe efectuada sobre um processo que não o desejado.
+O \textit{KProbes} é um sistema de instrumentação do núcleo que não efectua distinção entre que funções, não \textit{inline}, está a efectuar a instrumentação.
+Não existindo suporte no \textit{KProbes} para filtrar o processo que está a efectuar uma chamada ao sistema, foi necessário desenvolver uma metodologia que permitisse reduzir a sobrecarga, quando a monitorização é efectuada sobre um processo que não o desejado.
 
-Os pontos principais continuariam a ser reduzida sobrecarga e actualização permanente do(s) processo(s) a monitorizar.
-Tendo estas caracteristicas como base algumas possíbilidades foram tidas em consideração, onde o principal desafio foi conseguir manter a informação actualizada.
+-------------------------
 
-Uma das possíbilidades foi a criação de um repositório com a informação sobre os identificadores dos processos a monitorizar, sendo necessário novamente uma estrutura de suporte a este repositório bem como funcionalidades de adição, remoção, actualização e consulta.
-Este repositório teria de conter a estrutura genológica do processo a monitorizar, bem como um componente que actualize esta informação.
+Os objectivos referidos principais continuam a ser reduzida sobrecarga e actualização permanente do(s) processo(s) a monitorizar.
+Tendo estas caracteristicas como base algumas possibilidades foram tidas em consideração, onde o principal desafio foi conseguir manter a informação actualizada.
+
+--------------------------------------
+
+Uma das possibilidades foi a criação de um repositório com a informação sobre os identificadores dos processos a monitorizar, sendo necessária novamente uma estrutura de suporte a este repositório, bem como funcionalidades de adição, remoção, actualização e consulta.
+Este repositório teria de conter a estrutura genealógica do processo a monitorizar, bem como um componente que actualize esta informação.
 A actualização desta estrutura poderia ser efectuada através da instrumentação da chamada ao sistema \textit{fork} ou \textit{clone}.
-Para cada vez que fossem invocadas as funções, anteriormente mencionadas, seria efectuado uma consulta ao repositório e apartir da informação obtida neste seria ou não actualizado o repositório.
+Para cada vez que fossem invocadas as funções, anteriormente mencionadas, seria efectuada uma consulta ao repositório e apartir da informação obtida neste seria, ou não, actualizado o repositório.
 Esta possibilidade, ao contemplar a remoção de dados do repositório, necessitaria também de instrumentar a função de termino de processos.
-A actualização dinamica deste repositório, sem alterar código no núcleo, necessitaria de instrumentar algumas funções no núcleo o que iria afectar o desempenho do sistema não sua totalidade, pois a criação e destruição de processos pode ser elevada.
+A actualização dinâmica deste repositório, sem alterar código no núcleo, necessitaria de instrumentar algumas funções no núcleo o que iria afectar negativamente o desempenho do sistema na sua totalidade, pois a criação e destruição de processos pode ser elevada.
 
-Em alternativa, efectuou-se uma análise aos campos da estrutura que descreve um processo, a \textit{task\_struct}, de forma a compreender que forma estes dados se relacionam com os identificadores dos membros da àrvore genelógica do processo.
-Desta análise obteve-se que, os identificadores \textit{pid}, \textit{tid} e \textit{ppid} permitem na grande maioria das aplicações, identificar toda a àrvore geneológica.
+Em alternativa, efectuou-se uma análise aos campos da estrutura, \textit{task\_struct}, que descreve um processo para, compreender de que modo estes dados se relacionam com os identificadores dos membros da árvore genealógica do processo.
+Desta análise concluí-se que, os identificadores \textit{pid}, \textit{tid} e \textit{ppid} permitem na grande maioria das aplicações, identificar toda a árvore genealógica.
 
 
 \subsubsection{Identificadores}
 
-No núcleo do \textit{Linux} quando um processo é criado os identificadores \textit{pid} e \textit{tgid} são iguais.
-Os processos quando efectuam
+No núcleo do \textit{Linux} quando um processo é criado os identificadores, \textit{pid} e \textit{tgid} são iguais.
 
 \section{Filtro de pacotes, extensão ao LSF}
 
 No sistema de monitorização de rede um dos componentes é uma função que serve de máquina virtual às instruções do \textit{LSF}.
-Esta função itera sobre o filtro executando instrução a instrução, sobre o pacote (recebido ou enviado), até encontrar uma instrução de return (\textit{BPF\_RET} ou \textit{BPF\_RET\_A}).
-Consoante o valor de retorno nestas instruções o pacote analisado é ou não capturado.
-Se for capturado, é efectuada uma cópia do pacote e colocado em um \textit{ring buffer} partilhado com a aplicação monitora de rede, em nível utilizador.
-Caso não seja para captura a computação sobre esse pacote termina, reduzindo assim a sobrecarga da monitorização.
-Por esta razão um filtro que consiga identificar rapidamente a rejeição de um pacote, permite diminuir consideravelmente a sobrecarga imposta no sistema pela monitorização.
+Esta função itera sobre o filtro executando, instrução a instrução, sobre o pacote (recebido ou enviado), até encontrar uma instrução de retorno (\textit{BPF\_RET} ou \textit{BPF\_RET\_A}).
+Consoante o valor retornado nestas instruções o pacote analisado é ou não capturado.
+Se for capturado, é efectuada uma cópia do pacote e colocado num \textit{ring buffer}, partilhado com a aplicação monitora de rede em nível utilizador.
+Caso o valor retornado não seja para captura, a computação sobre esse pacote termina, reduzindo assim a sobrecarga da monitorização.
+Por este motivo um filtro que identifique rapidamente a rejeição de um pacote, permite diminuir consideravelmente a sobrecarga imposta no sistema pela monitorização.
 
 Possivelmente o sistema de instrumentação do núcleo, \textit{KProbes} , poderia ser utilizado para invocar o novo sistema de filtragem criado e modificar o valor de retorno, caso se verifique essa necessidade.
 Devido ao elevado número de vezes que a função de filtragem é invocada (uma para cada pacote, recebido ou enviado), a sobrecarga da utilização do \textit{KProbes} seria inaceitável.
 Por esta razão, a única alteração efectuada ao código do \textit{Linux}, foi na função \textit{sk\_run\_filter} e a definição de um \textit{hook} para activação e desactivação deste novo sistema, ambos definidos no do ficheiro \textit{filter.c}.
-Esta alteração permitiu adicionar uma nova funcionalidade à custa de uma sobrecarga muito reduzida, no sistema de monitorização, mesmo quando não estando activa a funcionalidade.
+Esta alteração permitiu adicionar uma nova funcionalidade à custa de uma sobrecarga muito reduzida, no sistema de monitorização, mesmo quando não está activa a funcionalidade.
 Quando monitorização de rede está activa, sem a componente MRoP, a sobrecarga introduzida é apenas a verificação se o \textit{hook} está activo ou não.
 
 \begin{figure}[ht]
@@ -280,13 +283,13 @@ Quando monitorização de rede está activa, sem a componente MRoP, a sobrecarga
 Devido à necessidade de obter algumas informações sobre o estado da computação dos diversos componentes da ferramenta foram criados alguns ficheiros no
 sistema de ficheiros virtual \textit{DebugFs}.
 
-Na verdade não foi só para obter o estado da computação foi também uma forma invocar o inicio da monitorização.
- Isto é, através dos ficheiros \textit{pid}, \textit{ppid}, \textit{tgid} e \textit{option}. 
+Na verdade não foi só para obter o estado da computação foi, também, uma forma de invocar o inicio da monitorização.
+Isto é, através dos ficheiros \textit{pid}, \textit{ppid}, \textit{tgid} e \textit{option}. 
 
 \subsection{Informação do processo}
 
 
-O MRoP foi desenhado para ser práticamente autónomo, apenas necessitando de configuração de alguns parâmetros essenciais ao seu funcionamento.
+O MRoP foi desenhado para ser praticamente autónomo, apenas necessitando da configuração de alguns parâmetros essenciais ao seu funcionamento.
 A componente \textit{Informação de análise e controlo}, permite efectuar o controlo sobre aspectos da instrumentação e do repositório.
 A informação de análise é apenas adicionada, se o suporte para análise for activado na compilação, permitindo assim obter métricas sobre os diferentes componentes internos do MRoP.
 
