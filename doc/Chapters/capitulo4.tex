@@ -381,13 +381,13 @@ Este módulo foi desenvolvido em 4 subpartes.
 ---------------------------------------------------------------------------------------------------------
 
 
-\subsection*{Instrumentação das chamadas ao sistema de rede}
+\subsection{Instrumentação das chamadas ao sistema de rede}
 \label{sub:mon_syscalls}
 
 Um ponto importante deste sistema, constituiu na garantia que todas as interacções desencadeadas por um processo com o exterior fossem detectadas. Para tal, foi necessário recorrer à monitorização das chamadas ao sistema de rede ao nível do Kernel, permitindo, assim, minimizar as cópias de dados e trocas de contexto. Tirando partido da utilização do sistema de monitorização KProbes foi possível realizar a monitorização sob o pequeno conjunto de chamadas ao sistema relevantes, nomeadamente: sendto, recvfrom, bind, accept, connect e close.
  Na realidade verificou-se a chamada ao sistema close, ao ser utilizada intensivamente por todo o sistema de ficheiros, poderia degradar desnecessariamente o desempenho. Desta forma, decidiu-se aplicar a monitorização à função interna \texttt{sock\_close}, garantindo apenas a monitorização das chamadas close sobre os sockets, reduzindo significativamente o número de eventos face às chamadas ao sistema do \texttt{close}.
 
-\subsection*{Estado do processo}
+\subsection{Estado do processo}
 \label{sub:data_repository}
 
 O estado dos portos TCP e UDP em uso pelo processo alvo é mantido num repositório de dados, e permanentemente actualizado pelo módulo anterior. 
@@ -396,7 +396,7 @@ O estado dos portos TCP e UDP em uso pelo processo alvo é mantido num repositó
   O uso deste tipo de estrutura permite obter um bom compromisso entre o tempo de acesso à estrutura e a quantidade de memória utilizada.
 
 
-\subsection*{Filtro de pacotes}
+\subsection{Filtro de pacotes}
 \label{sub:packet_filter}
 
 A função de filtragem  implementada neste sistema assenta no estado do processo alvo, mantido pelos módulos anteriormente descritos.
@@ -415,7 +415,7 @@ Necessidade de registar um \textit{hook} para aceder directamente à função de
 O sistema interage também com o \textit{LSF} pois existe uma conjunção entre o filtro definido pelo utilizador e a captura do tráfego da aplicação a ser monitorizada.
 
 
-\subsection*{Controlo e Informação}
+\subsection{Controlo e Informação}
 \label{sub:data_information}
 
 Para facilmente controlar e configurar o sistema desenvolvido foi definida uma interface baseada em ficheiros virtuais (DebugFS).
@@ -427,7 +427,7 @@ Para facilmente controlar e configurar o sistema desenvolvido foi definida uma i
  Pode ser indicado um processo ou todos os processos de um grupo.
  Os ficheiros de informação \textit{filter\_stats}, \textit{syscalls\_calls\_stats} e \textit{tree\_info} foram definidos para obter estatísticas dos pacotes analisados e das entradas/retornos das funções instrumentadas, bem como dos elementos presentes na árvore (dados dos sockets activos do processo).
 
-\subsubsection*{Mais info}
+\subsubsection{Mais info}
 %a não utilização de ioctl para o debug ... 
 A estratégia foi separar os diferentes componentes e a criação de um módulo de \textit{debug} para que pudesse existir uma forma de acesso à monitorização por parte do nível de utilizador, sem que exista a necessidade de criar ou alterar chamadas ao sistema ou suas opções.
 
