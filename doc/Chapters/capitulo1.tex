@@ -22,24 +22,23 @@
 % Dificuldades em saber quais, de quem, ou porquê determinado pacote está dentro de uma rede pode ter desencadeado o inicio de diversos projectos, que têm como âmbito fazer uma análise dos pacotes que fluem numa rede.
 % Se esta problemática desencadeou alguns projectos a verdade é que para a captura dos pacotes de um dado programa ainda não existe um projecto onde se insira a capacidade de análise dos pacotes, ou seja restringir o que se conhece como algo genérico como a captura de pacotes dentro de uma rede, para passar a ser a captura de pacotes de um dado programa. 
 
-A monitorização de uma aplicação serve para se obter informações relevantes acerca do comportamento desta.
-Esta monitorização pode servir para verificar a correcção de programas, recursos atribuídos a um determinado programa (por exemplo tempo de processamento, utilização de memória, interacções com o exterior, etc), performance de execução de programas, etc.
+A monitorização de uma aplicação serve para se obterem informações relevantes acerca do seu comportamento.
+Esta monitorização pode servir para verificar a correcção, recursos atribuídos e desempenho de execução de programas, etc.
 
-Por ser algo tão importante no desenvolvimento de aplicações, a maioria dos sistemas de operação generalistas apresentam métodos de monitorização de aplicações.
-Algumas ferramentas especializam-se em monitorizar determinado recurso, tal como a biblioteca \textit{LibPcap} é especifica nas interacções com o exterior utilizando dispositivos de rede.
-Outras são mais generalistas podendo monitorizar diversos recursos.
+A maioria dos sistemas de operação generalistas apresentam métodos de monitorização, devido à importância de que se revestem no desenvolvimento das aplicações.
+Se algumas ferramentas são específicas na monitorização de determinados recursos (como a biblioteca \textit{LibPcap}, que é específica nas interacções com o exterior utilizando dispositivos de rede), outras são mais generalistas podendo monitorizar recursos diversos.
+
 % A monitorização de rede de apenas um programa ainda não foi aplicada pelos principais fornecedores destes serviços, sendo uma operação complexa e muito depende dos sistema de operação em questão. 
 O dinamismo das aplicações dificulta bastante o processo de monitorização.
-Esta situação é particularmente visível ao nível da monitorização dos dispositivos de \textit{IO}, nomeadamente nas interfaces de rede.
-Aplicações onde o dinamismo das suas ligações é um dos seus pontos fortes, a monitorização destas é particularmente difícil de ser efectuada.
+Esta situação é particularmente sentida ao nível da monitorização dos dispositivos de \textit{IO}, nomeadamente nas interfaces de rede.
+Nas aplicações onde o dinamismo das ligações é um dos seus pontos fortes, a monitorização é particularmente difícil de ser efectuada.
 
-Apenas na camada de transporte da \textit{stack TCP/IP} se conhece quais os portos de origem e destino de um determinado pacote.
-De forma a definir univocamente um fluxo de comunicação de rede para uma dada aplicação, tem de se conhecer o endereço origem e o porto de origem bem como o endereço de destino e o porto de destino.
-Desta forma apenas quando o pacote chega à camada de transporte é que se consegue conhecer qual o destino deste.
+Apenas na camada de transporte da \textit{stack TCP/IP} se conhecem quais os portos de origem e destino de um determinado pacote.
+Se pretendermos definir univocamente um fluxo de comunicação de rede para uma dada aplicação, é obrigatório conhecer o endereço origem e o porto de origem bem como o endereço de destino e o porto de destino.
+Desta forma apenas quando o pacote chega à camada de transporte é que se consegue conhecer o seu destino.
 
-Tendo em conta que aplicações \textit{P2P} utilizam diversos portos de comunicação, é extremamente difícil capturar os pacotes com base nos actuais filtros, sem que exista uma elevada degradação da performance.
-De forma a capturar os dados relevantes para análise são aplicados filtros o mais cedo possível. Para minimizar os efeitos da monitorização estes filtros são aplicados dentro do núcleo de sistema.
-
+Tendo em conta que aplicações \textit{P2P} utilizam diversos portos de comunicação, é revela-se difícil capturar os pacotes com base nos actuais filtros, sem que se assista a uma elevada degradação do desempenho.
+De modo que para capturar dados relevantes e simultaneamente minimizar os efeitos da monitorização, estes filtros são aplicados no interior do núcleo do sistema, logo que possível.
 
 % \paragraph*{}
 % Diversas vezes quando se procede ao debug de uma aplicação onde não existe o código fonte, é necessário fazer \textit{reverse enginnering}. Para se analisar os pacotes de dados que uma aplicação utiliza na comunicação através de rede é necessário capturar esses pacotes utilizando ferramentas como a biblioteca \textit{Pcap}. A \textit{LibPcap} consegue capturar os pacotes que transitam na rede mediante alguns filtros de forma a conseguir seleccionar os pacotes relevantes para a captura. A forma de filtrar os dados baseia-se nos filtros bpf\cite{Mccanne92thebsd} .
@@ -47,19 +46,28 @@ De forma a capturar os dados relevantes para análise são aplicados filtros o m
 % Uma vez que os filtros são baseados nos dados dos \textit{sockets}, é interessante e importante definir regras para os filtros que sejam baseados no identificador do processo de forma a poder obter todos os dados que são transferidos de forma transparente sem que seja necessário indicar todos os portos que a aplicação está a usar. Desta forma poder-se-á fazer um traço de execução de um processo não só baseado nas suas instruções como também baseado nos dados que são transferidos por uma aplicação. Utilizando esta abordagem podem ser mais facilmente analisados programas distribuidos que fazem uso das interfaces de rede para comunicarem.
 \bigskip 
 
-No capitulo \ref{cap:introducao} é apresentado a temática monitorização de aplicações (secção \ref{sect:descricao}).
+No \ref{cap:introducao} capitulo secção \ref{sect:descricao} é apresentada a temática de monitorização de aplicações.
 
-Como a monitorização de rede é o principal foco desta dissertação, (subsecção \ref{sect:packet_capture}) apresenta-se de forma genérica esta monitorização das interacções com o exterior (através de dispositivos de rede), pondo em evidência alguns dos principais desafios.
+Como a monitorização de rede é o principal objectivo desta dissertação, (subsecção \ref{sect:packet_capture}) apresenta-se de forma genérica a monitorização das interacções com o exterior (através de dispositivos de rede), evidênciando alguns dos principais desafios.
 
-Sendo necessário a transferência de informação no sistemas (subsecção \ref{sect:transf_information}) são descritos alguns dos principais factores.
+TODO
+Sendo necessária a transferência de informação nos sistemas (subsecção \ref{sect:transf_information}) são descritos alguns dos principais factores.
 
-Após ser analisado o capítulo \ref{cap:trabrelacionado} propôs-se uma abordagem para a captura de pacotes de uma aplicação (secção \ref{sec:abordagem_proposta}).
+No \ref{cap:trabrelacionado} capítulo são analisados os seguintes temas:
+\begin{description}
 
-No capítulo \ref{cap:trabrelacionado} são analisados os temas: Monitorização no sistema de operação \textit{Linux} \ref{sect:instrumentacao_casos_linux}, transferência de dados dentro e fora do núcleo de sistema\ref{sect:kernel_user_comm}, a biblioteca de monitorização de rede \textit{LibPcap} \ref{sect:LibPcap} e outras abordagens de captura de pacotes (na secção \ref{sect:outras_abordagens}).
+\item 2.1 Monitorização no sistema de operação \textit{Linux}
 
-No capítulo \ref{cap:plano} está descrito o plano de trabalho traçado para a fase de elaboração da dissertação, com a respectiva calendarização dos vários passos que irão ser executados.
+\item 2.2 Transferência de dados dentro e fora do núcleo de sistema
 
- 
+\item 2.3 Biblioteca de monitorização de rede \textit{LibPcap}
+
+\item 2.4 Outras abordagens de captura de pacotes.
+
+\end{description}
+
+Após ser analisado o \ref{cap:trabrelacionado} capítulo, propôs-se uma abordagem para a captura de pacotes de uma aplicação (secção \ref{sec:abordagem_proposta}).
+
 % Na secção \ref{sect:descricao} é apresentado são analisados os diversos problemas.
 % Na secção \ref{sect:instrumentacao_casos_linux} são descritos os mecanismos de monitorização presentes no GNU/Linux de forma a poderem ser utilizados. 
 % Na secção \ref{sect:LibPcap} é analisado o \textit{LibPcap} e a sua arquitectura de forma a conhecer toda esta biblioteca.
@@ -67,10 +75,9 @@ No capítulo \ref{cap:plano} está descrito o plano de trabalho traçado para a 
 
 \section{Monitorização} \label{sect:descricao}
 
-Pode ser necessário recorrer à monitorização para se conseguir compreender o comportamento das aplicações.
-A monitorização permite obter dados relevantes sobre os recursos utilizados pelas aplicações, permitindo ter um conhecimento mais aprofundado do comportamento destas.
-As informações recolhidas podem servir de comparador de performance entre diferentes versões de uma mesma aplicação, pois consegue-se obter dados da utilização de \textit{cpu}, memória, dos dispositivos de \textit{IO}, etc.
-Através da monitorização é possível compreender o comportamento dinâmico das aplicações, por isso é comum ser utilizada como auxiliar  na depuração de programas~\cite{DuartePhd05}.
+Pode ser necessário recorrer à monitorização para se compreender o comportamento das aplicações.
+Esta permite-nos obter dados relevantes sobre os recursos utilizados pelas aplicações, de modo a proporcionar-nos um conhecimento mais profundo do seu comportamento.
+As informações recolhidas podem servir para analisarmos comparativamente o desempenho de diferentes versões de uma mesma aplicação, porquanto ao conseguir-se obter dados da utilização do \textit{cpu}, da memória, dos dispositivos de \textit{IO}, etc, é possível compreender o comportamento dinâmico das aplicações, daí que é comum ser utilizada como auxiliar na depuração de programas.~\cite{DuartePhd05}.
 
 % Fazer uma captura dos pacotes de um dado programa pode parecer simples, mas na verdade não o é, principalmente devido ao dinamismo que certos programas apresentam. Uma forma de obter informações sobre o comportamento dos programas é através de algumas estruturas presentes no núcleo de sistema. Desta forma uma das vertentes que irá ser analisada nas secções seguintes é a instrumentação de código dentro do núcleo de sistema.
 
@@ -92,81 +99,81 @@ Através da monitorização é possível compreender o comportamento dinâmico d
 % \paragraph*{O que é}
 
 %\paragraph*{Para que serve}
-A informação sobre o comportamento das aplicações é obtido de diferentes fontes e posteriormente coligido de forma a ser analisado por ferramentas especializadas.
-Existem diferentes formas de coligir, visualizar e até interactuar com as ferramentas de monitorização, cada uma com as suas especificidades e capacidades.
+Os dados relativos ao comportamento das aplicações, obtidos de diferentes fontes, são coligidos e posteriormente analisados por ferramentas especializadas.
+Existem diferentes formas de coligir, visualizar e até interactuar com as ferramentas de monitorização, cada uma com as suas especificidades e capacidades próprias.
 
-Tendo em vista o conhecimento e um melhor aproveitamento das capacidades de cada uma, são apresentadas as diferentes formas de análise / avaliação.
+Tendo em vista o conhecimento e um melhor aproveitamento das capacidades de cada uma, são apresentadas as diferentes formas de análise / avaliação:
 
 \begin{itemize}
  \item 
 
 
-Com base na visualização da história dos eventos, podemos analisá-los de duas formas distintas:
-\subparagraph*{Online}
+Se tivermos como referência a visualização da história dos eventos, podemos analisá-los de duas formas distintas:
+\subparagraph*{Online - }
 Enquanto decorre a monitorização da aplicação é possível ir observar os dados que são recolhidos pela aplicação.
-Como os eventos estão a ser recolhidos ao mesmo tempo que são visualizados, apenas podemos observar a história até ao momento.
+Como os eventos estão a ser recolhidos e visualizados em simultâneo, apenas podemos observar a história até ao momento.
 
-\subparagraph*{Offline ou \textit{Post-Mortem}}
-A história do programa é analisada após este ter-se completado (razão pela qual é utilizada a palavra \textit{Post-Mortem} para designar esta forma de análise).
-Uma vez que a análise é efectuada após o termino do programa, permite analisar toda a história deste.
+\subparagraph*{Offline ou \textit{Post-Mortem} - }
+A história do programa é analisada após este se ter completado (razão pela qual é utilizada a designação \textit{Post-Mortem}).
+Este método permite-nos analisar toda a sua história.
 
 \item
 
-Se a monitorização se basear na interactividade do utilizador, é possível defini-la de duas formas:
+Se a opção de monitorização se basear na interactividade do utilizador, é possível defini-la de duas formas:
 
 %PODER MODIFICAR DURANTE A MONITORIZACAOO pode reagir a modificar a aplicacao
-\subparagraph*{Activa}
+\subparagraph*{Activa - }
 
-Por iniciativa explicita do utilizador é possível inquirir o sistema de monitorização sobre o estado da computação.
+Por iniciativa explícita do utilizador é possível inquirir o sistema de monitorização sobre o estado da computação.
 Esta é a forma com maior interactividade, uma vez que permite ir analisando e modificando os parâmetros da monitorização.
 Este método é muitas das vezes descrito como \textit{computacional steering}.
 
 %Modificar os pontos de monitorização ou apenas analisar os dados ao mesmo tempo que estão a ser capturados. Desta forma o utilizador pode controlar explicitamente a monitorização da aplicação. Este controlo pode ser apenas visualização da computação ou pode ser sobre a forma como se está a desenvolver a monitorização podendo ser baseado num ciclo de monitorização, decisão sobre os pontos a monitorizar (adicionar, remover, etc).
 
-\subparagraph*{Passiva}
-Esta forma de monitorização é utilizada principalmente em ambientes onde é mais interessante ir obtendo toda a informação e apenas no final é que se faz alguma análise sobre os dados.
-Esta forma é passiva pois o utilizador não tem intervenção sobre a forma como os dados estão a ser adquiridos.
-Permite um menor grau de perturbação do sistema uma vez que não existe interacção sobre a forma de aquisição dos dados. 
+\subparagraph*{Passiva - }
+Esta forma de monitorização é utilizada principalmente em ambientes onde é mais importante a obtenção de todos os dados e apenas no final nos debruçarmos sobre a sua análise.
+Esta forma designada de passiva, por o utilizador não tem intervenção sobre a forma como os dados estão a ser adquiridos, o que reduz a perturbação do sistema. 
 %Quando não se tem interesse em ir alterando os pontos a serem monitorizados, está é uma das escolhas correctas pois permite um menor grau de perturbação do sistema.
 \item
 
-A instrumentação pode ser de dois tipos distintos, estática ou dinâmica, cada um com as suas características que serão discutidas em seguida.
+A instrumentação pode ser de dois tipos: a estática e a dinâmica, cada uma com as suas características próprias.
 
-\subparagraph*{Estática}
+\subparagraph*{Estática - }
 
-Na instrumentação estática o código instrumentado é definido em tempo de compilação, utilizando bibliotecas próprias para o efeito tais como a utilização da função \textit{assert()}, que define pontos a serem monitorizados.
+Na instrumentação estática o código instrumentado é definido em tempo de compilação, utilizando bibliotecas próprias para o efeito tais como a utilização da função \textit{assert()}, que define os pontos a serem monitorizados.
 Durante a monitorização não podem ser adicionados ou removidos pontos de análise.
 
-\subparagraph*{Dinâmica}
+\subparagraph*{Dinâmica - }
 
-Em contraste com a instrumentação estática está a dinâmica, é mais complexa e permite a inserção e remoção dos pontos a serem instrumentados.
+Em contraste com a instrumentação estática está a dinâmica, é mais complexa e permite a inserção e remoção dos pontos a serem monitorizados.
 O dinamismo verifica-se pela ausência do ciclo $introduzir ponto\rightarrow compilar programa\rightarrow executar\rightarrow remover ponto$.
-A utilização de pontos de instrumentação dinâmica pode ajudar a reduzir o grau de perturbação, uma vez que apenas são definidos os pontos que se deseja observar e não todos os pontos.
+A utilização de pontos de instrumentação dinâmica pode ajudar a reduzir o grau de perturbação, uma vez que apenas são definidos os pontos que se desejam observar.
 \end{itemize}
+
 \subparagraph*{}
-Todas estas formas podem ser combinadas resultando naquela que melhor se adapta à monitorização pretendida.
+Todavida é no uso combinado da história dos eventos, da interactividade e da instrumentação, que reside a melhor forma de monitorização.
 
 \subparagraph*{
 %Recolha de dados
 }
-A recolha de informação é uma das partes mais sensíveis em relação ao grau de perturbação do sistema.
-Em geral os dados vão sendo armazenados num \textit{buffer} em memória e após algum evento de \textit{buffer} cheio, ou de uma indicação explícita que se quer armazenar esses dados para posterior análise, estes são armazenados em memória persistente. 
+A recolha de informação é uma das componentes mais sensíveis relativamente ao grau de perturbação da monitorização.
+Em geral os dados vão sendo armazenados num \textit{buffer} em memória.
+Caso exista algum evento que assinale que o \textit{buffer} está cheio ou uma indicação explícita que se pretende armazenar esses dados, para posterior análise, estes são transferidos para memória persistente.
 
 \subparagraph*{
 %Grau de perturbação
 }
-Como já foi anteriormente mencionado existe uma preocupação em que o sistema a ser monitorizado tenha um baixo grau de perturbação.
-Devido a esta preocupação diversas abordagens para reduzir o impacto da monitorização num sistema em produção foram criadas.
-Uma destas abordagens foi utilizar instruções especializadas que alguns processadores têm para \textit{debug} de forma a utilizar os recursos mais propícios para o efeito.
-Nem sempre são utilizados estes métodos pois estão demasiados dependentes da arquitectura, o que torna difícil a sua portabilidade.
-De forma a minimizar a perturbação do sistema alguns sistemas de monitorização utilizam uma técnica de amostragem, permitindo obter indicações sobre os estado da computação ao fim de um certo número de iterações.
-Esta técnica é em oposição à criação de um traço de execução, pois permite obter dados sobre os recursos mas apenas por amostras, enquanto que na criação de um traço de execução é possível obter todos os dados de forma a criar uma história completa.
+Conforme o anteriormente mencionado, existe a preocupação de que o sistema a ser monitorizado tenha um baixo grau de perturbação.
+Daí que diversas abordagens foram criadas para reduzirem o impacto da monitorização num sistema em produção.
+Uma destas abordagens foi a utilização de instruções especializadas, que alguns processadores têm para \textit{debug}, de modo a utilizar os recursos que mais se adequam à monitorização.
+Nem sempre são utilizados estes métodos, pois estão demasiados dependentes da arquitectura, o que dificulta a sua portabilidade.
+Com vista a minimizar a perturbação do sistema alguns sistemas de monitorização utilizam uma técnica de amostragem, que permite obter indicações sobre os estado da computação ao fim de um certo número de iterações.
+Esta técnica, em oposição à criação de um traço de execução, permite obter dados sobre os recursos apenas por amostra, enquanto que na criação de um traço de execução é possível obter todos os dados de forma a criar uma história completa.
 
 \paragraph*{
 %Apresentação dos dados recolhidos
 }
-Apenas capturar estes dados oriundos da monitorização pode não ser suficiente, uma vez que ter os dados em bruto e não ter uma ferramenta onde estes possam ser trabalhados de pouco poderá servir.
-Ferramentas de visualização destes dados, permitem se consiga obter análises mais ricas visualmente.
+No entanto, capturar estes dados oriundos da monitorização pode revelar-se insuficiente, se não dispusermos de uma ferramenta onde estes possam ser trabalhados, de modo a obter análises mais ricas visualmente.
 
 \subsection{Monitorização de Rede}\label{sect:packet_capture}
 
@@ -192,26 +199,24 @@ Ferramentas de visualização destes dados, permitem se consiga obter análises 
 % 
 % COMPORTAMENTO DA APLICACAO
 
-Em geral as ferramentas de monitorização da interacção do processo com o exterior, como seja via rede, são baseadas em captura de pacotes de forma passiva.
-As ferramentas capturam os pacotes que fluem na rede para posterior análise.
-Esta análise ao tráfego pode ser sobre largura de banda utilizada, principais protocolos utilizados, eventuais problemas de segurança, etc.
+Em geral as ferramentas de monitorização da interacção do processo com o exterior, como seja via rede, são baseadas na captura de pacotes de forma passiva.
+As ferramentas capturam os pacotes que fluem na rede para posterior análise ao tráfego, que pode insidir sobre a largura de banda utilizada, principais protocolos, eventuais problemas de segurança, etc.
 
 \subparagraph*{Dinamismo das aplicações}
-Como foi descrito nas subsecções anteriores\ref{sect:instrumentation_overview}, as aplicações são dinâmicas e devido a este dinamismo se devem algumas das dificuldades que se encontram ao monitorizar aplicações.
-Em relação à monitorização das interacções com o exterior utilizando a interface de rede, este dinamismo é novamente um factor chave, pois existem dificuldades na forma de identificar os fluxos pertencentes a um processo.
+Como foi descrito nas subsecções \ref{sect:instrumentation_overview}, as aplicações são dinâmicas e a este dinamismo se devem algumas dificuldades com que nos deparamos ao monitorizar as aplicações.
+Relativamente à monitorização das interacções com o exterior, utilizando a interface de rede, este dinamismo é de novo um factor chave, pois existem dificuldades na forma de identificar os fluxos pertencentes a um processo.
 
 \subparagraph*{Formas de reduzir o volume de dados utilizando filtros}
-A utilização de filtros para a captura do tráfego que circula na rede é uma forma eficiente de apenas obter os dados que nos são interessantes.
-Estes filtros são particularmente importantes quando o volume de dados que circula na rede é bastante elevado permitindo que apenas os dados relevantes para os nossos objectivos sejam obtidos.
-De forma a serem eficientes estes filtros são implementados no núcleo de sistema de operação.
-Por questões de eficiência e complexidade estes baseiam-se em regras simples que podem ser combinadas para contemplar situações mais complexas.
+A utilização de filtros  na captura do tráfego que circula na rede é uma forma eficiente de obter apenas os dados que se mostrem relevantes com vista à satisfação nos nossos objectivos e são particularmente importantes quando o volume de dados que circula na rede é extremamente elevado.
+Tendo em vista a eficiência, estes filtros são implementados no núcleo do sistema de operação, baseando-se em regras simples, que podem ser combinadas para contemplar situações mais complexas.
 
 \subparagraph*{Dificuldade de criação de filtros dinâmicos}
-Os filtros actualmente suportados para capturar os pacotes no sistema \textit{linux}, são definidos \textit{a priori}, e não há forma eficiente de alterar estes filtros dinamicamente, uma vez que a captura tem de ser parada para poder ser criado um novo filtro, instalado e depois retomada a captura dos pacotes de acordo com estas novas regras.
+Os filtros actualmente suportados para capturar pacotes no \textit{Linux}, são definidos \textit{a priori}, e não há forma eficiente de os alterar dinamicamente, visto que a captura tem de ser parada a fim de ser criado um novo filtro, posteriormente aplicado, sendo depois retomada a captura dos pacotes, de acordo com as novas regras.
 
-\subparagraph*{Filtros mais complexos e inteligentes} De forma a aumentar a performance da captura de pacotes, os filtros são aplicados o mais cedo possível, ou seja logo quando chegam da interface de rede.
-Devido a esta situação, o tipo de filtros que se podem aplicar têm de ser escritos numa linguagem bastante simples e por esta razão muita da inteligência que se quer ter sobre os pacotes têm de ser efectuada em nível utilizador.
-Como se pode perceber quando os filtros são demasiado complexos, os módulos do núcleo de sistema têm de passar grande parte da informação para as camadas acima de forma a poder ser aplicados filtros mais elaborados, uma vez que estes conseguem ter um nível mais abstracto sobre a informação que está presente no \textit{payload} dos pacotes.
+\subparagraph*{Filtros mais complexos e inteligentes}
+De forma a aumentar a performance da captura de pacotes, os filtros são aplicados o mais cedo possível, ou seja logo quando chegam da interface de rede.
+Face a esta situação, o tipo de filtros que se podem aplicar têm de ser escritos numa linguagem simples.
+Quando os filtros são demasiado complexos, os módulos do núcleo têm de passar grande parte da informação para as camadas superiores de forma a poderem ser aplicados filtros mais elaborados, que conseguem um nível mais abstracto sobre a informação que presente no \textit{payload} dos pacotes.
 
 \subparagraph*{Problemas com o aumento do overhead}
 Como foi apresentado na subsecção \ref{sect:instrumentation_overview} a perturbação da aplicação monitorizada devido ao \textit{overhead} da captura e execuções resultantes desta, podem provocar diferentes problemas.
