@@ -218,25 +218,42 @@ De forma a aumentar a performance da captura de pacotes, os filtros são aplicad
 Face a esta situação, o tipo de filtros que se podem aplicar têm de ser escritos numa linguagem simples.
 Quando os filtros são demasiado complexos, os módulos do núcleo têm de passar grande parte da informação para as camadas superiores de forma a poderem ser aplicados filtros mais elaborados, que conseguem um nível mais abstracto sobre a informação que presente no \textit{payload} dos pacotes.
 
+
 \subparagraph*{Problemas com o aumento do overhead}
+
+----------------------------------------------------
+
+TODO
+
 Como foi apresentado na subsecção \ref{sect:instrumentation_overview} a perturbação da aplicação monitorizada devido ao \textit{overhead} da captura e execuções resultantes desta, podem provocar diferentes problemas.
+
+-----------------------------------------
 
 \subparagraph*{Outros problemas
 % Comportamento da aplicação, atrasos, perda de pacotes, entre outros
 }
+
+-------------------------------------
+
+TODO ack
+
 Se devido à monitorização de rede, os pacotes que chegam ao programa de monitorização necessitam de um tratamento pesado, este tratamento pode levar a que o sistema não consiga responder de forma correcta às aplicações que fazem uso das comunicações externas, pois o sistema pode não conseguir emitir \textit{acknowledges} dos pacotes que anteriormente tenham chegado, ou então não conseguir tratar novos pedidos de pacotes uma vez que os \textit{buffers} ficam cheios e começam a descartar os anteriores pacotes, aumentando ainda mais os problemas de retransmissão e de atrasos.
 
-\subparagraph*{Técnicas para aumento da performance}
+Se devido à monitorização de rede, os pacotes que chegam ao programa necessitarem de um tratamento pesado, este pode levar a que o sistema não consiga responder às aplicações que fazem uso das comunicações externas por impossibilidade do sistema em emitir \textit{acknoledges} dos pacotes anterior recebidos ou revelar dificuldades em tratar novos pedidos de pacotes dado que os \textit{buffers} por se encontrarem cheios começam a descarregar os anteriores pacotes aumentando substancialmente os problemas de retransmissão e a revelar atrasos.
+
+
+--------------------------------------------------------------------------
+
+\subparagraph*{Técnicas para o aumento de desempenho}
 % \todo{performance ou desempenho}
 Diferentes técnicas têm vindo a ser desenvolvidas para aumentar a performance de monitorização das interfaces de rede.
-Como foi visto anteriormente o problema do aumento do \textit{overhead} é muito importante e por isso deve ser mantido bastante reduzido, ao reduzir o \textit{overhead} de certa forma também se está a aumentar a performance de captura.
+Como foi referido, o problema do aumento da sobrecarga é muito importante, daí que deva ser mantido bastante reduzido, o que contribuirá para aumentar o desempenho da captura.
 
-Uma nova \textit{API} de atendimento de interrupções foi criada com este propósito.
-Esta nova \textit{API} está analisada na subsecção \ref{par:NAPI}.
+Uma nova \textit{API} de atendimento de interrupções foi criada com este propósito, e encontra-se analisada na subsecção \ref{par:NAPI}.
 
 \subparagraph*{Utilização de processadores \textit{multi-core} na captura}
-Numa época em que a utilização de máquinas equipadas com processadores multi-core é uma realidade para a grande maioria do público, será uma boa aproximação utilizar as capacidades dos novos processadores de forma a ultrapassar algumas dificuldades sentidas na captura de pacotes.
-Este é já um tópico que já está a ser estudado por algumas pessoas ligadas ao desenvolvimento da arquitectura de rede.
+Hoje em dia a utilização de máquinas equipadas com processadores \textit{multi-core} é uma realidade, daí que a utilização destes permite ultrapassar algumas difículdades sentidas na captura de pacotes.
+Este está a ser objecto de estudo por alguns interessados, ligados ao desenvolvimento da monitorização de rede.
 
 
 \subsection{Transferência de informação}\label{sect:transf_information}
@@ -244,10 +261,10 @@ Este é já um tópico que já está a ser estudado por algumas pessoas ligadas 
 
 % Como existe uma arquitectura estruturada dentro do sistema de operação para comunicar, esta deve ser respeitada. Por questões de eficiência diversas vezes esta estrutura é desrespeitada em detrimento do aumento das transferências de dados.
 
-Transferir informação de um ponto para outro dentro de um sistema quase sempre envolve uma cópia de dados.
-Esta cópia de dados pode se demasiado pesada na performance do sistema, especialmente se o meio for de transmissão lenta e o número de \textit{bytes} envolvidos nesta transferência for grande, ou se a frequência com que esta é efectuada for bastante grande.
-Estas transferências/cópias de dados para além da cópia em si necessitam de trocas de contexto entre o núcleo de sistema e as aplicações que necessitam dos dados, pois apenas o núcleo de sistema pode efectuar instruções privilegiadas de forma a garantir a segurança e robustez do sistema.
-Diferentes técnicas têm sido desenvolvidas de forma a aumentar a performance destas operações. 
+Transferir informação de um para outro ponto, dentro de um sistema quase sempre envolve uma cópia de dados.
+Esta cópia pode se revelar-se demasiado pesada no desempenho do sistema, especialmente se o meio for de transmissão lenta e o número de \textit{bytes} envolvidos nesta transferência for elevado, ou ainda se a frequência com que esta é efectuada for demasiada.
+Estas transferências/cópias de dados para além da cópia própriamente dita necessitam de trocas de contexto entre o núcleo de sistema e as aplicações que necessitam dos dados, porque apenas o núcleo do sistema pode efectuar instruções privilegiadas de forma a garantir a segurança e robustez do sistema.
+Diferentes técnicas têm sido desenvolvidas visando o desempenho destas operações. 
 
 
 \section{Descrição do problema} \label{sect:descricao_prob}
