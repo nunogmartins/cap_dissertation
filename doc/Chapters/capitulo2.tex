@@ -392,26 +392,26 @@ Este desenvolvimento tem de ser efectuado par-a-par, pois a ser efectuado apenas
 
 \subsection{Desempenho}
 De forma a medir o desempenho da \textit{LibPcap}, é frequente utilizar-se uma métrica que nos permita determinar a percentagem de pacotes que é possível capturar, sem que se verifiquem perdas.
-Esta métrica é calculada sabendo o número de pacotes que atravessam um determinado \textit{router ou switch} e depois obter o número de pacotes capturados na interface.
-Uma variante desta medida de desempenho é combiná-la com o máximo número de regras que é possível aplicar, sem que se percam pacotes.
-Esta medida é bastante importante em programas de detecção de intrusos.
-É importante saber qual o número máximo de pacotes ou de regras aplicáveis, pois assim é possível obter a velocidade máxima expectável de captura, pois quantos menos pacotes passarem nos filtros, maior é a filtragem e assim menor o número de pacotes que irão ser transferidos para os \textit{buffers} e destes para as aplicações.
+Esta métrica é calculada sabendo o número de pacotes que atravessam um determinado \textit{router ou switch}, e compará-la com o número de pacotes capturados na interface.
+Uma variante desta medida de desempenho é combiná-la com o máximo número de regras que é possível aplicar, sem que se assista à perda de pacotes.
+É particularmente importante conhecer o número máximo de pacotes capturados ou regras aplicáveis aos filtros, afim de determinar a velocidade máxima expectável de captura.
+Quanto mais eficiente for a filtragem, menor o número de pacotes transferidos para as aplicações, o que se traduz numa menor sobrecarga para o sistema aumentando o seu desempenho.
 
 \paragraph{Captura de pacotes com \textit{TimeStamp}}
 % como etiquetar os pacotes 
-Um dos pontos que pode influenciar negativamente a performance de obtenção de pacotes, é a necessidade de colocar uma estampilha temporal nos pacotes com o tempo de chegada destes ao sistema.
-O \textit{LipPcap} pode obter estes dados de duas formas distintas dependo da interface de rede que esteja a ser utilizada.
-Se a interface de rede conseguir fornecer a estampilha temporal associada ao pacote, o \textit{LipPcap} poderá utilizar este valor, caso contrário será necessário efectuar uma chamada ao sistema de forma a poder obter a estampilha temporal da chegada do pacote ao sistema.
-A forma como a \textit{LibPcap} obtém esta estampilha é através da chamada ao sistema \textit{gettimeofday}.
+Um dos pontos que pode influenciar negativamente o desempenho da obtenção de pacotes, sem que contudo seja significativo, é a necessidade de colocar nestes uma estampilha temporal, com o tempo da sua chegada ao sistema.
+O \textit{LibPcap} pode obter estes dados de duas formas distintas dependo da interface de rede que esteja a ser utilizada.
+Se a interface de rede conseguir fornecer a estampilha temporal associada ao pacote, o \textit{LibPcap} pode utilizar este valor, caso contrário será necessário obter a estampilha temporal da chegada do pacote ao sistema.
+A forma como a \textit{LibPcap} obtém esta estampilha é através da função \textit{gettimeofday}.
 
 \subsubsection{Implementações que permitem um aumento da taxa de transferência}
 
-Apesar de existir a mesma \textit{API} em diferentes plataformas, a performance destas pode variar bastante.
-Enquanto existe pouco tráfego de rede estas diferenças são pouco notórias, mas em condições de intenso tráfego as diferenças acentuam-se bastante, tal como pode ser observado no trabalho \textit{Improving Passive Packet Capture: Beyond Device Polling} \cite{Deri2004}.
+Apesar de ser igual \textit{API} existente em diferentes plataformas, o desempenho destas pode variar.
+Quando exista pouco tráfego de rede estas diferenças são pouco notórias, mas logo que este se intensifica, estas acentuam-se bastante, como demonstra o estudo \textit{Improving Passive Packet Capture: Beyond Device Polling} \cite{Deri2004}.
 
-Diversos esforços no sentido de aumentar a performance da captura de pacotes têm sido efectuados.
-Do lado do software, têm sido realizados esforços na utilização da técnica \textit{mmap} de forma a diminuir o número de cópias de dados entre as aplicações e o núcleo de sistema.
-Do lado do hardware também têm sido desenvolvidos esforços de forma a limitar as trocas de contexto no atendimento de interrupções, limitar o número de interrupções efectuadas pelos interfaces de rede, até à evolução de \textit{NPU} (\textit{Network Processing Unit}) de forma a libertar o \textit{cpu} e o núcleo de sistema de operação de algumas tarefas de filtragem e captura.
+Diversos esforços no sentido de aumentar o desempenho da captura de pacotes têm sido efectuados.
+Relativamente ao \textit{software}, são conhecidos esforços na utilização da técnica de \textit{mmap}, de forma a reduzir o número de cópias de dados entre as aplicações e o núcleo de sistema.
+Igualmente no \textit{hardware}, tem-se assistido a uma evolução no sentido de reduzir as interrupções efectuadas ao cpu, adicionando nas interfaces de rede processadores dedicados às funcionalidades presentes no núcleo, de modo a libertá-lo da execução destas tarefas.
 
 \paragraph*{NAPI}
 
