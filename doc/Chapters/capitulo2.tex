@@ -415,18 +415,18 @@ Igualmente no \textit{hardware}, tem-se assistido a uma evolução no sentido de
 
 \paragraph*{NAPI}
 
-A utilização desta nova \textit{API} permite diminuir o número de trocas de contexto entre o \textit{device driver} e o núcleo de sistema.
-Ao diminuir o número de vezes que é interrompido, o núcleo de sistema de cada vez que atende uma destas interrupções tem de obter um número maior de dados, o que combinado com um sistema de memória partilhada pode aumentar bastante a performance.
-Esta técnica está descrita na sub-secção \ref{par:NAPI}
+A utilização desta nova \textit{API} permite diminuir o número de trocas de contexto entre o controlador da interface e o núcleo de sistema.
+Sempre que o cpu atende uma interrupção de rede, obtem um número maior de dados, que combinado com um sistema de memória partilhada aumenta substancialmente o desempenho.
+Esta técnica encontra-se descrita na sub-secção \ref{par:NAPI}
 
-\paragraph*{Packet\_MMAP}
+\paragraph*{PACKET\_MMAP}
 
-Com base na anterior técnicas de \textit{MMAP} descrita em \ref{par:MMAP_overview} foi criado o \textit{PACKET\_MMAP}, disponível a a partir da versão 1.0.0 da biblioteca do \textit{LibPcap}.
-Este módulo permite algumas melhorias em termos de performance, pois foi reduzido o número de cópias efectuadas, e de trocas de contexto face à anterior versão 0.9.8 da biblioteca \textit{LibPcap}.
+Com base na técnica \textit{MMAP} descrita em \ref{par:MMAP_overview}, foi criado o \textit{PACKET\_MMAP}, disponível a partir da versão 1.0.0 da biblioteca do \textit{LibPcap}.
+Este módulo permite algumas melhorias em termos de desempenho, visto que foi reduzido o número de cópias efectuadas e de trocas de contexto, face à anterior versão 0.9.8 da biblioteca \textit{LibPcap}.
 
-Para além destas modificações no \textit{Packet\_MMAP} o núcleo de sistema de operação \textit{linux} na sua versão 2.6, passou a contar com a nova \textit{API} de rede (\textit{NAPI}) anteriormente descrita em \ref{par:NAPI}.
+Para além destas modificações no \textit{Packet\_MMAP} o núcleo de sistema de operação \textit{Linux} na sua versão 2.6, passou a contar com a nova \textit{API} de rede (\textit{NAPI}).
 
-Se as interfaces de rede suportarem um mecanismo de mitigação de interrupções, é possível obter resultados ainda melhores, como pode ser visto em \cite{Deri2004}.
+Se as interfaces de rede suportarem um mecanismo de mitigação de interrupções, é possível obter melhores resultados, conforme \cite{Deri2004}.
 
 % \subsection{Aplicação com base na Lipcap}
 % 
@@ -434,67 +434,71 @@ Se as interfaces de rede suportarem um mecanismo de mitigação de interrupçõe
 
 \paragraph*{PF\_RING}
 
-Este é um novo módulo para o núcleo de sistema, criado com base em duas técnicas \textit{mmap} e \textit{ring\_buffers} anteriormente descritas em \ref{par:MMAP_overview} e \ref{par:MMAP_overview} respectivamente.
-Este módulo difere na abordagem utilizada no \textit{Packet\_MMAP}, pois nesta a memória mapeada entre a ferramenta e o controlador da interface, enquanto que no \textit{Packet\_MMAP} a memória é mapeada entre a ferramenta e um \textit{buffer} externo ao controlador da interface, mas interno ao núcleo de sistema.
-Esta abordagem permite que os dados fiquem disponíveis à aplicação directamente sem que exista cópia dos dados do \textit{buffer} do controlador para um \textit{buffer} partilhado entre a ferramenta e o núcleo\cite{:PF_RING}.
- 
-\paragraph*{PF\_RING com DNA (Direct Nic Access)}
-Baseando-se na técnica anteriormente descrita de utilizar um \textit{buffer} partilhado entre a ferramenta de monitorização e o controlador, existe uma evolução desta técnica que permite que a interface de rede partilhe um \textit{buffer} com a ferramenta de monitorização para que os pacotes passem directamente para esta.
-Esta partilha é efectuada utilizando \textit{mmap} \textit{ring\_buffers} e \textit{DMA}.
-Para se utilizar esta técnica é necessário que a interface de rede permita a utilização de memória partilhada e utilização de \textit{DMA}.
+Este é um novo módulo para o núcleo de sistema, criado com base em duas técnicas \textit{mmap} e \textit{ring\_buffers} anteriormente descritas.
 
-Nestas técnicas que utilizam um \textit{Ring\_Buffer} é necessário utilizar uma \textit{API} de forma a serem controlados os índices de leitura e escrita\cite{:IntroPF_RIDNADirecNICAcces}.
+Este módulo difere na abordagem utilizada no \textit{Packet\_MMAP}, porquanto nesta a memória é mapeada entre a ferramenta e o controlador da interface, enquanto que no \textit{Packet\_MMAP} a memória é mapeada entre a ferramenta e um \textit{buffer} externo ao controlador da interface, mas interno ao núcleo de sistema.
+Esta abordagem permite que os dados fiquem disponíveis para a aplicação directamente, verificando-se a inexistência de cópia dos dados do \textit{buffer} do controlador, para o \textit{buffer} partilhado entre a ferramenta e o núcleo\cite{:PF_RING}.
+ 
+\paragraph*{PF\_RING com DNA (Direct NIC Access)}
+Baseando-se na técnica anteriormente descrita de utilizar um \textit{buffer} partilhado entre a ferramenta de monitorização e o controlador, assiste-se a uma evolução desta técnica, ao permitir que a interface de rede partilhe um \textit{buffer} com a ferramenta de monitorização, possibilitando que os pacotes passem directamente para esta.\cite{:IntroPF_RIDNADirecNICAcces}.
+Esta partilha é efectuada utilizando \textit{mmap}, \textit{ring\_buffers} e \textit{DMA}.
+Para se utilizar esta técnica é necessário que a interface de rede permita, a utilização de memória partilhada e \textit{DMA}.
 
 \paragraph*{Sistemas \textit{multi-core} e multi-processador}
-Devido ao aparecimento de sistemas multi-core e multi-processador para o publico em geral, a paralelização de código ou a forma de tirar partido destas arquitecturas para permitir um melhor aproveitamento dos recursos, parece interessante. 
-De forma a tirar partido dos multi-core é necessário que controlador de rede, interfaces de rede, \textit{buffers}, controladores de \textit{DMA} (\textit{Direct Memory Access}), sejam modificados de forma a terem conhecimento da arquitectura. Como se pode constatar, é necessário um esforço conjunto de modo a tirar o máximo proveito destas arquitecturas\cite{Deri:2010}.
+
+Com o aparecimento de sistemas \textit{multi-core} e \textit{multi-processador} a que a generalidade do público tem acesso, a paralelização de código ou a forma de tirar partido destas arquitecturas, que permitem um melhor aproveitamento dos recursos, assumem uma particular importância.
+De forma a tirar partido das arquitecturas \textit{multi-core}, é necessário que o controlador e interfaces de rede, os \textit{buffers}, e os controladores de \textit{DMA} (\textit{Direct Memory Access}), sejam modificados de forma a conhecerem esta estrutura.
+É pois, determinante um esforço conjunto envolvendo todas estas componentes, com vista à obtenção do máximo rendimento destas arquitecturas\cite{Deri:2010}.
 
 
 % \paragraph*{}
 % Utilização de DCA (Direct Cache Access) E RSS (Receive Side Scaling) e TNAPI (Threaded NAPI)
 
 
-\subsection{Formas de melhorar a performance dos filtros dinâmicos}
- O dinamismo das aplicações nomeadamente das aplicações multimédia, deu origem a diversos estudos sobre a forma de monitorização de rede que estes programas necessitam.
-Estas aplicações utilizam diversos fluxos de dados, quer de transmissão que de recepção. Em geral, as aplicações multimédia, com base na \textit{internet} utilizam uma metodologia cliente/servidor, onde o servidor fica à espera de pedidos do cliente num determinado porto (pré-definido). O cliente como conhece à partida este porto liga-se. A partir deste ponto, começam as trocas de informações que irão dar origem à troca de portos dinâmicos, para posteriormente dar-se inicio ao processo de transmissão/recepção de dados multimédia.
+\subsection{Formas de melhorar o desempenho dos filtros dinâmicos}
+ O dinamismo das aplicações, nomeadamente das aplicações multimédia, deu origem a diversos estudos sobre a forma de monitorização de rede, que estas necessitam.
+Estas aplicações utilizam diversos fluxos de dados, designadamente de transmissão e de recepção.
+Em geral, as aplicações multimédia, com base na \textit{internet} utilizam uma metodologia cliente/servidor, onde o servidor aguarda pedidos do cliente num determinado porto.
+O cliente conhecendo antecipadamente este porto liga-se.
+A partir deste ponto, iniciam-se trocas de informações que irão originar a troca de portos dinâmicos e posteriormente o processo de transmissão/recepção de dados multimédia.
 
-As aplicações multimédia assentes na \textit{internet} são apenas um exemplo de aplicações com diversos fluxos e em que as portas de comunicação entre as aplicações são negociadas dinamicamente.
+As aplicações multimédia assentes na \textit{internet} são apenas um exemplo de aplicações com diversos fluxos, em que as portas de comunicação entre as aplicações, são negociadas dinamicamente.
 
-Como foi descrito anteriormente em \ref{sect:LibPcap}, a captura de pacotes é definida em filtros estáticos.
-Para capturar este tipo de tráfego é necessário modificar os filtros definidos, de modo a acompanhar o protocolo.
-Esta forma de captura é bastante ineficiente e, para tal, foram estudadas algumas alternativas. Os projectos \textit{mmdump}\cite{505678}, %\textit{Fairly Fast Packet Filters (FFPF)}\cite{1251278} 
-e \textit{Swift}\cite{1387609} são dois destes casos estudados.
+Como o referido em \ref{sect:LibPcap}, a captura de pacotes é definida em filtros estáticos e para capturar este tipo de tráfego, é necessário modificar os filtros definidos, de modo a acompanhar o protocolo.
+Esta forma de captura mostra-se bastante ineficaz, o que motivou a que fossem estudadas algumas alternativas, tendo em vista a correcção desta situação.
+Os projectos \textit{mmdump}\cite{505678}, %\textit{Fairly Fast Packet Filters (FFPF)}\cite{1251278} 
+e \textit{Swift}\cite{1387609} são dois destes casos estudados, que merecem especial relevância e que adiante se analizam:
 
 \paragraph*{MMDump} É uma ferramenta de monitorização de protocolos multimédia com suporte na rede.
 Esta aplicação tem como base o \textit{tcpdump}, sendo a captura de pacotes efectuada através da utilização de filtros.
-Para determinar que portos obter é necessário verificar o conteúdo dos pacotes direccionados a portos específicos e, a partir destes, é que é possível saber os novos portos negociados dinamicamente pela aplicação e alterar o filtro a aplicar. 
+Para determinar os portos a obter é necessário analisar o conteúdo dos pacotes direccionados a portos específicos e, a partir destes é possível conhecer os novos portos negociados dinamicamente pela aplicação, e proceder à alteração dos filtros a aplicar.
+Como a alteração que é constituida pela cópia do novo filtro para o núcleo e verificação de segurança, de forma a validá-lo, é um processo demorado é necessário reduzir este tempo, com o objectivo de ter uma aplicação que consiga minimizar o grau de perturbação no sistema.
 
-Como a alteração, cópia do novo filtro para o núcleo e verificação de segurança de forma a validá-lo é um processo pesado e por isso foi necessário minimizar este tempo de forma a ter uma aplicação que conseguisse minimizar o grau de perturbação no sistema.
-Foi verificado que existe um certo padrão na forma de alteração do filtro.
-A forma encontrada foi pré-estabelecer uma parte comum a ser adicionada ao filtro e apenas alterar a parte referente aos portos.
+Na alteração do filtro, foi verificado que existe um certo padrão que consiste em pré-estabelecer uma parte comum a ser adicionada ao filtro e apenas alterar a parte referente aos portos.
 
-Esta forma de monitorização é muito especifica, tendo que se conhecer todo o protocolo interno de comunicação.
-Assim, para cada novo protocolo que se queira monitorizar, é necessário acrescentar um novo módulo com a interpretação desse protocolo.
+Esta forma de monitorização é muito especifica, pelo que é imprescindível todo o protocolo interno de comunicação.
+Assim, para cada novo protocolo a monitorizar, é necessário acrescentar um novo módulo com a interpretação desse protocolo.
 
 % \paragraph*{\textit{Fairly Fast Packet Filter} (FFPF)}
 
 \paragraph*{\textit{Swift}}
-\textit{Swift} é uma ferramenta de criação de filtros que tem como principal objectivo a melhoria do desempenho da utilização destes, na captura de tráfego de rede.
-Neste trabalho foi avaliado o tempo de alteração dos filtros utilizando o \textit{Linux Socket Filtering}, pois estes são os filtros de referência em no sistema de operação \textit{Gnu Linux}.
-A aplicação destes filtros a partir da biblioteca \textit{LipPcap} compreende três fases: cópia do filtro definido em nível utilizador para o núcleo de sistema, verificação de segurança, e aplicação do filtro.
-De forma a diminuir a latência de actualização dos filtros criaram uma especificação de filtros de modo que estes não tivessem que ser analisados em termos de segurança, a própria linguagem garante as propriedades de segurança necessárias.
-Com este novo \textit{instruction set} e sem a necessidade de verificação conseguiram diminuir a latência de actualização de filtros, permitindo assim um aumento da performance na utilização de filtros dinâmicos.
+\textit{Swift} é uma ferramenta de criação de filtros, cujo principal objectivo é a melhoria do desempenho da utilização destes, na captura de tráfego de rede.
+Nesta ferramenta, foi avaliado o tempo de alteração dos filtros, utilizando o \textit{Linux Socket Filtering}, pois estes são os filtros de referência no sistema de operação \textit{Gnu Linux}.
+A aplicação destes filtros a partir da biblioteca \textit{LibPcap} compreende três fases: cópia do filtro definido em nível utilizador para o núcleo de sistema, verificação de segurança, e aplicação do filtro.
+De forma a diminuir a latência de actualização dos filtros, foi criada uma especificação de modo que estes não necessitassem de ser analisados relativamente à segurança, visto que a própria linguagem garante as propriedades de segurança necessárias.
+Com este novo \textit{instruction set}, e sem necessidade de verificação, reduziram a latência de actualização dos filtros, o que conduziu a um aumento de desempenho na utilização de filtros dinâmicos.
 
-\section{Captura de tráfego de um processo utilizando monitorização da estrutura de rede}\label{sect:outras_abordagens}
+\section{Captura de tráfego de um processo utilizando monitorização da estrutura de rede}
+\label{sect:outras_abordagens}
 
-A captura do tráfego respeitante a um processo, foi alvo de estudo em \cite{1688981} e em \cite{Farruca:2009}, esta última uma dissertação de mestrado. 
+A captura do tráfego respeitante a um processo, foi alvo de estudo em \cite{1688981} e em \cite{Farruca:2009}, esta última objecto de uma dissertação de mestrado.
 
-No primeiro trabalho foi desenvolvido um sistema de captura dos pacotes de um determinado processo, utilizando um módulo no núcleo de sistema que intercepta e obtém os pacotes de e para um determinado processo.
+No primeiro trabalho foi desenvolvido um sistema de captura de pacotes de um determinado processo, utilizando um módulo no núcleo de sistema que intercepta e captura os pacotes do processo.
 
-Este sistema é composto por três partes essenciais, uma dentro do núcleo de sistema e outras duas em nível utilizador.
-Como o título do trabalho indica, foi utilizado a ferramenta \textit{KProbes} para a monitorização de algumas funções dentro do núcleo de sistema \textit{Linux}, de forma a obter quais os portos que uma determinada aplicação iria utilizar.
-Após obtida a informação sobre o porto, esta é enviada para um processo em nível utilizador que tem o registo de todos os portos que estão a ser utilizados pela aplicação a monitorizar.
-Se esse porto ainda não estiver a ser monitorizado, então essa informação é passada a outro processo que utiliza a biblioteca \textit{LibPcap} de forma a captura o tráfego existente nesse porto.
+Este sistema é composto por três componentes essenciais, uma dentro do núcleo de sistema e duas em nível utilizador.
+Na realização do trabalho foi utilizada a ferramenta \textit{KProbes} para a monitorização de algumas funções do núcleo de sistema \textit{Linux}, de forma a conhecer quais os portos que uma determinada aplicação vai utilizar.
+Logo que obtida a informação, esta é enviada para um processo em nível utilizador que tem o registo de todos os portos que estão a ser utilizados pela aplicação objecto de monitorização.
+Se esse porto não estiver a ser monitorizado, essa informação é passada a outro processo que utiliza a biblioteca \textit{LibPcap} de forma a capturar o tráfego existente nesse porto.
 
 
 \begin{figure}[h!]
@@ -505,17 +509,15 @@ Se esse porto ainda não estiver a ser monitorizado, então essa informação é
 \end{figure}
 
 
-Como se pode ver na figura ~\ref{fig:paper_capture_kprobes}, o ACAP\_Collector e o ACAP\_Capturer estão em nível utilizador, o que sugere que se consiga aumentar a performance desta ferramenta caso esta seja completamente implementada dentro do núcleo de sistema de operação.
+Analisando a arquitectura de monitorização de tráfego representada na figura~\ref{fig:paper_capture_kprobes}, o ACAP\_Collector e o ACAP\_Capturer, estão em nível utilizador, de onde se infere que o desempenho desta ferramenta é passível de ser aumentada, caso esta seja completamente implementada dentro do núcleo de sistema de operação.
 
-No segundo trabalho foram implementadas duas abordagens, uma com monitorização da aplicação e outra através de informações pertencentes ao núcleo do sistema de operação.
-
-O núcleo de sistema do \textit{Linux} tem a informação sobre quais os portos de comunicação que uma aplicação tem com o exterior e permite que estes dados sejam consultados através do sistema de ficheiros virtual \textit{ProcFs} apresentado em \ref{cap:ProcFs_overview}.
-Uma das formas de monitorização foi consultar estes dados de forma regular, com intervalos reduzidos.
-Esta forma de monitorização consome demasiados recursos e não é 100\% fiável e quanto menor o intervalo de tempo que se utilizar, maior a perturbação que o sistema tem.
-A outra abordagem efectuada foi de interceptar às chamadas à bibiloteca \textit{LibC} para a utilização de \textit{sockets}, criando uma bibiloteca partilhada com a mesma sintaxe das chamadas que são utilizadas.
-Para utilizar este método é necessário definir a variável de ambiente \textit{LD\_PRELOAD} de forma a fazer esta intercepção.
-Como esta biblioteca está em nível utilizador é necessário capturar todos os pacotes e apenas em nível utilizador visualizar o tráfego respeitante ao processo.
-Capturar todos os pacotes pode ser uma tarefa com um elevado grau de perturbação do sistema. 
+Relativamente ao segundo trabalho foram implementadas duas abordagens: uma com monitorização da aplicação e outra através de informações pertencentes ao núcleo do sistema de operação.
+No que à primeira diz respeito, a monitorização efectuada foi através da interceptação das chamadas à bibiloteca \textit{LibC}, para a utilização de \textit{sockets}, criando uma bibiloteca partilhada com a mesma sintaxe das chamadas que são utilizadas.
+A opção pela utilização deste método, implica definir a variável de ambiente \textit{LD\_PRELOAD}, de forma a fazer esta intercepção.
+Como esta biblioteca está em nível utilizador, mostra-se necessário capturar todos os pacotes e apenas em nível utilizador visualizar o tráfego respeitante ao processo.
+Esta obrigatoriedade de capturar todos os pacotes pode consituir uma tarefa com elevado grau de perturbação do sistema.
+No que à segunda abordagem se refere, o método de monitorização utilizado baseou-se na consulta efectuada de forma regular com interválos reduzidos, dos dados referentes aos portos de comunicação, utilizados pela aplicação, que são exportados pelo núcleo através do \textit{ProcFs}.
+Esta forma de monitorização consome demasiados recursos e não se mostra totalmente fiável, na medida em que quanto menor o intervalo de tempo utilizado, maior a perturbação apresentada pelo sistema.
 
 \section{Outros projectos}
 
