@@ -31,59 +31,59 @@
 
 \section{Sistemas de monitorização em Linux}\label{sect:instrumentacao_casos_linux}
 
-Como foi anteriormente analisado na secção \ref{sect:instrumentation_overview} referente à monitorização, esta secção será dedicada à apresentação das diferentes ferramentas de monitorização do núcleo de sistema do Gnu Linux.
-Estas ferramentas são as mais recentes e mais utilizadas neste sistema de operação.
-
+Como o anteriormente analisado na secção \ref{sect:instrumentation_overview} referente à monitorização, esta secção é dedicada à apresentação das diferentes ferramentas de monitorização do núcleo de sistema do \textit{Gnu Linux} sendo as mais recentemente utilizadas neste sistema de operação.
 
 \subsection{KProbes}\label{sect:KProbes_overview}
 
-O \textit{KProbes} é uma ferramenta de instrumentação dinâmica do núcleo de sistema do Gnu Linux.
-A \textit{API} desta ferramenta permite que outras aplicações de mais alto nível, tais como o \textit{DProbes} ou o \textit{SystemTap} possam aceder às suas funcionalidades.
-Esta encontra-se na versão principal do núcleo do sistema Linux desde a versão 2.6.9, o que indica tratar-se de uma ferramenta bastante estável\cite{kernel_debug_printk_on_fly,KProbesSite}.
+O \textit{KProbes} é uma ferramenta de instrumentação dinâmica do núcleo de sistema do \textit{Gnu Linux}.
+A \textit{API} desta ferramenta permite que outras aplicações de mais alto nível, como o \textit{DProbes} ou o \textit{SystemTap} possam aceder às suas funcionalidades.
+Esta encontra-se na versão principal do núcleo do sistema \textit{Linux} desde a versão 2.6.9, o que indica tratar-se de uma ferramenta bastante estável\cite{kernel_debug_printk_on_fly,KProbesSite}.
 
 
-Para se obter informações sobre as funções ou instruções que estão a ser monitorizadas, o \textit{KProbes} disponibiliza-as por meio do \textit{debugfs}.
+Para se obterem informações sobre as funções ou instruções que estão a ser monitorizadas, o \textit{KProbes} disponibiliza-as por meio do \textit{DebugFs}.
 
-Existem três tipos de instrumentação que podem ser efectuados: \textit{KProbe}, \textit{JProbe} e \textit{KRetProbe}. Cada um destes três tipos é especifico para uma determinada funcionalidade.
+Existem três tipos de instrumentação que podem ser efectuados: \textit{KProbe}, \textit{JProbe} e \textit{KRetProbe}.
+Cada um destes três tipos é especifico de uma determinada funcionalidade.
 
 \begin{itemize}
  \item \textbf{KProbe}
 % \paragraph*{\textbf{KProbe}}
 Utilizando um KProbe pode-se detectar a chamada de funções ou apenas de uma instrução.
-Para analisar apenas uma instrução tem de ser dado o valor do \textit{offset} em função da distância ao inicio da função, podendo ser definido pelo seu nome ou através do seu endereço de memória.
+Para analisar apenas uma instrução, tem de ser indicado o \textit{offset} relativamente à distância ao inicio da função instrumentada.
+A indicação da função a instrumentar, pode ser definida recorrendo ao seu nome ou ao endereço de memória.
 Múltiplos \textit{KProbe} podem ser definidos para uma mesma função ou instrução.
-
-Para que um KProbe seja registado têm de ser definidos três \textit{handlers} que serão descritos em seguida.
 
 \item \textbf{JProbe}
 % \paragraph*{\textbf{JProbe}}
-Um \textit{JProbe} serve para analisar os parâmetros que são passados como argumento na função.
-Quando é declarado um \textit{JProbe} a função de \textit{handler} tem de ter os mesmos tipos de argumentos que a função que irá ser analisada, de forma a poderem ser monitorizados.
+Um \textit{JProbe} destina-se a analisar os parâmetros, da função a instrumentar.
+Quando é declarado um \textit{JProbe} a função de \textit{handler} tem de ter conter os mesmos tipos de argumentos que a função que se destina a ser instrumentada, de forma a serem passíveis de serem monitorizadas.
  
 
  \item \textbf{KRetProbe}
 % \paragraph*{\textbf{KretProbe}}
-  Este tipo de análise serve para obter o valor de retorno da função a ser analisada.
-Para poder efectuar esta operação é utilizada a técnica do trampolim~\cite{Hollingsworth94dynamicprogram}, uma vez que uma função pode ter vários pontos onde termina.
+Este tipo de análise tem como objectivo obter o valor de retorno da função que se pretende analisar.
+Para efectuar esta operação é utilizada a técnica do trampolim~\cite{Hollingsworth94dynamicprogram}, uma vez que uma função pode terminar em pontos diversos.
 
 
 \end{itemize}
 
-Para utilizar o \textit{KProbes} é necessário criar um módulo para o núcleo do sistema de operação com informações relativas às rotinas que devem ser instrumentadas, aos \textit{handlers} que irão ser activados, para além de outros parâmetros necessários à realização da análise.
-Uma vez que os módulos são escritos em linguagem C ou \textit{assembly}, foram desenvolvidas outras duas ferramentas, o \textit{DProbes} e o \textit{SystemTap}.
-Estas novas ferramentas de mais alto nível vêm ajudar no desenvolvimento de \textit{scripts}, de forma simplificar e a melhorar a segurança na utilização desta ferramenta de instrumentação (\textit{KProbes}).
+Para utilizar o \textit{KProbes} é necessário criar um módulo para o núcleo do sistema de operação, com informações relativas às rotinas a instrumentar.
+Para além destas o módulo tem de conter igualmente os \textit{handlers} de análise, assim como outros parâmetros necessários à realização da instrumentação.
+Uma vez que os módulos são escritos em linguagem C ou \textit{assembly}, foram desenvolvidas as ferramentas, \textit{DProbes} e \textit{SystemTap}.
+Estas novas ferramentas de mais alto nível ajudam no desenvolvimento de \textit{scripts}, simplificando e melhorando a segurança na utilização desta ferramenta de instrumentação (\textit{KProbes}).
 
-Quando o módulo é inserido no núcleo de sistema, o registo dos \textit{handlers} das funções a serem monitorizadas é efectuado de forma atómica.
+Quando o módulo é inserido no núcleo de sistema, o registo dos \textit{handlers} das funções a serem instrumentadas é efectuado de forma atómica.
 A execução do \textit{KProbes} não utiliza nenhum \textit{mutex} ou outra forma de controlo de concorrência, apenas funciona com a preempção desligada.
 Dependendo da arquitectura, os \textit{handlers} podem também executar com as interrupções desligadas.
 
-A monitorização é efectuada utilizando substituição dos endereços das funções a serem analisadas, por interrupções (utilizando neste caso o \textit{int 3}). Quando possível o \textit{KProbes} utiliza instruções do processador especializadas no \textit{debug} de forma a minimizar o grau de perturbação. 
+A instrumentação processa-se pela subsituição dos endereços das funções a serem analisadas, por interrupções (utilizando neste caso o \textit{int 3}).
+Quando possível o \textit{KProbes} utiliza instruções do processador especializadas no \textit{debug} de forma a minimizar o grau de perturbação.
 
 Apesar de ser possível instrumentar praticamente todo o núcleo do sistema de operação, existem algumas situações que podem requerer alguma perícia na forma como são tratadas.
 Quando o compilador realiza substituição de funções por código \textit{inline}, as instruções que anteriormente estavam dentro da função passam a fazer parte do ponto onde foram substituídas, deixando de existir um ponto de entrada na função.
-Assim sendo a função deixa de existir, tornando impossível a instrumentação destas funções.
+Assim sendo, a função deixa de existir, impossibilitando a instrumentação destas funções.
 
-Existe uma nova optimização nas últimas versões do núcleo de operação nomeadamente nas versões 2.6.32 e 2.6.33.
+Existe uma nova optimização do \textit{KProbes} nas últimas versões do núcleo de operação, nomeadamente nas versões 2.6.32 e 2.6.33.
 % Esta optimização consiste em utilizar a instrução \textit{jmp} em vez da interrupção \textit{int3}, mais pesada, 
 % mas estas substituição não pode ser efectuada em todas as situações. (ME) falta descrever ou não o pq de ser mais pesada
 
@@ -94,79 +94,76 @@ Existe uma nova optimização nas últimas versões do núcleo de operação nom
 
 %Esta ferramenta também foi desenvolvida pela IBM estando agora como um projecto no site sourceforge.net .
 
-O \textit{DProbes} utiliza o \textit{KProbes} como suporte para efectuar a instrumentação dinâmica do núcleo de sistema. Como a criação de pontos de análise é escrito em linguagem C ou \textit{assembly}, foi desenvolvida uma linguagem de mais alto nível de forma a poder ser mais simples a utilização desta aplicação.
+O \textit{DProbes} utiliza o \textit{KProbes} como suporte para efectuar a instrumentação dinâmica do núcleo de sistema.
+Como a criação de pontos de análise é escrito em linguagem C ou \textit{assembly}, foi desenvolvida uma linguagem de mais alto nível de forma a simplificar  a utilização desta aplicação.
 
-Após os dados terem sido obtidos, estes podem ser enviados para diferentes meios, tais como: para um ficheiro, para o \textit{deamon de logging} do núcleo de sistema, ou para uma porta serie.
-Existe também a opção de interoperabilidade com o \textit{Linux Trace Toolkit}\cite{:DProbes}.
+Após os dados terem sido obtidos, estes podem ser transferidos para um ficheiro, para o \textit{daemon logging} do núcleo de sistema, ou para uma porta série.
+Existe igualmente a opção de interoperabilidade com o \textit{Linux Trace Toolkit}\cite{:DProbes}.
 
 \subsubsection{SystemTap}\label{cap:Systemtap_overview}
 % Ainda tem de ser bem pensado o que escrever
-O \textit{SystemTap} é uma ferramenta que possibilita o desenvolvimento de módulos para o \textit{KProbes}, utilizando uma linguagem própria para o efeito de forma a ser segura e fácil de trabalhar.
+O \textit{SystemTap} é uma ferramenta que possibilita o desenvolvimento de módulos para o \textit{KProbes}, utilizando uma linguagem específica, de forma a ser segura e fácil de trabalhar.
 
 %A facilidade no desenvolvimento de scripts (tapsets) utilizando a linguagem de scripting criada para o efeito.
 
 % O sistema utilizado pelo SystemTap para passar informações ao processo em espaço utilizador é o replayFs.
 % para além de ter encontrado instruções neste sentido, a obtenção do strace veio confirmar estes dados
 
-Uma vez que os dados gerados estão no espaço de memória do núcleo de sistema e o programa que os irá analisar se situa no espaço de endereçamento do utilizador, é necessário efectuar tem de ser efectuada uma transferência dos dados de um espaço para o outro.
-O modo como o \textit{SystemTap} efectua esta transferência, é recorrendo à utilização do sistema de ficheiros \textit{ReplayFs}, onde é possível escrever de forma rápida, sem comprometer a segurança do sistema.\cite{Donovan2007,Jones2009} 
+Uma vez que os dados gerados estão no espaço de endereçamento de memória do núcleo, e o programa que os analisará se situa no espaço de endereçamento do utilizador, é necessário efectuar uma transferência de dados de um para outro espaço.
+O \textit{SystemTap} efectua esta transferência, recorrendo à utilização do sistema de ficheiros \textit{ReplayFs}, onde é possível escrever de forma rápida, sem comprometer a segurança do sistema.\cite{Donovan2007,Jones2009}
 
-Apesar de no pacote de aplicações desta ferramenta existir um visualizador gráfico de dados recolhidos pelo \textit{SystemTap}, esta só consegue utilizar os \textit{TapSets} pré-definidos no \textit{SystemTap}, por isso, novas ferramentas estão a ser desenvolvidas.
-Uma destas ferramentas tem o nome de \textit{bootlimn}(está actualmente a ser desenvolvida no \textit{Google Summer of Code}).
-O propósito desta ferramenta é utilizar o \textit{SystemTap} para recolher informações sobre o arranque do sistema e agregar estes dados utilizando o formato \textit{XML}, para que posteriormente possam ser efectuadas visualizações gráficas do processo de inicialização do sistema, bem como da utilização de disco e \textit{CPU} neste intervalo de tempo.
-Outro projecto é o \textbf{Systemtap GUI} que engloba o \textbf{System Tap Editor Plug-in} para a ferramenta Eclipse, e um ambiente onde podem ser analisados e visualizados os dados recolhidos pelo \textit{SystemTap}.
+Apesar de no pacote de aplicações desta ferramenta existir um visualizador gráfico de dados, recolhidos pelo \textit{SystemTap}, esta só consegue analisar os \textit{TapSets} pré-definidos no \textit{SystemTap}, para ultrapassar esta limitação, novas ferramentas estão a ser desenvolvidas.
+Uma destas ferramentas designada por \textit{bootlimn}, está actualmente a ser desenvolvida no \textit{Google Summer of Code}, com o objectivo de utilizar o \textit{SystemTap} para recolher informações sobre o arranque do sistema, agregando estes dados no formato \textit{XML}.
+Os dados recolhidos permitem visualizações gráficas do processo de inicialização do sistema, bem como da utilização de disco e \textit{CPU}.
+Outro projecto conhecido como \textbf{Systemtap GUI}, que engloba o \textbf{System Tap Editor Plug-in} para a ferramenta Eclipse, é um ambiente onde podem ser analisados e visualizados os dados recolhidos pelo \textit{SystemTap}.
 O \textit{System Tap Editor Plug-in} é um \textit{plug-in} para a ferramenta de desenvolvimento \textit{Eclipse}, de modo a ajudar no desenvolvimento dos \textit{TapSets} para o \textit{SystemTap}.
 
-O \textit{SystemTap} actualmente está a ser desenvolvido pelas seguintes empresas: \textit{Red Hat}, \textit{IBM}, \textit{Hitachi} e \textit{Oracle}.
+O \textit{SystemTap} actualmente está a ser desenvolvido por empresas de reconhecido mérito internacional, nomeadamente a \textit{Red Hat}, a \textit{IBM}, a \textit{Hitachi} e a \textit{Oracle}.
 
 \subsection{Linux Trace ToolKit}\label{cap:linux_trace_toolkit_overview}
 
 % O Linux Trace Toolkit é uma ferramenta de ``tracing''
 % Utiliza o Klog com repositorio da informação obtida do kernel.
-Uma outra ferramenta um pouco mais antiga que o \textit{KProbes} é o \textit{Linux Trace Toolkit (LTT)}.
-É composto por 4 partes o \textit{Kernel Patch}, o \textit{Kernel Module} o \textit{Trace Daemon} e o \textit{Data Decoder}.
-
-Posteriormente foi substituído pelo \textit{Linux Trace Toolkit New Generation} que se apresenta em seguida.
+O \textit{Linux Trace ToolKit} é uma ferramenta um pouco mais antiga que o \textit{KProbes}, constituída por quatro componentes: o \textit{Kernel Patch}, pelo o \textit{Kernel Module} o \textit{Trace Daemon} e o \textit{Data Decoder}, foi substituída pelo \textit{Linux Trace Toolkit New Generation} que se apresenta em seguida.
 
 \subparagraph{Linux Trace Toolkit New Generation}\label{cap:lttng_overview}
 
 % Nesta versão a comunicação entre o kernel e aplicação em user space é efectuada utilizando o relayfs.
 % O RelayFs é um sistema de ficheiros para comunicação entre o código dentro e fora do núcleo de operação.
 
-Uma evolução do \textit{LTT (Linux Trance ToolKit)} permite colaborar com diversas ferramentas tais como \textit{KProbes}, \textit{Tracepoints}\cite{Mathieu2009} e \textit{Linux Kernel Markers}\cite{Mathieu2009}.
-As ferramentas \textit{Tracepoints} e Linux \textit{Kernel Markers} fazem parte da instrumentação estática pertencentes ao núcleo de sistema \textit{Gnu Linux}.
+Representa uma evolução do \textit{LTT (Linux Trance ToolKit)}, e permite colaborar com ferramentas como o \textit{KProbes}, o \textit{Tracepoints}\cite{Mathieu2009} e \textit{Linux Kernel Markers}\cite{Mathieu2009}.
+As ferramentas \textit{Tracepoints} e Linux \textit{Kernel Markers} fazem parte da instrumentação estática pertencente ao núcleo de sistema \textit{Gnu Linux}.
 
 A transferência dos dados do núcleo de sistema para a aplicação, é efectuada utilizando o \textit{RelayFs}.
 
 %A utilização desta ferramenta em sistemas de tempo real é um bom indicador da sua performance.
 
 \subparagraph{Linux Trace Toolkit Viewer}\label{cap:lttv_overview}
-O \textit{Linux Trace Toolkit Viewer (LTTV)} é um projecto desenvolvido em paralelo com o \textit{LTT} e \textit{LTTng} de forma a  poder ser possível fazer uma análise visual aos dados recolhidos por estas duas aplicações.
-Esta ferramenta permite ainda realizar uma análise temporal dos dados uma vez que estes têm uma estampilha temporal.
+O \textit{Linux Trace Toolkit Viewer (LTTV)} é um projecto desenvolvido em paralelo com o \textit{LTT} e \textit{LTTng} de forma a possibilitar uma análise visual dos dados recolhidos por estas aplicações.
+Esta ferramenta possibilita igualmente realizar um traço de execução, uma vez que os dados recolhidos contêm uma estampilha temporal do momento em que foram obtidos.
 
 
 \subsection{Linux Kernel State Tracer}
 % Linux Kernel State Tracer(LKST) records information as trace data about events in the Linux Kernel. It records various events like process context switch, send signal, exception, memory allocation, send packet, and so on. 
 
-O \textit{Linux Kernel State Tracer(LKST)} obtém informações referentes ao núcleo de sistema de forma a criar um traço de execução.
-Consegue capturar diferentes eventos tais como trocas de contexto, envio de sinais, alocação de memória, envio de pacotes, etc.
+O \textit{Linux Kernel State Tracer(LKST)} obtém informações referentes ao núcleo de sistema de forma a criar um traço de execução, e consegue capturar diferentes eventos como trocas de contexto, envio de sinais, alocação de memória, transmissão de pacotes, etc.
 
-% \subparagraph{DJProbe}
+% a\subparagraph{DJProbe}
 \label{cap:djprobe}
   % Este sistema é mais leve devido à forma como é feito o ``trap'' pois não usa o int 3
 % Duvidas na forma como é controlado o sistema na presença de processadores maquinas com multiplos processadores.
 % Não utiliza o int 3 para fazer o trap por isso segundo o artigo fica mais leve que o KProbe e o JProbe.
 % DJProbe  quer dizer Direct Jump Probe faz um jmp e não usa o int 3.
-O \textit{Direct Jump Probe} está actualmente a ser desenvolvido como um subprojecto do \textit{Linux Kernel State Tracer} . 
-Esta ferramenta de instrumentação pode trabalhar em conjunto com o \textit{KProbe} (secção \ref{sect:KProbes_overview}). 
-Este sistema é uma optimização à utilização do \textit{trap int3} presente em alguns processadores. Esta optimização pode ser comparada no relatório efectuado por Masami Hiramatsu \cite{Hiramatsu2005}.
+Actualmente está a ser desenvolvido como um subprojecto do \textit{Linux Kernel Stace Tracer} designado por \textit{Direct Jump Probe}.
+Esta ferramenta de instrumentação é uma optimização à utilização do \textit{trap int3}, presente em alguns processadores, e que pode trabalhar em conjunto com o \textit{KProbes} \ref{sect:KProbes_overview}.
+Esta optimização pode ser verificada na comparação efectuada no relatório\cite{Hiramatsu2005}.
  
 \subsection{OProfile}\label{cap:Oprofile_overview}
-Todas ferramentas anteriores mencionadas utilizam mecanismos para formar um traço de execução.
-No caso do \textit{OProfile}, este difere nesse facto. Em vez de a cada evento utilizar uma função para obter os dados, apenas o faz após um certo número de vezes.
+Todas ferramentas anteriores mencionadas utilizem mecanismos para formar um traço de execução, este difere neste facto.
+Em vez de a cada evento utilizar uma função para obter os dados, apenas a utiliza decorridos um certo número de eventos.
+O recurso a este critério permite ao \textit{OProfile} ser mais eficiente, uma vez que nem sempre é necessário o universo dos eventos que as ferramentas de monitorização capturam, mas tão somente uma amostra.
 Esta é uma forma criada de modo ao \textit{OProfile} tornar-se mais eficiente, uma vez que nem sempre são necessários todos os eventos que as ferramentas de instrumentação capturam.
-Esta técnica de captura tem o nome de amostragem.
-Utilizando esta técnica, o \textit{OProfile} pode ter um menor grau de perturbação no sistema\cite{Will:TuninProgrOProf}.
+Deste modo ao utilizar a amostragem, o \textit{OProfile}, benficia de um menor grau de perturbação no sistema\cite{Will:TuninProgrOProf}.
 % ser menos perturbador do sistema.
 % it uses data sampling ... the others don't
 
@@ -176,6 +173,8 @@ Utilizando esta técnica, o \textit{OProfile} pode ter um menor grau de perturba
 % \todo{completar esta tabela}
 \begin{table}[h!]
 \begin{center}
+\caption{Tabela Comparativa dos sistemas de instrumentação}
+\label{tab:inst_compare}
 \begin{tabular}{|l||c|c|c|}
 \hline
 Instrumentação & Amostragem / Traço & Análise de Parâmetros & Deamon \\
@@ -189,24 +188,22 @@ LKST & Traço & Permite & Não necessita \\
 OProfile & Amostragem & Não permite & Necessita \\
 \hline
 \end{tabular}
-\caption{Tabela Comparativa dos sistemas de instrumentação}
-\label{tab:inst_compare}
 \end{center}
 \end{table}
+
+Da observação da tabela \ref{tab:inst_compare} pode inferir-se que: TODO
 
 A tabela \ref{tab:inst_compare} permite fazer uma comparação entre alguns dos atributos destes sistemas de instrumentação presentes no núcleo de sistema do \textit{Linux}.
 Os diferentes sistemas de instrumentação dinâmica do núcleo do \textit{Linux} segundo os seguintes critérios: metodologia da captura (por traço ou por amostragem), análise dos parâmetros das funções instrumentadas e a necessidade de ter um \textit{deamon} de recolha de dados provenientes do sistema de monitorização.
 A necessidade de ter um \textit{deamon} a executar de forma de coligir e organizar os dados pode penalizar a performance do sistema.
 A possibilidade de analisar os parâmetros das funções instrumentadas é um ponto a favor do sistema. 
 
-\section{Transferência de dados}\label{sect:kernel_user_comm}
+\section{Transferência de dados}
+\label{sect:kernel_user_comm}
 
-Quando se obtêm dados de alguma fonte estes podem não ser apenas requeridos no sitio onde são capturados.
-Desta forma foram criadas formas de transferência de dados.
-De modo a melhorar a partilha dos recursos externos, o controlo dá-se ao nível do núcleo de sistema.
-Por essa razão parte das comunicações dos utilizadores com dispositivos externos é efectuada através do núcleo de sistema.
-Várias formas de transferência de informação foram estudadas, podendo ser internas ou externas ao núcleo de sistema.
-% Duas formas transferência de informação foram analisadas, sendo estas internas ou externas que se apresentam em seguida.
+Quando se recorre a alguma fonte para a obtenção de dados, não é imprescindível que estes sejam requeridos no sítio onde são capturados.
+Assim foram criados dois modos de transferência de dados:as internas e as externas.
+No intuíto de melhorar a partilha dos recursos externos, o controlo dá-se ao nível do núcleo do sistema, pelo que parte das comunicações dos utilizadores com dispositivos externos, é efectuada através do núcleo de sistema.
 
 %Incluir por aqui a informação de mmaps, ring buffers e afins ....
 % colocar a parte interna e verificar o mmap que tb faz parte do utilizador
@@ -214,35 +211,41 @@ Várias formas de transferência de informação foram estudadas, podendo ser in
 %texto explicativo de interno e externo 
 \subsection{Interna ao sistema}
 
-É necessário transferir informações entre diferentes \textit{buffers} dentro do núcleo de sistema.
-Devido a esta necessidade, novas técnicas foram criadas de forma a minimizar o \textit{overhead} mantendo todas as situações de segurança e integridade dos dados.
-Nesta secção irão ser apresentados diferentes técnicas de transferência de informação interna ao núcleo de sistema.
+Devido há necessidade de transferir informações entre diferentes \textit{buffers} dentro do núcleo de sistema, foram desenvolvidas novas técnicas tendo sempre como referência a minimização da sobrecarga.
 
-\paragraph*{\textit{MMAP}}\label{par:MMAP_overview}
-A técnica de \textit{MMAP} (\textit{Memory Map}) proporciona a possibilidade de mapear um ficheiro para memória potenciando assim, a partilha de dados entre diferentes processos que necessitem aceder ao mesmo ficheiro.
-A possibilidade de partilha de dados de \textit{IO} é uma das vertentes que pode ser explorada de forma a aumentar a performance, pois permite a partilha de dados entre um ou mais programas e o núcleo de operação.
-Esta técnica é implementada utilizando páginas a pedido, minimizando as transferências e gastos de memória.
+De entre as diferentes técnicas de transferência interna de informação ao núcleo do sistema, merecem especial relevo:
 
-\paragraph*{Zero Copy}\label{par:zero_copy_overview}
+\paragraph*{\textit{MMAP}}
+\label{par:MMAP_overview}
 
-Forma de transferência de dados sem que existam cópias dos \textit{buffers} pertencentes ao núcleo de sistema e ao espaço de utilizador.
-Esta técnica permite que os dados sejam partilhados por diferentes entidades, sem que exista a necessidade de criação de novos \textit{buffers} de cópia e sem que os dados sejam copiados, pois apenas são passadas as referências.
 
-\paragraph*{Ring Buffers}\label{c}
-Esta técnica consiste num aproveitamento de recursos já alocados, mas que deixaram de ser necessários, estando dessa forma livres para nova utilização.
-Esta técnica é utilizada quando o peso da criação de novos elementos é elevado comparativamente com a reutilização dos mesmos.
-É também extensivamente utilizado em situações de \textit{``produtor-consumidor''}, ou seja, quando é necessário manter ordem dos elementos.
+Esta técnica é implementada utilizando páginas de memória a pedido, reduzindo as transferências e gastos de memória, proporciona a possibilidade de mapear um ficheiro para memória potenciando assim, a partilha de dados entre diferentes processos que necessitem aceder ao mesmo ficheiro.
+A possibilidade de partilha de dados de \textit{IO} é uma vertente que pode ser objecto de desenvolvimento, de forma a aumentar o desempenho, porquanto permite a partilha de dados entre um ou mais programas, e o núcleo de operação.
 
-\paragraph*{NAPI - New API}\label{par:NAPI}
+\paragraph*{Zero Copy}
+\label{par:zero_copy_overview}
+
+Esta técnica de transferência de dados sem que existam cópias dos \textit{buffers} pertencentes ao núcleo de sistema e ao espaço de utilizador, permite que os dados sejam partilhados por diferentes entidades, sem a necessidade de criação de novos \textit{buffers} e cópias de dados, uma vez que apenas são passadas as referências.
+
+\paragraph*{Ring Buffers}
+\label{c}
+Esta técnica consiste num aproveitamento dos recursos já alocados, mas que se tornaram desnecessários, estando desta forma passíveis de nova utilização.
+Os \textit{Ring Buffers} são utilizados tendo presente a relação custo / benefício, isto é, quando o peso da criação de novos elementos é superior compartivamente com os recursos já alocados.
+É igualmente utilizada em situações de \textit{"produtor-consumidor"}, ou seja, quando é necessário manter a ordem dos elementos.
+
+\paragraph*{NAPI - New API}
+\label{par:NAPI}
 %VERIFICAR a origem do NAPI 
 
-Uma nova \textit{API} (\textit{Application Program Interface}) de atendimento de interrupções do processador vindos de interfaces de rede.
-Foi criada para permitir um aumento da performance da utilização de rede de alta velocidade.
-Esta nova \textit{API} permite desligar a atenção do processador a novas interrupções oriundas da interface de rede, durante um certo período de tempo.
-Este tempo deve ser analisado de forma a não criar situações em que se crie demasiada latência na chegada dos pacotes às aplicações, nem que se mantenha igual ao que estava anteriormente, onde o processador era interrompido a cada chegada de um novo pacote à interface de rede~\cite{administrator:napi}.
+Foi criada uma nova \textit{API} (\textit{Application Program Interface}) de atendimento de interrupções do processador, oriundos das interfaces de rede, com o objectivo de aumentar o desempenho da utilização de rede elevado débito.
+Esta nova \textit{API} permite desligar a atenção do processador a novas interrupções, oriundas da interface de rede, durante um certo período de tempo.
 
-Utilizando esta nova \textit{API} é possível explorar um escalonamento mais eficiente das interrupções em situações de intensa actividade do processador.
-Esta nova \textit{API} só pode ser aplicada caso os controladores das interfaces de rede estejam preparados para utilizar alguma forma de mitigação da interrupção, caso contrário esta \textit{API} não é aplicada.
+Este tempo foi definido de forma a que não se verifiquem situações de elevada latência na chegada dos pacotes às aplicações.
+A forma anterior de recepção de pacotes, era efectuada de forma a atender uma interrupção por cada pacote que chegava à interface de rede, gerando assim demasiada sobrecarga no sistema.
+Actualmente a arquitectura de rede, está balanceada de forma a mudar o modo de atendimento de interrupções para NAPI, caso existam demasiadas interrupções por unidade de tempo.~\cite{administrator:napi}.
+
+Utilizando esta nova \textit{API}, é possível explorar um escalonamento mais eficiente das interrupções em situações de intensa actividade do processador.
+O \textit{NAPI} apenas pode ser aplicado nos caso em que os controladores das interfaces de rede estejam preparados para utilizar alguma forma de mitigação da interrupção, caso contrário esta \textit{API} não é aplicada.
 
 \subsection{Com o exterior do sistema}
 % {\color{red}
@@ -252,54 +255,53 @@ Esta nova \textit{API} só pode ser aplicada caso os controladores das interface
 % DISTINÇÂO ENTRE OS DIFERENTES SISTEMAS
 % }
 
-Devido à necessidade de análise de estruturas e informações provenientes do núcleo de sistema foram criados diferentes subsistemas para este fim.
-Um destes subsistemas é o \textit{ProcFs} que já existe no núcleo de sistema do \textit{Linux} desde as primeiras versões.
-Outros subsistemas como o \textit{DebugFs} ou o \textit{RelayFs} são mais recentes e com novas abordagens. 
+Devido à necessidade de análise de estruturas e dados do núcleo de sistema, foram criados diferentes subsistemas com vista à sua satisfação.
+Um destes subsistemas é o \textit{ProcFs}, que existe no núcleo de sistema do \textit{Linux} desde as primeiras versões.
+Outros como o \textit{DebugFs} ou o \textit{RelayFs} são mais recentes e com novas abordagens.
 %diferentes abordagens e o pq de ter de existirem estas formas
 
 \paragraph*{}
-De forma a obter informações relativas a estruturas dentro do núcleo de sistema foram encontrados três principais sistemas de comunicação entre o utilizador e o núcleo.
+De forma a obter informações relativas a estruturas dentro do núcleo de sistema foram referênciados os seguintes sistemas de comunicação entre o utilizador e o núcleo, a saber:
 
 \paragraph*{ProcFs}\label{cap:ProcFs_overview}
 
 Desenvolvido para obter informações relativas aos processos tem sido utilizado desde as primeiras versões do núcleo de sistema do \textit{Linux}.
-Apesar de novos subsistemas tais como o \textit{SysFs} terem sido criados, este ainda é utilizado por algumas aplicações.
+Apesar de novos subsistemas como o \textit{SysFs} terem sido criados, é ainda utilizado por algumas aplicações.
 
 \paragraph*{SysFs}\label{cap:SysFs_overview}
 
-Este sistema de ficheiros virtual foi desenvolvido para colmatar algumas deficiências que o \textit{ProcFs} tem (secção \ref{cap:ProcFs_overview}).
-Estes problemas são principalmente na forma como a quantidade de informação disponibilizada está distribuída sobre o \textit{ProcFs}.
-Este novo sistema de ficheiros virtual tem algumas restrições sobre a forma como são disponibilizados os dados do núcleo de sistema, desta forma outros sistemas de ficheiros virtuais foram aparecendo tais como o \textit{DebugFs} ou o \textit{RelayFs} que irão ser descritos nas secções \ref{cap:DebugFs_overview} e \ref{cap:RelayFs_overview} respectivamente.
+Este sistema de ficheiros virtual foi desenvolvido para colmatar algumas deficiências encontradas no \textit{ProcFs}(secção \ref{cap:ProcFs_overview}).
+Estes problemas situam-se basicamente na forma como a quantidade de informação disponibilizada está distribuída sobre o \textit{ProcFs}.
+Este novo sistema de ficheiros virtual evidencia algumas restrições designadamente a forma como são disponibilizados os dados do núcleo de sistema.
+Esta limitação conduziu a que outros sistemas de ficheiros virtuais, nomeadamente o \textit{DebugFs} e o \textit{RelayFs} fizessem a sua aparição.
 
 \paragraph*{DebugFs}\label{cap:DebugFs_overview}
 
-A análise de dados provenientes do núcleo de sistema foi sempre necessária para os programadores.
-Este sistema foi essencialmente criado a pensar nesta necessidade.
-Apesar de já existirem dois sistemas de ficheiros virtuais, o \textit{ProcFs} e o \textit{SysFs} este tentou colmatar os problemas dos anteriores sistemas, não sendo tão estruturado como o \textit{SysFs} e com melhor organização de dados que o \textit{ProcFs}.
+Este sistema foi essencialmente criado a pensar nas necessidades sentidas pelos programadores.
+Apesar de já existirem dois sistemas de ficheiros virtuais, o \textit{ProcFs} e o \textit{SysFs}, este tentou colmatar os problemas que se apresentavam, não obstante se mostrar tão estruturado como o \textit{SysFs}, ou com melhor organização de dados que o \textit{ProcFs}.
 
-O sistema de instrumentação do núcleo de sistema \textit{Linux}, \textit{KProbes}, utiliza este sistema de ficheiros virtual de forma a apresentar quais os pontos onde existe instrumentação no núcleo de sistema.
+O sistema de instrumentação do núcleo de sistema \textit{Linux}, \textit{KProbes}, utiliza este sistema de ficheiros virtual de forma a apresentar os pontos onde existe instrumentação no núcleo de sistema.
 
 \paragraph*{RelayFs}\label{cap:RelayFs_overview}
 
 Este sistema de ficheiros virtual foi desenvolvido tendo em mente a transferência de grandes quantidades de dados entre o núcleo de sistema e o espaço de utilizador.
- Este novo sistema de ficheiros virtual tem novas primitivas onde não existem tantas zonas de controlo de concorrência.
- Desta forma o \textit{RelayFs} permite um aumento de transferências de dados entre o núcleo de sistema e o espaço de endereçamento do utilizador\cite{Donovan2007}.
+O \textit{RelayFs} permite um aumento de transferências de dados entre o núcleo de sistema e o processo em nível utilizador, fazendo uso de novas primitivas onde são mais reduzidas as zonas de controlo de concorrência\cite{Donovan2007}.
 
 \paragraph*{NetLink}\label{cap:NetLink_overview}
-O \textit{NetLink} utiliza uma forma de comunicação baseada em \textit{sockets} para fazer a comunicação entre o núcleo de sistema e os programas de nível utilizador. 
- Tendo como abstracção os \textit{sockets} este sistema também tem a possibilidade de enviar dados para múltiplos processos, pois utiliza as primitivas de envio colectivo (\textit{Multicast}).
+O \textit{NetLink} utiliza uma forma de comunicação baseada em \textit{sockets} para estabelecer a comunicação entre o núcleo de sistema e os processos em nível utilizador. 
+ Tendo como abstracção os \textit{sockets} este sistema tem igualmente a possibilidade de enviar dados para múltiplos processos, devido à utilização das primitivas de envio colectivo (\textit{Multicast}).
 % \todo{Explicar melhor o NetLink}
  É com base no \textit{NetLink} que a comunicação entre processos dentro da mesma máquina (\textit{IPC}) é implementada.
 %Isto ja e novo
  A comunicação com diferentes partes do subsistema de rede é efectuada recorrendo a este sistema de \textit{sockets}.
 
 %Isto e novo
-\paragraph*{Splice}
-Falar sobre esta chamada ao sistema
+%\paragraph*{Splice}
+%Falar sobre esta chamada ao sistema
 
 %Isto e novo
-\paragraph*{Tee}
-Falar sobre esta chamada ao sistema
+%\paragraph*{Tee}
+%Falar sobre esta chamada ao sistema
 
 
 % \todo{Corrigir esta tabela}
@@ -327,22 +329,24 @@ NetLink & Sem & Elevado \\
 \end{table}
 
 \paragraph*{}
-Como se pode verificar através da tabela \ref{tab:transf_compare} que compara a estruturação dos dados de cada Sistema com o volume de dados que é possível transferir, o \textit{RelayFs} e o \textit{NetLink} são os dois sistemas de comunicação não têm estruturação fixa dos dados, e que conseguem transferir uma grande quantidade de dados comparativamente aos sistemas \textit{Procs}, \textit{SysFs} e \textit{DebugFs}.
-Entre o \textit{RelayFs} e o \textit{NetLink} o primeiro consegue transferir um maior volume quantidade de dados.
+Como se pode verificar através da tabela \ref{tab:transf_compare} que compara a estruturação dos dados de cada Sistema com o volume de dados que é possível transferir.
+O \textit{RelayFs} e o \textit{NetLink} são os dois sistemas de comunicação que não tendo estruturação fixa dos dados, conseguem transferir um volume superior de dados, comparativamente com os restantes objecto da análise.
+Se limitar-mos a análise comparativa dos sistemas \textit{RelayFs} e \textit{NetLink}, constatamos que o volume de dados que é possível transferir pelo primeiro é superior ao verificado no \textit{NetLink}.
 
 \section{Biblioteca LibPcap}\label{sect:LibPcap}
 
 A monitorização de rede existente no \textit{Gnu Linux} permite capturar os pacotes de rede logo que eles chegam ao controlador de rede.
 Assim a biblioteca \textit{LibPcap}\cite{:LibPcap} faz uso desta possibilidade.
-Uma das principais características desta biblioteca é a sua \textit{API} de alto nível para a captura de pacotes que é a mesma em todas as plataformas.
-Para filtrar os pacotes indesejados a \textit{LipPcap} utiliza filtros baseados no \textit{BPF (Berkeley Packet Filtering)} implementados no núcleo de sistema de modo a torná-la eficiente.
+Uma das principais características desta biblioteca é a sua \textit{API} de alto nível para a captura de pacotes que é igual em todas as plataformas.
+Para filtrar os pacotes indesejados a \textit{LibPcap}, utiliza filtros baseados no \textit{BPF (Berkeley Packet Filtering)}, implementados no núcleo de sistema de modo a que a monitorização se torne mais eficiente.
 
-Em seguida será apresentado a arquitectura da biblioteca \textit{LibPcap}.
+Em seguida é apresentada a arquitectura da biblioteca \textit{Pcap}.
 
-\subsection {Arquitectura}\label{sect:architecture_libpcap}
-A arquitectura do \textit{LibPcap} subdivide-se em duas partes, a biblioteca a nível utilizador, e o módulo dentro do núcleo de sistema composto por \textit{sockets} e filtros que são utilizados na captura.
-Como é visível na figura \ref{fig:pcap_architecture} a utilização de filtros pode logo ser aplicada assim que os pacotes são criados.
-Este sistema de captura permite que pacotes que não são visíveis às aplicações devido à \textit{firewall} do \textit{Linux} possam ser captados e analisados pelas ferramentas de monitorização de rede.
+\subsection {Arquitectura}
+\label{sect:architecture_libpcap}
+A arquitectura do \textit{Pcap} subdivide-se em duas partes: a biblioteca a nível utilizador, e o módulo no núcleo de sistema composto por \textit{sockets} e filtros que são utilizados na captura.
+Como se constata na figura \ref{fig:pcap_architecture} a utilização de filtros é aplicada assim que os pacotes são recebidos.
+Este sistema de captura permite que pacotes que não são visíveis às aplicações devido à \textit{firewall} do \textit{Linux} possam ser capturados e analisados pelas ferramentas de monitorização de rede.
 
 \begin{figure}[h]
        \centering
@@ -351,44 +355,43 @@ Este sistema de captura permite que pacotes que não são visíveis às aplicaç
       \label{fig:pcap_architecture}
 \end{figure}
 
-A arquitectura de rede do núcleo de sistema \textit{Linux} utiliza \textit{socket buffers} de forma a manter todas as camadas e \textit{payloads} necessários às diferentes camadas da \textit{stack TCP/IP}
-Esta estrutura tem toda a informação sobre o pacote que irá ser lido pela aplicação.
-Apesar do \textit{Linux} utilizar esta estrutura, a \textit{LipPcap} não a utiliza, preferindo capturar os pacotes directamente do controlador da interface de rede, através da utilização de um módulo diferente, o \textit{AF\_Packet}.
+A arquitectura de rede do núcleo de sistema \textit{Linux}, utiliza \textit{socket buffers}, que contêm dados referentes às diferentes camadas da \textit{stack TCP/IP}.
+Esta estrutura que dispõe de toda a informação sobre o pacote, a receber pela aplicação, é igualmente utilizada nos sistemas de monitorização em nível utilizador.
+A monitorização da rede é efectuada directamente no controlador da interface de rede, utilizando para isso um \textit{socket} \textit{AF\_PACKET}.
 
 \subsubsection{UserLevel}
 
-A biblioteca dinâmica \textit{LipPcap} é utilizada pela grande maioria dos programas de captura de pacotes.
-Esta biblioteca, como é multi-plataforma permite ao programador utilizá-la nos principais sistemas de operação, isto porque a \textit{API} da \textit{LipPcap} é opaca em relação à implementação, esta sim especifica a cada plataforma.
-Para ser possível efectuar a captura de pacotes, o programa tem de especificar qual a interface de rede que quer monitorizar e, se necessitar de filtrar pacotes, especificar os filtros a utilizar recorrendo para isso à função \textit{setFilter}, que desta forma aplica um filtro criado anteriormente, através da notação \textit{BPF}.
-Após esta inicialização, o programa poderá utilizar \textit{Polling} de forma a obter os pacotes e analisá-los.
+A biblioteca dinâmica \textit{LibPcap} é utilizada pela generalidade dos programas de captura de pacotes.
+Esta biblioteca, como é multi-plataforma, permite ao programador utilizá-la nos principais sistemas de operação, porque a \textit{API} da \textit{LibPcap} é opaca relativamente à implementação, esta sim especifica de cada plataforma.
+Para ser possível efectuar a captura de pacotes, o programa tem de especificar qual a interface de rede que quer monitorizar.
+Se necessitar de filtrar pacotes, especificará os filtros a utilizar, recorrendo para isso à função \textit{setFilter}, que aplicará o filtro criado anteriormente, através da notação \textit{BPF}.
+Após esta inicialização, o programa poderá utilizar \textit{Polling}, de forma a obter os pacotes e analisá-los.
 
 \subsubsection{AF\_PACKET}
 
-Quando os pacotes chegam ao controlador da interface de rede, é utilizado este componente de forma a criar os pacotes dentro do núcleo de sistema. 
-É a partir deste momento que a informação sobre o pacote e os restantes \textit{payloads} ficam disponíveis.
-
-O módulo \textit{AF\_PACKET} permite utilizar explicitamente o modo promiscuo, ou seja permite que sejam capturados pacotes que não são destinados à máquina em questão.
+O módulo \textit{AF\_PACKET} permite utilizar explicitamente o modo promiscuo, ou seja permite que sejam capturados pacotes que não são destinados à máquina utilizada.
 Na versão actual do núcleo de sistema do \textit{Linux} (2.6.32) o módulo \textit{AF\_PACKET} já pode utilizar um sistema de partilha de \textit{buffer} com o espaço de utilizador.
-Neste caso tem de ser o utilizador a definir explicitamente que quer utilizar o \textit{socket} desta forma, e pedir ao núcleo, uma região de memória, sendo esta, posteriormente passada como argumento de configuração do novo \textit{socket}.
+Neste caso cabe ao utilizador definir explicitamente a forma como pretende utilizar o \textit{socket}. 
+Para atingir este objectivo o utilizador tem de pedir ao núcleo, uma região de memória, sendo esta, posteriormente indicada como argumento de configuração do novo \textit{socket}.
 
-Como foi anteriormente descrito o \textit{AF\_PACKET}, permite a comunicação directa com o controlador da interface de rede presente.
- Assim torna-se possível capturar os diversos pacotes ainda antes deses poderem ser filtrados pela \textit{firewall} presente no núcleo de sistema, neste caso o \textit{netfilter}.
-Podem ser aplicados filtros aos \textit{sockets} de forma a ser mais eficiente a captura dos pacotes, descartando aqueles que não são relevantes para a monitorização. 
- Estes filtros irão ser descritos em seguida.
+Como o referido anteriormente, o \textit{AF\_PACKET}, permite a comunicação directa com o controlador da interface de rede, possibilitando capturar os diversos pacotes ainda antes destes poderem ser filtrados pela \textit{firewall}, presente no núcleo de sistema, neste caso o \textit{netfilter}.
+Podem ser aplicados filtros aos \textit{sockets} de modo a aumentar a eficiência na captura dos pacotes, excluindo aqueles que são irrelevantes para a monitorização.
 
+Dos filtros em questão merece especial referência:
 
 \subsubsection{Linux Socket Filtering}
 O \textit{Linux Socket Filtering} é derivado do \textit{BPF (Berkeley Packet Filtering)} que é o standard de \textit{de facto} para a criação de filtros dentro do núcleo de sistema. 
 
-Este sistema de filtros permite que os utilizadores com permissões de \textit{Super User}, possam definir filtros e afectá-los aos \textit{sockets}.
-Os filtros definidos são descritos numa linguagem simples, de forma a ser possível efectuar com rapidez a selecção dos pacotes a capturar, rejeitando todos os outros.
-Se o filtro for demasiado complexo, este não poderá ser aplicado e só será possível em nível utilizador, perdendo alguma performance.
+Este sistema de filtros permite aos os utilizadores com permissões de \textit{Super User}, definir filtros e afectá-los aos \textit{sockets}.
+Os filtros definidos são descritos numa linguagem simples, de forma a efectuarem com rapidez a selecção dos pacotes a capturar, rejeitando todos os outros.
+Se o filtro for demasiado complexo, não poderá ser aplicado no núcleo, sendo apenas possível aplicá-lo em nível utilizador, perdendo algum desempenho.
 A linguagem utilizada para a criação dos filtros é compilada para o \textit{Instruction Set}, definido no \textit{BPF}.
-Este \textit{Instruction Set} utiliza operadores lógicos de forma a combinar as regras definidas nos filtros, criando-se assim apenas um fluxo que pode ser aplicado aos \textit{sockets}.
-Para se poder definir uma nova instrução para no \textit{Instruction Set} é necessário que se altere o ficheiro \textit{grammar.y} na entrada correspondente à posição que deverá ocupar na \textit{AST (Abstract Sintax Tree)}, e modificar as funções de criação do novo filtro, quer em modo utilizador quer dentro do núcleo de sistema. Este desenvolvimento tem de ser efectuado par-a-par pois não faria sentido ter apenas de um lado senão o outro não fica compatível~\cite{Mccanne92thebsd}.
+Este \textit{Instruction Set} utiliza operadores lógicos de forma a combinar as regras definidas nos filtros, criando-se apenas um fluxo que pode ser aplicado aos \textit{sockets}.
+Para se poder definir uma nova instrução para no \textit{Instruction Set} é necessário alterar o ficheiro \textit{grammar.y}, na entrada correspondente à posição que deverá ocupar na \textit{AST (Abstract Sintax Tree)}, e modificar as funções de criação do novo filtro, quer em modo utilizador quer dentro do núcleo de sistema.
+Este desenvolvimento tem de ser efectuado par-a-par, pois a ser efectuado apenas de um lado, ou outro tornar-se-á incompatível.~\cite{Mccanne92thebsd}.
 
 \subsection{Desempenho}
-De forma a medir o desempenho da \textit{LibPcap} é frequente utilizar-se uma métrica de qual a percentagem de pacotes que é possível capturar, sem que se percam pacotes.
+De forma a medir o desempenho da \textit{LibPcap}, é frequente utilizar-se uma métrica que nos permita determinar a percentagem de pacotes que é possível capturar, sem que se verifiquem perdas.
 Esta métrica é calculada sabendo o número de pacotes que atravessam um determinado \textit{router ou switch} e depois obter o número de pacotes capturados na interface.
 Uma variante desta medida de desempenho é combiná-la com o máximo número de regras que é possível aplicar, sem que se percam pacotes.
 Esta medida é bastante importante em programas de detecção de intrusos.
