@@ -30,7 +30,7 @@ Como apresentado na secção \ref{}, o sistema de monitorização de rede é uti
 
 %Por cada pacote ter de atravessar toda a arquitectura de rede incluida no \textit{vfs} seria demasiado pesado para o sistema.
 
-------- apresentar as diversas seccoes ao leitor ----------------
+%------- apresentar as diversas seccoes ao leitor ----------------
 
 Nas subsecções seguintes irão ser apresentados os quatro subcomponentes do MRoP.
 
@@ -62,7 +62,13 @@ E quando é utilizada mais uma interface virtual sob uma real ? .....
 
 \item[Listas]
 
+No núcleo existe a implementação da estrutura de dados \emph{lista} (\emph{list}).
+A implementação desta estrutura de dados é bastante eficiente.
+A implementação efectuada tem dois apontadores, um para o elemente que o precede e outro para o elemento seguinte.
 
+Apesar de não ser necessário definir uma lista com o máximo número de portos, uma vez que estes podem ser adicionados dinamicamente à lista, a complexidade temporal de pesquisa no pior caso de O(n), não é um bom indicador de desempenho, para este trabalho.
+ 
+Quando o número de elementos não é elevado, a utilização de uma lista é uma boa solução.
 
 
 
@@ -78,12 +84,30 @@ Apesar de não ser necessário percorrer os elementos ou obter os indíces de fo
 
 %\paragraph{Arvores Balanceadas}
 \item[Árvore Balanceada]
-\textit{Red-black Tree} implementada no núcleo de operação permite efectuar
+\textit{Red-black Tree} 
+
+
+No núcleo existe uma implementação parcial de uma árvore \textit{Red-black} genérica, que permite acesso aos dados através de chave, ou seja é uma estrutura associativa.\ref{}
+A árvore \textit{Red-black} é semi-balanceada, ou seja, a diferença de alturas entre o ramo mais profundo e o mais curto é de apenas 1.
+Esta propriedade é mantida através de rebalanceamentos da árvore em inserções e remoções, o que provoca um custo na sua utilização, mas no caso esperado existem mais consultas do que inserções e remoções, este custo é amortizado.
+
+Para utilizar esta estrutura de dados é necessário definir três funções de manipulação da árvore, inserção, remoção e consulta.
+O suporte fornecido pelo núcleo apenas permite manusear a árvore, sendo necessário definir as funções que utilizam a chave de acesso ao conteudo dos dados, estas sendo especificas, não foram incluídas no suporte.
+
+Para a utilização do número máximo de porto possíveis nos protocolos \textit{TCP} ou \textit{UDP}, de 65535 portos, a altura da árvore será de 10, ou seja para chegar a um dos elementos nos extremos, máximo ou mínimo da árvore, serão necessárias 10 iteraçoes sobre a árvore.
+Apesar de não ser um requisito, é possível obter de forma ordenada todas as chaves, bem como os valores associados a estas.
+
+-----------------------------------------------------------------------------------------------------------
 
 Complexidade de inserção, pesquisa e remoção é O(log n), sendo n o número de elementos da árvore.
 
 Pode existir uma penalização no desempenho, devido à necessidade de balancear a àrvore.
 Os ganhos provenientes deste balanceamento, face às àrvores não balanceadas, permite manter a complexidade média de acesso aos dados em O(log(n)), ao invés de um possível decremento até O(n), ou seja a árvore degenerar em uma lista.
+
+-----------------------------------------------------------------------------------------------------------
+\item[Radix Tree]
+talvez falar sobre esta arvore ....
+
 \end{description}
 
 \subsection{Sem Suporte no núcleo}
@@ -91,7 +115,8 @@ Os ganhos provenientes deste balanceamento, face às àrvores não balanceadas, 
 \begin{description}
 %\subsubsection{Tabela de dispersão}
 \item[Tabela de Dispersão]
-Não existe nenhuma implementação 
+No núcleo existe uma implementação de tabelas de dispersão que efectuam a dispersão e o controlo sobre as suas chaves.
+
 
 %\subsubsection{Bloom Filter}
 \item[Bloom Filter]
@@ -162,34 +187,34 @@ Após a monitorização de um processo é esperado que a componente \textit{Esta
 
 \section{Instrumentação de funções do núcleo}
 
-----------------------------------------------------------------------------------------------------------
+%----------------------------------------------------------------------------------------------------------
 
-Como foi anteriormente descrito em \ref{subsection:network} sobre as chamadas aos sistema para utilizar as funcionalidades de rede
+%Como foi anteriormente descrito em \ref{subsection:network} sobre as chamadas aos sistema para utilizar as funcionalidades de rede
 
-Foi necessário conhecer a \textit{ABI}\ref{ABI}\cite{ABI} referente às arquitecturas suportadas, \textit{x86} e \textit{x86\_64}, para a passagem de parâmetros das chamadas aos sistema.
+%Foi necessário conhecer a \textit{ABI}\ref{ABI}\cite{ABI} referente às arquitecturas suportadas, \textit{x86} e \textit{x86\_64}, para a passagem de parâmetros das chamadas aos sistema.
 
-O sistema de \textit{KProbes} permite consultar os registos do processador onde foi efectuada a chamada à função (neste caso a chamada ao sistema).
- Por isso foram definidos 6 \textit{KRetProbes} referentes às chamadas \textit{connect}, \textit{bind}, \textit{accept}, \textit{sendto}, \textit{recvfrom} e
-\textit{close}.
- Para esta última \textit{close} devido à elevada utilização desta chamada ao sistema por diferentes aplicações no sistema, foi utilizada a função \textit{qqq coisa ...  ????}
+%O sistema de \textit{KProbes} permite consultar os registos do processador onde foi efectuada a chamada à função (neste caso a chamada ao sistema).
+% Por isso foram definidos 6 \textit{KRetProbes} referentes às chamadas \textit{connect}, \textit{bind}, \textit{accept}, \textit{sendto}, \textit{recvfrom} e
+%\textit{close}.
+% Para esta última \textit{close} devido à elevada utilização desta chamada ao sistema por diferentes aplicações no sistema, foi utilizada a função \textit{qqq coisa ...  ????}
 
-Para efectuar a monitorização das interacções de rede de um processo foi necessário recorrer à instrumentação de funções do núcleo.
+%Para efectuar a monitorização das interacções de rede de um processo foi necessário recorrer à instrumentação de funções do núcleo.
 
-Através da instrumentação de funções do núcleo foi possível manter o contexto da execução do processo.
+%Através da instrumentação de funções do núcleo foi possível manter o contexto da execução do processo.
 
-Como apresentado e concluído na secção \ref{}, o sistema de monitorização que melhor se adequa ao problema exposto é o \textit{KProbes}.
- Deste sistema utilizou-se o \textit{KRetProbe}, de forma a instrumentar a entrada e retorno de funções.
- Obter os parâmetros de entrada das funções, principalmente o \textit{file descriptor}, tornou-se essencial.
- Para garantir que o repositório do estado do processo está coerente com o estado do núcleo, foi necessário obter o valor de retorno das funções.
- Por estas razões e porque as chamadas ao sistema têm ciclos de modificação da bastante lentos, o que evidência elevada estabilidade e consistência do núcleo, e por ser ponto de entrada do processo no núcleo foram as funções instrumentadas.
+%Como apresentado e concluído na secção \ref{}, o sistema de monitorização que melhor se adequa ao problema exposto é o \textit{KProbes}.
+% Deste sistema utilizou-se o \textit{KRetProbe}, de forma a instrumentar a entrada e retorno de funções.
+% Obter os parâmetros de entrada das funções, principalmente o \textit{file descriptor}, tornou-se essencial.
+% Para garantir que o repositório do estado do processo está coerente com o estado do núcleo, foi necessário obter o valor de retorno das funções.
+% Por estas razões e porque as chamadas ao sistema têm ciclos de modificação da bastante lentos, o que evidência elevada estabilidade e consistência do núcleo, e por ser ponto de entrada do processo no núcleo foram as funções instrumentadas.
 
-As subsecções \ref{} .... \ref{} apresentam as funções do núcleo que foram instrumentadas.
+%As subsecções \ref{} .... \ref{} apresentam as funções do núcleo que foram instrumentadas.
 
 %
 % faltam as subsecoes ... 
 %
 
-----------------------------------------------------------------------------------------------------------
+%----------------------------------------------------------------------------------------------------------
 
 A metodologia aplicada à resolução do problema de desempenho, teve como base o desenvolvimento de uma componente que efectue uma análise aos canais de comunicação de rede, utilizados por um processo, insira a informação necessária num repositório e, quando o pacote chegar ao sistema de monitorização, utilize o repositório para capturar, ou não, o pacote.
 
@@ -215,30 +240,30 @@ Por este motivo foi necessário encontrar a função que lida com o fecho de \te
 
 \subsection{Filtro de processos}
 
-------------------------------------------------------------------------------------------------
+%------------------------------------------------------------------------------------------------
 
-A filtragem dos processos que efectuam as chamadas ao sistema de rede impôs um novo desafio.
- Se apenas filtrar as chamadas de um processo/pid seria apenas verificar se o pid é igual ao que se pretende é trivial e com baixa sobrecarga.
- Para um utilizador que queria analisar um processo, e não saiba qual dos fluxos do processo é responsável pela comunicação de rede, tornou-se complicado.
+%A filtragem dos processos que efectuam as chamadas ao sistema de rede impôs um novo desafio.
+% Se apenas filtrar as chamadas de um processo/pid seria apenas verificar se o pid é igual ao que se pretende é trivial e com baixa sobrecarga.
+% Para um utilizador que queria analisar um processo, e não saiba qual dos fluxos do processo é responsável pela comunicação de rede, tornou-se complicado.
 
-Com esta abordagem ainda existe a possibilidade de não se obter todas as \textit{task} do processo, caso este tenha um àrvore com mais de 3 níveis, mas a sobrecarga sobre o sistema é inferior à situação de monitorização da criação de processos no sistema.
- Estes três identificadores foram escolhidos pois permitem identificar até 3 níveis da árvore de um processo.
+%Com esta abordagem ainda existe a possibilidade de não se obter todas as \textit{task} do processo, caso este tenha um àrvore com mais de 3 níveis, mas a sobrecarga sobre o sistema é inferior à situação de monitorização da criação de processos no sistema.
+% Estes três identificadores foram escolhidos pois permitem identificar até 3 níveis da árvore de um processo.
 
-Seria bom colocar uma imagem de uma àrvore de processo .... 
+%Seria bom colocar uma imagem de uma àrvore de processo .... 
 
-Os identificadores têm de ser escritos para os ficheiros respectivos no \textit{DebugFs}, que serão explicados na secção \ref{}.
+%Os identificadores têm de ser escritos para os ficheiros respectivos no \textit{DebugFs}, que serão explicados na secção \ref{}.
 
------------------------------------------------------------------------------------------------------
+%-----------------------------------------------------------------------------------------------------
 
 O \textit{KProbes} é um sistema de instrumentação do núcleo que não efectua distinção entre que funções, não \textit{inline}, está a efectuar a instrumentação.
 Não existindo suporte no \textit{KProbes} para filtrar o processo que está a efectuar uma chamada ao sistema, foi necessário desenvolver uma metodologia que permitisse reduzir a sobrecarga, quando a monitorização é efectuada sobre um processo que não o desejado.
 
--------------------------
+%-------------------------
 
-Os objectivos referidos principais continuam a ser reduzida sobrecarga e actualização permanente do(s) processo(s) a monitorizar.
-Tendo estas caracteristicas como base algumas possibilidades foram tidas em consideração, onde o principal desafio foi conseguir manter a informação actualizada.
+%Os objectivos referidos principais continuam a ser reduzida sobrecarga e actualização permanente do(s) processo(s) a monitorizar.
+%Tendo estas caracteristicas como base algumas possibilidades foram tidas em consideração, onde o principal desafio foi conseguir manter a informação actualizada.
 
---------------------------------------
+%--------------------------------------
 
 Uma das possibilidades foi a criação de um repositório com a informação sobre os identificadores dos processos a monitorizar, sendo necessária novamente uma estrutura de suporte a este repositório, bem como funcionalidades de adição, remoção, actualização e consulta.
 Este repositório teria de conter a estrutura genealógica do processo a monitorizar, bem como um componente que actualize esta informação.
@@ -251,9 +276,9 @@ Em alternativa, efectuou-se uma análise aos campos da estrutura, \textit{task\_
 Desta análise concluí-se que, os identificadores \textit{pid}, \textit{tid} e \textit{ppid} permitem na grande maioria das aplicações, identificar toda a árvore genealógica.
 
 
-\subsubsection{Identificadores}
+%\subsubsection{Identificadores}
 
-No núcleo do \textit{Linux} quando um processo é criado os identificadores, \textit{pid} e \textit{tgid} são iguais.
+%No núcleo do \textit{Linux} quando um processo é criado os identificadores, \textit{pid} e \textit{tgid} são iguais.
 
 \section{Filtro de pacotes, extensão ao LSF}
 
