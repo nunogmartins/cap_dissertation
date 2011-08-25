@@ -5,7 +5,9 @@ Para conceber a arquitectura do sistema de Monitorização de Rede orientado ao 
 Após conhecer a arquitectura de rede do \textit{Linux}, foi necessário compreender de que forma se processa a comunicação, bem como a monitorização de rede.
 
 Neste capitulo irá ser apresentada a constituição do sistema de rede do \textit{Linux}, desde o momento em que o processo envia os dados, até ao momento em que estes chegam à interface de rede e vice-versa.
-Como esta visão é muito abrangente, apenas serão focados os pontos essenciais da arquitectura. ---- TODO Dar a ideia de alguns pontos ----
+Como esta visão é muito abrangente, apenas serão focados os pontos essenciais da arquitectura. 
+
+---- TODO Dar a ideia de alguns pontos ----
 
 Após esta visão geral do sistema de rede do \textit{Linux}, será apresentada a arquitectura proposta para o sistema de Monitorização de Rede orientado ao Processo (MRoP).
 
@@ -42,7 +44,7 @@ Os canais têm um conjunto de funções (\textit{API}) bem definidas para utiliz
 Os administradores de sistemas necessitam de filtrar o fluxo de informação que circula nas suas redes, por isso têm sido desenvolvidos sistemas de filtragem de comunicações, também conhecidas com \textit{firewalls}.
 Sendo o \textit{Linux} um sistema de operação utilizado em larga escala em ambientes de servidores, necessitou também deste controlo. Tem sido desenvolvido o \textit{NetFilter}, uma \textit{Firewall} que filtra o fluxo de dados que circula entre o sistema e a periferia deste, via rede.
 
-Para além da filtragem do fluxo de dados existe, também, um sistema de controlo do tráfego (\textit{Traffic Control}).
+Para além da filtragem do fluxo de dados existe, também, um sistema de controlo do escalonamento do fluxo de tráfego (\textit{Traffic Control}).
 Este sistema permite ao administrador indicar quais os fluxos de dados prioritários, ou que necessitam de uma determinada largura de banda e assim efectuar uma reserva anticipada para estes.
 Quer o \textit{NetFilter} como o \textit{Traffic Control} são definidos no núcleo.
  
@@ -149,24 +151,42 @@ Permite utilizar um ficheiro no sistema de ficheiros, como um canal de comunica�
 
 \subsubsection{AF\_NETLINK}
 
+A familia \textit{NETLINK} é utilizada pelos processos em nível utilizador para comunicar com o núcleo.
+É possível efectuar comunicações ponto-a-ponto, ou multi-ponto, ou seja, é possível que um ou mais processos comuniquem com o núcleo, através de um \textit{socket} criado no núcleo.
+Continuam a ser os processos em nível utilizador que têm de se conectar ao \textit{socket} definido no núcleo, mas este não é completamente passívo, podendo efectuar comunicações assincronamente com os processos.
+
+Alguns dos componentes com que se podem comunicar no núcleo são: \textit{netfilter}, sistema de encaminhamento de pacotes de rede, interfaces de rede, etc.
+Apesar de as interfaces de rede poderem ser configuradas através do programa \textit{ifconfig} em nível utilizador, que fazem uso de \textit{ioctl's} para comunicar as configurações da interface de rede, uma outra ferramenta foi desenvolvida o \textit{ethtool} que através de \textit{socket netlink} permite efectuar estas configurações.
+
 
 \subsubsection{AF\_INET}
 \label{subsub:af_inet}
 
-\textit{AF\_INET} é a familia de endereços utilizada na comunicação através da \textit{internet}, utilizando para isso o protocolo \textit{IP versão 4} (ver figura \ref{}
+\textit{AF\_INET} é a familia de endereços utilizada na comunicação através da \textit{internet}, utilizando para isso o protocolo \textit{IP versão 4} (ver figura \ref{fig:stack_tcp_ip}).
 
- (ainda tem de ser colocada stack tcp ip).
+\begin{figure}[ht]
+\centering
+%url = http://upload.wikimedia.org/wikipedia/commons/3/3b/UDP_encapsulation.svg
+\includegraphics[scale=0.7]{UDP_encapsulation.pdf}
+\caption{Estruturação em camadas baseados em TCP/IP, obtido do sítio da internet http://upload.wikimedia.org/wikipedia/commons/3/3b/UDP\_encapsulation.svg}
+\label{fig:stack_tcp_ip}
+\end{figure}
 
-A estruturação por camadas permite que a implementação de protocolos seja efectuada de forma mais rápida e simples.
-Existem vários protocolos de nível transporte sobre \textit{IPv4}, sendo os mais utilizados o \textit{TCP} e \textit{UDP}.
+
+A estruturação por camadas permite que a implementação de protocolos seja efectuada de forma rápida e simples, utilizando as camadas inferiores como suporte para as superiores, aumentando assim a abstracção e complexidade dos protocolos.
+Existem vários protocolos de nível transporte sobre \textit{IPv4}, sendo os mais utilizados o \textit{TCP} e \textit{UDP}, como é evidenciado pela figura \ref{fig:stack_tcp_ip}.
 A criação de canais sobre o nível de transporte é efectuado utilizando a chamada ao sistema \textit{socket}, indicando como valores \textit{SOCK\_STREAM} ou \textit{SOCK\_DGRAM}, respectivamente, para o parâmetro tipo.
-Cada protocolo tem a sua especificidade, permitindo assim efectuar comunicações de forma distinta.
-O \textit{TCP} é utilizado para canais que necessitem de efectuar comunicações sem perdas de pacotes.
-Para este protocolo é efectuado um controlo na transferência e recepção dos pacotes, permitindo adequar o ritmo de transmissão ao meio subjacente.
-O \textit{UDP} é um protocolo mais leve que o \textit{TCP}, pois não utiliza o controlo anteriormente mencionado, sendo habitualmente utilizado quando existe a possibilidade de perda de pacotes durante a transmissão, ou quando o controlo da retransmissão de pacotes é efectuada em camadas superiores.
+Cada protocolo tem a sua especificidade, permitindo assim efectuar comunicações de formas distinta.
 
-Para além destes protocolos existe também o \textit{SOCK\_RAW}, que permite acesso directo ao nível rede.
+O \textit{TCP} é utilizado para comunicações com controlo de fluxo de dados, em que estes se adaptam ao canal existente e que tolera a perda de pacotes momentanea, sendo iniciada a retransmissão destes, logo que possível.
+O controlo das retransmissões é efectuado à custa do envio de pacotes (\textit{acknowledges}), que indicam quais os pacotes que foram recebidos correctamente, permitindo assim iniciar rapidamente o reenvio destes.
+
+O \textit{UDP} é um protocolo mais leve que o \textit{TCP}, pois não utiliza o controlo anteriormente mencionado, sendo habitualmente utilizado quando existe a possibilidade de perda de pacotes durante a transmissão, ou quando o controlo da retransmissão de pacotes é efectuado em camadas superiores.
+
+Para além destes protocolos, existe também o \textit{SOCK\_RAW}, que permite acesso directo ao nível rede.
 Este protocolo permite a criação de um canal que comunica directamente com o nível rede, da pilha de protocolos \textit{TCP/IP}, permitindo assim executar protocolos de comunicação em nível utilizador.
+Para utilizar \textit{sockets} através do modo \textit{RAW}, é necessário ter permissões de \textit{super user}, uma vez que é possível o utilizador específicar parte dos cabeçalhos a enviar, sem que o núcleo os valide.
+
 
 \subsubsection{AF\_PACKET}
 \label{subsub:af_packet}
@@ -226,15 +246,15 @@ FALTA DEFINIR OS PONTOS ....
 
 \subsection{Traffic Control}
 
-------------------------------------------------------------------------------------------------------------
+%------------------------------------------------------------------------------------------------------------
+%TODO
+% Dentro do núcleo do \textit{Linux} para além da \textit{firewall NetFilter} existe um mecanismo de controlo sobre os dados que circulam nas interfaces de rede.
+% O principal propósito deste sistema é controlar a transmissão de dados, \textit{egress data transfer}.
+% Quando os protocolos de nível 3 vão enviar os dados, para a camada de nível 2, estes são armazenados em \textit{QDisks} para posteriormente serem enviados.
+% Com a necessidade de diferenciar os diferentes tipos de dados os administradores de sistemas podem diferenciar o trafego e armazená-lo em diferentes \textit{QDisks}, de forma a poder efectuar \textit{Quality of Service}.
+%Apesar de ter estrutra para controlo dos dados que chegam da interface de rede o principal propósito é controlo do dados que saem através das interface de rede.
 
- Dentro do núcleo do \textit{Linux} para além da \textit{firewall NetFilter} existe um mecanismo de controlo sobre os dados que circulam nas interfaces de rede.
- O principal propósito deste sistema é controlar a transmissão de dados, \textit{egress data transfer}.
- Quando os protocolos de nível 3 vão enviar os dados, para a camada de nível 2, estes são armazenados em \textit{QDisks} para posteriormente serem enviados.
- Com a necessidade de diferenciar os diferentes tipos de dados os administradores de sistemas podem diferenciar o trafego e armazená-lo em diferentes \textit{QDisks}, de forma a poder efectuar \textit{Quality of Service}.
-Apesar de ter estrutra para controlo dos dados que chegam da interface de rede o principal propósito é controlo do dados que saem através das interface de rede.
-
-------------------------------------------------------------------------------------------------------------
+%------------------------------------------------------------------------------------------------------------
 
 No núcleo para além do \textit{NetFilter}, que controla o fluxo de dados na rede, existe o \textit{Traffic Control} que efectua o escalonamento da transferências de dados para o exterior da rede.
 O escalonamento do tráfego de rede é particularmente importante para os Administradores de rede, pois permite gerir de forma eficiente a largura de banda da interface de rede.
@@ -279,25 +299,25 @@ Falta boneco com esta informação ... fica mais realista.
 
 \subsection{Recepção de dados}
 
----------------------------------------OLD-----------------------------------------------------------
+%---------------------------------------OLD-----------------------------------------------------------
 
-A chegada de um pacote de dados à interface de rede desencadeia uma acção de interrupção da actividade do processador, permitindo quer este seja transferido para o sistema o mais cedo possível.
-Esta interrupção é efectuada através de um \textit{irq} pré-definido entre o controlador e a interface de rede. As interrupções são atendidas no processador desligando a atenção a todas as outras interrupções provenientes de outros dispositivos. %esta frase está ruim ...
-O processador deve estar o menor intervalo de tempo possível com as interrupções desligadas, antes de retornar da interrupção o sistema agenda a execução de uma função que irá terminar a recepção do pacote para a camada correcta da \textit{stack TCP/IP}.%ainda falta falar sobre DMA, interrupt mode too exclusive deve ser breve, encaminhar pelo processamento da stack tcp/ip 
+%A chegada de um pacote de dados à interface de rede desencadeia uma acção de interrupção da actividade do processador, permitindo quer este seja transferido para o sistema o mais cedo possível.
+%Esta interrupção é efectuada através de um \textit{irq} pré-definido entre o controlador e a interface de rede. As interrupções são atendidas no processador desligando a atenção a todas as outras interrupções provenientes de outros dispositivos. %esta frase está ruim ...
+%O processador deve estar o menor intervalo de tempo possível com as interrupções desligadas, antes de retornar da interrupção o sistema agenda a execução de uma função que irá terminar a recepção do pacote para a camada correcta da \textit{stack TCP/IP}.%ainda falta falar sobre DMA, interrupt mode too exclusive deve ser breve, encaminhar pelo processamento da stack tcp/ip 
 
-No processo de recepção da \textit{frame} é verificado se existem \textit{sniffers} registados, caso existam é passada uma referência sobre a frame, de forma a efectuar apenas a cópia da frame quando necessária.
-Esta situação é devida à possível existência de um filtro sobre a \textit{frame}, em que se não for necessário capturá-la, a cópia dos dados seja desnecessária, permitindo efectuar trabalho útil.
+%No processo de recepção da \textit{frame} é verificado se existem \textit{sniffers} registados, caso existam é passada uma referência sobre a frame, de forma a efectuar apenas a cópia da frame quando necessária.
+%Esta situação é devida à possível existência de um filtro sobre a \textit{frame}, em que se não for necessário capturá-la, a cópia dos dados seja desnecessária, permitindo efectuar trabalho útil.
 
-Faltar falar que a frame segue para a stack tcp ip de forma normal ...
+%Faltar falar que a frame segue para a stack tcp ip de forma normal ...
 
-Falta falar sobre o netfilter ... firewall do linux que existem 5 pontos de "entrada" onde existe algumas verificações .... 
+%Falta falar sobre o netfilter ... firewall do linux que existem 5 pontos de "entrada" onde existe algumas verificações .... 
 
-Faltar indicar que o processo está bloqueado à espera de input que lhe é copiado entre o nucleo e o processo em nivel utilizador por meio de o kiovec (talvez kernel io vector ...) 
+%Faltar indicar que o processo está bloqueado à espera de input que lhe é copiado entre o nucleo e o processo em nivel utilizador por meio de o kiovec (talvez kernel io vector ...) 
 
 
-A variável global \textit{ptype\_base} do núcleo é uma tabela de dispersão aberta, que contém os tipos de controladores de protocolos de rede. Os diferentes protocolos endereçam uma função que recebe o pacote e sabe o que fazer com ele, passando pela \textit{firewall netfilter} terminando na cópia dos dados dos \textit{buffers} do núcleo para os do processo, que ficou bloqueado numa lista de espera através da chamada ao sistema de operação \textit{recv}, \textit{recvfrom} ou \textit{recvmsg}.
+%A variável global \textit{ptype\_base} do núcleo é uma tabela de dispersão aberta, que contém os tipos de controladores de protocolos de rede. Os diferentes protocolos endereçam uma função que recebe o pacote e sabe o que fazer com ele, passando pela \textit{firewall netfilter} terminando na cópia dos dados dos \textit{buffers} do núcleo para os do processo, que ficou bloqueado numa lista de espera através da chamada ao sistema de operação \textit{recv}, \textit{recvfrom} ou \textit{recvmsg}.
 
-----------------------------------------END OF OLD----------------------------------------------------
+%----------------------------------------END OF OLD----------------------------------------------------
 
 O processo de recepção de pacotes pelas aplicações através de interfaces de rede, atravessa as diversas componentes apresentadas anteriormente em .... , ... e ... .
 
@@ -367,18 +387,18 @@ Este sistema permite que sejam capturados os pacotes de rede de um processo, sem
  De forma a minimizar a redução de desempenho, todo o sistema foi desenvolvido dentro do núcleo do \textit{Linux}, sem alterações nas interfaces já existentes.
  Assim, ferramentas de façam uso da biblioteca \textit{LibPcap}, como o programa \textit{tcpdump} ou suas variantes, podem beneficiar desta extensão sem qualquer alteração e sem impacto relevante no seu desempenho.
 
----------------------------------------------------------------------------------------------------------
+%---------------------------------------------------------------------------------------------------------
+%TODO
+%A arquitectura foi pensada para ser executada de forma ortogonal ao sistema utilizado.
+% Desta forma não existe a necessidade de recompilar programas antigos.
+% Para além desta situação novas aplicações podem utilizar esta ferramenta de forma transparente.
 
-A arquitectura foi pensada para ser executada de forma ortogonal ao sistema utilizado.
- Desta forma não existe a necessidade de recompilar programas antigos.
- Para além desta situação novas aplicações podem utilizar esta ferramenta de forma transparente.
+%Esta ferramenta foi desenvolvida para os processadores x86 e x86\_64 pois nestas arquitecturas existe suporte para o sistema de monitorização KProbes \ref{}, sendo esta a unica dependência especifica que a ferramenta irá ter.
 
-Esta ferramenta foi desenvolvida para os processadores x86 e x86\_64 pois nestas arquitecturas existe suporte para o sistema de monitorização KProbes \ref{}, sendo esta a unica dependência especifica que a ferramenta irá ter.
-
-As diferentes partes da ferramenta foram desenvolvidas de forma a poderem ser modificadas em separado permitindo um melhor aproveitamento da modularização.
+%As diferentes partes da ferramenta foram desenvolvidas de forma a poderem ser modificadas em separado permitindo um melhor aproveitamento da modularização.
 Este módulo foi desenvolvido em 4 subpartes. 
 
----------------------------------------------------------------------------------------------------------
+%---------------------------------------------------------------------------------------------------------
 
 
 \subsection{Instrumentação das chamadas ao sistema de rede}
