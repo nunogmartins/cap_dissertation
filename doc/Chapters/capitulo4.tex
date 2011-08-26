@@ -232,20 +232,26 @@ A cópia do pacote é efectuada caso a avaliação do filtro indique que este de
 \subsection{NetFilter}
 
 O sistema de operação \textit{Linux} tem um sistema de \textit{firewall} que permite controlar os acessos dos processos aos sistemas de comunicação de rede.
- Este sistema é o \textit{NetFilter}, está presente no núcleo do sistema operação permitindo controlar o fluxo de dados dos processos para as interfaces de rede, bem como no sentido oposto.
- O \textit{NetFilter} está presente na \textit{stack TCP/IP} em cinco pontos apenas e, desta forma, consegue controlar o fluxo dos dados.
- O \textit{NetFilter} pode ser controlado pelo \textit{iptables}, uma ferramenta em nível utilizador, que através de regras, define o acesso dos dados das comunicações rede.
+Este sistema é o \textit{NetFilter}, está presente no núcleo do sistema operação permitindo controlar o fluxo de dados dos processos para as interfaces de rede, bem como no sentido oposto.
+O \textit{NetFilter} está presente na \textit{stack TCP/IP} em cinco pontos apenas e, desta forma, consegue controlar o fluxo dos dados.
+Em cada um destes pontos existe uma lista de funções a ser executada sobre o pacote, sendo que após a finalização destas e dependendo do valor retornado, o pacote irá ou não prosseguir para as restantes camadas, até atingir o \textit{Traffic Control}(apresentado na subseccção \ref{sub:traffic_control} ou a aplicação.
+Os cinco pontos colocados na \textit{stack tcp/ip} são: \textit{PRE ROUTING}, \textit{LOCAL IN}, \textit{FORWARD} \textit{LOCAL OUT} e \textit{POST ROUTING}.Como os nomes sugerem, estes \textit{hooks} são activados antes ou depois das decisões de encaminhamento, ou de entrega às ou para as aplicações.
 
------------------------
+O \textit{NetFilter} pode ser controlado pelo \textit{iptables}, uma ferramenta em nível utilizador, que através de regras, define o acesso dos dados das comunicações rede.
+Estas regras são baseadas em endereços \textit{IP}, portos, interfaces de rede, se o tráfego é de envio ou recepção, etc.
+Desta forma os administradores de rede não têm que conhecer internamente o \textit{netfilter}, apenas a arquitectura da rede, de forma a definir as politicas de acesso do tráfego de rede ao sistema, permitindo e bloqueando o tráfego desejado.
 
-TODO
-FALTA DEFINIR OS PONTOS ....
+Um componente do \textit{netfilter} é o \textit{connection tracking}, este módulo do núcleo efectua um acompanhamento de ligações desde o inicio ao fim.
+De forma a efectuar este acompanhamento necessita de conhecer os diferentes protocolos utilizados, para isso ele utiliza os \textit{connection tracking helpers}.
+Estes ao conhecer o processo de estabelecimento de ligações/sessões indicam ao \textit{connection tracking}, se devem ser adicionados, removidos ou se a conexão passa a efectiva, ficando assim registada numa tabela de conexões estabelecidas até serem removidas.
+De forma a não gastar todos os recursos de memória esta tabela tem dimensão fixa, e inicio de conexões que não ficam completas, ou por um temporizador que expirou ou por incorrecto estabelimento de sessão, são removidas permitindo que novas conexões possam ser adicionadas.
+Tal como o \textit{netfilter} pode ser controlado por um programa em nível utilizador, esta componente \textit{connection tracking}, também pode ser controlada pelo administrador através do \textit{conntrack}.
+Como se pode compreender este componente permite efectuar uma gestão mais eficiente e mais inteligente das conexões, sendo geralmente referido como \textit{firewall} como estado.
 
-
----------------------
+Como ao enviar dados o \textit{netfilter} termina no \textit{Traffic Control}, existe a possíbilidade de marcar pacotes com um identificador de forma a serem reconhecidos pelo \textit{traffic control}, de forma a ser efectuada uma gestão conjunta e inteligente do tráfego.
 
 \subsection{Traffic Control}
-
+\label{sub:traffic_control}
 %------------------------------------------------------------------------------------------------------------
 %TODO
 % Dentro do núcleo do \textit{Linux} para além da \textit{firewall NetFilter} existe um mecanismo de controlo sobre os dados que circulam nas interfaces de rede.
