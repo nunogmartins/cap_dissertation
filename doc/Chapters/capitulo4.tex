@@ -2,9 +2,9 @@
 \label{cap:Estrutura}
 
 Para conceber a arquitectura do sistema de Monitorização de Rede orientado ao Processo (MRoP), foi necessário conhecer como os processos em nível utilizador comunicam com o exterior.
-Após conhecer a arquitectura de rede do \textit{Linux}, foi necessário compreender de que forma se processa a comunicação, bem como a monitorização de rede.
+Após conhecer a arquitectura de rede do \textit{Linux}, foi imprescindivel compreender a forma como se processa a comunicação, e a monitorização de rede.
 
-Neste capitulo irá ser apresentada a constituição do sistema de rede do \textit{Linux}, desde o momento em que o processo envia os dados, até ao momento em que estes chegam à interface de rede e vice-versa.
+Neste capítulo irá ser apresentada a constituição do sistema de rede do \textit{Linux}, desde o momento do envio dos dados pelo processo até que estes chegam à interface de rede e vice-versa.
 Como esta visão é muito abrangente, apenas serão focados os pontos essenciais da arquitectura. 
 
 ---- TODO Dar a ideia de alguns pontos ----
@@ -16,14 +16,14 @@ Após esta visão geral do sistema de rede do \textit{Linux}, será apresentada 
 \section{Arquitectura de rede em \textit{Linux}}
 \label{sub:network}
 
-Os processos são instâncias de programas, estes num sistema multiprogramado partilham recursos do sistema.
-Os processos necessitam de comunicar, para obter dados, de forma a completar as suas execuções.
-Estas comunicações podem ser efectuadas dentro do mesmo sistema ou externas.
-Em geral as comunicaçoes externas são efectuadas através de uma interface de rede, sendo necessário para isso criar canais de comunicação.
-A(s) interface(s) de rede são recursos do sistema e, por isso, partilhadas pelos diversos processos.
-Esta partilha é efectuada pelo núcleo, pois apenas este é capaz de a efectuar de forma correcta.
+Os processos são instâncias de programas e estes num sistema multiprogramado partilham recursos.
+Os processos necessitam de comunicar para obter dados, de forma a completar as suas execuções.
+Estas comunicações podem ser efectuadas interna ou externamente ao sistema.
+Em geral as comunicaçoes externas processam-se através de uma interface de rede, para o que é necessário criar canais de comunicação.
+A(s) interface(s) de rede são recursos do sistema e por isso, partilhadas pelos diversos processos.
+Esta partilha é efectuada pelo núcleo, pois apenas este é capaz de a efectuar correctamente.
 
-A criação de canais de comunicação é efectuada através da chamada ao sistema \textit{socket}.
+A criação de canais de comunicação é executada através da chamada ao sistema \textit{socket}.
 
 ----------- --------- ----------- qualquer coisa sobre a Norma posix ------------
 
@@ -34,15 +34,15 @@ A criação de canais de comunicação é efectuada através da chamada ao siste
 \label{fig:network_arch}
 \end{figure}
 
-A chamada ao sistema \textit{socket} é efectuada para a criação de um canal de comunicação e dependendo dos parâmetros instânciados para este, varia o tipo e o protocolo utilizado. TODO --- muito crú
+A chamada ao sistema \textit{socket} é efectuada para a criação de um canal de comunicação e este varia em função dos parâmetros familia, tipo e protocolo.
 
-Existe um agrupamento em familia de endereços (\textit{Address Family}), este podem ser para comunicação remota ou local.
-As comunicações locais podem ser entre processos (\textit{AF\_UNIX}), ou entre processos e o núcleo (\textit{AF\_NETLINK}).
-As remotas podem ser efectuadas sobre a internet, existindo também para estas uma familia própria, a \textit{AF\_INET}.
-Os canais têm um conjunto de funções (\textit{API}) bem definidas para utilização e controlo, permintindo assim criar uma forma estruturada de comunicação.
+Existe um agrupamento em familia de endereços (\textit{Address Family}), que se destinam à comunicação remota ou local.
+As comunicações locais podem efectuar-se entre processos (\textit{AF\_UNIX}), ou entre estes e o núcleo (\textit{AF\_NETLINK}), enquanto as remotas podem ter lugar sobre a \textit{internet}, dispondo igualmente de uma familia própria a \textit{AF\_INET}.
 
-Os administradores de sistemas necessitam de filtrar o fluxo de informação que circula nas suas redes, por isso têm sido desenvolvidos sistemas de filtragem de comunicações, também conhecidas com \textit{firewalls}.
-Sendo o \textit{Linux} um sistema de operação utilizado em larga escala em ambientes de servidores, necessitou também deste controlo. Tem sido desenvolvido o \textit{NetFilter}, uma \textit{Firewall} que filtra o fluxo de dados que circula entre o sistema e a periferia deste, via rede.
+Os canais possuem um conjunto de funções (\textit{API}) bem definidas, para utilização e controlo, permintindo criar uma forma estruturada de comunicação.
+
+Os administradores de sistemas necessitam filtrar o fluxo de informação que circula nas suas redes, pelo que se tem assitido ao desenvolvimento de sistemas de filtragem de comunicações, conhecidas por \textit{firewalls}.
+Sendo o \textit{Linux} um sistema de operação frequentemente em ambientes de servidores, necessitou naturalmente deste controlo, daí que tenha sido desenvolvido o \textit{NetFilter}, uma \textit{firewall} que \color{red}filtra \color{black}o fluxo de dados que circulam na rede, entre o sistema e a periferia.
 
 Para além da filtragem do fluxo de dados existe, também, um sistema de controlo do escalonamento do fluxo de tráfego (\textit{Traffic Control}).
 Este sistema permite ao administrador indicar quais os fluxos de dados prioritários, ou que necessitam de uma determinada largura de banda e assim efectuar uma reserva anticipada para estes.
@@ -325,40 +325,41 @@ Falta boneco com esta informação ... fica mais realista.
 
 %----------------------------------------END OF OLD----------------------------------------------------
 
-O processo de recepção de pacotes pelas aplicações através de interfaces de rede, atravessa as diversas componentes apresentadas anteriormente em .... , ... e ... .
+%O processo de recepção de pacotes pelas aplicações através de interfaces de rede, atravessa as diversas componentes apresentadas anteriormente em .... , ... e ... .
 
-O sistema de monitorização de rede opera de forma opaca à normal utilização de rede, pelas aplicações.
-
-----------------
-
-TODO
-Explicar melhor opaco
-
--------------
-
-Quando um pacote chega à interface de rede, esta envia um pedido de interrupção da computação ao cpu, de forma a que este atenda o pedido da interface de rede.
-Neste ponto é desligada a atenção do processador a novas interrupções e a computação passa para o controlador da interface de rede.
+O sistema de monitorização de rede opera de forma opaca à normal utilização de rede, pelas aplicações, desta forma quando um pacote chega à interface de rede, esta envia um pedido de interrupção da computação ao cpu, para que este atenda o pedido da interface de rede.
+Neste ponto é desligada a atenção do processador a novas interrupções, passando a computação para o controlador da interface de rede.
 Uma vez que a atenção do processador a novas interrupções está desligada, a computação deve ser o mais breve possível de forma a poder ligar novamente a atenção do processador a interrupções, para que o normal funcionamento seja retomado, por isso apenas a computação crítica é efectuada e é registada a necessidade de invocação de um \textit{softirq}, para que seja terminado o tratamento dos pacotes que chegaram à interface.
-
----------------------
-
-TODO
-O QUE E O SOFTIRQ
-
+O escalonamento de um \textit{softirq}, permite naquele momento diferir a execução necessária a ser efectuada para um momento posterior, permitindo assim ligar rapidamente a atenção do processador a novas interrupções.
 A invocação do \textit{softirq} é realizada de forma que a computação seja terminada e que possam ser atendidos novos eventos no processador, o que permite uma maior actividade por parte deste.
 O \textit{softirq} escalonado opera sobre o pacote recebido pela interface de rede, de modo que seja possível analisá-lo.
 
------------------
+Antes de ser entregue ao \textit{packet handler} respectivo, este é passado para os \textit{sniffers} registados no sistema.
+A monitorização de rede é efectuada por os \textit{sniffers}, num sistema podem existir mais do que um \textit{sniffer} em determinado momento, sendo o pacote passado a cada um destes, para que o possam analisar.
+Cada \textit{sniffer} tem um filtro associado, este filtro poderá ser tão simples como:
 
-Antes de ser analisado pelo \textit{packet handler} respectivo, este é passado para os \textit{sniffers} registados no sistema.
-Estes \textit{sniffers} são a forma de monitorizar a rede
+\begin{lstlisting}
+struct sock_filter {    /* Filter block */
+	__u16	code;   /* Actual filter code */
+	__u8 	jt;     /* Jump true */
+	__u8 	jf;     /* Jump false */
+	__u32	k;      /* Generic multiuse field */
+};
+
+struct sock_filter filter = {
+	.code =  BPF_RET,
+	.k = 100
+};
+\end{lstlisting}
+
+Este filtro indicado pela variavel \textit{filter} (linha 8) descrito em linguagem \textit{bpf}, ao ser executada pela máquina virtual, indica que devem ser capturados os primeiros 100 bytes de cada pacote.
 
 \subsection{Transmissão de dados}
 
 Uma aplicação em nível utilizador transfere dados sobre a rede através de chamadas ao sistema de operação, sendo que estas podem ser \textit{send}, \textit{sendto}, \textit{sendmsg}.
- Neste ponto de entrada os dados tem de ser copiados e efectuadas diversas verificações sobre estes, após estas verificações são utilizadas estruturas e funções através da \textit{stack TCP/IP} e fluir pela \textit{firewall netfilter}.
- Os dados gerados pelas diversas camadas da \textit{stack} são agregados numa estrutura \textit{sk\_buffer} para ser adicionados a uma fila para ser enviados pela ferramenta \textit{traffic control}.
- Quando esta ferramenta irá enviar os dados para o controlador é passada a referência sobre este pacote para os \textit{sniffers} registados, sendo apenas efectuada uma cópia dos dados caso o pacote seja recolhido para maior análise. Os dados passados ao controlador da interface de rede são então transferidos para a interface de rede, e daí para o seu destino.
+Neste ponto de entrada os dados tem de ser copiados e efectuadas diversas verificações sobre estes, após estas verificações são utilizadas estruturas e funções através da \textit{stack TCP/IP} e fluir pela \textit{firewall netfilter}.
+Os dados gerados pelas diversas camadas da \textit{stack} são agregados numa estrutura \textit{sk\_buffer} para ser adicionados a uma fila para ser enviados pela ferramenta \textit{traffic control}.
+Quando esta ferramenta irá enviar os dados para o controlador é passada a referência sobre este pacote para os \textit{sniffers} registados, sendo apenas efectuada uma cópia dos dados caso o pacote seja recolhido para maior análise. Os dados passados ao controlador da interface de rede são então transferidos para a interface de rede, e daí para o seu destino.
 
 Quando a aplicação está a executar e efectua uma chamada ao sistema de operação, o sistema muda de modo e executa dentro do núcleo "em nome da aplicação".
  Durante parte da execução da chamada ao sistema de operação é possível referenciar qual o processo que efectuou a chamada, pois caso a chamada seja sincrona, é agendada um processamento sobre os dados e a aplicação fica bloqueada à espera de ser re-escalonada através da função \textit{schedule}.
