@@ -422,8 +422,8 @@ O estado dos portos dos protocolos \textit{TCP} e \textit{UDP} em uso no process
 A árvore \textit{Red and Black} já disponível no núcleo do sistema, foi a estrutura dados escolhida para produzir o repositório pretendido.
 
 O conteúdo de cada folha da árvore é uma estrutura com duas listas de elementos, cada uma contendo endereços IP utilizados pela aplicação.
-A chave de indexação das folhas é o número do porto, desta forma a árvore poderá conter no máximo 65535 elementos.
-No pior caso, a procura de um porto na árvore necessitará de efectuar dezasseis iterações, uma vez que $$\log 2 65535 = 16 $$
+A chave de indexação das folhas é o número do porto, desta forma a árvore poderá conter no máximo 65535 elementos, por ser este o número máximo de portos em utilização por um endereço \textit{IP}.
+No pior caso, a procura de um porto na árvore necessitará de efectuar dezasseis iterações, uma vez que \begin{math}\log _2 65536 = 16 \end{math}.
 
 %\td{conteúdo? ip, interface, porto udp, porto tcp, etc??}
   O uso deste tipo de estrutura permite obter um bom compromisso entre o tempo de acesso à estrutura e a quantidade de memória utilizada.
@@ -432,9 +432,10 @@ No pior caso, a procura de um porto na árvore necessitará de efectuar dezassei
 \subsection{Filtro de pacotes}
 \label{sub:packet_filter}
 
-A função de filtragem  implementada neste sistema assenta no estado do processo alvo, mantido pelos módulos anteriormente descritos.
-Através da extensão do LSF com um hook, quando ligado, este invoca esta filtragem que devolve ao LSF se o pacote deve ser logo ignorado (não envolve nenhum dos portos do processo alvo) ou se se deve continuar a avaliar as restantes regras de filtragem definidas.
- Mantém-se assim a compatibilidade e continua-se a tirar partido dos benefícios da utilização do Linux Socket Filter.
+A função de filtragem implementada neste sistema assenta no estado do processo alvo, mantido pelos módulos anteriormente descritos.
+Através da extensão do \textit{LSF} com um \textit{hook}, este quando ligado invoca esta filtragem que devolve ao \textit{LSF} informando-o se o pacote deve ou não ser capturado.
+Se for capturado indica que este pacote pertence ao processo alvo, caso contrário irá avaliar as restantes regras de filtragem definidas.
+Mantém-se assim a compatibilidade e os beneficios da utilização do \textit{Linux Socket Filter}.
 
 Para continuar a ser opaco para os diferentes sistemas de monitorização/captura de rede foi necessário colocar um ponto de ligação entre o sistema actual e o módulo desenvolvido.
  Quando não existe uma ligação(\textit{Hook}) activa, existe apenas um ligeiro decréscimo no desempenho, este deve-se apenas à verificação da existência se esta ligação está activa.
