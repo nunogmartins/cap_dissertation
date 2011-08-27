@@ -44,11 +44,11 @@ Os canais possuem um conjunto de funções (\textit{API}) bem definidas, para ut
 Os administradores de sistemas necessitam filtrar o fluxo de informação que circula nas suas redes, pelo que se tem assitido ao desenvolvimento de sistemas de filtragem de comunicações, conhecidas por \textit{firewalls}.
 Sendo o \textit{Linux} um sistema de operação frequentemente em ambientes de servidores, necessitou naturalmente deste controlo, daí que tenha sido desenvolvido o \textit{NetFilter}, uma \textit{firewall} que \color{red}filtra \color{black}o fluxo de dados que circulam na rede, entre o sistema e a periferia.
 
-Para além da filtragem do fluxo de dados existe, também, um sistema de controlo do escalonamento do fluxo de tráfego (\textit{Traffic Control}).
-Este sistema permite ao administrador indicar quais os fluxos de dados prioritários, ou que necessitam de uma determinada largura de banda e assim efectuar uma reserva anticipada para estes.
-Quer o \textit{NetFilter} como o \textit{Traffic Control} são definidos no núcleo.
+Para além da filtragem do fluxo de dados existe um sistema de controlo do escalonamento do fluxo de tráfego, (\textit{Traffic Control}), que como o \textit{netfilter} é definido no núcleo, e permite ao administrador indicar quais os fluxos de dados prioritários ou que necessitam de determinada largura de banda possibilitando-lhe efectuar para estes uma reserva anticipada.
  
-Nas subsecções seguintes irão apresentar-se diferentes constituintes da estrutura de rede do \textit{Linux}, começando pelo processo em nível utilizador até aos controladores de interfaces de rede. As últimas duas subsecções apresentarão a visão geral do fluxo de um canal de comunicação, envio e recepção, respectivamente.
+Nas subsecções seguintes apresentar-se-ão diferentes constituintes da estrutura de rede do \textit{Linux}, começando pelo processo em nível utilizador até aos controladores de interfaces de rede.
+
+\color{red}As últimas duas subsecções apresentarão a visão geral do fluxo de um canal de comunicação, envio e recepção, respectivamente.\color{black}
 
 %Os processos em um sistema são instâncias de um programa, que partilha recursos físicos e lógicos da máquina.
 %Os processos para aceder a alguns recursos, podem necessitar de efectuar comunicações com instâncias de outros programas, estes podem estar localizados na mesma máquina (processos locais), ou estar em outra máquina (processos remotos).
@@ -92,24 +92,24 @@ Nas subsecções seguintes irão apresentar-se diferentes constituintes da estru
 \subsection{Estrutura de um processo}
 % ou recursos de rede de um processo
 
-Um processo é a instânciação de um programa, sendo também uma unidade de escalonamento de execução (\textit{task}) no sistema.
+Um processo é a instânciação de um programa, sendo igualmente uma unidade de escalonamento de execução (\textit{task}) no sistema.
 Este consome recursos (físicos e lógicos), partilhados com outros processos num sistema multiprogramado.
-O núcleo para cada processo gere uma estrutura, \textit{struct\_task}, onde estão identificados todos os recursos atribuidos a este.
-Esta estrutura contém apontadores para diversos recursos tais como: zonas de memória requisitadas, canais abertos (ficheiros, \textit{sockets}, entre outros), contabilização de utilização de \textit{cpu}, apontadores para a sua árvore genealógica (pai, irmãos e filhos), etc.
+O núcleo para cada processo gere uma estrutura, \textit{struct\_task}, onde estão identificados todos os recursos a este atribuidos.
+Esta estrutura contém apontadores para diversos recursos nomeadamente: zonas de memória requisitadas, canais abertos (ficheiros, \textit{sockets}, entre outros), contabilização de utilização de \textit{cpu}, apontadores para a sua árvore genealógica (pai, irmãos e filhos), etc.
 
-Os apontadores para a sua árvore genealógica são o apontador para o pai (o processo que efectuou um \textit{fork}, para lhe dar origem), a lista de irmãos e de descententes.
-Cada um dos elementos da lista, ou o pai, são também eles estruturas do tipo \textit{task\_struct}, o que permite navegar pela árvore genealógica do processo.
+A árvore genealógica anteriormente indicada contém o apontador para o pai (o processo que efectuou um \textit{fork}, para lhe dar origem), a lista de irmãos e de descententes.
+O pai tal como cada um dos elementos da lista são também estruturas do tipo \textit{task\_struct}, pelo que é possível navegar pela árvore genealógica do processo.
 
-Um dos recursos partilhados pelos diferentes processos é o acesso à rede, permitindo desta forma a comunicação com o exterior.
-Para se efectuarem comunicações é necessário a alocação de canais de comunicação, por isso o sistema de operação tem uma \textit{API} de comunicação que permite a criação, destruição e utilização destes.
-Quando um processo cria um canal, o sistema devolve-lhe um identificador.
-Este identificador serve para o processo referenciar o canal, dentro do núcleo, para efectuar as suas futuras comunicações, bem como o controlá-lo.
-Dentro do núcleo, este identificador é gerido na estrutura que identifica os canais abertos, pelo processo.
+Um dos recursos partilhados pelos diferentes processos é o acesso à rede, o que permite a comunicação com o exterior.
+Para que as comunicações tenham lugar é necessário a alocação de canais de comunicação, cuja criação, utilização e destruição é efectuada pela \textit{API} definida no sistema de operação.
+Quando um processo cria um canal, o núcleo devolve-lhe um identificador, que permite ao processo referenciar o canal dentro do núcleo, para controlá-lo e efectuar futuras comunicações.
+No núcleo, este identificador é gerido na estrutura que identifica os canais abertos, pelo processo.
 
-A estrutura de canais abertos, permite abstrair qual o canal que foi aberto, se foi um ficheiro, um socket, um \textit{pipe}, etc.
-Para reconhecer qual o tipo do canal aberto, existem algumas funções especificas que o analisam e, permitem efectuar diferentes operações consoante o canal.
-Por exemplo ao manipular um ficheiro existe a possibilidade de avançar e recuar, sobre um determinado ponto dentro do ficheiro.
-Esta situação não faz sentido quando se controla um \textit{socket} ou um \textit{pipe}, pois as comunicações nestes são destruidas quando consumidas, enquanto que isso não acontece num ficheiro.
+%A estrutura de canais abertos, permite abstrair qual o tipo de canal aberto, se foi um ficheiro, um socket, um \textit{pipe}, etc.
+
+Para reconhecer qual o tipo do canal aberto, existem algumas funções específicas que o analisam e lhe permitem efectuar operações.
+Assim, ao manipular um ficheiro existe a possibilidade de avançar e recuar, tendo como referência um determinado ponto.
+Todavia esta situação deixa de fazer sentido quando se pretende controlar um \textit{socket} ou um \textit{pipe}, porquanto as comunicações nestes são destruídas quando consumidas, o que não acontece no ficheiro.
  
 
 %Um processo para executar tem de ser carregado para memória e posteriormente ser agendado para execução através do escalonador de processos do núcleo.
