@@ -436,34 +436,29 @@ A função de filtragem implementada neste sistema assenta no estado do processo
 Através da extensão do \textit{LSF} com um \textit{hook}, este quando ligado invoca esta filtragem que devolve ao \textit{LSF} informando-o se o pacote deve ou não ser capturado.
 Se for capturado indica que este pacote pertence ao processo alvo, caso contrário irá avaliar as restantes regras de filtragem definidas.
 Mantém-se assim a compatibilidade e os beneficios da utilização do \textit{Linux Socket Filter}.
+Quando não existe uma ligação (\textit{hook}) activa, assiste-se a um ligeiro decréscimo no desempenho na utilização da filtragem estática.
+Tal facto deve-se apenas à necessidade de constatar se a ligação está ou não activo.
 
-Para continuar a ser opaco para os diferentes sistemas de monitorização/captura de rede foi necessário colocar um ponto de ligação entre o sistema actual e o módulo desenvolvido.
- Quando não existe uma ligação(\textit{Hook}) activa, existe apenas um ligeiro decréscimo no desempenho, este deve-se apenas à verificação da existência se esta ligação está activa.
- Caso a ligação esteja activa o fluxo de controlo é passado para a função de filtro definida no módulo.
- Desta forma é possível criar funções que permitem controlar o fluxo de dados que devem ser processados ou descartados
-
-Necessidade de registar um \textit{hook} para aceder directamente à função de filtro.
- Caso este \textit{hook} não esteja ligado o \textit{overhead} introduzido será o de um teste para verificar se existe ligação ou não.
- No caso de não existir a ligação a este \textit{hook} o sistema comporta-se de forma a utilizar apenas o sistema anterior.
-
-O sistema interage também com o \textit{LSF} pois existe uma conjunção entre o filtro definido pelo utilizador e a captura do tráfego da aplicação a ser monitorizada.
+Como se pode verificar este sistema interage com o filtro estático do \textit{LSF}, efectuando uma conjunção entre o filtro definido pelo utilizador e a captura do tráfego da aplicação a ser monitorizada.
 
 
 \subsection{Controlo e Informação}
 \label{sub:data_information}
 
-Para facilmente controlar e configurar o sistema desenvolvido foi definida uma interface baseada em ficheiros virtuais (DebugFS).
- Estes ficheiros estão apenas acessíveis ao utilizador \textit{root}, controlando o acesso por parte dos utilizadores da máquina ao sistema de monitorização.
- Os ficheiros de controlo definidos foram \textit{option}, \textit{pid}, \textit{ppid} e \textit{tgid}.
- O primeiro ficheiro permite controlar a análise e a informação da árvore.
- Dependendo do valor a escrever em \textit{option} o sistema poderá proceder a uma análise dos \textit{sockets} do processo (identificado em \textit{pid, ppid, tgid}), e carregar essa informação para a àrvore do estado do processo, bem como poderá remover todos os elementos da àrvore se for essa a opção escrita para o ficheiro.
- Como foi indicado os restantes ficheiros permitem definir o(s) processo(s) a monitorizar.
- Pode ser indicado um processo ou todos os processos de um grupo.
- Os ficheiros de informação \textit{filter\_stats}, \textit{syscalls\_calls\_stats} e \textit{tree\_info} foram definidos para obter estatísticas dos pacotes analisados e das entradas/retornos das funções instrumentadas, bem como dos elementos presentes na árvore (dados dos sockets activos do processo).
+Para facilmente controlar e configurar o sistema desenvolvido foi definida uma interface baseada em ficheiros virtuais numa directoria do (\textit{DebugFS}).
+Estes ficheiros com permissões apenas acessíveis ao utilizador \textit{root}, impedem o acesso por parte dos restantes utilizadores da máquina ao sistema de monitorização.
+%Os ficheiros de controlo definidos foram \textit{option}, \textit{pid}, \textit{ppid} e \textit{tgid}.
 
-\subsubsection{Mais info}
+
+% O primeiro ficheiro permite controlar a análise e a informação da árvore.
+% Dependendo do valor a escrever em \textit{option} o sistema poderá proceder a uma análise dos \textit{sockets} do processo (identificado em \textit{pid, ppid, tgid}), e carregar essa informação para a àrvore do estado do processo, bem como poderá remover todos os elementos da àrvore se for essa a opção escrita para o ficheiro.
+% Como foi indicado os restantes ficheiros permitem definir o(s) processo(s) a monitorizar.
+% Pode ser indicado um processo ou fluxos de execução pertencentes ao grupo do processo.
+% Os ficheiros de informação \textit{filter\_stats}, \textit{syscalls\_calls\_stats} e \textit{tree\_info} foram definidos para obter estatísticas dos pacotes analisados e das entradas/retornos das funções instrumentadas, bem como dos elementos presentes na árvore (dados dos sockets activos do processo).
+
+%\subsubsection{Mais info}
 %a não utilização de ioctl para o debug ... 
-A estratégia foi separar os diferentes componentes e a criação de um módulo de \textit{debug} para que pudesse existir uma forma de acesso à monitorização por parte do nível de utilizador, sem que exista a necessidade de criar ou alterar chamadas ao sistema ou suas opções.
+%A estratégia foi separar os diferentes componentes e a criação de um módulo de \textit{debug} para que pudesse existir uma forma de acesso à monitorização por parte do nível de utilizador, sem que exista a necessidade de criar ou alterar chamadas ao sistema ou suas opções.
 
 
 
