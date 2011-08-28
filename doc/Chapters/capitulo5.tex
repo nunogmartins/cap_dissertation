@@ -212,21 +212,22 @@ Logo que um pacote chega ao sistema de monitorização, este faz uso do reposit�
 De entre os sistemas analisados foi o \textit{KProbes}, que sendo dinâmico permite uma menor sobrecarga.
 Os restantes continham componentes de \textit{logging} que para a realização deste estudo, apresentavam uma sobrecarga desnecessária, afectando negativamente o desempenho.
 
+Para além do sistema de instrumentação utilizado foi igualmente considerado o número de funções a instrumentar.
+
 Para além de se ter tido em consideração o sistema de instrumentação utilizado, foi também tido em consideração o número de funções a instrumentar.
-A sobrecarga total exercida por esta componente tem em conta o número de funções que são instrumentadas, bem como o número de vezes que estas são executadas.
+A sobrecarga total exercida pela instrumentação de funções do núcleo, tem em conta não só o número de funções que são instrumentadas, como o número de vezes que estas são executadas.
 
-A análise efectuada no capítulo \ref{cap:Estrutura} sobre a \textit{Arquitectura de rede em Linux}, permitiu obter uma melhor análise deste.
+O conhecimento adquirido com a análise efectuada no capítulo \ref{cap:Estrutura}, sobre a \textit{Arquitectura de rede em Linux}, afectou positivamente a opção sobre as funções a instrumentar.
 
-O MRoP, instrumenta um reduzido número de funções do núcleo pertencentes ao subsistema de rede do \textit{Linux}.
-Este novo sistema foi criado para monitorizar a utilização de canais da familia \textit{inet} para comunicação, tendo como particularidade a utilização de canais baseados nos protocolos \textit{tcp} e \textit{udp}.
+O MRoP, foi desenvolvido para monitorizar a utilização de canais da familia \textit{inet}, tendo como particularidade a utilização de canais baseados nos protocolos \textit{tcp} e \textit{udp}, e instrumenta um reduzido número de funções do núcleo pertencentes ao subsistema de rede.
 
-O \textit{tcp} e o \textit{udp} têm em comum algumas funções com protocolos de outras familias, principalmente quando o nível de abstracção é elevado (chamadas ao sistema).
-De forma a dimínuir o número de funções a instrumentar, decidiu-se pelas chamadas ao sistema, obtendo assim um maior nível de abstração e também um controlo directo dos processos em nível utilizador.
+O \textit{tcp} e o \textit{udp} apresentam em comum algumas funções com protocolos de outras familias, principalmente quando são executadas chamadas ao sistema, onde o nível de abstracção sobre estes protocolos é elevado.
+Com o objectivo de dimínuir o número de funções a instrumentar, decidiu-se pelas chamadas ao sistema, obtendo assim um maior nível de abstração e um controlo directo dos processos de nível utilizador.
+
 As chamadas ao sistema instrumentadas foram: \textit{sendto}, \textit{recvfrom}, \textit{connect}, \textit{bind}, \textit{accept} e \textit{close}.
-
-As primeiras análises efectuadas demonstraram que apenas a chamada ao sistema \textit{close}, era executada demasiadas vezes, dimínuindo o desempenho global do sistema.
-Esta situação é explicada por a chamada ao sistema \textit{close}, é utilizada extensivamente para fechar canais, sejam eles ficheiros, \textit{sockets}, \textit{pipes}, etc.
-Por este motivo foi necessário encontrar a função que lida com o fecho de \textit{sockets}, permitindo reduzir a sobrecarga imposta pela instrumentação.
+As análises inicialmente efectuadas demonstraram que apenas a chamada ao sistema \textit{close}, era demasiadas vezes executada, penalizando o desempenho global do sistema.
+Esta situação radica no facto da chamada ao sistema \textit{close}, ser utilizada extensivamente para fechar canais, independentemente destes serem ficheiros, \textit{sockets}, \textit{pipes}, etc.
+Para solucionar esta situação foi necessário encontrar a função uma função que lidasse exclusivamente com o fecho de \textit{sockets}, de modo a reduzir a sobrecarga imposta pela instrumentação.
 
 
 \subsection{Filtro de processos}
@@ -246,8 +247,8 @@ Por este motivo foi necessário encontrar a função que lida com o fecho de \te
 
 %-----------------------------------------------------------------------------------------------------
 
-O \textit{KProbes} é um sistema de instrumentação do núcleo que não efectua distinção entre que funções, não \textit{inline}, está a efectuar a instrumentação.
-Não existindo suporte no \textit{KProbes} para filtrar o processo que está a efectuar uma chamada ao sistema, foi necessário desenvolver uma metodologia que permitisse reduzir a sobrecarga, quando a monitorização é efectuada sobre um processo que não o desejado.
+O \textit{KProbes} é um sistema de instrumentação do núcleo que não distingue entre que funções, não \textit{inline}, está a efectuar a instrumentação.
+Não existindo suporte no \textit{KProbes} para filtrar o processo, que está a efectuar uma chamada ao sistema, foi necessário desenvolver uma metodologia que permitisse reduzir a sobrecarga, quando a monitorização é efectuada sobre um processo que não o desejado.
 
 %-------------------------
 
@@ -256,14 +257,16 @@ Não existindo suporte no \textit{KProbes} para filtrar o processo que está a e
 
 %--------------------------------------
 
-Uma das possibilidades foi a criação de um repositório com a informação sobre os identificadores dos processos a monitorizar, sendo necessária novamente uma estrutura de suporte a este repositório, bem como funcionalidades de adição, remoção, actualização e consulta.
-Este repositório teria de conter a estrutura genealógica do processo a monitorizar, bem como um componente que actualize esta informação.
+No intuito de sanear esta situação uma das possibilidades foi a criação de um repositório com a informação sobre os identificadores dos processos a monitorizar, para o que foi necessário uma vez mais uma estrutura de suporte a este repositório, bem como funcionalidades de adição, remoção, actualização e consulta.
+Este repositório teria de conter a estrutura genealógica do processo a monitorizar, assim como um componente que actualiza-se esta informação.
 A actualização desta estrutura poderia ser efectuada através da instrumentação da chamada ao sistema \textit{fork} ou \textit{clone}.
-Para cada vez que fossem invocadas as funções, anteriormente mencionadas, seria efectuada uma consulta ao repositório e apartir da informação obtida neste seria, ou não, actualizado o repositório.
+Sempre que fossem invocadas as funções já referidas, seria efectuada uma consulta ao repositório e a partir da informação obtida, este seria ou não, actualizado.
 Esta possibilidade, ao contemplar a remoção de dados do repositório, necessitaria também de instrumentar a função de termino de processos.
-A actualização dinâmica deste repositório, sem alterar código no núcleo, necessitaria de instrumentar algumas funções no núcleo o que iria afectar negativamente o desempenho do sistema na sua totalidade, pois a criação e destruição de processos pode ser elevada.
 
-Em alternativa, efectuou-se uma análise aos campos da estrutura, \textit{task\_struct}, que descreve um processo para, compreender de que modo estes dados se relacionam com os identificadores dos membros da árvore genealógica do processo.
+Considerando que a actualização dinâmica deste repositório, sem alterar o código do núcleo, afectava negativamente o desempenho do sistema na sua totalidade, optou-se por abandonar esta alternativa em virtude da criação e destruição de processos poder ser elevada.
+
+
+Face a esta situação optou-se por efectuar uma análise aos campos da estrutura, \textit{task\_struct}, o que permitiu compreender de que modo os identificadores dos processos se relacionam com os dos membros da árvore genealógica do processo.
 Desta análise concluí-se que, os identificadores \textit{pid}, \textit{tid} e \textit{ppid} permitem na grande maioria das aplicações, identificar toda a árvore genealógica.
 
 
