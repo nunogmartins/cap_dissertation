@@ -276,19 +276,19 @@ Desta análise concluí-se que, os identificadores \textit{pid}, \textit{tid} e 
 
 \section{Filtro de pacotes, extensão ao LSF}
 
-No sistema de monitorização de rede um dos componentes é uma função que serve de máquina virtual às instruções do \textit{LSF}.
-Esta função itera sobre o filtro executando, instrução a instrução, sobre o pacote (recebido ou enviado), até encontrar uma instrução de retorno (\textit{BPF\_RET} ou \textit{BPF\_RET\_A}).
-Consoante o valor retornado nestas instruções o pacote analisado é ou não capturado.
+No sistema de monitorização de rede, um dos componentes é uma função que serve de máquina virtual às instruções do \textit{LSF}.
+Esta função itera sobre o filtro, executando instrução a instrução, sobre o pacote (recebido ou enviado), até encontrar uma instrução de retorno (\textit{BPF\_RET} ou \textit{BPF\_RET\_A}).
+Consoante o valor retornado nestas instruções, o pacote analisado é ou não capturado.
 Se for capturado, é efectuada uma cópia do pacote e colocado num \textit{ring buffer}, partilhado com a aplicação monitora de rede em nível utilizador.
-Caso o valor retornado não seja para captura, a computação sobre esse pacote termina, reduzindo assim a sobrecarga da monitorização.
-Por este motivo um filtro que identifique rapidamente a rejeição de um pacote, permite diminuir consideravelmente a sobrecarga imposta no sistema pela monitorização.
+Caso o valor retornado não seja para captura, a computação sobre esse pacote termina, reduzindo a sobrecarga da monitorização.
+Daí que o uso de um filtro que identifique de forma célere a rejeição de um pacote, diminua consideravelmente a sobrecarga imposta ao sistema pela monitorização.
 
-Possivelmente o sistema de instrumentação do núcleo, \textit{KProbes} , poderia ser utilizado para invocar o novo sistema de filtragem criado e modificar o valor de retorno, caso se verifique essa necessidade.
-Devido ao elevado número de vezes que a função de filtragem é invocada (uma para cada pacote, recebido ou enviado), a sobrecarga da utilização do \textit{KProbes} seria inaceitável.
-Por esta razão, a única alteração efectuada ao código do \textit{Linux}, foi na função \textit{sk\_run\_filter} e a definição de um \textit{hook} para activação e desactivação deste novo sistema, ambos definidos no do ficheiro \textit{filter.c}.
-Esta alteração permitiu adicionar uma nova funcionalidade à custa de uma sobrecarga muito reduzida, no sistema de monitorização, mesmo quando não está activa a funcionalidade.
-Quando monitorização de rede está activa, sem a componente MRoP, a sobrecarga introduzida é apenas a verificação se o \textit{hook} está activo ou não.
+Face aos benefícios obtidos com o uso do filtro considera-se que o sistema de instrumentação do núcleo, \textit{KProbes}, poderia ser utilizado para invocar o novo sistema de filtragem criado e modificar o valor de retorno caso se mostrasse necessário.
+Todavia, face ao número de vezes que a função de filtragem é invocada (uma para cada pacote, recebido ou enviado), a sobrecarga da utilização do \textit{KProbes} é de todo desaconselhavel.
 
+Assim, além da definição de um \textit{hook} para activação e desactivação deste novo sistema, foi efectuada uma alteração ao código do \textit{Linux} na função \textit{sk\_run\_filter}, que se traduziu no retorno da decisão conjunta do filtro estático com o dinâmico, ambas realizadas no ficheiro \textit{filter.c}.
+
+Esta alteração permitiu adicionar uma nova funcionalidade, não obstante se assistir a uma ligeira sobrecarga no sistema de monitorização, independentemente da funcionalidade estar ou não activa.
 
 \begin{figure}[ht]
 \centering
@@ -299,20 +299,16 @@ Quando monitorização de rede está activa, sem a componente MRoP, a sobrecarga
 
 \section{Informação de análise e controlo}
 
-Devido à necessidade de obter algumas informações sobre o estado da computação dos diversos componentes da ferramenta foram criados alguns ficheiros no
-sistema de ficheiros virtual \textit{DebugFs}.
+Com o propósito de obter algumas informações sobre o estado da computação dos diversos componentes da ferramenta e de invocar a monitorização procedeu-se à criação de alguns ficheiros no sistema de ficheiros virtual \textit{DebugFs}.
 
-Na verdade não foi só para obter o estado da computação foi, também, uma forma de invocar o inicio da monitorização.
-Isto é, através dos ficheiros \textit{pid}, \textit{ppid}, \textit{tgid} e \textit{option}. 
+%Isto é, através dos ficheiros \textit{pid}, \textit{ppid}, \textit{tgid} e \textit{option}. 
 
 \subsection{Informação do processo}
 
 
-O MRoP foi desenhado para ser praticamente autónomo, apenas necessitando da configuração de alguns parâmetros essenciais ao seu funcionamento.
-A componente \textit{Informação de análise e controlo}, permite efectuar o controlo sobre aspectos da instrumentação e do repositório.
-A informação de análise é apenas adicionada, se o suporte para análise for activado na compilação, permitindo assim obter métricas sobre os diferentes componentes internos do MRoP.
-
-O sistema de comunicação, entre o nível utilizador e o núcleo, utilizado foi o \textit{DebugFs}, anteriormente analisado em \ref{}.
+O MRoP foi desenhado e implementado para ser relativamente autónomo, apenas necessitando da configuração de alguns parâmetros, essenciais ao seu funcionamento.
+À componente \textit{Informação de análise e controlo}, está reservado o controlo sobre os aspectos da instrumentação e do repositório.
+A informação de análise apenas é adicionada, se o seu suporte for activado na compilação, permitindo assim obter métricas sobre os diferentes componentes internos ao MRoP.
 
 \begin{figure}[ht]
 \centering
