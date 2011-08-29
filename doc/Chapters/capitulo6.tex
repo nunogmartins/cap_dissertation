@@ -1,77 +1,79 @@
 \chapter{Avaliação}
 \label{cap:avaliacao}
 
-Durante as fases de análise e desenvolvimento existiu sempre a preocupação de efectuar uma análise funcional e de desempenho.
+%Durante as fases de análise e desenvolvimento existiu sempre a preocupação de efectuar uma análise funcional e de desempenho.
 
 
 
-\section{Ferramenta de testes e}
+%\section{Ferramenta de testes e}
 %Como efectuar a monitorização
 
-Foi desenvolvida uma aplicação para testar o desenvolvimento da ferramenta.
-Esta aplicação 
+%Foi desenvolvida uma aplicação para testar o desenvolvimento da ferramenta.
+%Esta aplicação 
 
-\subsection{Test Unit}
+%\subsection{Test Unit}
 
-De forma a testar o repositório de dados foram efectuados diferentes \textit{unit tests}, de forma a assegurar que todas as alterações efectuadas na ferramenta ficavam de correctas.
+%De forma a testar o repositório de dados foram efectuados diferentes \textit{unit tests}, de forma a assegurar que todas as alterações efectuadas na ferramenta ficavam de correctas.
 
-\subsection{Aplicação Monitora}
-\label{sub:monitor_app}
+%\subsection{Aplicação Monitora}
+%\label{sub:monitor_app}
 
-Para poder mais facilmente efectuar os testes de avaliação, foi criado uma ferramenta em nível utilizador que permite lançar a aplicação e configurar automaticamente o sistema para a monitorizar. Esta verifica o identificador do processos e o momento em que se dá o inicio e o fim da sua execução, de forma a iniciar e terminar a monitorização quando necessário.
+%Para poder mais facilmente efectuar os testes de avaliação, foi criado uma ferramenta em nível utilizador que permite lançar a aplicação e configurar automaticamente o sistema para a monitorizar. Esta verifica o identificador do processos e o momento em que se dá o inicio e o fim da sua execução, de forma a iniciar e terminar a monitorização quando necessário.
 
-\subsection{Aplicação de testes de performance}
+%\subsection{Aplicação de testes de performance}
 
-Para ajudar na avaliação da ferramenta desenvolvida foi criado um conjunto de aplicações independentes ( scripts e aplicações ) para monitorizar a actividade de algumas aplicações que se consideraram pertinentes no processo de avaliação do desempenho da ferramenta.
+%Para ajudar na avaliação da ferramenta desenvolvida foi criado um conjunto de aplicações independentes ( scripts e aplicações ) para monitorizar a actividade de algumas aplicações que se consideraram pertinentes no processo de avaliação do desempenho da ferramenta.
 
-A aplicação desenvolvida \textit{manager} tem de ser executada sob o controlo do utilizador \textit{root}, devido à necessidade de executar processos que só este utilizador tem acesso. Estes processos anteriormente mencionados são \textit{insmod}, \textit{rmmod} e \textit{tcpdump}.
+%A aplicação desenvolvida \textit{manager} tem de ser executada sob o controlo do utilizador \textit{root}, devido à necessidade de executar processos que só este utilizador tem acesso. Estes processos anteriormente mencionados são \textit{insmod}, \textit{rmmod} e \textit{tcpdump}.
 
-Os \textit{scripts} criandos e bash serviram para obter o número de dados e pacotes transferidos na interface, bem como fazer a separação dos tempos que as aplicações de testes executaram para conseguir automatizar o processo de execução e recolha de dados dos testes.
-
-
-\section{Temporizadores}
-
-Temporizadores no núcleo do sistema.
+%Os \textit{scripts} \textit{bash} criados serviram para obter o número de dados e pacotes transferidos na interface, bem como fazer a separação dos tempos que as aplicações de testes executaram para conseguir automatizar o processo de execução e recolha de dados dos testes.
 
 
-\subsection{Temporizadores de Alta-Resolução}
+%\section{Temporizadores}
 
-\textit{HrTimer}
+%Temporizadores no núcleo do sistema.
 
 
-----------------------------------------------------------------------------------------------------------
+%\subsection{Temporizadores de Alta-Resolução}
+
+%\textit{HrTimer}
+
+
+%----------------------------------------------------------------------------------------------------------
 
 
 \section{Avaliação}
 \label{sec:evaluation}
 
 O sistema implementado foi avaliado através da utilização dos protocolos \textit{ftp}, \textit{http} e da aplicação \textit{iperf}\cite{iperf}.
- Para tal, recorreu-se a um conjunto alargado de testes, tendo como principal objectivo verificar a correcção do funcionamento, a sua capacidade de capturar todos os pacotes envolvidos nas comunicações do processo alvo (e apenas estes), bem como observar o seu desempenho.
+ Para o efeito recorreu-se a um conjunto alargado de testes, tendo como principal objectivo verificar a correcção do funcionamento, a capacidade de capturar todos os pacotes envolvidos nas comunicações do processo alvo (e apenas estes), bem como observar o seu desempenho.
 
-De modo a realizar os testes de desempenho, foram utilizadas duas máquinas com interfaces de rede de 100Mbits/s, ligadas directamente através de um cabo Ethernet cruzado.
+Tendo em vista a realização dos testes de desempenho, foram utilizadas duas máquinas com interfaces de rede de 100Mbits/s, ligadas directamente através de um cabo Ethernet cruzado.
 Uma das máquinas ficou responsável pela execução dos serviços \textit{ftp}, \textit{http} e \textit{iperf}.
 
 \subsection{Avaliação Funcional}
-A análise funcional foi efectuada por meio de programas simples, que desencadeiam chamadas sucessivas de criação de \textit{sockets} e comunicação, obtendo-se o estado destes (portos e endereços) dentro do módulo no núcleo.
- Estes dados poderam ser confirmados no sistema \textit{DebugFS}, por consulta dos ficheiros existentes para esse efeito. Este ficheiro, quando acedido, contém toda a informação relativa aos portos e endereços em utilização, por parte da aplicação monitorizada.
- Deste modo, para obter um grau de comparação dos dados produzidos e validar esta análise, foi utilizada a ferramenta \textit{netstat}, na qual indica os portos e os endereços utilizados pelos processos no sistema (esta ferramenta tira partido do sistema de ficheiros virtual \textit{ProcFs}, para obter esses dados).
- Para além desta análise, foi efectuada a confirmação da correcção de que todos os pacotes pertencentes às comunicações foram de facto obtidos.
- Para tal, recorreu-se à captura de pacotes, por intermédio do \textit{tcpdump} com o módulo activo, verificando-se que todo o tráfego respeitante ao protocolo (\textit{ftp} e \textit{http}) estava de facto completo e correcto, desde a abertura ao fecho das conexões, não existindo outros pacotes na captura.
+A análise funcional foi efectuada recorrendo a programas simples, que desencadeiam chamadas sucessivas de criação de \textit{sockets} e comunicação, obtendo-se o estado destes (portos e endereços) dentro do módulo no núcleo.
+ Estes dados foram confirmados no sistema \textit{DebugFS}, por consulta dos ficheiros existentes para esse efeito. Este ficheiro, quando acedido, contém toda a informação relativa aos portos e endereços em utilização, por parte da aplicação monitorizada.
+ Deste modo, para obter um grau de comparação dos dados produzidos e validar esta análise, foi utilizada a ferramenta \textit{netstat}, que indica os portos e os endereços utilizados pelos processos no sistema (esta ferramenta utiliza o sistema de ficheiros virtual \textit{ProcFs}, para obter esses dados).
+ Para além desta análise, foi efectuada a confirmação de que todos os pacotes pertencentes às comunicações foram de facto correctamente obtidos.
+ Para tal, recorreu-se à captura de pacotes, por intermédio do \textit{tcpdump} com o módulo activo, constantando-se que todo o tráfego respeitante ao protocolo (\textit{ftp} e \textit{http}) estava de facto completo e correcto, desde a abertura ao fecho das conexões, não existindo outros pacotes na captura.
  Esta validação foi verificada utilizando o programa \textit{wireshark}, que identificou os fluxos de dados dos protocolos.
 
 \subsection{Avaliação do desempenho}
 Foram efectuados diversos testes para avaliar o \emph{overhead} introduzido por este sistema.
- Estes testes basearam-se na recepção ou transmissão de 1GigaByte de dados, por meio de diferentes programas e protocolos, entre as duas máquinas conectadas directamente, por interfaces de rede a 100 Mbit/s.
- Ambas máquinas (1 e 2) executaram-nos, utilizando apenas, um processador activo de 2 e 2.6 Ghz, respectivamente.
- Na máquina 1 foram efectuados os testes que em seguida serão apresentados.
- A versão do sistema de operação utilizado em ambas as máquinas correspondeu ao 2.6.39, sendo que na máquina 1 se introduziu algumas modificações para incluir o \textit{hook} e suas funções auxiliares, enquanto que na máquina 2 se executou o sistema original.
+ Estes testes basearam-se na recepção ou transmissão de 1GigaByte de dados, utilizando diferentes programas e protocolos, entre duas máquinas conectadas directamente, por interfaces de rede a 100 Mbit/s.
+ Ambas as máquinas (1 e 2) procederam à sua executação, utilizando apenas, um processador activo de 2 e 2.6 Ghz, respectivamente.
+ Na máquina 1 foram efectuados os testes a seguir apresentados.
+ A versão do sistema de operação utilizado em ambas as máquinas correspondeu ao 2.6.39, sendo que na máquina 1 se introduziram algumas modificações para incluir o \textit{hook} e suas funções auxiliares, enquanto que na máquina 2 se executou o sistema original.
 
 Na execução destes testes, foram efectuadas 10 iterações para cada experiência considerada, de modo a obter um valor médio com um desvio padrão aceitável.
- Os resultados obtidos estão apresentados nas tabelas \ref{tab:desempenho} e \ref{tab:overhead}.
+ Os resultados obtidos estão constam das tabelas \ref{tab:desempenho} e \ref{tab:overhead}.
 
-Os testes identificados com os números de $^{1}$ a $^{4}$ foram efectuados utilizando apenas uma conexão ao servidor, enquanto que os testes $^{5}$ e $^{6}$ foram efectuados utilizando mais uma comunicação, de modo a aumentar o peso sobre o processador e o número de pacotes a circular entre as máquinas. 
+Os testes identificados com os números de $^{1}$ a $^{4}$ foram efectuados utilizando apenas uma conexão ao servidor, enquanto que os testes $^{5}$ e $^{6}$ foram realizados utilizando mais uma comunicação, de modo a aumentar o peso sobre o processador e o número de pacotes a circular entre as máquinas. 
  Desta forma, foi possível identificar a sobrecarga exercida quando o \textit{tcpdump} estava a executar e a capturar todos os pacotes ou apenas um subconjunto destes (os pertencentes ao processo alvo).
- A coluna "Original" corresponde aos valores resultantes do tempo médio das execuções das transferências sem qualquer monitorização, a coluna "Com TcpDump" apresenta a média dos tempos de transferência com a captura total do tráfego, enquanto que a coluna identificada com "Com TcpDump e módulo" apresenta a média dos tempos para a transferência com a captura pelo \textit{tcpdump} e o módulo desenvolvido no núcleo, de forma a apenas capturar o tráfego da transferência do processo alvo.
+
+ A coluna "Original" corresponde aos valores resultantes do tempo médio das execuções das transferências sem qualquer monitorização.
+ A coluna "Com TcpDump" apresenta a média dos tempos de transferência com a captura total do tráfego, enquanto que a coluna identificada com "Com TcpDump e módulo" regista a média dos tempos para a transferência com a captura pelo \textit{tcpdump} e o módulo desenvolvido no núcleo, de forma a apenas capturar o tráfego da transferência do processo alvo.
 %\vspace{-0.8cm}
 \begin{table}
 \begin{center}
@@ -95,9 +97,9 @@ IPerf - 1GB UDP 2 conexões$^{6}$ & 179.4930 & 179.6280 & 179.6369 \\
 \end{table}
 %\vspace{-1.2cm}
 
-Nos primeiros 4 testes é possível verificar que a utilização do módulo no núcleo aumentou de forma insignificante o tempo de execução.
- É também possível observar que em $^{1}$ e $^{3}$ aquando da utilização do \textit{tcpdump}, a execução sem monitorização, foi ligeiramente mais rápida.
- Esta situação pode dever-se ao facto de quando a máquina está em sobrecarga, o sistema desencadeia o aumento do tamanho médio dos pacotes, reduzindo, assim, o seu número e o volume de dados transferidos, em virtude da diminuição dos cabeçalhos dos pacotes.
+Nos primeiros 4 testes é possível verificar que a utilização do módulo no núcleo aumentou de forma irrelevante o tempo de execução.
+ É também possível observar que em $^{1}$ e $^{3}$ aquando da utilização do \textit{tcpdump}, a execução sem monitorização, manifestou-se ligeiramente mais rápida.
+ Esta situação pode dever-se ao facto de quando a máquina está em sobrecarga, o sistema provoca o aumento do tamanho médio dos pacotes, reduzindo o seu número e o volume de dados transferidos, em virtude da diminuição dos seus cabeçalhos.
 
 %\vspace{-0.5cm}
 \begin{table}
@@ -124,14 +126,14 @@ IPerf - 1GB UDP 2 conexões$^{6}$ & 0.0752 & 0.0802   \\
 %\vspace{-0.3cm}
 
 Nos testes $^{5}$ e $^{6}$, como o tráfego na interface é duplicado e o \textit{tcpdump} tem de capturar todos os pacotes, é possível evidenciar a sobrecarga exercida por estas cópias de dados e consequentes transferências, para nível utilizador.
- Na tabela \ref{tab:overhead} é possível observar que, para o teste $^{5}$, a sobrecarga do \textit{tcpdump} atinge os 3.6\% face ao original, enquanto que a sobrecarga do \textit{tcpdump} com módulo, permitiu uma pequena melhoria face ao original (-0.0775\%).
+ Na tabela \ref{tab:overhead} é possível observar que, para o teste $^{5}$, a sobrecarga do \textit{tcpdump} atinge os 3.6\% face ao original, enquanto que a sobrecarga do \textit{tcpdump} com módulo, permitiu uma ligeira melhoria face ao original (-0.0775\%).
  Conclui-se, portanto, que quando o fluxo de dados que não pretendemos capturar aumenta consideravelmente, torna-se mais vantajoso utilizar este sistema, do que capturar todos os pacotes, na medida em que seria necessário efectuar uma análise, em nível utilizador, para identificar e filtrar os pacotes pertencentes ao processo alvo.
 
 \subsubsection{Desempenho da estrutura de dados}
 
 Para além das avaliações anteriormente descritas, tornou-se essencial analisar o comportamento da estrutura de dados utilizada para manter o “estado do processo”, de modo a verificar o seu desempenho. 
  Assim, para esta análise, foi elaborado um teste que utiliza o sistema de alta resolução de temporizadores (\textit{HRTimer}), contido no núcleo do sistema de operação.
- O teste consistiu na obtenção do tempo anterior e posterior à inserção dos 1024 elementos, afim de determinar o tempo decorrido.
+ O teste consistiu em obter o tempo anterior e posterior à inserção dos 1024 elementos, afim de determinar o tempo decorrido.
  De igual modo, foi calculado o tempo de remoção dos referidos elementos.
 
 %\vspace{-0.5cm}
