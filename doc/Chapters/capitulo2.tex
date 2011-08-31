@@ -194,9 +194,6 @@ TODO ack
 
 Se devido à monitorização de rede, os pacotes que chegam ao programa de monitorização necessitam de um tratamento pesado, este tratamento pode levar a que o sistema não consiga responder de forma correcta às aplicações que fazem uso das comunicações externas, pois o sistema pode não conseguir emitir \textit{acknowledges} dos pacotes que anteriormente tenham chegado, ou então não conseguir tratar novos pedidos de pacotes uma vez que os \textit{buffers} ficam cheios e começam a descartar os anteriores pacotes, aumentando ainda mais os problemas de retransmissão e de atrasos.
 
-Se devido à monitorização de rede, os pacotes que chegam ao programa necessitarem de um tratamento pesado, este pode levar a que o sistema não consiga responder às aplicações que fazem uso das comunicações externas por impossibilidade do sistema em emitir \textit{acknoledges} dos pacotes anterior recebidos ou revelar dificuldades em tratar novos pedidos de pacotes dado que os \textit{buffers} por se encontrarem cheios começam a descarregar os anteriores pacotes aumentando substancialmente os problemas de retransmissão e a revelar atrasos.
-
-
 --------------------------------------------------------------------------
 
 \subparagraph*{Técnicas para o aumento de desempenho}
