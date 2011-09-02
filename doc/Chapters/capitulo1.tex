@@ -13,31 +13,33 @@ O dinamismo das aplicações dificulta bastante o processo de monitorização.
 Esta situação é particularmente sentida ao nível da monitorização dos dispositivos de \textit{IO}, nomeadamente nas interfaces de rede.
 Nas aplicações onde o dinamismo das ligações é um dos seus pontos fortes, a monitorização é particularmente difícil de ser efectuada.
 
-Apenas na camada de transporte da \textit{stack TCP/IP} se conhecem quais os portos de origem e destino de um determinado pacote.
-Se pretendermos definir univocamente um fluxo de comunicação de rede para uma dada aplicação, é obrigatório conhecer o endereço origem e o porto de origem bem como o endereço de destino e o porto de destino.
-Desta forma apenas quando o pacote chega à camada de transporte é que se consegue conhecer o seu destino.
+Apenas na camada de transporte da \textit{stack TCP/IP} se conhecem os portos de origem e destino de um determinado pacote.
+Se pretendermos definir univocamente um fluxo de comunicação de rede para uma dada aplicação, é obrigatório conhecer o endereço e o porto de origem bem como o endereço e o porto de destino.
+Desta forma apenas quando o pacote chega à camada de transporte se consegue conhecer o seu destino.
 
 Tendo em conta que aplicações \textit{P2P} utilizam diversos portos de comunicação, revela-se difícil capturar os pacotes com base nos actuais filtros, sem que se assista a uma elevada degradação do desempenho.
-De modo que para capturar dados relevantes e simultaneamente minimizar os efeitos da monitorização, estes filtros são aplicados no interior do núcleo do sistema, logo que possível.
+De modo a capturar dados relevantes e simultaneamente minimizar os efeitos da monitorização, estes filtros são aplicados logo que possível no núcleo do sistema.
 
 \section{Motivação}
 \label{sub:intro_motivation}
 
 No contexto de uma dissertação anterior~\cite{Farruca:2009}, utilizou-se a biblioteca \textit{LibPcap} para a captura do tráfego de rede, e um dos problemas resolvidos foi o de isolar os pacotes que pertencem a determinado processo alvo.
 A solução conseguida não é fácil de integrar em qualquer outra ferramenta e oferece um fraco desempenho.
-Esta dissertação centra-se nos mecanismos de inspecção oferecidos pelos sistemas de operação que permitem verificar o funcionamento e avaliar o desempenho do sistema e dos processos dos utilizadores (\textit{debugging}, \textit{profiling}, etc).
+Esta dissertação centra-se nos mecanismos de inspecção, oferecidos pelos sistemas de operação que permitem verificar o funcionamento e avaliar o desempenho do sistema e dos processos dos utilizadores (\textit{debugging}, \textit{profiling}, etc).
 
-É objectivo desta dissertação investigar mecanismos, inclusive internos ao \textit{kernel}, que permitam incorporar a filtragem com base no identificador do processo e possível incorporação nas funcionalidades do \textit{pcap}, incluindo avaliações do \textit{overhead} introduzido e possíveis optimizações.
+
 
 \section{Objectivos}
 \label{sec:intro_goals}
 
+É objectivo desta dissertação investigar mecanismos, inclusive internos ao núcleo, que permitam incorporar a filtragem com base no identificador do processo e a possível incorporação nas funcionalidades do \textit{pcap}, incluindo avaliações da sobrecarga introduzida e possíveis optimizações.
+
 ----------------------------------------------------------------------------------------------------------
 
-De forma a monitorizar uma aplicação utilizando o suporte do núcleo de sistema do \textit{linux}, com base no estudo prévio efectuado descrito no capitulo \ref{}.
-A abordagem que se irá seguir utilizará um módulo dentro do núcleo de sistema de forma a instrumentar algumas funções da estrutura de rede, para obter os portos que um processo usa e quais os que irá utilizar num futuro próximo.
-Irá fazer-se uso da infraestrutura de monitorização já presente no núcleo de sistema de operação do linux, como as apresentadas no capítulo \ref{}.
-Os dados recolhidos irão ser utilizados na modificação do filtro utilizado no \textit{Linux Socket Filter} para capturar o tráfego.
+De forma a monitorizar uma aplicação utilizando o suporte do núcleo de sistema do \textit{Linux}, com base no estudo prévio efectuado descrito no capitulo \ref{}.
+A abordagem que se irá seguir utilizará um módulo dentro do núcleo de sistema de forma a instrumentar algumas funções da estrutura de rede, para obter os portos que um processo utiliza e os que utilizará num futuro próximo.
+Far-se-à uso da infraestrutura de monitorização presente no núcleo de sistema de operação do \textit{Linux}, como as apresentadas no capítulo \ref{}.
+Os dados recolhidos serão utilizados no \textit{Linux Socket Filter}, para capturar o tráfego.
 De forma a permitir uma rápida adaptação do filtro às alterações no processo, a informação sobre os portos que estão a ser usados e suas alterações irão ficar monitorizadas e actualizadas.
 
 Para que esta nova funcionalidade possa ser integrada na biblioteca \textit{LibPcap}, é necessário proceder a modificações ao nível da linguagem de mais alto nível necessária para se criar um filtro.
@@ -48,10 +50,10 @@ Para que esta nova funcionalidade possa ser integrada na biblioteca \textit{LibP
 \section{Principais contribuições} 
 \label{sec:intro_contribuicoes}
 
-A inclusão da possibilidade de monitorizar apenas o fluxo de rede de um determinado programa, poderá permitir que muitos dos filtros até agora construídos possam ser simplificados.
-Para além desta simplificação a possibilidade de monitorização do fluxo de rede de uma aplicação, permite a observação dos dados sem ter a necessidade de um sistema prévio, que conheça os protocolos de mais alto nível aplicados sobre a rede.
-Havendo a existência de um um sistema de captura de tráfego de rede genérico torna-se bastante benéfico para a análise de protocolos, pois nem sempre se tem acesso às especificações dos protocolos presentes nas aplicações.
-Com este componente, a performance de obtenção dos dados relevantes poderá ser incrementada, mitigando anteriores problemas de performance entre o núcleo de sistema de operação e as ferramentas de análise de tráfego.
+A possibilidade de monitorizar apenas o fluxo de rede de um determinado programa, poderá permitir que muitos dos filtros até agora construídos possam ser simplificados.
+Para além desta simplificação, a possibilidade de monitorização do fluxo de rede de uma aplicação, permite a observação dos dados sem ter necessidade de um sistema prévio, que conheça os protocolos de mais alto nível aplicados sobre a rede.
+Existência de um sistema de captura de tráfego de rede genérico, torna-se bastante benéfico para a análise de protocolos, pois nem sempre se tem acesso às especificações destes presentes nas aplicações.
+Com este componente, o desempenho de obtenção dos dados relevantes poderá ser incrementado, mitigando anteriores problemas de desempenho entre o núcleo de sistema de operação e as ferramentas de análise de tráfego.
 
 
 
