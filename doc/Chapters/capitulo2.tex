@@ -64,30 +64,33 @@ Tendo em vista o conhecimento e um melhor aproveitamento das capacidades de cada
  \item 
 
 
-Se tivermos como referência a visualização da história dos eventos, podemos analisá-los de duas formas distintas:
-\subparagraph*{Online - }
+Se considerarmos como referência a visualização da história dos eventos, podemos analisá-los de duas formas distintas:
+
+ 
+\subparagraph*{Online -}
 Enquanto decorre a monitorização da aplicação é possível observar os dados que são recolhidos pela aplicação.
 Como os eventos estão a ser recolhidos e visualizados em simultâneo, apenas podemos observar a história até ao momento.
 
 \subparagraph*{Offline ou \textit{Post-Mortem} - }
-A história do programa é analisada após este se ter completado (razão pela qual é utilizada a designação \textit{Post-Mortem}).
-Este método permite-nos analisar toda a sua história.
+
+A história do programa é analisada após este se ter completado daí a designação \textit{Post-Mortem}.
+Este método permite-nos analisar integralmente a sua história.
 
 \item
 
 Se a opção de monitorização se basear na interactividade do utilizador, é possível defini-la de duas formas:
 
 %PODER MODIFICAR DURANTE A MONITORIZACAOO pode reagir a modificar a aplicacao
-\subparagraph*{Activa - }
+ \subparagraph*{Activa - }
 
-Por iniciativa explícita do utilizador é possível inquirir o sistema de monitorização sobre o estado da computação.
-Este método por vezes descrito como \textit{computacional steering}, é a forma com maior interactividade, uma vez que permite ir analisando e modificando os parâmetros da monitorização.
+Por iniciativa explícita do utilizador, é possível inquirir o sistema de monitorização sobre o estado da computação.
+Este método, por vezes descrito como \textit{computacional steering}, é a forma com maior interactividade, uma vez que permite ir analisando e modificando os parâmetros da monitorização.
 
 %Modificar os pontos de monitorização ou apenas analisar os dados ao mesmo tempo que estão a ser capturados. Desta forma o utilizador pode controlar explicitamente a monitorização da aplicação. Este controlo pode ser apenas visualização da computação ou pode ser sobre a forma como se está a desenvolver a monitorização podendo ser baseado num ciclo de monitorização, decisão sobre os pontos a monitorizar (adicionar, remover, etc).
 
 \subparagraph*{Passiva - }
-Esta forma de monitorização é utilizada principalmente em ambientes onde é mais importante a obtenção de todos os dados e apenas no final nos debruçarmos sobre a sua análise.
-Esta forma é designada de passiva, por o utilizador não ter intervenção na forma como os dados estão a ser adquiridos, o que reduz a perturbação do sistema. 
+Esta forma de monitorização é especialmente utilizada em ambientes onde é relevante a obtenção da totalidade dos dados e apenas no final nos debruçarmos sobre a sua análise.
+Esta forma é designada de passiva, por o utilizador não ter intervenção na forma como os dados estão a ser obtidos, o que reduz a perturbação do sistema. 
 %Quando não se tem interesse em ir alterando os pontos a serem monitorizados, está é uma das escolhas correctas pois permite um menor grau de perturbação do sistema.
 \item
 
@@ -95,7 +98,7 @@ A instrumentação pode ser de dois tipos: a estática e a dinâmica, cada uma c
 
 \subparagraph*{Estática - }
 
-Na instrumentação estática o código instrumentado é definido em tempo de compilação, utilizando bibliotecas próprias para o efeito, como a utilização da função \textit{assert()}, que define os pontos a serem monitorizados.
+Na instrumentação estática o código instrumentado é definido em tempo de compilação, utilizando bibliotecas próprias para o efeito, como a utilização da função \textit{assert}, que define os pontos a serem monitorizados.
 Durante a monitorização não podem ser adicionados ou removidos pontos de análise.
 
 \subparagraph*{Dinâmica - }
@@ -103,7 +106,7 @@ Durante a monitorização não podem ser adicionados ou removidos pontos de aná
 Em contraste com a instrumentação estática está a dinâmica.
 É mais complexa e permite a inserção e remoção dos pontos a serem monitorizados.
 O dinamismo verifica-se pela ausência do ciclo $introduzir ponto\rightarrow compilar programa\rightarrow executar\rightarrow remover ponto$.
-A utilização de pontos de instrumentação dinâmica pode ajudar a reduzir o grau de perturbação, uma vez que apenas são definidos os que se desejam observar.
+A utilização de pontos de instrumentação dinâmica, pode ajudar a reduzir o grau de perturbação, uma vez que apenas são definidos os que se desejam observar.
 \end{itemize}
 
 \subparagraph*{}
@@ -114,17 +117,17 @@ Todavia, é no uso combinado da história dos eventos, da interactividade e da i
 }
 A recolha de informação, é uma das componentes mais sensíveis relativamente ao grau de perturbação da monitorização.
 Em geral os dados vão sendo armazenados num \textit{buffer} em memória.
-Caso exista algum evento que assinale que o \textit{buffer} está cheio ou uma indicação explícita de que se pretende armazenar esses dados, para posterior análise, estes são transferidos para memória persistente.
+Caso exista algum evento que assinale que o \textit{buffer} está cheio ou uma indicação explícita de que se pretende armazenar esses dados, para posterior análise, estes são transferidos para a memória persistente.
 
 \subparagraph*{
 %Grau de perturbação
 }
-Conforme o anteriormente mencionado, existe a preocupação de que o sistema a ser monitorizado tenha um baixo grau de perturbação.
+Conforme o anteriormente referido, existe a preocupação de que o sistema a ser monitorizado tenha um baixo grau de perturbação.
 Daí que, diversas abordagens foram criadas, para reduzirem o impacto da monitorização num sistema em produção.
-Uma destas abordagens foi a utilização de instruções especializadas, que alguns processadores têm para \textit{debug}, de modo a utilizar os recursos que mais se adequam à monitorização.
-Nem sempre são utilizados estes métodos, pois estão demasiados dependentes da arquitectura, o que dificulta a sua portabilidade.
+Uma destas abordagens traduz-se na utilização de instruções especializadas, de que alguns processadores dispoẽm para \textit{debug}, de modo a utilizar os recursos que mais se adequem à monitorização.
+Estes métodos, nem sempre são utilizados, devido à sua dependência da arquitectura, o que dificulta a sua portabilidade.
 Com vista a minimizar a perturbação, alguns sistemas de monitorização utilizam uma técnica de amostragem, que permite obter indicações sobre os estado da computação ao fim de um certo número de iterações.
-Esta técnica, em oposição à criação de um traço de execução, permite obter dados sobre os recursos apenas por amostra, enquanto que na criação de um traço de execução, é possível obter todos os dados de forma a criar uma história completa.
+Esta técnica, em oposição à criação de um traço de execução, permite obter dados sobre os recursos apenas por amostra, enquanto que na criação de um traço de execução, é possível obter a totalidade dos dados de forma a criar uma história completa.
 
 \paragraph*{
 %Apresentação dos dados recolhidos
@@ -158,24 +161,25 @@ No entanto, capturar estes dados oriundos da monitorização pode revelar-se ins
 Em geral, as ferramentas de monitorização da interacção do processo com o exterior, são baseadas na captura de pacotes de forma passiva.
 As ferramentas capturam os pacotes que fluem na rede, para posterior análise ao tráfego, que pode incidir sobre a largura de banda utilizada, principais protocolos, eventuais problemas de segurança, etc.
 
-\subparagraph*{Dinamismo das aplicações}
-Como foi descrito nas subsecções \ref{sect:instrumentation_overview}, as aplicações são dinâmicas e a este dinamismo se devem algumas dificuldades com que nos deparamos, ao monitorizar as aplicações.
+\subparagraph*{Dinamismo das aplicações - }
+Como o anteriormente referido, as aplicações são dinâmicas e a este dinamismo se devem algumas dificuldades com que nos deparamos, ao monitorizar as aplicações.
+
 Relativamente à monitorização das interacções com o exterior, utilizando a interface de rede, este dinamismo é de novo um factor chave, pois existem dificuldades na forma de identificar os fluxos pertencentes a um processo.
 
-\subparagraph*{Formas de reduzir o volume de dados utilizando filtros}
-A utilização de filtros na captura do tráfego que circula na rede, é uma forma eficiente de obter apenas os dados que se mostrem relevantes, com vista à satisfação nos nossos objectivos e são particularmente importantes, quando o volume de dados que circula na rede é extremamente elevado.
+\subparagraph*{Formas de reduzir o volume de dados utilizando filtros - }
+A utilização de filtros na captura do tráfego que circula na rede, é uma forma eficiente de se obterem apenas os dados que se mostrem relevantes, com vista à satisfação nos nossos objectivos e são particularmente importantes, quando o volume de dados que circula na rede é extremamente elevado.
 Tendo em vista a eficiência, estes filtros são implementados no núcleo do sistema de operação, baseando-se em regras simples, que podem ser combinadas para contemplar situações mais complexas.
 
-\subparagraph*{Dificuldade de criação de filtros dinâmicos}
-Os filtros actualmente suportados para capturar pacotes no \textit{Linux}, são definidos \textit{a priori}, e não há forma eficiente de os alterar dinamicamente, visto que a captura tem de ser parada a fim de ser criado um novo filtro, posteriormente aplicado, sendo depois retomada a captura dos pacotes, de acordo com as novas regras.
+\subparagraph*{Dificuldade de criação de filtros dinâmicos - }
+Os filtros actualmente suportados para capturar pacotes no \textit{Linux}, são definidos \textit{a priori}, e não há forma eficiente de os alterar dinamicamente, visto que para tal a captura tem de ser parada a fim de ser criado um novo filtro, posteriormente aplicado, procedendo-se em seguida à retoma da captura dos pacotes, de acordo com as novas regras.
 
-\subparagraph*{Filtros mais complexos e inteligentes}
-De forma a aumentar o desempenho da captura de pacotes, os filtros são aplicados o mais cedo possível, ou seja logo quando chegam à interface de rede.
+\subparagraph*{Filtros mais complexos e inteligentes - }
+De forma a aumentar o desempenho da captura de pacotes, os filtros são aplicados o mais cedo possível, ou seja, logo que chegam à interface de rede.
 Face a esta situação, o tipo de filtros que se podem aplicar têm de ser escritos numa linguagem simples.
-Quando os filtros são demasiado complexos, os módulos do núcleo têm de passar grande parte da informação para as camadas superiores, de forma a poderem ser aplicados filtros mais elaborados, que conseguem um nível mais abstracto sobre a informação presente no \textit{payload} dos pacotes.
+Quando os filtros são demasiado complexos, os módulos do núcleo têm de passar grande parte da informação para as camadas superiores, de forma a puderem ser aplicados filtros mais elaborados, que analisam um nível mais abstracto da informação, presente no \textit{payload} dos pacotes.
 
 
-\subparagraph*{Problemas com o aumento do overhead}
+\subparagraph*{Problemas com o aumento da sobrecarga - }
 
 ----------------------------------------------------
 
@@ -193,7 +197,7 @@ Como foi apresentado na subsecção \ref{sect:instrumentation_overview} a pertur
 
 TODO ack
 
-Se devido à monitorização de rede, os pacotes que chegam ao programa de monitorização necessitarem de um tratamento pesado, este pode levar a que o sistema não consiga responder às aplicações que fazem uso das comunicações externas, por impossibilidade do sistema em emitir \textit{acknowledges} dos pacotes anteriormente recebidos.
+Se devido à monitorização de rede, os pacotes que chegam ao programa de monitorização necessitarem de um tratamento pesado, este pode contribuir para que o sistema não consiga responder às aplicações que fazem uso das comunicações externas, por impossibilidade do sistema em emitir \textit{acknowledges} dos pacotes anteriormente recebidos.
 Pode igualmente revelar dificuldades em tratar novos pedidos de pacotes, dado que os \textit{buffers} por se encontrarem cheios começam a descartar os anteriores aumentando substâncialmente os problemas de retransmissão e a revelar atrasos.
 
 --------------------------------------------------------------------------
@@ -201,14 +205,14 @@ Pode igualmente revelar dificuldades em tratar novos pedidos de pacotes, dado qu
 \subparagraph*{Técnicas para o aumento de desempenho}
 % \todo{performance ou desempenho}
 Diferentes técnicas têm vindo a ser desenvolvidas para aumentar a performance de monitorização das interfaces de rede.
-Como foi referido, o problema do aumento da sobrecarga é muito importante, daí que esta deva ser mantida bastante reduzida, o que contribuirá para aumentar o desempenho da captura.
+Como já referido, o aumento da sobrecarga é muito penalizante, daí que esta deva ser mantida bastante reduzida, o que contribuirá para aumentar o desempenho da captura.
 
 Uma nova \textit{API} de atendimento de interrupções foi criada com este propósito, e encontra-se analisada na subsecção \ref{par:NAPI}.
 
 \subparagraph*{Utilização de processadores \textit{multi-core} na captura}
-Hoje em dia a utilização de máquinas equipadas com processadores \textit{multi-core} é uma realidade, daí que a utilização destes permite ultrapassar algumas dificuldades sentidas na captura de pacotes.
-Se for os processadores \textit{multi-core} atenderem em parelelo as diversas interrupções, originadas pelo envio ou recepção de pacotes, o desempenho da rede é passivel de ser aumentado. 
-É díficil atingir este paralelismo para todas as interfaces de rede, pois nem todas estão fisicamente preparadas para beneficiar de arquitecturas com multiplos \textit{cores}.
+Hoje em dia a utilização de máquinas equipadas com processadores \textit{multi-core} é uma realidade, daí que a sua utilização permita ultrapassar algumas dificuldades sentidas na captura de pacotes.
+Se for os processadores \textit{multi-core} atenderem em parelelo as diversas interrupções, originadas pelo envio ou recepção de pacotes, o desempenho da rede é passível de ser aumentado.
+No entanto, revela-se díficil atingir este paralelismo para todas as interfaces de rede, pois nem todas estão preparadas para beneficiar de arquitecturas com múltiplos \textit{cores}.
 
 
 \subsection{Transferência de informação}\label{sect:transf_information}
@@ -217,9 +221,9 @@ Se for os processadores \textit{multi-core} atenderem em parelelo as diversas in
 % Como existe uma arquitectura estruturada dentro do sistema de operação para comunicar, esta deve ser respeitada. Por questões de eficiência diversas vezes esta estrutura é desrespeitada em detrimento do aumento das transferências de dados.
 
 Transferir informação de um para outro ponto, dentro de um sistema quase sempre envolve uma cópia de dados.
-Esta cópia pode revelar-se demasiado pesada no desempenho do sistema, especialmente se o meio for de transmissão lenta e o número de dados envolvidos nesta transferência for elevado, ou ainda se a frequência com que esta é efectuada, for demasiada.
+Esta cópia pode revelar-se demasiado pesada no desempenho do sistema, especialmente se o meio for de transmissão lenta e o número de dados envolvidos nesta transferência for elevado, ou ainda, se for efectuada com demasiada frequência.
 Estas transferências/cópias de dados, para além da cópia própriamente dita, necessitam de trocas de contexto entre o núcleo de sistema e as aplicações, porque apenas o núcleo do sistema pode efectuar instruções privilegiadas, de forma a garantir a segurança e robustez do sistema.
-Diferentes técnicas têm sido desenvolvidas visando o desempenho destas operações. 
+Diferentes técnicas têm sido desenvolvidas visando o aumento do desempenho destas operações. 
 
 \section{Sistemas de monitorização no núcleo do \textit{Linux}}\label{sect:instrumentacao_casos_linux}
 
@@ -262,20 +266,20 @@ Para efectuar esta operação é utilizada a técnica do trampolim~\cite{Holling
 Para utilizar o \textit{KProbes} é necessário criar um módulo para o núcleo do sistema de operação, com informações relativas às rotinas a instrumentar.
 Para além destas, o módulo tem de conter igualmente os \textit{handlers} de análise, assim como outros parâmetros necessários à realização da instrumentação.
 Uma vez que os módulos são escritos em linguagem C ou \textit{assembly}, foram desenvolvidas as ferramentas, \textit{DProbes} e \textit{SystemTap}.
-Estas novas ferramentas de mais alto nível ajudam no desenvolvimento de \textit{scripts}, simplificando e melhorando a segurança na utilização desta ferramenta de instrumentação (\textit{KProbes}).
+Estas novas ferramentas de mais alto nível, ajudam no desenvolvimento de \textit{scripts}, simplificando e melhorando a segurança na utilização desta ferramenta de instrumentação (\textit{KProbes}).
 
 Quando o módulo é inserido no núcleo de sistema, o registo dos \textit{handlers} das funções a serem instrumentadas é efectuado de forma atómica.
 A execução do \textit{KProbes} não utiliza nenhum \textit{mutex} ou outra forma de controlo de concorrência, apenas funciona com a preempção desligada.
 Dependendo do contexto, os \textit{handlers} podem ser executados com as interrupções desligadas.
 
-A instrumentação processa-se pela substituição dos endereços das funções a serem analisadas, por interrupções (utilizando neste caso o \textit{int 3}).
+A instrumentação, processa-se substituindo por interrupções as instruções ou funções a serem analisadas, utilizando neste caso o \textit{int 3}.
 Quando possível o \textit{KProbes} utiliza instruções do processador especializadas no \textit{debug} de forma a minimizar o grau de perturbação.
 
 Apesar de ser possível instrumentar praticamente todo o núcleo do sistema de operação, existem algumas situações que podem requerer alguma perícia na forma como são tratadas.
-Quando o compilador realiza substituição de funções por código \textit{inline}, as instruções que anteriormente estavam dentro da função passam a fazer parte do ponto onde foram substituídas, deixando de existir um ponto de entrada na função.
+Quando o compilador realiza substituição de funções por código \textit{inline}, as instruções que anteriormente estavam dentro da função passam a integrar o ponto onde foram substituídas, deixando de existir um ponto de entrada na função.
 Assim sendo, a função deixa de existir, impossibilitando a instrumentação destas funções.
 
-Existe uma nova optimização do \textit{KProbes} nas últimas versões do núcleo de operação, nomeadamente nas versões 2.6.32 e 2.6.33.
+Existe uma nova optimização do \textit{KProbes} nas últimas versões do núcleo de operação do \textit{Linux}, nomeadamente nas versões 2.6.32 e 2.6.33.
 % Esta optimização consiste em utilizar a instrução \textit{jmp} em vez da interrupção \textit{int3}, mais pesada, 
 % mas estas substituição não pode ser efectuada em todas as situações. (ME) falta descrever ou não o pq de ser mais pesada
 
@@ -308,6 +312,7 @@ Apesar de no pacote de aplicações desta ferramenta, existir um visualizador gr
 Para ultrapassar esta limitação, novas ferramentas estão a ser desenvolvidas.
 Uma destas ferramentas designada por \textit{bootlimn}, está actualmente a ser desenvolvida no \textit{Google Summer of Code}, com o objectivo de utilizar o \textit{SystemTap} para recolher informações sobre o arranque do sistema, agregando estes dados no formato \textit{XML}.
 Os dados recolhidos, permitem visualizações gráficas do processo de inicialização do sistema, bem como da utilização de disco e \textit{CPU}.
+
 Outro projecto conhecido como \textbf{Systemtap GUI}, que engloba o \textbf{System Tap Editor Plug-in} para a ferramenta Eclipse, é um ambiente onde podem ser analisados e visualizados os dados recolhidos pelo \textit{SystemTap}.
 O \textit{System Tap Editor Plug-in} é um \textit{plug-in} para a ferramenta de desenvolvimento \textit{Eclipse}, de modo a ajudar no desenvolvimento dos \textit{TapSets} para o \textit{SystemTap}.
 
@@ -319,7 +324,7 @@ O \textit{SystemTap} actualmente está a ser desenvolvido por empresas de reconh
 % Utiliza o Klog com repositorio da informação obtida do kernel.
 O \textit{Linux Trace ToolKit} é uma ferramenta um pouco mais antiga que o \textit{KProbes}, constituída por quatro componentes: o \textit{Kernel Patch}, o \textit{Kernel Module} o \textit{Trace Daemon} e o \textit{Data Decoder}, foi substituída pelo \textit{Linux Trace Toolkit New Generation} que se apresenta em seguida.
 
-\subparagraph{Linux Trace Toolkit New Generation}\label{cap:lttng_overview}
+\subparagraph{Linux Trace Toolkit New Generation - }\label{cap:lttng_overview}
 
 % Nesta versão a comunicação entre o kernel e aplicação em user space é efectuada utilizando o relayfs.
 % O RelayFs é um sistema de ficheiros para comunicação entre o código dentro e fora do núcleo de operação.
@@ -331,15 +336,15 @@ A transferência dos dados do núcleo de sistema para a aplicação, é efectuad
 
 %A utilização desta ferramenta em sistemas de tempo real é um bom indicador da sua performance.
 
-\subparagraph{Linux Trace Toolkit Viewer}\label{cap:lttv_overview}
-O \textit{Linux Trace Toolkit Viewer (LTTV)} é um projecto desenvolvido em paralelo com o \textit{LTT} e \textit{LTTng} de forma a possibilitar uma análise visual dos dados recolhidos por estas aplicações.
+\subparagraph{Linux Trace Toolkit Viewer - }\label{cap:lttv_overview}
+O \textit{Linux Trace Toolkit Viewer (LTTV)} é um projecto desenvolvido em paralelo com o \textit{LTT} e \textit{LTTng}, de forma a possibilitar uma análise visual dos dados recolhidos por estas aplicações.
 Esta ferramenta possibilita igualmente realizar um traço de execução, uma vez que os dados recolhidos contêm uma estampilha temporal, do momento em que foram obtidos.
 
 
 \subsection{Linux Kernel State Tracer}
 % Linux Kernel State Tracer(LKST) records information as trace data about events in the Linux Kernel. It records various events like process context switch, send signal, exception, memory allocation, send packet, and so on. 
 
-O \textit{Linux Kernel State Tracer(LKST)} obtém informações referentes ao núcleo de sistema de forma a criar um traço de execução, e consegue capturar diferentes eventos como trocas de contexto, envio de sinais, alocação de memória, transmissão de pacotes, etc.
+O \textit{Linux Kernel State Tracer(LKST)} obtém informações referentes ao núcleo de sistema, de forma a criar um traço de execução, e consegue capturar diferentes eventos como trocas de contexto, envio de sinais, alocação de memória, transmissão de pacotes, etc.
 
 % a\subparagraph{DJProbe}
 \label{cap:djprobe}
@@ -347,9 +352,9 @@ O \textit{Linux Kernel State Tracer(LKST)} obtém informações referentes ao n�
 % Duvidas na forma como é controlado o sistema na presença de processadores maquinas com multiplos processadores.
 % Não utiliza o int 3 para fazer o trap por isso segundo o artigo fica mais leve que o KProbe e o JProbe.
 % DJProbe  quer dizer Direct Jump Probe faz um jmp e não usa o int 3.
-Actualmente está a ser desenvolvido um subprojecto do \textit{Linux Kernel Stace Tracer} designado por \textit{Direct Jump Probe}.
+Actualmente, está a ser desenvolvido um subprojecto do \textit{Linux Kernel Stace Tracer} designado por \textit{Direct Jump Probe}.
 O \textit{Direct Jump Probe} é uma optimização à utilização do \textit{trap int3}, presente em alguns processadores, e que pode trabalhar em conjunto com o \textit{KProbes} \ref{sect:KProbes_overview}.
-Esta optimização pode ser verificada na comparação efectuada no relatório\cite{Hiramatsu2005}.
+Esta optimização pode ser verificada no relatório\cite{Hiramatsu2005}.
  
 \subsection{OProfile}\label{cap:Oprofile_overview}
 As ferramentas anteriormente referidas utilizam mecanismos para formar um traço de execução, este difere neste facto.
@@ -428,13 +433,13 @@ Os \textit{Ring Buffers} são utilizados tendo presente a relação custo / bene
 %VERIFICAR a origem do NAPI 
 
 Foi criada uma nova \textit{API} (\textit{Application Program Interface}) de atendimento de interrupções do processador, oriundos das interfaces de rede, com o objectivo de aumentar o desempenho da utilização de rede de elevado débito.
-Esta nova \textit{API} permite desligar a atenção do processador a novas interrupções, oriundas da interface de rede, durante um certo período de tempo.
+Esta nova \textit{API}, permite desligar a atenção do processador a novas interrupções, oriundas da interface de rede, durante um certo período de tempo.
 
 Este tempo foi definido, de forma a que não se verifiquem situações de elevada latência na chegada dos pacotes às aplicações.
 A forma anterior de recepção de pacotes, era efectuada de modo a atender uma interrupção por cada pacote que chegava à interface de rede, gerando assim demasiada sobrecarga no sistema.
 Actualmente a arquitectura de rede, está balanceada de forma a mudar o modo de atendimento de interrupções para NAPI, caso existam demasiadas interrupções por unidade de tempo.~\cite{administrator:napi}.
 
-Utilizando esta nova \textit{API}, é possível explorar um escalonamento mais eficiente das interrupções em situações de intensa actividade do processador.
+Utilizando esta nova \textit{API}, é possível explorar um escalonamento mais eficiente das interrupções, em situações de intensa actividade do processador.
 O \textit{NAPI} apenas pode ser aplicado nos caso em que os controladores das interfaces de rede estejam preparados para utilizar alguma forma de mitigação da interrupção, caso contrário esta \textit{API} não é aplicada.
 
 \subsection{Com o exterior do sistema}
@@ -451,7 +456,7 @@ Outros como o \textit{DebugFs} ou o \textit{RelayFs} são mais recentes e com no
 %diferentes abordagens e o pq de ter de existirem estas formas
 
 \paragraph*{}
-De forma a obter informações relativas a estruturas dentro do núcleo de sistema foram referênciados os seguintes sistemas de comunicação entre o utilizador e o núcleo, a saber:
+De forma a obter informações relativas a estruturas dentro do núcleo de sistema, foram referênciados os seguintes sistemas de comunicação entre o utilizador e o núcleo, a saber:
 
 \paragraph*{ProcFs - }\label{cap:ProcFs_overview}
 
@@ -462,20 +467,20 @@ Apesar de novos subsistemas como o \textit{SysFs} terem sido criados, é ainda u
 
 Este sistema de ficheiros virtual foi desenvolvido para colmatar algumas deficiências encontradas no \textit{ProcFs}(secção \ref{cap:ProcFs_overview}).
 Estes problemas situam-se basicamente na forma como a quantidade de informação disponibilizada está distribuída sobre o \textit{ProcFs}.
-Este novo sistema de ficheiros virtual, evidencia algumas restrições, designadamente a forma como são disponibilizados os dados do núcleo de sistema.
-Esta limitação conduziu a que outros sistemas de ficheiros virtuais, nomeadamente o \textit{DebugFs} e o \textit{RelayFs} fizessem a sua aparição.
+Este novo sistema de ficheiros virtual, evidencia algumas restrições, designadamente na forma como são disponibilizados os dados do núcleo de sistema.
+Esta limitação conduziu a que outros sistemas de ficheiros virtuais, nomeadamente o \textit{DebugFs} e o \textit{RelayFs}, fizessem a sua aparição.
 
 \paragraph*{DebugFs - }\label{cap:DebugFs_overview}
 
 Este sistema foi essencialmente criado a pensar nas necessidades sentidas pelos programadores.
 Apesar de já existirem dois sistemas de ficheiros virtuais, o \textit{ProcFs} e o \textit{SysFs}, este tentou colmatar os problemas que se apresentavam, não obstante não se mostrar tão estruturado como o \textit{SysFs}, e com melhor organização de dados que o \textit{ProcFs}.
 
-O sistema de instrumentação do núcleo de sistema \textit{Linux}, \textit{KProbes}, utiliza este sistema de ficheiros virtual de forma a apresentar os pontos onde existe instrumentação no núcleo de sistema.
+O sistema de instrumentação do núcleo de sistema \textit{Linux}, \textit{KProbes}, utiliza este sistema de ficheiros virtual, de forma a apresentar os pontos, onde existe instrumentação no núcleo de sistema.
 
 \paragraph*{RelayFs - }\label{cap:RelayFs_overview}
 
 Este sistema de ficheiros virtual foi desenvolvido tendo em mente a transferência de grandes quantidades de dados entre o núcleo de sistema e o espaço de utilizador.
-O \textit{RelayFs} permite um aumento de transferências de dados entre o núcleo de sistema e o processo em nível utilizador, fazendo uso de novas primitivas onde são mais reduzidas as zonas de controlo de concorrência\cite{Donovan2007}.
+O \textit{RelayFs} responde a esta exigência, fazendo uso de novas primitivas onde são mais reduzidas as zonas de controlo de concorrência\cite{Donovan2007}.
 
 \paragraph*{NetLink - }\label{cap:NetLink_overview}
 O \textit{NetLink} utiliza uma forma de comunicação baseada em \textit{sockets} para estabelecer a comunicação entre o núcleo de sistema e os processos em nível utilizador. 
