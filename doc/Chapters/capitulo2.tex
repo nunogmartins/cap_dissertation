@@ -687,11 +687,11 @@ Com este novo \textit{instruction set}, e sem necessidade de verificação, foi 
 
 A captura do tráfego respeitante a um processo, foi alvo de estudo em \cite{1688981} e em \cite{Farruca:2009}, esta última objecto de uma dissertação de mestrado.
 
-No primeiro trabalho foi desenvolvido um sistema de captura de pacotes de um determinado processo, utilizando um módulo no núcleo de sistema que intercepta e captura os pacotes do processo.
+No primeiro trabalho, foi desenvolvido um sistema de captura de pacotes de um determinado processo, utilizando um módulo no núcleo de sistema que intercepta e captura os pacotes do processo.
 
-Este sistema é composto por três componentes essenciais, uma dentro do núcleo de sistema e duas em nível utilizador.
-Na realização do trabalho foi utilizada a ferramenta \textit{KProbes} para a monitorização de algumas funções do núcleo de sistema \textit{Linux}, de forma a conhecer quais os portos que uma determinada aplicação vai utilizar.
-Logo que obtida a informação, esta é enviada para um processo em nível utilizador que tem o registo de todos os portos que estão a ser utilizados pela aplicação objecto de monitorização.
+Este sistema é constituido por três componentes essenciais, uma dentro do núcleo de sistema e duas em nível utilizador.
+Na realização do trabalho, foi utilizada a ferramenta \textit{KProbes} para a monitorização de algumas funções do núcleo de sistema \textit{Linux}, de forma a conhecer quais os portos que vão ser utilizados por uma determinada aplicação.
+Logo que obtida, a informação é enviada para um processo em nível utilizador que tem o registo de todos os portos que estão a ser utilizados pela aplicação objecto de monitorização.
 Se esse porto não estiver a ser monitorizado, essa informação é passada a outro processo que utiliza a biblioteca \textit{LibPcap} de forma a capturar o tráfego existente nesse porto.
 
 
@@ -705,19 +705,20 @@ Se esse porto não estiver a ser monitorizado, essa informação é passada a ou
 
 Analisando a arquitectura de monitorização de tráfego representada na figura~\ref{fig:paper_capture_kprobes}, o ACAP\_Collector e o ACAP\_Capturer, estão em nível utilizador, de onde se infere que o desempenho desta ferramenta é passível de ser aumentado, caso esta seja completamente implementada dentro do núcleo de sistema de operação.
 
-Relativamente ao segundo trabalho foram implementadas duas abordagens: uma com monitorização da aplicação e outra através de informações pertencentes ao núcleo do sistema de operação.
-No que à primeira diz respeito, a monitorização efectuada foi através da interceptação das chamadas à bibiloteca \textit{LibC}, para a utilização de \textit{sockets}, criando uma bibiloteca partilhada com a mesma sintaxe das chamadas que são utilizadas.
+Relativamente ao segundo trabalho, foram implementadas duas abordagens: uma com monitorização da aplicação e outra através de informações pertencentes ao núcleo do sistema de operação.
+No que à primeira diz respeito, a monitorização efectuada processou-se através da interceptação das chamadas à bibiloteca \textit{LibC}, para a utilização de \textit{sockets}, criando uma bibiloteca partilhada com a mesma sintaxe das chamadas que são utilizadas.
 A opção pela utilização deste método, implica definir a variável de ambiente \textit{LD\_PRELOAD}, de forma a operar esta intercepção.
 Como esta biblioteca está em nível utilizador, mostra-se necessário capturar todos os pacotes e apenas em nível utilizador visualizar o tráfego respeitante ao processo.
 Esta obrigatoriedade de capturar todos os pacotes pode constituir uma tarefa com elevado grau de perturbação do sistema.
+
 No que à segunda abordagem se refere, o método de monitorização utilizado baseou-se na consulta efectuada de forma regular com intervalos reduzidos, dos dados referentes aos portos de comunicação, utilizados pela aplicação, que são exportados pelo núcleo através do \textit{ProcFs}.
 Esta forma de monitorização consome demasiados recursos e não se mostra totalmente fiável, na medida em que quanto menor o intervalo de tempo utilizado, maior é a perturbação apresentada pelo sistema.
 
 \section{Filtragem de pacotes de um processo através do \textit{Netfilter}}
 
 O \textit{NetFilter} é o sistema de filtragem de pacotes do núcleo do \textit{Linux} que irá ser apresentado na secção \ref{}.
-Foi implementado um módulo do núcleo utilizando o \textit{NetFilter} que filtra os pacotes pertencentes ao um processo ou utilizador.
-Este sistema a cada pacote que é recebido ou enviado verifica se este pertence ao processo ou processos pertencentes a um utilizador, verificando canal a canal se o identificador do canal do pacote é igual a um canal do processo. Se 
+Foi implementado um módulo no núcleo utilizando o \textit{NetFilter} que filtra os pacotes pertencentes a um processo ou utilizador.
+Este sistema, verifica relativamente a cada pacote que é recebido ou enviado, se este faz parte do processo ou processos pertencentes a um utilizador, verificando canal a canal se o identificador do canal do pacote é igual ao canal do processo.
 
 
 
