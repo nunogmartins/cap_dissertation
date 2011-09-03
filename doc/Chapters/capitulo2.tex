@@ -483,10 +483,10 @@ Este sistema de ficheiros virtual foi desenvolvido tendo em mente a transferênc
 O \textit{RelayFs} responde a esta exigência, fazendo uso de novas primitivas onde são mais reduzidas as zonas de controlo de concorrência\cite{Donovan2007}.
 
 \paragraph*{NetLink - }\label{cap:NetLink_overview}
-O \textit{NetLink} utiliza uma forma de comunicação baseada em \textit{sockets} para estabelecer a comunicação entre o núcleo de sistema e os processos em nível utilizador. 
- Tendo como abstracção os \textit{sockets} este sistema tem igualmente a possibilidade de enviar dados para múltiplos processos, devido à utilização das primitivas de envio colectivo (\textit{Multicast}).
+O \textit{NetLink} utiliza uma forma de comunicação baseada em \textit{sockets}, para estabelecer a comunicação entre o núcleo de sistema e os processos em nível utilizador. 
+ Tendo como abstracção os \textit{sockets}, este sistema tem igualmente a possibilidade de enviar dados para múltiplos processos, devido à utilização das primitivas de envio colectivo (\textit{Multicast}).
 % \todo{Explicar melhor o NetLink}
- É com base no \textit{NetLink} que a comunicação entre processos dentro da mesma máquina (\textit{IPC}) é implementada.
+ É com base no \textit{NetLink}, que a comunicação entre processos dentro da mesma máquina (\textit{IPC}) é implementada.
 %Isto ja e novo
  A comunicação com diferentes partes do subsistema de rede é efectuada recorrendo a este sistema de \textit{sockets}.
 
@@ -531,7 +531,7 @@ Se limitarmos a análise comparativa aos sistemas \textit{RelayFs} e \textit{Net
 
 A monitorização de rede existente no \textit{Gnu Linux} permite capturar os pacotes de rede logo que eles chegam ao controlador de rede.
 Assim a biblioteca \textit{LibPcap}\cite{:LibPcap} faz uso desta possibilidade.
-Uma das principais características desta biblioteca é a sua \textit{API} de alto nível para a captura de pacotes que é igual em todas as plataformas.
+Uma das principais características desta biblioteca, é a sua \textit{API} de alto nível para a captura de pacotes, que é igual em todas as plataformas.
 Para filtrar os pacotes indesejados a \textit{LibPcap}, utiliza filtros baseados no \textit{BPF (Berkeley Packet Filtering)}, implementados no núcleo de sistema, de modo a que a monitorização se torne mais eficiente.
 
 Em seguida é apresentada a arquitectura da biblioteca \textit{Pcap}.
@@ -540,7 +540,7 @@ Em seguida é apresentada a arquitectura da biblioteca \textit{Pcap}.
 \label{sect:architecture_libpcap}
 A arquitectura do \textit{Pcap} divide-se em duas partes: a biblioteca a nível utilizador, e o módulo no núcleo de sistema composto por \textit{sockets} e filtros que são utilizados na captura.
 Como se constata na figura \ref{fig:pcap_architecture} a utilização de filtros é aplicada assim que os pacotes são recebidos.
-Este sistema de captura permite que pacotes que não são visíveis às aplicações devido à \textit{firewall} do \textit{Linux} possam ser capturados e analisados pelas ferramentas de monitorização de rede.
+Este sistema de captura, permite que pacotes que não são visíveis às aplicações, devido à \textit{firewall} do \textit{Linux} possam ser capturados e analisados pelas ferramentas de monitorização de rede.
 
 \begin{figure}[h]
        \centering
