@@ -589,14 +589,14 @@ De forma a medir o desempenho da \textit{LibPcap}, é frequente utilizar-se uma 
 Esta métrica é calculada sabendo o número de pacotes que atravessam um determinado \textit{router ou switch}, e compará-la com o número de pacotes capturados na interface.
 Uma variante desta medida de desempenho é combiná-la com o máximo número de regras que é possível aplicar, sem que se assista à perda de pacotes.
 É particularmente importante conhecer o número máximo de pacotes capturados ou regras aplicáveis aos filtros, afim de determinar a velocidade máxima expectável de captura.
-Quanto mais eficiente for a filtragem, menor o número de pacotes transferidos para as aplicações, o que se traduz numa menor sobrecarga para o sistema aumentando o seu desempenho.
+Quanto mais eficiente for a filtragem, menor o número de pacotes transferidos para as aplicações, o que se traduz numa menor sobrecarga para o sistema, aumentando o seu desempenho.
 
 \paragraph{Captura de pacotes com \textit{TimeStamp}}
 % como etiquetar os pacotes 
 Um dos pontos que pode influenciar negativamente o desempenho da obtenção de pacotes, sem que contudo seja significativo, é a necessidade de colocar nestes, uma estampilha temporal, com o tempo da sua chegada ao sistema.
-O \textit{LibPcap} pode obter estes dados de duas formas distintas dependo da interface de rede que esteja a ser utilizada.
+O \textit{LibPcap} pode obter estes dados de duas formas distintas, dependo da interface de rede que esteja a ser utilizada.
 Se a interface de rede conseguir fornecer a estampilha temporal associada ao pacote, o \textit{LibPcap} pode utilizar este valor, caso contrário será necessário obter a estampilha temporal da chegada do pacote ao sistema.
-A forma de obtenção da estampilha pela \textit{LibPcap} processa-se através da chamada ao sistema \textit{gettimeofday}.
+A forma de obtenção da estampilha pela \textit{LibPcap}, processa-se através da chamada ao sistema \textit{gettimeofday}.
 
 \subsubsection{Implementações que permitem um aumento da taxa de transferência}
 
@@ -618,7 +618,7 @@ Esta técnica encontra-se descrita na sub-secção \ref{par:NAPI}
 Com base na técnica \textit{MMAP} descrita em \ref{par:MMAP_overview}, foi criado o \textit{PACKET\_MMAP}, disponível a partir da versão 1.0.0 da biblioteca do \textit{LibPcap}.
 Este módulo permite algumas melhorias em termos de desempenho, visto que foi reduzido o número de cópias efectuadas e de trocas de contexto, face à anterior versão 0.9.8 da biblioteca \textit{LibPcap}.
 
-Para além destas modificações no \textit{Packet\_MMAP} o núcleo de sistema de operação \textit{Linux} na sua versão 2.6, passou a contar com a nova \textit{API} de rede (\textit{NAPI}).
+Para além destas modificações no \textit{Packet\_MMAP}, o núcleo de sistema de operação \textit{Linux} na sua versão 2.6, passou a contar com a nova \textit{API} de rede (\textit{NAPI}).
 
 Se as interfaces de rede suportarem um mecanismo de mitigação de interrupções, é possível obter melhores resultados, conforme \cite{Deri2004}.
 
@@ -653,7 +653,7 @@ De forma a tirar partido das arquitecturas \textit{multi-core}, é necessário q
  O dinamismo das aplicações, nomeadamente das aplicações multimédia, deu origem a diversos estudos sobre a forma de monitorização de rede, que estas necessitam.
 Estas aplicações utilizam diversos fluxos de dados, designadamente de transmissão e de recepção.
 Em geral, as aplicações multimédia, com base na \textit{internet} utilizam uma metodologia cliente/servidor, onde o servidor aguarda pedidos do cliente num determinado porto.
-O cliente conhecendo antecipadamente este porto liga-se.
+O cliente, conhecendo antecipadamente este porto, liga-se.
 A partir deste ponto, iniciam-se trocas de informações que irão originar a troca de portos dinâmicos e posteriormente o processo de transmissão/recepção de dados multimédia.
 
 As aplicações multimédia assentes na \textit{internet} são apenas um exemplo de aplicações com diversos fluxos, em que as portas de comunicação entre as aplicações, são negociadas dinamicamente.
@@ -665,22 +665,22 @@ e \textit{Swift}\cite{1387609} são dois destes casos estudados, que merecem esp
 
 \paragraph*{MMDump - } É uma ferramenta de monitorização de protocolos multimédia com suporte na rede.
 Esta aplicação tem como base o \textit{tcpdump}, sendo a captura de pacotes efectuada através da utilização de filtros.
-Para determinar os portos a obter, é necessário analisar o conteúdo dos pacotes direccionados a portos específicos, a partir destes é possível conhecer os novos portos negociados dinamicamente pela aplicação, e proceder à alteração dos filtros a aplicar.
-Como a alteração, que é constituida pela cópia do novo filtro para o núcleo e verificação de segurança, de forma a validá-lo, é um processo demorado, é necessário reduzir este tempo, com o objectivo de ter uma aplicação que consiga minimizar o grau de perturbação no sistema.
+Para determinar os portos a obter, é necessário analisar o conteúdo dos pacotes direccionados a portos específicos, e a partir destes é possível identificar os novos portos negociados dinamicamente pela aplicação, e proceder à alteração dos filtros a aplicar.
+Como a alteração, que é constituída pela cópia do novo filtro para o núcleo e verificação de segurança, de forma a validá-lo, é um processo demorado, é necessário reduzir este tempo, com o objectivo de ter uma aplicação que consiga minimizar o grau de perturbação no sistema.
 
 Na alteração do filtro, foi verificado que existe um certo padrão, que consiste em pré-estabelecer uma parte comum a ser adicionada ao filtro, e apenas alterar a parte referente aos portos.
 
-Esta forma de monitorização é muito especifica, pelo que é imprescindível todo o protocolo interno de comunicação.
+Esta forma de monitorização é muito específica, pelo que é imprescindível todo o protocolo interno de comunicação.
 Assim, para cada novo protocolo a monitorizar, é necessário acrescentar um novo módulo com a interpretação desse protocolo.
 
 % \paragraph*{\textit{Fairly Fast Packet Filter} (FFPF)}
 
 \paragraph*{\textit{Swift} - }
-É uma ferramenta de criação de filtros, cujo principal objectivo é a melhoria do desempenho da utilização destes, na captura de tráfego de rede.
+É uma ferramenta de criação de filtros, cujo principal objectivo é a melhoria do desempenho da utilização destes, na captura do tráfego de rede.
 Nesta ferramenta, foi avaliado o tempo de alteração dos filtros, utilizando o \textit{Linux Socket Filtering}, pois estes são os filtros de referência no sistema de operação \textit{Linux}.
 A aplicação destes filtros a partir da biblioteca \textit{LibPcap} compreende três fases: cópia do filtro definido em nível utilizador para o núcleo de sistema, verificação de segurança, e aplicação do filtro.
-De forma a diminuir a latência de actualização dos filtros, foi criada uma especificação de modo que estes não necessitassem de ser analisados relativamente à segurança, visto que a própria linguagem garante as propriedades de segurança necessárias.
-Com este novo \textit{instruction set}, e sem necessidade de verificação, reduziram a latência de actualização dos filtros, o que conduziu a um aumento de desempenho na utilização de filtros dinâmicos.
+De forma a diminuir a latência de actualização dos filtros, foi criada uma especificação de modo a que estes não necessitassem de ser analisados relativamente à segurança, visto que a própria linguagem garante as propriedades de segurança necessárias.
+Com este novo \textit{instruction set}, e sem necessidade de verificação, foi reduzida a latência de actualização dos filtros, o que conduziu a um aumento de desempenho na utilização de filtros dinâmicos.
 
 \section{Captura de tráfego de um processo utilizando monitorização da estrutura de rede}
 \label{sect:outras_abordagens}
