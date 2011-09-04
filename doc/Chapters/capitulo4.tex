@@ -378,9 +378,9 @@ O sistema proposto foi desenvolvido procurando cumprir os seguintes requisitos:
 \end{itemize}
 
 Assim, o sistema criado está dividido em quatro componentes principais: filtragem dos pacotes de rede, instrumentação das chamadas ao sistema, repositório do estado das interacções via rede, e controlo e informação sobre o estado da monitorização (ver figura \ref{arquitectura}).
-A função de filtragem, é invocada por um \textit{hook} que estende o \textit{LSF}, permite que apenas o tráfego do processo alvo seja analisado pelo restante sistema de fitragem do \textit{LSF}.
+A função de filtragem, invocada por um \textit{hook} que estende o \textit{LSF}, permite que apenas o tráfego do processo alvo seja analisado pelo restante sistema de fitragem do \textit{LSF}.
 Relativamente à componente instrumentação das chamadas ao sistema (ou outras funções contidas no sistema de rede), actualiza a componente repositório de dados, onde é mantido o estado das interacções via rede do(s) processo(s) alvo, com as efectuadas pelo processo.
-Existe ainda um sistema para controlo/configuração destinado a obter informação sobre o estado da monitorização.
+Existe ainda um sistema para controlo/configuração, destinado a obter informação sobre o estado da monitorização.
 
 \begin{figure}[htbp]
 \begin{center}
@@ -412,9 +412,9 @@ Este módulo do núcleo foi desenvolvido em quatro componentes, que a seguir se 
 \subsection{Instrumentação das chamadas ao sistema de rede}
 \label{sub:mon_syscalls}
 
-A principal relevância deste sistema, assenta na gartantia de que todas as interacções desencadeadas por um processo com o exterior sejam detectadas.
+A principal relevância deste sistema, assenta no pressuposto de que todas as interacções desencadeadas por um processo com o exterior são detectadas.
 Para atingir esse objectivo, foi necessário recorrer à monitorização das chamadas ao sistema de rede ao nível do núcleo, possibilitando reduzir as cópias de dados e as trocas de contexto.
-Fazendo uso do sistema de monitorização \textit{KProbes} foi possível realizar a monitorização sob o limitando conjunto de chamadas ao sistema, nomeadamente: \textit{sendto}, \textit{recvfrom}, \textit{bind}, \textit{accept}, \textit{connect} e \textit{close}.
+Fazendo uso do sistema de monitorização \textit{KProbes}, foi possível realizar a monitorização sob um limitado conjunto de chamadas ao sistema, nomeadamente: \textit{sendto}, \textit{recvfrom}, \textit{bind}, \textit{accept}, \textit{connect} e \textit{close}.
 
 
 %Na realidade constatou-se que chamada ao sistema close, ao ser utilizada intensivamente por todo o sistema de ficheiros, poderia degradar desnecessariamente o desempenho.
@@ -423,34 +423,35 @@ Fazendo uso do sistema de monitorização \textit{KProbes} foi possível realiza
 \subsection{Estado do processo}
 \label{sub:data_repository}
 
-O estado dos portos dos protocolos \textit{TCP} e \textit{UDP} em uso no processo alvo é mantido num repositório de dados e permanentemente actualizado pelo componente anteriormente referido em \ref{sub:mon_syscalls}.
+O estado dos portos dos protocolos \textit{TCP} e \textit{UDP} em uso no processo alvo, é mantido num repositório de dados e permanentemente actualizado pelo componente anteriormente referido em \ref{sub:mon_syscalls}.
 A árvore \textit{Red and Black} já disponível no núcleo do sistema, foi a estrutura dados escolhida para produzir o repositório pretendido.
 
-O conteúdo de cada folha da árvore é uma estrutura com duas listas de elementos, cada uma contendo endereços IP utilizados pela aplicação.
-A chave de indexação das folhas é o número do porto, desta forma a árvore poderá conter no máximo 65535 elementos, por ser este o número máximo de portos em utilização por um endereço \textit{IP}.
+O conteúdo de cada folha da árvore é uma estrutura com duas listas de elementos, contendo cada uma endereços \textit{IP} utilizados pela aplicação.
+A chave de indexação das folhas é o número do porto.
+Desta forma, a árvore poderá conter no máximo 65535 elementos, por ser este o número máximo de portos em utilização por um endereço \textit{IP}.
 No pior caso, a procura de um porto na árvore necessitará de efectuar dezasseis iterações, uma vez que \begin{math}\log _2 65536 = 16 \end{math}.
 
 %\td{conteúdo? ip, interface, porto udp, porto tcp, etc??}
-  O uso deste tipo de estrutura permite obter um bom compromisso entre o tempo de acesso à estrutura e a quantidade de memória utilizada.
+O uso deste tipo de estrutura, permite obter um bom compromisso entre o tempo de acesso aos dados e a quantidade de memória utilizada.
 
 
 \subsection{Filtro de pacotes}
 \label{sub:packet_filter}
 
 A função de filtragem implementada neste sistema assenta no estado do processo alvo, mantido pelos módulos anteriormente descritos.
-Através da extensão do \textit{LSF} com um \textit{hook}, este quando ligado invoca esta filtragem que devolve ao \textit{LSF} informando-o se o pacote deve ou não ser capturado.
-Se for capturado indica que este pacote pertence ao processo alvo, caso contrário irá avaliar as restantes regras de filtragem definidas.
-Mantém-se assim a compatibilidade e os beneficios da utilização do \textit{Linux Socket Filter}.
+Através da extensão do \textit{LSF} com um \textit{hook}, este quando ligado, invoca esta filtragem que devolve ao \textit{LSF}, informando-o se o pacote deve ou não ser capturado.
+Se for capturado indica que este pertence ao processo alvo, caso contrário irá avaliar as restantes regras de filtragem definidas.
+Mantêm-se assim, a compatibilidade e os benefícios da utilização do \textit{Linux Socket Filter}.
 Quando não existe uma ligação (\textit{hook}) activa, assiste-se a um ligeiro decréscimo no desempenho na utilização da filtragem estática.
-Tal facto deve-se apenas à necessidade de constatar se a ligação está ou não activo.
+Tal facto deve-se apenas à necessidade de constatar se a ligação está ou não activa.
 
-Como se pode verificar este sistema interage com o filtro estático do \textit{LSF}, efectuando uma conjunção entre o filtro definido pelo utilizador e a captura do tráfego da aplicação a ser monitorizada.
+Como se verifica, este sistema interage com o filtro estático do \textit{LSF}, efectuando uma conjunção entre o filtro definido pelo utilizador e a captura do tráfego da aplicação a ser monitorizada.
 
 
 \subsection{Controlo e Informação}
 \label{sub:data_information}
 
-Para facilmente controlar e configurar o sistema desenvolvido foi definida uma interface baseada em ficheiros virtuais numa directoria do (\textit{DebugFS}).
+Para facilmente controlar e configurar o sistema desenvolvido, foi definida uma interface baseada em ficheiros virtuais numa directoria do (\textit{DebugFS}).
 Estes ficheiros com permissões apenas acessíveis ao utilizador \textit{root}, impedem o acesso por parte dos restantes utilizadores da máquina ao sistema de monitorização.
 %Os ficheiros de controlo definidos foram \textit{option}, \textit{pid}, \textit{ppid} e \textit{tgid}.
 
