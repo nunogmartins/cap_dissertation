@@ -5,9 +5,13 @@ Para conceber a arquitectura do sistema de Monitorização de Rede orientado ao 
 Após conhecer a arquitectura de rede do \textit{Linux}, foi imprescindível compreender a forma, como se processa a comunicação e a monitorização de rede.
 
 Neste capítulo irá ser apresentada a constituição do sistema de rede do \textit{Linux}, desde o momento do envio dos dados pelo processo até que estes chegam à interface de rede e vice-versa.
-Como esta visão é muito abrangente, apenas serão focados os pontos essenciais da arquitectura. 
+Considerando a abrangência desta visão, apenas serão focados os pontos essenciais da arquitectura. 
 
----- TODO Dar a ideia de alguns pontos ----
+---- 
+
+TODO Dar a ideia de alguns pontos 
+
+----
 
 Após esta visão geral do sistema de rede do \textit{Linux}, será apresentada a arquitectura proposta para o sistema de Monitorização de Rede orientado ao Processo (MRoP).
 
@@ -16,7 +20,7 @@ Após esta visão geral do sistema de rede do \textit{Linux}, será apresentada 
 \section{Arquitectura de rede em \textit{Linux}}
 \label{sub:network}
 
-Os processos são instâncias de programas e estes num sistema multiprogramado partilham recursos.
+Os processos são instâncias de programas, e estes num sistema multiprogramado partilham recursos.
 Os processos necessitam de comunicar para obter dados, de forma a completar as suas execuções.
 Estas comunicações podem ser efectuadas interna ou externamente ao sistema.
 Em geral as comunicações externas processam-se através de uma interface de rede, para o que é necessário criar canais de comunicação.
@@ -34,19 +38,19 @@ A criação de canais de comunicação é executada através da chamada ao siste
 \label{fig:network_arch}
 \end{figure}
 
-A chamada ao sistema \textit{socket} é efectuada para a criação de um canal de comunicação e este varia em função dos parâmetros familia, tipo e protocolo.
+A chamada ao sistema \textit{socket}, é efectuada para a criação de um canal de comunicação e este varia em função dos parâmetros família, tipo e protocolo.
 
-Existe um agrupamento em familia de endereços (\textit{Address Family}), que se destinam à comunicação remota ou local.
-As comunicações locais podem efectuar-se entre processos (\textit{AF\_UNIX}), ou entre estes e o núcleo (\textit{AF\_NETLINK}), enquanto as remotas podem ter lugar sobre a \textit{internet}, dispondo igualmente de uma familia própria a \textit{AF\_INET}.
+Existe um agrupamento em família de endereços (\textit{Address Family}), que se destina à comunicação remota ou local.
+As comunicações locais podem efectuar-se entre processos (\textit{AF\_UNIX}), ou entre estes e o núcleo (\textit{AF\_NETLINK}), enquanto as remotas podem ter lugar sobre a \textit{internet}, dispondo igualmente de uma família própria a \textit{AF\_INET}.
 
 Os canais possuem um conjunto de funções (\textit{API}) bem definidas, para utilização e controlo, permintindo criar uma forma estruturada de comunicação.
 
 Os administradores de sistemas necessitam filtrar o fluxo de informação que circula nas suas redes, pelo que se tem assitido ao desenvolvimento de sistemas de filtragem de comunicações, conhecidas por \textit{firewalls}.
-Sendo o \textit{Linux} um sistema de operação frequentemente em ambientes de servidores, necessitou naturalmente deste controlo, daí que tenha sido desenvolvido o \textit{NetFilter}, uma \textit{firewall} que \color{red}filtra \color{black}o fluxo de dados que circulam na rede, entre o sistema e a periferia.
+Sendo o \textit{Linux} um sistema de operação frequentemente utilizado em ambientes de servidores, necessitou naturalmente deste controlo, daí que tenha sido desenvolvido o \textit{NetFilter}, uma \textit{firewall} que \color{red}filtra \color{black}o fluxo de dados que circulam na rede, entre o sistema e a periferia.
 
-Para além da filtragem do fluxo de dados, existe um sistema de controlo do escalonamento do fluxo de tráfego, (\textit{Traffic Control}), que como o \textit{netfilter} é definido no núcleo, e permite ao administrador indicar quais os fluxos de dados prioritários ou que necessitam de determinada largura de banda, possibilitando-lhe efectuar para estes uma reserva antecipada.
+Para além da filtragem do fluxo de dados, existe um sistema de controlo do escalonamento do fluxo de tráfego, (\textit{Traffic Control}), que como o \textit{netfilter} é definido no núcleo, e permite ao administrador indicar quais os fluxos de dados prioritários ou que necessitam de determinada largura de banda, possibilitando-lhe efectuar para estes, uma reserva antecipada.
  
-Nas subsecções seguintes apresentar-se-ão diferentes constituintes da estrutura de rede do \textit{Linux}, começando pelo processo em nível utilizador até aos controladores de interfaces de rede.
+Adiante apresentar-se-ão diferentes constituintes da estrutura de rede do \textit{Linux}, começando pelo processo em nível utilizador até aos controladores de interfaces de rede.
 
 \color{red}As últimas duas subsecções apresentarão a visão geral do fluxo de um canal de comunicação, envio e recepção, respectivamente.\color{black}
 
@@ -73,16 +77,16 @@ Nas subsecções seguintes apresentar-se-ão diferentes constituintes da estrutu
 %Falta falar sobre o netfilter ... sobre tc trafic control
 
 %  Descrever um pouco esta parte ...
-% Os canais de comunicação de rede estão organizados em familias de endereços, sendo a familia de endereços \textit{AF\_INET} utilizada para efectuar comunicações sobre a internet.
-%Outras familias de \textit{sockets} existentes são \textit{AF\_NETLINK}, \textit{AF\_UNIX}, etc.
-%A chamada ao sistema \textit{socket} é composta pela familia de endereços, pelo tipo e pelo protocolo.
+% Os canais de comunicação de rede estão organizados em famílias de endereços, sendo a família de endereços \textit{AF\_INET} utilizada para efectuar comunicações sobre a internet.
+%Outras famílias de \textit{sockets} existentes são \textit{AF\_NETLINK}, \textit{AF\_UNIX}, etc.
+%A chamada ao sistema \textit{socket} é composta pela família de endereços, pelo tipo e pelo protocolo.
 %Desta forma generica é possível mapear diferentes tipos de comunicação, tais como \textit{INET} , \textit{NETLINK}, \textit{UNIX LOCAL}, em uma estrutura, o \textit{BSD socket}.
 
-% A generalidade das aplicações utilizam os \textit{sockets} da familia \textit{AF\_INET}, para efectuar as suas comunicações sobre redes, sendo os principais tipos utilizados o \textit{INET\_STREAM} e \textit{INET\_DGRAM}.
+% A generalidade das aplicações utilizam os \textit{sockets} da família \textit{AF\_INET}, para efectuar as suas comunicações sobre redes, sendo os principais tipos utilizados o \textit{INET\_STREAM} e \textit{INET\_DGRAM}.
 % Estes dois tipos oferecencem canais orientados à conexão com estado e sem estado, respectivamente.
 
 
-%Quando a chamada ao sistema \textit{socket} é efectuada, é criado uma nova instância de um socket e inicializados os respectivos campos com a informação dependente para a familia e tipo. 
+%Quando a chamada ao sistema \textit{socket} é efectuada, é criado uma nova instância de um socket e inicializados os respectivos campos com a informação dependente para a família e tipo. 
 
 %As principais chamadas ao sistema para estabelecer, terminar e comunicar sobre \textit{sockets} são: \textit{socket}, \textit{close}, \textit{connect}, \textit{bind}, \textit{listen}, \textit{accept}, \textit{send}, \textit{recv}, \textit{sendto} e \textit{recvfrom}. 
 
@@ -101,7 +105,7 @@ A árvore genealógica anteriormente indicada contém o apontador para o pai (o 
 O pai tal como cada um dos elementos da lista são também estruturas do tipo \textit{task\_struct}, pelo que é possível navegar pela árvore genealógica do processo.
 
 Um dos recursos partilhados pelos diferentes processos é o acesso à rede, o que permite a comunicação com o exterior.
-Para que as comunicações tenham lugar é necessário a alocação de canais de comunicação, cuja criação, utilização e destruição é efectuada pela \textit{API} definida no sistema de operação.
+Para que as comunicações tenham lugar, é necessária a alocação de canais de comunicação, cuja criação, utilização e destruição é efectuada pela \textit{API} definida no sistema de operação.
 Quando um processo cria um canal, o núcleo devolve-lhe um identificador, que permite ao processo referenciar o canal dentro do núcleo, para controlá-lo e efectuar futuras comunicações.
 No núcleo, este identificador é gerido na estrutura que identifica os canais abertos, pelo processo.
 
@@ -128,15 +132,15 @@ Todavia, esta situação deixa de fazer sentido, quando se pretende controlar um
 
 Como o anteriormente referido em \ref{sub:network}, um processo para comunicar via rede, tem que criar um canal.
 Estes são criados para efectuar comunicações locais ou remotas, e apesar das acções que podem ser efectudas serem comuns, o meio de transmissão é diferente, como diferentes são os canais e as formas utilizadas.
-Os \textit{sockets} podem ser agrupados por familias de endereços \textit{Address Family}, que permitem especificar a forma de comunicação (local ou remota) utilizada.
-Para caracterizar o canal não é apenas suficiente a especificação da familia, é igualmente necessário especificar o tipo de canal e o protocolo a utilizar, pois diferentes combinações de valores para estes parâmetros, traduzem-se em canais com diferentes funcionalidades.
+Os \textit{sockets}, podem ser agrupados por famílias de endereços \textit{Address Family}, que permitem especificar a forma de comunicação (local ou remota) utilizada.
+Para caracterizar o canal não é apenas suficiente a especificação da família, é igualmente necessário especificar o tipo de canal e o protocolo a utilizar, pois diferentes combinações de valores para estes parâmetros, traduzem-se em canais com diferentes funcionalidades.
 
 \paragraph*{}
-Nas subsecções seguintes irão ser apresentadas diferentes familias de endereços implementadas no núcleo, com especial ênfase para as familias \textit{UNIX}, \textit{INET}, \textit{NETLINK} e \textit{PACKET}.
+Seguidamente irão ser apresentadas diferentes famílias de endereços implementadas no núcleo, com especial ênfase para as famílias \textit{UNIX}, \textit{INET}, \textit{NETLINK} e \textit{PACKET}.
 
 
 %Como já foi indicado em \ref{sub:network}, um processo para comunicar tem de utlizar um \textit{socket}.
-% Os \textit{sockets} para se diferenciarem devido às suas diferentes utilidades são definidos em  familias de endereços.
+% Os \textit{sockets} para se diferenciarem devido às suas diferentes utilidades são definidos em  famílias de endereços.
 % Os \textit{sockets} para comunicação de internet utilizam o domínio \textit{AF\_INET}, que permite utilizar diferentes tipos de protocolos, tais como \textit{UDP} e \textit{TCP}.
 % Estes protocolos são utilizados pela generalidade das aplicações quando necessita de comunicar com outro processo que utilize os mesmos protocolos de comunicação.
 
@@ -145,23 +149,22 @@ Nas subsecções seguintes irão ser apresentadas diferentes familias de endere�
 
 \subsubsection{AF\_UNIX}
 
-Esta familia de \textit{sockets} é utilizada para efectuar a comunicação entre processos dentro da mesma máquina.
+Esta família de \textit{sockets} é utilizada para efectuar a comunicação entre processos dentro da mesma máquina.
 É um dos sistemas de \textit{Inter Process Communication (IPC)}, utilizado em sistemas Unix.
 \color{red}Permite utilizar um ficheiro no sistema de ficheiros, como um canal de comunicações.\color{black}
 
 \subsubsection{AF\_NETLINK}
 
-A familia \textit{NETLINK} é utilizada pelos processos em nível utilizador para comunicar com o núcleo.
+A família \textit{NETLINK} é utilizada pelos processos em nível utilizador para comunicar com o núcleo.
 É possível efectuar comunicações ponto-a-ponto, ou multi-ponto, ou seja, é possível que um ou mais processos comuniquem com o núcleo, designadamente o \textit{netfilter}, o sistema de encaminhamento de pacotes de rede, o sistema de configuração de interfaces de rede, etc, através de um \textit{socket} nele criado.
-Cabe aos processos em nível utilizador conectarem-se ao \textit{socket} definido no núcleo, que não é completamente passivo, podendo este iniciar comunicações assincronas com os processos.
+Cabe aos processos em nível utilizador conectarem-se ao \textit{socket} definido no núcleo, que não é completamente passivo, podendo este iniciar comunicações assíncronas com os processos.
 
-Apesar das interfaces de rede serem configuradas através do programa \textit{ifconfig} em nível utilizador, que utiliza \textit{ioctl's} para as efectuar, outra ferramenta foi desenvolvida o \textit{ethtool} que através de \textit{socket netlink} permite efectuar estas configurações, uma vez que as \textit{ioctls} não permitem especificar correctamente os parâmetros ao contrário dos \textit{socket netlink}.
-
+Apesar das interfaces de rede serem configuradas através do programa \textit{ifconfig} em nível utilizador, que utiliza \textit{ioctl's} para as efectuar, outra ferramenta foi desenvolvida, o \textit{ethtool}, que através de \textit{socket netlink} permite efectuar estas configurações, uma vez que as \textit{ioctls} não permitem especificar correctamente os parâmetros contrariamente aos \textit{socket netlink}.
 
 \subsubsection{AF\_INET}
 \label{subsub:af_inet}
 
-\textit{AF\_INET} é a familia de endereços utilizada na comunicação através da \textit{internet}, e que faz uso do protocolo \textit{IP versão 4} (ver figura \ref{fig:stack_tcp_ip}).
+\textit{AF\_INET} é a família de endereços utilizada na comunicação através da \textit{internet}, e que faz uso do protocolo \textit{IP versão 4} (ver figura \ref{fig:stack_tcp_ip}).
 
 \begin{figure}[ht]
 \centering
@@ -174,16 +177,16 @@ Apesar das interfaces de rede serem configuradas através do programa \textit{if
 
 A estruturação por camadas permite que a implementação de protocolos seja efectuada de forma simples e rápida, e ao utilizar as camadas inferiores como suporte para as superiores, aumenta a abstracção e complexidade dos protocolos.
 Existem vários protocolos de nível transporte sobre \textit{IPv4}, sendo os mais utilizados o \textit{TCP} e \textit{UDP}, como o evidenciado pela figura \ref{fig:stack_tcp_ip}.
-A criação de canais sobre o nível de transporte é efectuado utilizando a chamada ao sistema \textit{socket}, indicando para o parâmetro tipo os valores \textit{SOCK\_STREAM} ou \textit{SOCK\_DGRAM} para os protocolos \textit{TCP} e \textit{UDP} respectivamente.
+A criação de canais sobre o nível de transporte é efectuado utilizando a chamada ao sistema \textit{socket}, indicando para o parâmetro tipo os valores \textit{SOCK\_STREAM} ou \textit{SOCK\_DGRAM} para os protocolos \textit{TCP} e \textit{UDP}, respectivamente.
 
 O \textit{TCP} é utilizado para comunicações com controlo de fluxo de dados, que se adaptam ao canal existente tolerando a perda momentânea de pacotes, procedendo à sua retransmissão logo que possível.
-O controlo das retransmissões é efectuado através do envio de pacotes (\textit{acknowledges}), que informam o transmissor dos que foram correctamente recebidos, permitindo-lhe reenviar os pacotes em falta.
+O controlo das retransmissões é efectuado através do envio de pacotes (\textit{acknowledges}), que informam o transmissor dos que foram correctamente recebidos, permitindo-lhe reenviar os que se encontram em falta.
 
-O \textit{UDP} é um protocolo mais leve que o \textit{TCP}, pois não utiliza o controlo atrás referido, sendo habitualmente utilizado quando se está peramte a possibilidade de perda de pacotes durante a transmissão ou quando o controlo da retransmissão de pacotes é efectuado em camadas superiores.
+O \textit{UDP} é um protocolo mais leve que o \textit{TCP}, pois não usa o controlo atrás referido, sendo habitualmente utilizado quando se está perante a possibilidade de perda de pacotes durante a transmissão ou quando o controlo da retransmissão destes é efectuado em camadas superiores.
 
 Para além destes protocolos, existe ainda o \textit{SOCK\_RAW}, que permite acesso directo ao nível rede.
 Este protocolo possibilita a criação de um canal que comunica directamente com o nível rede da pilha de protocolos \textit{TCP/IP}, permitindo executar protocolos de comunicação em nível utilizador.
-Para utilizar \textit{sockets} através do modo \textit{RAW}, é necessário ter permissões de \textit{super user}, uma vez que é permitido o utilizador específicar parte dos cabeçalhos dos pacotes a enviar, sem que o núcleo os valide.
+Para utilizar \textit{sockets} através do modo \textit{RAW}, é necessário ter permissões de \textit{super user}, uma vez que é permitido ao utilizador específicar parte dos cabeçalhos dos pacotes a enviar, sem que o núcleo os valide.
 A não validação, pode proporcionar que pacotes maliciosos, isto é, com falhas deliberadas, possam ser introduzidos na rede.
  
 
@@ -191,11 +194,11 @@ A não validação, pode proporcionar que pacotes maliciosos, isto é, com falha
 \subsubsection{AF\_PACKET}
 \label{subsub:af_packet}
 
-A familia \textit{AF\_PACKET} comunica directamente com o controlador da interface de rede, possibilitando assim efectuar a monitorização de rede.
+A família \textit{AF\_PACKET} comunica directamente com o controlador da interface de rede, possibilitando assim efectuar a monitorização de rede.
 A utilização destes \textit{sockets} requer uma autorização de \textit{CAP\_NET\_RAW}, apenas disponível ao \textit{super user}.
 Esta verificação previne que utilizadores não autorizados possam monitorizar, ou injectar pacotes na rede, influenciando o seu comportamento.
 Dado que dispõe da possibilidade de enviar pacotes directamente para o controlador de rede, uma das suas utilizações é a implementação de protocolos de rede em nível utilizador.
-Os de canais da familia \textit{AF\_PACKET} são frequentemente utilizado em sistemas de detecção de intrusos, pois permitem analisar os pacotes e detectar falhas na sua formatação.
+Os de canais da família \textit{AF\_PACKET} são frequentemente utilizado em sistemas de detecção de intrusos, pois permitem analisar os pacotes e detectar falhas na sua formatação.
 
 TODO ------
 
@@ -214,7 +217,7 @@ Como a obtenção dos pacotes por estes canais, é efectuada antes da recepção
 
 Como todos os pacotes recebidos pela(s) interface(s) de rede são obtidos por este canal, é necessário efectuar uma cópia destes e fornece-los à aplicação em nível utilizador.
 Esta monitorização implica um peso extra na computação, por isso diversas técnicas, designadamente \textit{lazy cloning}, \textit{mmap}, etc, têm sido desenvolvidas no sentido de minimizá-lo.
-A utilização de \textit{lazy cloning}, destina-se a apenas efectuar a cópia caso seja absolutamente necessária, permite reduzir a perda de eficiência do sistema, quando está a monitorizar os pacotes de rede.
+A utilização de \textit{lazy cloning}, destina-se a apenas efectuar a cópia caso seja absolutamente necessária, permitindo reduzir a perda de eficiência do sistema, quando está a monitorizar os pacotes de rede.
 
 -------------------------
 
@@ -231,18 +234,18 @@ A cópia do pacote é efectuada caso a avaliação do filtro indique que este de
 
 
 Este sistema, está implementado no núcleo do sistema de operação do \textit{Linux}, e controla o fluxo de dados dos processos para as interfaces de rede, bem como o oposto.
-O \textit{NetFilter} está presente na \textit{stack TCP/IP} em apenas cinco pontos (\textit{PRE ROUTING}, \textit{LOCAL IN}, \textit{FORWARD} \textit{LOCAL OUT} e \textit{POST ROUTING}), em cada um dos quais existe uma lista de funções a ser executada sobre o pacote que foi recebido ou transmitido, sendo que após a finalização destas e dependendo do valor retornado, o pacote irá ou não prosseguir para as restantes camadas, até atingir o \textit{Traffic Control}(apresentado na subseccção \ref{sub:traffic_control} ou a aplicação, efectuando deste modo o controlo sobre o fluxo de rede.
-O \textit{NetFilter} pode ser controlado pelo \textit{iptables}, uma ferramenta em nível utilizador, que através de regras, define o acesso dos dados das comunicações rede.
+O \textit{NetFilter} está presente na \textit{stack TCP/IP} em apenas cinco pontos (\textit{PRE ROUTING}, \textit{LOCAL IN}, \textit{FORWARD} \textit{LOCAL OUT} e \textit{POST ROUTING}), em cada um dos quais existe uma lista de funções a ser executada sobre o pacote que foi recebido ou transmitido, sendo que, após a finalização destas e dependendo do valor retornado, o pacote irá ou não, prosseguir para as restantes camadas, até atingir o \textit{Traffic Control}(apresentado na subseccção \ref{sub:traffic_control}) ou a aplicação, efectuando deste modo o controlo sobre o fluxo de rede.
+O \textit{NetFilter} pode ser controlado pelo \textit{iptables}, uma ferramenta em nível utilizador, que através de regras, define o acesso dos dados das comunicações \color{red} de \color{black} rede.
 Estas são baseadas em endereços \textit{IP}, portos, interfaces de rede, etc, pelo que desta forma os administradores de rede não têm que conhecer internamente o \textit{netfilter}, apenas a arquitectura de rede, para definir as politicas de acesso do tráfego de rede ao sistema, permitindo ou bloqueando o tráfego com vista à satisfação dos objectivos pretendidos. 
 
-Um dos componentes do \textit{netfilter} designado por \textit{connection tracking}, efectua o acompanhamento do inicio ao fim das ligações.
-De forma a efectuar este acompanhamento necessita de conhecer os diferentes protocolos utilizados, para isso ele utiliza os \textit{connection tracking helpers}.
-Estes ao conhecer o processo de estabelecimento de ligações/sessões indicam ao \textit{connection tracking}, se devem ser adicionados, removidos ou se a conexão passa a efectiva, ficando assim registada numa tabela de conexões estabelecidas até serem removidas.
-De forma a não gastar todos os recursos de memória esta tabela tem dimensão fixa, e inicio de conexões que não ficam completas, ou por um temporizador que expirou ou por incorrecto estabelimento de sessão, são removidas permitindo que novas conexões possam ser adicionadas.
-Tal como o \textit{netfilter} pode ser controlado por um programa em nível utilizador, esta componente \textit{connection tracking}, também pode ser controlada pelo administrador através do \textit{conntrack}.
-Como se pode compreender este componente permite efectuar uma gestão mais eficiente e mais inteligente das conexões, sendo geralmente referido como \textit{firewall} como estado, é também utilizada para efectuar \textit{NAT} (\textit{Network Address Translation}) sobre as interfaces de rede, para permitir que máquinas no interior de uma rede possam aceder ao exterior utilizando a interface para o exterior, sem que tenham de ter endereços públicos, permitindo assim uma melhor gestão dos endereços públicos de \textit{IPv4}.
+Um dos componentes do \textit{netfilter} designado por \textit{connection tracking}, efectua o acompanhamento do início ao fim das ligações.
+Para efectuar este acompanhamento necessita conhecer os diferentes protocolos utilizados, para o que usa os \textit{connection tracking helpers}.
+Estes ao conhecerem o processo de estabelecimento de ligações/sessões indicam ao \textit{connection tracking}, se a conexão deve ser adicionada, removida ou se passa a efectiva, ficando registada numa tabela de conexões estabelecidas até ser removida.
+De forma a não dispender todos os recursos de memória, esta tabela tem dimensão fixa, e inicio de conexões que não ficam completas, ou por um temporizador que expirou ou por incorrecto estabelecimento de sessão, são removidas permitindo que novas conexões possam ser adicionadas.
+Tal como o \textit{netfilter} pode ser controlado por um programa em nível utilizador, esta componente \textit{connection tracking}, pode igualmente ser controlada pelo administrador, através do \textit{conntrack}.
+Como se depreende este componente, \textit{connection tracking}, permite efectuar uma gestão mais eficiente e mais inteligente das conexões, sendo geralmente referido como \textit{firewall} com estado, é também utilizada para efectuar \textit{NAT} (\textit{Network Address Translation}) sobre as interfaces de rede, permitindo que máquinas no interior de uma rede possam aceder ao exterior, sem que disponham de endereços públicos, possibilitando uma melhor gestão dos endereços públicos de \textit{IPv4}.
 
-Como ao enviar dados o \textit{netfilter} termina no \textit{Traffic Control}, existe a possíbilidade de marcar pacotes com um identificador de forma a serem reconhecidos pelo \textit{traffic control}, de forma a ser efectuada uma gestão conjunta e inteligente do tráfego.
+Na transmissão de dados, quando estes passam no \textit{netfilter}, existe a possíbilidade de identificá-los de forma a serem reconhecidos pelo \textit{traffic control}, permitindo assim efectuar uma gestão conjunta e inteligente do tráfego.
 
 \subsection{Traffic Control}
 \label{sub:traffic_control}
@@ -256,14 +259,14 @@ Como ao enviar dados o \textit{netfilter} termina no \textit{Traffic Control}, e
 
 %------------------------------------------------------------------------------------------------------------
 
-No núcleo para além do \textit{NetFilter}, que controla o fluxo de dados na rede, existe o \textit{Traffic Control} que efectua o escalonamento da transferências de dados para o exterior da rede.
-O escalonamento do tráfego de rede é particularmente importante para os administradores desta, dado que a largura de banda é um recurso limitado, a sua gestão rigorosa é criteriosamente observada pelos administradores de rede.
+No núcleo, para além do \textit{NetFilter}, que controla o fluxo de dados na rede, existe o \textit{Traffic Control} que efectua o escalonamento da transferência de dados para o exterior da rede.
+Na rede, o escalonamento do tráfego é particularmente importante para os seus administradores, e dado que a largura de banda é um recurso limitado, a sua gestão rigorosa é criteriosamente observada.
 
 A gestão é efectuada através de regras definidas em função da largura de banda, ritmo de envio, ou outros parâmetros.
-O tráfego baseado nas regras atrás definidas, é agrupado em classes, que podem ter diferentes niveis de prioridade.
+O tráfego baseado nas regras atrás referidas, é agrupado em classes, que podem ter diferentes niveis de prioridade.
 É ainda possível definir os algoritmos de escalonamento a utilizar, de modo a potenciar a eficiência da rede.
 
-Quando está eminente o envio de um \color{red}segmento \color{black}\textit{IP} pela função \textit{ip\_output}, é transmitido para o \textit{Traffic Control}, onde o pacote é marcado com a \textit{tag} da respectiva classe, para posteriormente ser adicionado ao \textit{QDisk} correspondente.
+Quando está eminente o envio de um pacote pela função \textit{ip\_output}, este é transmitido para o \textit{Traffic Control}, onde o pacote é marcado com a \textit{tag} da respectiva classe, para posteriormente ser adicionado ao \textit{QDisk} correspondente.
 O \textit{QDisk} é a estrutura de suporte à transmissão de dados efectuada pelo \textit{Traffic Control}, onde cada elemento desta estrutura é um \textit{sk\_buff}.
 
 
@@ -278,7 +281,7 @@ Esta, independentemente de estarem ou não em utilização, constam de uma lista
 Em cada posição desta lista existem informações referente a uma interface de rede, nomeadamente a informação sobre o seu endereço \textit{IP}, o seu endereço \textit{MAC}, etc, bem como outras configurações.
 
 No registo de um novo controlador de interface de rede definem-se as operações a executar em determinados eventos, como a recepção e/ou transmissão de frames, a remoção da interface, etc.
-Estas operações são definidas através de uma interface comum, a \textit{struct netdev\_ops}, que permite afectar a esta estrutura funções presentes nos módulos dos controladores, de modo a serem efectuadas as acções necessárias à utilização da interface de rede.
+Estas operações são definidas através de uma interface comum, a \textit{struct netdev\_ops}, que permite afectar a esta estrutura, funções presentes nos módulos dos controladores, de modo a serem efectuadas as acções necessárias à utilização da interface de rede.
 
 -------------------------
 
@@ -291,7 +294,7 @@ Falar sobre os controladores das interfaces de rede, que definem um conjunto de 
 \label{subsub:sk_buff}
 
 Os dados envolvidos no fluxo de comunicação e utilizados pelos controladores são os \textit{socket buffers}, estruturas do tipo \textit{sk\_buff}.
-Esta estrutura contém diversos elementos, merecendo relevo os apontadores para a estrutura de rede do controlador, apontadores para secções do pacote (os diversos cabeçalhos pertencentes ao nível de rede e transporte), bem como o tamanho dos espaços alocados para estes e outros apontadores.
+Esta estrutura contém diversos elementos, merecendo relevo os apontadores para a estrutura de rede do controlador, apontadores para secções do pacote (os diversos cabeçalhos pertencentes ao nível de rede e transporte), bem como a dimensão dos espaços alocados para estes e outros apontadores.
 
 %Existem 4 apontadores para endereços de memória dentro da estrutura que definem os endereços de inicio e fim do pacote, bem como dos cabeçalhos.
 
@@ -321,15 +324,16 @@ Esta estrutura contém diversos elementos, merecendo relevo os apontadores para 
 
 %O processo de recepção de pacotes pelas aplicações através de interfaces de rede, atravessa as diversas componentes apresentadas anteriormente em .... , ... e ... .
 
-O sistema de monitorização de rede opera de forma opaca à normal utilização de rede, pelas aplicações, desta forma quando um pacote chega à interface de rede, esta envia um pedido de interrupção da computação ao cpu, para que este atenda o pedido da interface de rede.
-Neste ponto é desligada a atenção do processador a novas interrupções, passando a computação para o controlador da interface de rede.
-Uma vez que a atenção do processador a novas interrupções está desligada, a computação deve ser o mais breve possível a reiniciar-se a atenção do processador a novas interrupções e o normal funcionamento seja retomado.
-Apenas a computação crítica é efectuada diferindo a restante execução, através da invocação de um \textit{softirq}, para que seja terminado o tratamento dos pacotes que chegaram à interface.
+O sistema de monitorização de rede, opera de forma opaca à normal utilização da rede, pelas aplicações.
+Desta forma, quando um pacote chega à interface de rede, esta envia ao cpu um pedido de interrupção da computação.
+Neste ponto, é desligada a atenção do processador a novas interrupções, passando a computação para o controlador da interface de rede.
+Com a atenção do processador a novas interrupções desligada, a computação deve ser breve e restabelecer-se de imediato a atenção do processador, a novas interrupções, para que o normal funcionamento seja retomado.
+Apenas a computação crítica é efectuada, diferindo a restante execução através da invocação de um \textit{softirq}, para que seja terminado o tratamento dos pacotes que chegaram à interface.
 %O escalonamento do \textit{softirq} potencia o aproveitamento dos recursos ao equilibrar a execução de interrupções com as restantes tarefas.
 
 Os pacotes recebidos são entregues aos \textit{sniffers} registados no sistema, antes de o serem aos \textit{packet handlers} respectivos.
 A monitorização de rede é efectuada pelos \textit{sniffers}, sendo os pacotes entregues a cada um deles, para que possam proceder à sua análise.
-Cada \textit{sniffer} tem um filtro associado escrito em linguagem \textit{bpf}, a ser executado na máquina virtual implementada para o efeito.
+Cada \textit{sniffer} tem um filtro associado escrito em linguagem \textit{bpf}, a ser executado na máquina virtual, implementada para o efeito.
 
 %\begin{lstlisting}
 %struct sock_filter {    /* Filter block */
@@ -349,17 +353,18 @@ Cada \textit{sniffer} tem um filtro associado escrito em linguagem \textit{bpf},
 
 \subsection{Transmissão de dados}
 
-Uma aplicação em nível utilizador transfere dados sobre a rede através de chamadas ao sistema de operação, sendo que estas podem ser \textit{send}, \textit{sendto}, \textit{sendmsg}.
-Neste ponto de entrada os dados são copiados e sobre eles são efectuadas diversas verificações.
+Uma aplicação em nível utilizador, transfere dados sobre a rede através de chamadas ao sistema de operação, sendo que estas podem ser \textit{send}, \textit{sendto}, \textit{sendmsg}.
+Neste ponto de entrada, os dados são copiados e sobre eles são efectuadas diversas verificações.
 
-Seguidamente são utilizadas estruturas e funções do núcleo, fluindo pela \textit{stack TCP/IP} e \textit{netfilter} até ser entregue ao controlador da interface de rede.
+Seguidamente, são utilizadas estruturas e funções do núcleo sobre os dados enviados, fluindo pela \textit{stack TCP/IP} e \textit{netfilter}, até serem entregues ao controlador da interface de rede.
 
-Os dados gerados pelas diversas camadas da \textit{stack} são agregados numa estrutura \textit{sk\_buffer} para ser adicionados a uma fila para ser enviados pela ferramenta \textit{traffic control}.
-Quando esta ferramenta irá enviar os dados para o controlador é passada a referência sobre este pacote para os \textit{sniffers} registados, sendo apenas efectuada uma cópia dos dados caso o pacote seja recolhido para maior análise. Os dados passados ao controlador da interface de rede são então transferidos para a interface de rede, e daí para o seu destino.
+Os dados gerados pelas diversas camadas da \textit{stack}, são registados numa estrutura \textit{sk\_buffer}, para serem adicionados a um \textit{QDisk}, de modo a serem transmitidos pelo \textit{traffic control}.
+Quando esta ferramenta enviar o pacote para o controlador, é passada a sua referência para os \textit{sniffers} registados, sendo apenas efectuada uma cópia, caso este seja recolhido para análise.
+Os dados passados ao controlador da interface de rede, são transferidos por \textit{DMA} para o dipositivo de rede, e daí para o seu destino.
 
-Quando a aplicação está a executar e efectua uma chamada ao sistema de operação, o sistema muda de modo e executa dentro do núcleo "em nome da aplicação".
- Durante parte da execução da chamada ao sistema de operação é possível referenciar qual o processo que efectuou a chamada, pois caso a chamada seja sincrona, é agendada um processamento sobre os dados e a aplicação fica bloqueada à espera de ser re-escalonada através da função \textit{schedule}.
- O sistema de ficheiros mantém a referência sobre quais os ficheiros/sockets abertos para cada processo e é possível obter qual o processo a que cada descritor de ficheiros pertence. % back pointers ... nos sockets ... binded de uma porta a um processo ... pode nao ser a chamada bind ... 
+Quando a aplicação está a executar e efectua uma chamada ao sistema de operação, este muda de modo e executa no núcleo \color{red}"em nome da aplicação"\color{black}.
+Durante parte da execução da chamada ao sistema de operação, é possível referenciar qual o processo que efectuou a chamada, pois caso esta seja síncrona, é agendado um processamento sobre os dados e a aplicação fica bloqueada aguardando ser re-escalonada através da função \textit{schedule}.
+O sistema de ficheiros mantém a referência sobre quais os canais abertos para cada processo, sendo possível determinar a que processo pertence cada descritor de ficheiro.% back pointers ... nos sockets ... binded de uma porta a um processo ... pode nao ser a chamada bind ... 
 
 \section{Desenho e arquitectura do MRoP}
 \label{sec:mrop_architecture}
