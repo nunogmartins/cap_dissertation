@@ -53,21 +53,22 @@ Uma das máquinas ficou responsável pela execução dos serviços \textit{ftp},
 
 \subsection{Avaliação Funcional}
 A análise funcional foi efectuada recorrendo a programas simples, que desencadeiam chamadas sucessivas de criação de \textit{sockets} e comunicação, obtendo-se o estado destes (portos e endereços) dentro do módulo no núcleo.
- Estes dados foram confirmados no sistema \textit{DebugFS}, por consulta dos ficheiros existentes para esse efeito. Este ficheiro, quando acedido, contém toda a informação relativa aos portos e endereços em utilização, por parte da aplicação monitorizada.
- Deste modo, para obter um grau de comparação dos dados produzidos e validar esta análise, foi utilizada a ferramenta \textit{netstat}, que indica os portos e os endereços utilizados pelos processos no sistema (esta ferramenta utiliza o sistema de ficheiros virtual \textit{ProcFs}, para obter esses dados).
- Para além desta análise, foi efectuada a confirmação de que todos os pacotes pertencentes às comunicações foram de facto correctamente obtidos.
- Para tal, recorreu-se à captura de pacotes, por intermédio do \textit{tcpdump} com o módulo activo, constantando-se que todo o tráfego respeitante ao protocolo (\textit{ftp} e \textit{http}) estava de facto completo e correcto, desde a abertura ao fecho das conexões, não existindo outros pacotes na captura.
- Esta validação foi verificada utilizando o programa \textit{wireshark}, que identificou os fluxos de dados dos protocolos.
+Estes dados foram confirmados no sistema \textit{DebugFs}, por consulta aos ficheiros existentes para o efeito.
+Este ficheiro, quando acedido, contém toda a informação relativa aos portos e endereços em utilização, por parte da aplicação monitorizada.
+Deste modo, para obter um grau de comparação dos dados produzidos e validar esta análise, foi utilizada a ferramenta \textit{netstat}, que indica os portos e os endereços utilizados pelos processos no sistema (esta ferramenta utiliza o sistema de ficheiros virtual \textit{ProcFs}, para obter esses dados).
+Para além desta análise, foi efectuada a confirmação de que todos os pacotes pertencentes às comunicações foram de facto correctamente obtidos.
+Para tal, recorreu-se à captura de pacotes, por intermédio do \textit{tcpdump} com o módulo activo, constantando-se que todo o tráfego respeitante ao protocolo (\textit{ftp} e \textit{http}) estava de facto completo e correcto, desde a abertura ao fecho das conexões, não existindo outros pacotes na captura.
+Esta validação foi verificada utilizando o programa \textit{wireshark}, que identificou os fluxos de dados dos protocolos.
 
 \subsection{Avaliação do desempenho}
 Foram efectuados diversos testes para avaliar o \emph{overhead} introduzido por este sistema.
  Estes testes basearam-se na recepção ou transmissão de 1GigaByte de dados, utilizando diferentes programas e protocolos, entre duas máquinas conectadas directamente, por interfaces de rede a 100 Mbit/s.
- Ambas as máquinas (1 e 2) procederam à sua executação, utilizando apenas, um processador activo de 2 e 2.6 Ghz, respectivamente.
- Na máquina 1 foram efectuados os testes a seguir apresentados.
- A versão do sistema de operação utilizado em ambas as máquinas correspondeu ao 2.6.39, sendo que na máquina 1 se introduziram algumas modificações para incluir o \textit{hook} e suas funções auxiliares, enquanto que na máquina 2 se executou o sistema original.
+ Ambas as máquinas (1 e 2) procederam à sua execução, utilizando apenas, um processador activo de 2 e 2.6 Ghz, respectivamente.
 
-Na execução destes testes, foram efectuadas 10 iterações para cada experiência considerada, de modo a obter um valor médio com um desvio padrão aceitável.
- Os resultados obtidos estão constam das tabelas \ref{tab:desempenho} e \ref{tab:overhead}.
+A versão do sistema de operação utilizado em ambas as máquinas correspondeu ao 2.6.39, sendo que na máquina 1 se introduziram algumas modificações para incluir o \textit{hook} e as suas funções auxiliares, enquanto que na máquina 2 se executou o sistema original.
+
+Na execução destes testes, foram efectuadas 10 iterações para cada experiência considerada, de modo a obter um valor médio com um desvio padrão aceitável.\todo{qual foi o desvio padrao}
+ Os resultados obtidos são os constantes das tabelas \ref{tab:desempenho} e \ref{tab:overhead}.
 
 Os testes identificados com os números de $^{1}$ a $^{4}$ foram efectuados utilizando apenas uma conexão ao servidor, enquanto que os testes $^{5}$ e $^{6}$ foram realizados utilizando mais uma comunicação, de modo a aumentar o peso sobre o processador e o número de pacotes a circular entre as máquinas. 
  Desta forma, foi possível identificar a sobrecarga exercida quando o \textit{tcpdump} estava a executar e a capturar todos os pacotes ou apenas um subconjunto destes (os pertencentes ao processo alvo).
