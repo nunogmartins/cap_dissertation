@@ -8,17 +8,17 @@ Não obstantante, esta monitorização pode igualmente servir para verificar a c
 A maioria dos sistemas de operação generalistas apresentam métodos de monitorização, devido à importância de que estes se revestem, no desenvolvimento das aplicações.
 Se algumas ferramentas são específicas na monitorização de determinados recursos (como a biblioteca \textit{LibPcap}, que é específica nas interacções com o exterior utilizando interfaces de rede), outras são mais generalistas podendo monitorizar recursos diversos.
 
-% A monitorização de rede de apenas um programa ainda não foi aplicada pelos principais fornecedores destes serviços, sendo uma operação complexa e muito depende dos sistema de operação em questão. 
 O dinamismo das aplicações dificulta bastante o processo de monitorização.
 Esta situação é particularmente sentida ao nível da monitorização dos dispositivos de \textit{IO}, nomeadamente nas interfaces de rede.
 Nas aplicações onde o dinamismo das ligações é um dos seus pontos fortes, a monitorização é particularmente difícil de ser efectuada.
 
-Apenas na camada de transporte da \textit{stack TCP/IP} se conhecem os portos de origem e destino de um determinado pacote.
-Se pretendermos definir univocamente, um fluxo de comunicação de rede para uma dada aplicação, é determinante conhecer o endereço e o porto de origem bem como o endereço e o porto de destino.
-Desta forma, apenas quando o pacote atinge a camada de transporte, se conhece o seu destino.
+De modo a capturar dados relevantes, e simultaneamente minimizar os efeitos da monitorização, estes filtros são aplicados logo que possível, no núcleo do sistema.
 
 Tendo em conta que aplicações \textit{P2P} utilizam diversos portos de comunicação, revela-se difícil capturar os pacotes com base nos actuais filtros, sem que se assista a uma elevada degradação do desempenho.
-De modo a capturar dados relevantes, e simultaneamente minimizar os efeitos da monitorização, estes filtros são aplicados logo que possível, no núcleo do sistema.
+Não sendo exclusivo das aplicações \textit{P2P} a utilização de um elevado número de portos, também aplicações \textit{VoIP}.
+Estas aplicações nas suas diversas comunicações não utilizam sempre portas conhecidas \textit{à priori}, fazendo uso de protocolos de iniciação de sessões que negoceiam portos dinamicamente o que dificulta bastante a utilização de filtros.
+
+
 
 \section{Motivação}
 \label{sub:intro_motivation}
@@ -26,26 +26,11 @@ De modo a capturar dados relevantes, e simultaneamente minimizar os efeitos da m
 No contexto de uma dissertação anterior~\cite{Farruca:2009}, utilizou-se a biblioteca \textit{LibPcap} para a captura do tráfego de rede, sendo que o principal desafio solucionado foi isolar os pacotes que pertencem a determinado processo alvo.
 A solução encontrada, não é de fácil integração em qualquer outra ferramenta, e oferece um fraco desempenho.
 
-
-\section{Objectivos}
-\label{sec:intro_goals}
-
 É objectivo desta dissertação investigar mecanismos, incluindo os internos ao núcleo, que permitam incorporar a filtragem com base no identificador do processo, a sua possível integração nas funcionalidades do \textit{pcap}, e proceder à avaliação da sobrecarga introduzida a respectiva optimização.
 
 Esta dissertação centra-se nos mecanismos de inspecção, oferecidos pelos sistemas de operação que permitem verificar o funcionamento e avaliar o desempenho do sistema e dos processos dos utilizadores (\textit{debugging}, \textit{profiling}, etc).
 
-%----------------------------------------------------------------------------------------------------------
 
-%De forma a monitorizar uma aplicação utilizando o suporte do núcleo de sistema do \textit{Linux}, com base no estudo prévio efectuado descrito no capitulo \ref{}.
-%A abordagem a efectuar, utilizará um módulo dentro do núcleo de sistema, de forma a instrumentar algumas funções da estrutura de rede, com vista à obtenção dos portos que um processo utiliza e os que usará futuramente.
-%Far-se-à uso da infraestrutura de monitorização, presente no núcleo de sistema de operação do \textit{Linux}.
-%Os dados recolhidos serão utilizados no \textit{Linux Socket Filter}, para capturar o tráfego.
-%De forma a permitir uma rápida adaptação do filtro às alterações do processo, a informação sobre os portos que estão a ser usados e suas alterações ficarão monitorizadas e actualizadas.
-
-%Para que esta nova funcionalidade possa ser integrada na biblioteca \textit{LibPcap}, é imprescíndivel proceder a modificações ao nível da linguagem de alto nível necessária à criação de um filtro.
-
-
-%----------------------------------------------------------------------------------------------------------
 
 \section{Principais contribuições} 
 \label{sec:intro_contribuicoes}
@@ -55,26 +40,8 @@ Para além desta simplificação, a monitorização do fluxo de rede de uma apli
 A existência de um sistema de captura de tráfego de rede genérico, torna-se benéfico para a análise de protocolos, pois nem sempre se tem acesso às especificações destes, presentes nas aplicações.
 Com este componente, o desempenho na obtenção dos dados relevantes poderá ser incrementado, mitigando anteriores problemas de desempenho entre o núcleo de sistema de operação e as ferramentas de análise de tráfego.
 
-
-% Dificuldades em saber quais, de quem, ou porquê determinado pacote está dentro de uma rede pode ter desencadeado o inicio de diversos projectos, que têm como âmbito fazer uma análise dos pacotes que fluem numa rede.
-% Se esta problemática desencadeou alguns projectos a verdade é que para a captura dos pacotes de um dado programa ainda não existe um projecto onde se insira a capacidade de análise dos pacotes, ou seja restringir o que se conhece como algo genérico como a captura de pacotes dentro de uma rede, para passar a ser a captura de pacotes de um dado programa. 
-
-
-
-% \paragraph*{}
-% Diversas vezes quando se procede ao debug de uma aplicação onde não existe o código fonte, é necessário fazer \textit{reverse enginnering}. Para se analisar os pacotes de dados que uma aplicação utiliza na comunicação através de rede é necessário capturar esses pacotes utilizando ferramentas como a biblioteca \textit{Pcap}. A \textit{LibPcap} consegue capturar os pacotes que transitam na rede mediante alguns filtros de forma a conseguir seleccionar os pacotes relevantes para a captura. A forma de filtrar os dados baseia-se nos filtros bpf\cite{Mccanne92thebsd} .
-% 
-% Uma vez que os filtros são baseados nos dados dos \textit{sockets}, é interessante e importante definir regras para os filtros que sejam baseados no identificador do processo de forma a poder obter todos os dados que são transferidos de forma transparente sem que seja necessário indicar todos os portos que a aplicação está a usar. Desta forma poder-se-á fazer um traço de execução de um processo não só baseado nas suas instruções como também baseado nos dados que são transferidos por uma aplicação. Utilizando esta abordagem podem ser mais facilmente analisados programas distribuidos que fazem uso das interfaces de rede para comunicarem.
 \bigskip 
 
-
-
-
-
-% Na secção \ref{sect:descricao} é apresentado são analisados os diversos problemas.
-% Na secção \ref{sect:instrumentacao_casos_linux} são descritos os mecanismos de monitorização presentes no GNU/Linux de forma a poderem ser utilizados. 
-% Na secção \ref{sect:LibPcap} é analisado o \textit{LibPcap} e a sua arquitectura de forma a conhecer toda esta biblioteca.
-% Na secção \ref{sect:kernel_user_comm} são analisados diversos sistemas de transferência de dados de forma a poder obter informações do núcleo de sistema, e forma eficientes de transferir dados entre os dispositivos externos e o núcleo de sistema, e entre o núcleo de sistema e o espaço de utilizador.
 
 \section{Organização do Documento}
 \label{sec:intro_document_outline}
@@ -88,8 +55,8 @@ Os restantes capítulos do documento, encontram-se assim distribuidos e estrutur
 
 	\item \textbf{Capítulo \ref{cap:Implementacao} - \nameref{cap:Implementacao} - } Implementação do \textit{MRoP} e discussão de alternativas de implementação
 
-	\item \textbf{Capítulo \ref{cap:avaliacao} - \nameref{cap:avaliacao} - } Avaliação 
+	\item \textbf{Capítulo \ref{cap:avaliacao} - \nameref{cap:avaliacao} - } Avaliação funcional e de desempenho do \textit{MRoP} e dos seus componentes. Analisar o desempenho do sistema de monitorização utilizado (\textit{KProbes}.
 
-	\item \textbf{Capítulo \ref{cap:conclusao} - \nameref{cap:conclusao} - } 
+	\item \textbf{Capítulo \ref{cap:conclusao} - \nameref{cap:conclusao} - } Apresentação das conclusões referentes à avaliação efectuada, apresentando algumas propostas de melhoramentos.
 
 \end{itemize}
