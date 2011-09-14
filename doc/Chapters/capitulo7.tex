@@ -1,3 +1,32 @@
 \chapter{Conclusão}
 \label{cap:conclusao}
 
+O \textit{MRoP} é um módulo do núcleo que permite monitorizar as interacções de rede de um processo, sem que exista um conhecimento prévio dos portos que a aplicação utiliza.
+Esta monitorização não tem consequências algumas para a aplicação, pois esta nem se apercebe que está a ser monitorizada, permitindo ao administrador monitorizar aplicações que não tenha acesso ao código fonte.
+
+Se analisarmos as aplicações do ponto de vista de segurança na rede é possível verificar se determinada aplicação está a enviar informação para fora da máquina.
+Desta forma é verifica-se se um determinado processo está a enviar dados que não deveria, pois com o normal funcionamento da \textit{LibPCap} é díficil observar quais os fluxos de cada processo sem que tenha de ser isolado de alguma forma, comprometendo a integridade da aplicação como um todo.
+Por isso este novo recurso de análise de fluxos de rede permite de uma forma não intrusiva a captura e análise do tráfego de um processo.
+
+Foi apresentado o desenho e implementação de um sistema que estende o \textit{LSF}, usado na captura de tráfego de rede usando a \textit{LibPCap}, por forma a filtrar o tráfego de um processo.
+ Este oferece a possibilidade de capturar só os pacotes pretendidos, facilitando as análises que se pretendam efectuar e reduzindo o \textit{overhead} neste tipo de sistemas.
+ Por outro lado, deixa de ser necessário capturar mais do que o tráfego pretendido e de necessitar de conhecer os protocolos e portos usados pela aplicação.
+
+Esta funcionalidade é transparente para todas as ferramentas desenvolvidas com base no \textit{LibPCap}, podendo todas elas tirarem partido deste sistema.
+
+Em termos de sobrecarga introduzida, face à monitorização já existente, revelou-se insignificante como pode ser verificado na secção \ref{sub:eval_performance}.
+No entanto, esta situação é ainda melhor, nos casos em que o foco sobre o tráfego de um único processo, leva a reduzir o trabalho realizado pelo \textit{LSF}.
+
+As vantagens do sistema criado tornam-se ainda mais notórias quando a máquina está sobre uma carga mais elevada de trabalho, ou grande volume de tráfego via rede, dado manter o uso dos recursos na proporção aproximada apenas do tráfego do processo alvo.
+
+\section{Trabalho Futuro}
+
+Em termos de implementação existe a possiblidade de expandir e melhorar o suporte para multiplos processos ou conjunto de processos a serem monitorizados.
+Implementar suporte para controlo de concorrência utilizando \textit{spin locks}, ou outro método com suporte no núcleo de modo a não possibilitar a ocorrência de \textit{race conditions}.
+
+Como trabalho futuro existe a possibilidade de integrar este trabalho no anterior trabalho \cite{duarte10,Farruca:2009}, formando uma ferramenta de monitorização distribuída com baixa sobrecarga.
+ Como o sistema implementado permite apenas monitorizar protocolos assentes em \textit{TCP} e \textit{UDP}, uma contribuição seria suportar outros protocolos que se pretendam monitorizar (\textit{icmp, arp ,stp}, etc).
+ Outra possibilidade será procurar optimizar a instrumentação, aplicando-a apenas a funções internas específicas dos protocolos monitorizados.
+ Pretende-se brevemente a partilha destas alterações, submetendo este sistema para análise, pela comunidade utilizadora do sistema \textit{Linux} e possível implementação na versão principal do núcleo do \textit{Linux}.
+
+
