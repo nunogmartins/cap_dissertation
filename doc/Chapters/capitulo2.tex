@@ -31,7 +31,7 @@
 \section{Monitorização} \label{sect:descricao}
 
 Pode ser necessário recorrer à monitorização para se compreender o comportamento das aplicações.
-Esta permite-nos obter dados relevantes sobre os recursos utilizados pelas aplicações, de modo a proporcionar-nos um conhecimento mais profundo do seu comportamento.
+Esta permite-nos obter dados relevantes sobre os recursos utilizados, de modo a proporcionar-nos um conhecimento mais profundo do seu comportamento.
 As informações recolhidas podem servir para analisarmos comparativamente o desempenho de diferentes versões de uma mesma aplicação, porquanto ao conseguir-se obter dados da utilização do \textit{cpu}, da memória, dos dispositivos de \textit{IO}, etc, é possível compreender o comportamento dinâmico das aplicações.
 Daí ser comum a utilização da monitorização como auxiliar na depuração de programas.~\cite{DuartePhd05}.
 
@@ -117,12 +117,12 @@ Todavia, é no uso combinado da história dos eventos, da interactividade e da i
 }
 A recolha de informação, é uma das componentes mais sensíveis relativamente ao grau de perturbação da monitorização.
 Em geral os dados vão sendo armazenados num \textit{buffer} em memória.
-Caso exista algum evento que assinale que o \textit{buffer} está cheio ou uma indicação explícita de que se pretende armazenar esses dados, para posterior análise, estes são transferidos para a memória persistente.
+Caso exista algum evento que indique que o \textit{buffer} se encontra cheio ou por acção explícita do utilizador que pretende armazenar esses dados, para posterior análise, estes são transferidos para a memória persistente.
 
 \subparagraph*{
 %Grau de perturbação
 }
-Conforme o anteriormente referido, existe a preocupação de que o sistema a ser monitorizado tenha um baixo grau de perturbação.
+Conforme referido anteriormente, existe a preocupação de que o sistema a ser monitorizado tenha um baixo grau de perturbação.
 Daí que, diversas abordagens foram criadas, para reduzirem o impacto da monitorização num sistema em produção.
 Uma destas abordagens traduz-se na utilização de instruções especializadas, de que alguns processadores dispõem para \textit{debug}, de modo a utilizar os recursos que mais se adequem à monitorização.
 Estes métodos, nem sempre são utilizados, devido à sua dependência da arquitectura, o que dificulta a sua portabilidade.
@@ -167,11 +167,11 @@ Como o anteriormente referido, as aplicações são dinâmicas e a este dinamism
 Relativamente à monitorização das interacções com o exterior, utilizando a interface de rede, este dinamismo é de novo um factor chave, pois existem dificuldades na forma de identificar os fluxos pertencentes a um processo.
 
 \subparagraph*{Formas de reduzir o volume de dados utilizando filtros - }
-A utilização de filtros na captura do tráfego que circula na rede, é uma forma eficiente de se obterem apenas os dados que se mostrem relevantes, com vista à satisfação nos nossos objectivos e são particularmente importantes, quando o volume de dados que circula na rede é extremamente elevado.
+A utilização de filtros na captura do tráfego que circula na rede, é uma forma eficiente de apenas se obterem os dados relevantes, com vista à satisfação dos nossos objectivos e são particularmente importantes, quando o volume de dados que circula na rede é extremamente elevado.
 Tendo em vista a eficiência, estes filtros são implementados no núcleo do sistema de operação, baseando-se em regras simples, que podem ser combinadas para contemplar situações mais complexas.
 
 \subparagraph*{Dificuldade de criação de filtros dinâmicos - }
-Os filtros actualmente suportados para capturar pacotes no \textit{Linux}, são definidos \textit{a priori}, e não há forma eficiente de os alterar dinamicamente, visto que para tal a captura tem de ser parada a fim de ser criado um novo filtro, posteriormente aplicado, procedendo-se em seguida à retoma da captura dos pacotes, de acordo com as novas regras.
+Os filtros actualmente suportados para capturar pacotes no \textit{Linux}, são definidos \textit{a priori}, não existindo forma eficiente de os alterar dinamicamente, uma vez que a captura tem de ser interrompida a fim de ser criado um novo filtro, posteriormente aplicado, procedendo-se em seguida à retoma da captura dos pacotes, de acordo com as novas regras.
 
 \subparagraph*{Filtros mais complexos e inteligentes - }
 De forma a aumentar o desempenho da captura de pacotes, os filtros são aplicados o mais cedo possível, ou seja, logo que chegam à interface de rede.
@@ -231,8 +231,8 @@ Como o anteriormente analisado na secção \ref{sect:instrumentation_overview} r
 
 \subsection{KProbes}\label{sect:KProbes_overview}
 
-O \textit{KProbes} é uma ferramenta de instrumentação dinâmica do núcleo de sistema do \textit{Gnu Linux}.
-A \textit{API} desta ferramenta permite que outras aplicações de mais alto nível, como o \textit{DProbes} ou o \textit{SystemTap} possam aceder às suas funcionalidades.
+O \textit{KProbes} é uma ferramenta de instrumentação dinâmica do núcleo do \textit{Linux}.
+A \textit{API} desta ferramenta permite que aplicações, como o \textit{DProbes} ou o \textit{SystemTap} possam aceder às suas funcionalidades.
 Esta encontra-se na versão principal do núcleo do sistema \textit{Linux} desde a versão 2.6.9, o que indica tratar-se de uma ferramenta bastante estável\cite{kernel_debug_printk_on_fly,KProbesSite}.
 
 
@@ -306,7 +306,7 @@ O \textit{SystemTap} é uma ferramenta que possibilita o desenvolvimento de mód
 % para além de ter encontrado instruções neste sentido, a obtenção do strace veio confirmar estes dados
 
 Uma vez que os dados gerados estão no espaço de endereçamento de memória do núcleo, e o programa que os analisará se situa no espaço de endereçamento do utilizador, é necessário efectuar uma transferência de dados de um para outro espaço.
-O \textit{SystemTap} efectua esta transferência, recorrendo à utilização do sistema de ficheiros \textit{ReplayFs}, onde é possível escrever de forma rápida, sem comprometer a segurança do sistema.\cite{Donovan2007,Jones2009}
+O \textit{SystemTap} efectua esta transferência, recorrendo à utilização do sistema de ficheiros \textit{ReplayFs}, onde é possível escrever de forma rápida, sem comprometer a segurança do sistema\cite{Donovan2007,Jones2009}.
 
 Apesar de no pacote de aplicações desta ferramenta, existir um visualizador gráfico de dados, recolhidos pelo \textit{SystemTap}, esta só consegue analisar os \textit{TapSets} pré-definidos no \textit{SystemTap}.
 Para ultrapassar esta limitação, novas ferramentas estão a ser desenvolvidas.
@@ -332,7 +332,7 @@ O \textit{Linux Trace ToolKit} é uma ferramenta um pouco mais antiga que o \tex
 Representa uma evolução do \textit{LTT (Linux Trance ToolKit)}, e permite colaborar com ferramentas como o \textit{KProbes}, o \textit{Tracepoints}\cite{Mathieu2009} e \textit{Linux Kernel Markers}\cite{Mathieu2009}.
 As ferramentas \textit{Tracepoints} e Linux \textit{Kernel Markers} fazem parte da instrumentação estática pertencente ao núcleo de sistema \textit{Gnu Linux}.
 
-A transferência dos dados do núcleo de sistema para a aplicação, é efectuada utilizando o \textit{RelayFs}.
+A transferência dos dados do núcleo de sistema para a aplicação, é efectuada utilizando o sistema de ficheiros virtual \textit{RelayFs}.
 
 %A utilização desta ferramenta em sistemas de tempo real é um bom indicador da sua performance.
 
@@ -400,7 +400,7 @@ Se a necessidade de ter um \textit{deamon} a executar de forma a coligir e organ
 \label{sect:kernel_user_comm}
 
 Quando se recorre a alguma fonte para a obtenção de dados, não é imprescindível que estes sejam requeridos no sítio onde são capturados.
-Assim, foram criados dois modos de transferência de dados:os internas e os externos.
+Assim, foram criados dois modos de transferência de dados: os internas e os externos.
 No intuíto de melhorar a partilha dos recursos externos, o controlo dá-se ao nível do núcleo do sistema, pelo que parte das comunicações dos utilizadores com dispositivos externos, é efectuada através do núcleo de sistema.
 
 %Incluir por aqui a informação de mmaps, ring buffers e afins ....
@@ -465,7 +465,7 @@ Apesar de novos subsistemas como o \textit{SysFs} terem sido criados, é ainda u
 
 \paragraph*{SysFs - }\label{cap:SysFs_overview}
 
-Este sistema de ficheiros virtual foi desenvolvido para colmatar algumas deficiências encontradas no \textit{ProcFs}(secção \ref{cap:ProcFs_overview}).
+Este sistema de ficheiros virtual foi desenvolvido para colmatar algumas deficiências encontradas no \textit{ProcFs}.
 Estes problemas situam-se basicamente na forma como a quantidade de informação disponibilizada está distribuída sobre o \textit{ProcFs}.
 Este novo sistema de ficheiros virtual, evidencia algumas restrições, designadamente na forma como são disponibilizados os dados do núcleo de sistema.
 Esta limitação conduziu a que outros sistemas de ficheiros virtuais, nomeadamente o \textit{DebugFs} e o \textit{RelayFs}, fizessem a sua aparição.
@@ -483,7 +483,7 @@ Este sistema de ficheiros virtual foi desenvolvido tendo em mente a transferênc
 O \textit{RelayFs} responde a esta exigência, fazendo uso de novas primitivas onde são mais reduzidas as zonas de controlo de concorrência\cite{Donovan2007}.
 
 \paragraph*{NetLink - }\label{cap:NetLink_overview}
-O \textit{NetLink} utiliza uma forma de comunicação baseada em \textit{sockets}, para estabelecer a comunicação entre o núcleo de sistema e os processos em nível utilizador. 
+O \textit{NetLink} utiliza uma método de comunicação baseado em \textit{sockets}, para estabelecer a comunicação entre o núcleo de sistema e os processos em nível utilizador. 
  Tendo como abstracção os \textit{sockets}, este sistema tem igualmente a possibilidade de enviar dados para múltiplos processos, devido à utilização das primitivas de envio colectivo (\textit{Multicast}).
 % \todo{Explicar melhor o NetLink}
  É com base no \textit{NetLink}, que a comunicação entre processos dentro da mesma máquina (\textit{IPC}) é implementada.
