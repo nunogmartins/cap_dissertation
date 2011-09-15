@@ -2,7 +2,15 @@
 \label{cap:Implementacao}
 
 % falta falar sobre filesystem vfs e como chegar ao socket file private\_data para alem da parte de interrupts, tasklets e bottomhalfs bem como sobre os contextos de execucao
-Falta falar sobre os motivos e a estrutura desejada para esta implementação
+%Falta falar sobre os motivos e a estrutura desejada para esta implementação
+
+
+
+É objectivo da implementação criar um módulo do núcleo que consiga estender as funcionalidades do \textit{LSF} de forma a introduzir a funcionalidade de monitorizar o tráfego realizado por um processo utilizando a instrumentação de código do núcleo.
+Esta instrumentação como é efectuada no núcleo permite que qualquer aplicação possa ser monitorizada, sem que o seu código tenha de ser alterado.
+Como se pode compreender esta instrumentação é não instrusiva para as aplicações, por isso existe a necessidade de criar uma forma de verificação de qual o processo que efectua cada função instrumentada.
+Esta adição ao \textit{LSF} irá ter um sistema externo, para ser utilizado sem a necessidade de modificar qualquer aplicação que faça uso do \textit{LSF}.
+As modificações necessárias ao aumento das funcionalidades do \textit{LSF} no núcleo estão confinadas ao ficheiro \textit{filter.c} presente no directório \textit{net/core} do código do \textit{Linux}.
 
 \section{MRoP e a sua implementação}
 \label{sec:mrop_implementation}
