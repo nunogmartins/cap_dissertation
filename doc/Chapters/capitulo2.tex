@@ -1,33 +1,6 @@
 \chapter{Trabalho relacionado}
 \label{cap:trabrelacionado}
- %Este capítulo deve conter uma síntese inicial de trabalho relacionado 
-%(como resumo de estado da arte) e com foco nos objectivos e contribuições da
-%dissertação. 
-%O capítulo deve demonstrar que o aluno procedeu e uma recolha bibliográfica para
-%análise, tratamento e classificação preliminar, devendo esta ser suficientemente
-%representativa das leituras preparatórias para o prosseguimento da elaboração da 
-%dissertação. Esta síntese deve ser apresentada com as respectivas referências 
-%bibliográficas (correctamente apresentadas na Bibliografia).
-
-%Usar no capítulo fonte times-roman 12 com um espaçamento e meio, esperando-se
-%uma dimensão indicativa de cerca de 20 páginas.
  
-% \indent \indent Ferramentas para captura de pacotes de rede ao nível do sistema de operação não
-% têm sido muito desenvolvidas.
-% 
-% O trabalho nesta área tem centrado-se no aumento da performance da captura dos
-% pacotes que transitam na rede.\cite{Deri2004}
-% 
-% Duas das formas que irei abordar serão a utilização de instrumentação dinâmica 
-% e o desenvolvimento de um filtro para a libpcap dentro do kernel. Ambos as formas 
-% irão ser abordadas de seguida.
-
-% No artigo escrito por Byungjoon Lee, Seong Moon e Youngseok Lee intitulado 
-% \textit{Application-specific packet capturing using kernel probes}\cite{Lee2009}
-% foi descrito como executaram um sistema de instrumentação para captura de pacotes
-% relativos a uma aplicação, o que demonstra que existe a necessidade de capturar 
-%o trafego referente apenas uma aplicação para ser efectuado uma análise mais pormenorizada.
-
 \section{Monitorização} \label{sect:descricao}
 
 Pode ser necessário recorrer à monitorização para se compreender o comportamento das aplicações.
@@ -35,26 +8,8 @@ Esta permite-nos obter dados relevantes sobre os recursos utilizados, de modo a 
 As informações recolhidas podem servir para analisarmos comparativamente o desempenho de diferentes versões de uma mesma aplicação, porquanto ao conseguir-se obter dados da utilização do \textit{cpu}, da memória, dos dispositivos de \textit{IO}, etc, é possível compreender o comportamento dinâmico das aplicações.
 Daí ser comum a utilização da monitorização como auxiliar na depuração de programas.~\cite{DuartePhd05}.
 
-% Fazer uma captura dos pacotes de um dado programa pode parecer simples, mas na verdade não o é, principalmente devido ao dinamismo que certos programas apresentam. Uma forma de obter informações sobre o comportamento dos programas é através de algumas estruturas presentes no núcleo de sistema. Desta forma uma das vertentes que irá ser analisada nas secções seguintes é a instrumentação de código dentro do núcleo de sistema.
-
 \subsection{Obtenção de informação}\label{sect:instrumentation_overview}
-% 
-% %Falta falar sobre o que é a instrumentação
-% Instrumentação de uma aplicação é uma técnica de obtenção de informações sobre o estado e a performance desta. Assim permite também realizar \textit{debugging} ao código.
-% 
-% %Esta parte é sobre a parte de ser dinâmico e as vantagens que isso traz 
-% Ao ser dinâmica é muito importante, pois permite que sejam efectuadas análises sem que o núcleo do sistema tenha de ser recompilado e posteriormente reiniciado.Desta forma pode ser utilizado em sistemas em produção.
-% 
-% Alguns sistemas de análise de performance utilizam este tipo de técnicas para poder obter, dados precisos sobre o estado da computação.
-% 
-% Quando os programas são criados os compiladores geram estruturas para poder ajudar no processamento e estruturação do código. (DWARF)
-% 
-% 
-% A instrumentação dinâmica permite que ao ser alterado o código, mesmo que este esteja a correr sobre a instanciação de um \textit{debugger} este seja efectuado, esta instrumentação continue a ser efectuada.
-% 
-% \paragraph*{O que é}
 
-%\paragraph*{Para que serve}
 Os dados relativos ao comportamento das aplicações, obtidos de diferentes fontes, são coligidos e posteriormente analisados por ferramentas especializadas.
 Existem diferentes formas de coligir, visualizar e até interactuar com as ferramentas de monitorização, cada uma com as suas especificidades e capacidades próprias.
 
@@ -63,9 +18,7 @@ Tendo em vista o conhecimento e um melhor aproveitamento das capacidades de cada
 \begin{itemize}
  \item 
 
-
 Se considerarmos como referência a visualização da história dos eventos, podemos analisá-los de duas formas distintas:
-
  
 \subparagraph*{Online -}
 Enquanto decorre a monitorização da aplicação é possível observar os dados que são recolhidos pela aplicação.
@@ -80,18 +33,15 @@ Este método permite-nos analisar integralmente a sua história.
 
 Se a opção de monitorização se basear na interactividade do utilizador, é possível defini-la de duas formas:
 
-%PODER MODIFICAR DURANTE A MONITORIZACAOO pode reagir a modificar a aplicacao
  \subparagraph*{Activa - }
 
 Por iniciativa explícita do utilizador, é possível inquirir o sistema de monitorização sobre o estado da computação.
 Este método, por vezes descrito como \textit{computacional steering}, é a forma com maior interactividade, uma vez que permite ir analisando e modificando os parâmetros da monitorização.
 
-%Modificar os pontos de monitorização ou apenas analisar os dados ao mesmo tempo que estão a ser capturados. Desta forma o utilizador pode controlar explicitamente a monitorização da aplicação. Este controlo pode ser apenas visualização da computação ou pode ser sobre a forma como se está a desenvolver a monitorização podendo ser baseado num ciclo de monitorização, decisão sobre os pontos a monitorizar (adicionar, remover, etc).
-
 \subparagraph*{Passiva - }
 Esta forma de monitorização é especialmente utilizada em ambientes onde é relevante a obtenção da totalidade dos dados e apenas no final nos debruçarmos sobre a sua análise.
 Esta forma é designada de passiva, por o utilizador não ter intervenção na forma como os dados estão a ser obtidos, o que reduz a perturbação do sistema. 
-%Quando não se tem interesse em ir alterando os pontos a serem monitorizados, está é uma das escolhas correctas pois permite um menor grau de perturbação do sistema.
+
 \item
 
 A instrumentação pode ser de dois tipos: a estática e a dinâmica, cada uma com as suas características próprias.
@@ -136,28 +86,6 @@ No entanto, capturar estes dados oriundos da monitorização pode revelar-se ins
 
 \subsection{Monitorização de Rede}\label{sect:packet_capture}
 
-% \paragraph*{}
-% Os dados que circulam nas redes de computadores, em geral utilizam um conjunto de protocolos de forma a poderem comunicar através de diferentes dispositivos. Para saber que dados chegam a um determinado dispositivo, via interface de rede, é necessário conseguir obter uma cópia destes. Esta cópia pode ser efectuada logo nos dispositivos de rede, ou quando o pacote de dados chega à máquina de destino, e aí é o núcleo de sistema da maquina de destino que irá se encarregar de efectuar a cópia e entregar o pacote à aplicação/camada de destino.
-% 
-% 
-% 
-% \subparagraph*{Aumento de performance da captura em redes de alta velocidade}
-% \paragraph*{}
-% OBSERVAR AS APLICACAES NO CONTEXTO DA REDE 
-% \paragraph*{}
-% Diferentes abordagens têm sido estudadas de modo a aumentar a velocidade de captura dos pacotes que chegam a uma dada interface de rede.
-% Estas abordagens centram-se mais na forma de diminuir o número de cópias que são efectuadas (entre os diferentes \textit{buffers}) e o local onde os dados irão estar disponíveis. Estas duas situações permitem um aumento da velocidade de captura dos pacotes.
-% 
-% Algumas destas abordagens são: \textit{MMAP}, \textit{Zero Copy}, \textit{Ring Buffers}, \textit{NAPI - New API}, estas abordagens são apresentadas na secção Transferência de dados no núcleo de sistema (\ref{sect:kernel_user_comm})
-% 
-% \subparagraph*{O problemas da perda de pacotes}
-% Quando o núcleo de operação está a capturar os pacotes que atravessam a interface de rede, caso não consiga acompanhar o ritmo de chegada de pacotes à interface poderá perder pacotes. Estas perdas de pacotes, não são aceitaveis uma vez que se os pacotes forem perdidos, mais tem de ser retransmitidos, o que irá desencadear o efeito bola de neve sobre o número de pacotes que a rede tem de pedir para serem retransmitidos. Desta forma a velocidade degrada-se ainda mais, as filas de pacotes aumentam e poderá degenerar num \textit{DOS (Denial of Service)}.Estas perdas são contabilizadas de forma a poderem ser analisadas, de forma a remediar a situação de perda de pacotes em futuras operações.
-% 
-% ATRASAR 
-% OVERHEAD 
-% 
-% COMPORTAMENTO DA APLICACAO
-
 Em geral, as ferramentas de monitorização da interacção do processo com o exterior, são baseadas na captura de pacotes de forma passiva.
 As ferramentas capturam os pacotes que fluem na rede, para posterior análise ao tráfego, que pode incidir sobre a largura de banda utilizada, principais protocolos, eventuais problemas de segurança, etc.
 
@@ -178,30 +106,6 @@ De forma a aumentar o desempenho da captura de pacotes, os filtros são aplicado
 Face a esta situação, o tipo de filtros que se podem aplicar têm de ser escritos numa linguagem simples.
 Quando os filtros são demasiado complexos, os módulos do núcleo têm de passar grande parte da informação para as camadas superiores, de forma a puderem ser aplicados filtros mais elaborados, que analisam um nível mais abstracto da informação, presente no \textit{payload} dos pacotes.
 
-
-\subparagraph*{Problemas com o aumento da sobrecarga - }
-
-----------------------------------------------------
-
-TODO
-
-Como foi apresentado na subsecção \ref{sect:instrumentation_overview} a perturbação da aplicação monitorizada devido ao \textit{overhead} da captura e execuções resultantes desta, podem provocar diferentes problemas.
-
------------------------------------------
-
-\subparagraph*{Outros problemas
-% Comportamento da aplicação, atrasos, perda de pacotes, entre outros
-}
-
--------------------------------------
-
-TODO ack
-
-Se devido à monitorização de rede, os pacotes que chegam ao programa de monitorização necessitarem de um tratamento pesado, este pode contribuir para que o sistema não consiga responder às aplicações que fazem uso das comunicações externas, por impossibilidade do sistema em emitir \textit{acknowledges} dos pacotes anteriormente recebidos.
-Pode igualmente revelar dificuldades em tratar novos pedidos de pacotes, dado que os \textit{buffers} por se encontrarem cheios começam a descartar os anteriores aumentando substâncialmente os problemas de retransmissão e a revelar atrasos.
-
---------------------------------------------------------------------------
-
 \subparagraph*{Técnicas para o aumento de desempenho}
 % \todo{performance ou desempenho}
 Diferentes técnicas têm vindo a ser desenvolvidas para aumentar a performance de monitorização das interfaces de rede.
@@ -214,11 +118,7 @@ Hoje em dia a utilização de máquinas equipadas com processadores \textit{mult
 Se for os processadores \textit{multi-core} atenderem em parelelo as diversas interrupções, originadas pelo envio ou recepção de pacotes, o desempenho da rede é passível de ser aumentado.
 No entanto, revela-se díficil atingir este paralelismo para todas as interfaces de rede, pois nem todas estão preparadas para beneficiar de arquitecturas com múltiplos \textit{cores}.
 
-
 \subsection{Transferência de informação}\label{sect:transf_information}
-%problemas de transferencia no overhead, o que aumenta mto as trocas de contexto e a frequencia de transferencia
-
-% Como existe uma arquitectura estruturada dentro do sistema de operação para comunicar, esta deve ser respeitada. Por questões de eficiência diversas vezes esta estrutura é desrespeitada em detrimento do aumento das transferências de dados.
 
 Transferir informação de um para outro ponto, dentro de um sistema quase sempre envolve uma cópia de dados.
 Esta cópia pode revelar-se demasiado pesada no desempenho do sistema, especialmente se o meio for de transmissão lenta e o número de dados envolvidos nesta transferência for elevado, ou ainda, se for efectuada com demasiada frequência.
@@ -242,24 +142,23 @@ Existem três tipos de instrumentação que podem ser efectuados: \textit{KProbe
 Cada um destes três tipos é especifico de uma determinada funcionalidade.
 
 \begin{itemize}
- \item \textbf{KProbe}
-% \paragraph*{\textbf{KProbe}}
+ \item \textbf{KProbe - }
+
 Utilizando um KProbe pode-se detectar a chamada de funções ou apenas de uma instrução.
 Para analisar apenas uma instrução, tem de ser indicado o \textit{offset} relativamente à distância ao inicio da função instrumentada.
 A indicação da função a instrumentar, pode ser definida recorrendo ao seu nome ou ao endereço de memória.
 Múltiplos \textit{KProbe} podem ser definidos para uma mesma função ou instrução.
 
-\item \textbf{JProbe}
-% \paragraph*{\textbf{JProbe}}
+\item \textbf{JProbe - }
+
 Um \textit{JProbe} destina-se a analisar os parâmetros, da função a instrumentar.
 Quando é declarado um \textit{JProbe} a função de \textit{handler} tem de conter os mesmos tipos de argumentos que a função que se destina a ser instrumentada, de forma a serem monitorizadas.
  
 
- \item \textbf{KRetProbe}
-% \paragraph*{\textbf{KretProbe}}
+ \item \textbf{KRetProbe - }
+
 Este tipo de análise tem como objectivo obter o valor de retorno da função que se pretende analisar.
 Para efectuar esta operação é utilizada a técnica do trampolim~\cite{Hollingsworth94dynamicprogram}, uma vez que uma função pode terminar em pontos diversos.
-
 
 \end{itemize}
 
@@ -280,15 +179,9 @@ Quando o compilador realiza substituição de funções por código \textit{inli
 Assim sendo, a função deixa de existir, impossibilitando a instrumentação destas funções.
 
 Existe uma nova optimização do \textit{KProbes} nas últimas versões do núcleo de operação do \textit{Linux}, nomeadamente nas versões 2.6.32 e 2.6.33.
-% Esta optimização consiste em utilizar a instrução \textit{jmp} em vez da interrupção \textit{int3}, mais pesada, 
-% mas estas substituição não pode ser efectuada em todas as situações. (ME) falta descrever ou não o pq de ser mais pesada
 
-%Falta ver a estatisticas que estão no ficheiro KProbes.txt na documentação do kernel, 
-%onde tem as estatisticas dos custos de cada tipo
 
 \subsubsection{DProbes}\label{cap:Dprobe_overview}
-
-%Esta ferramenta também foi desenvolvida pela IBM estando agora como um projecto no site sourceforge.net .
 
 O \textit{DProbes} utiliza o \textit{KProbes} como suporte para efectuar a instrumentação dinâmica do núcleo de sistema.
 Como a criação de pontos de análise é escrito em linguagem C ou \textit{assembly}, foi desenvolvida uma linguagem de mais alto nível de forma a simplificar  a utilização desta aplicação.
@@ -297,13 +190,8 @@ Após os dados terem sido obtidos, estes podem ser transferidos para um ficheiro
 Existe igualmente a opção de interoperabilidade com o \textit{Linux Trace Toolkit}\cite{:DProbes}.
 
 \subsubsection{SystemTap}\label{cap:Systemtap_overview}
-% Ainda tem de ser bem pensado o que escrever
+
 O \textit{SystemTap} é uma ferramenta que possibilita o desenvolvimento de módulos para o \textit{KProbes}, utilizando uma linguagem específica, de forma a ser segura e fácil de trabalhar.
-
-%A facilidade no desenvolvimento de scripts (tapsets) utilizando a linguagem de scripting criada para o efeito.
-
-% O sistema utilizado pelo SystemTap para passar informações ao processo em espaço utilizador é o replayFs.
-% para além de ter encontrado instruções neste sentido, a obtenção do strace veio confirmar estes dados
 
 Uma vez que os dados gerados estão no espaço de endereçamento de memória do núcleo, e o programa que os analisará se situa no espaço de endereçamento do utilizador, é necessário efectuar uma transferência de dados de um para outro espaço.
 O \textit{SystemTap} efectua esta transferência, recorrendo à utilização do sistema de ficheiros \textit{ReplayFs}, onde é possível escrever de forma rápida, sem comprometer a segurança do sistema\cite{Donovan2007,Jones2009}.
@@ -384,7 +272,6 @@ LTT & Traço & Não permite & Necessita \\
 \hline
 OProfile & Amostragem & Não permite & Necessita \\
 \hline
-
 
 \end{tabular}
 \end{center}
@@ -489,15 +376,6 @@ O \textit{NetLink} utiliza uma método de comunicação baseado em \textit{socke
  É com base no \textit{NetLink}, que a comunicação entre processos dentro da mesma máquina (\textit{IPC}) é implementada.
 %Isto ja e novo
  A comunicação com diferentes partes do subsistema de rede é efectuada recorrendo a este sistema de \textit{sockets}.
-
-%Isto e novo
-%\paragraph*{Splice}
-%Falar sobre esta chamada ao sistema
-
-%Isto e novo
-%\paragraph*{Tee}
-%Falar sobre esta chamada ao sistema
-
 
 % \todo{Corrigir esta tabela}
 \begin{table}[h]
@@ -622,10 +500,6 @@ Para além destas modificações no \textit{Packet\_MMAP}, o núcleo de sistema 
 
 Se as interfaces de rede suportarem um mecanismo de mitigação de interrupções, é possível obter melhores resultados, conforme \cite{Deri2004}.
 
-% \subsection{Aplicação com base na Lipcap}
-% 
-% Novas aplicações com base em alterações efectuadas ao LibPcap surgiram. Um exemplo destas foi a aplicação NTOP. Esta utiliza uma versão modificada do LibPcap, onde a captura dos dados é obtida da interface de rede directamente para um \textit{Ring Buffer} partilhado entre a aplicação NTOP e o controlador da interface de rede.\cite{Deri2004}
-
 \paragraph*{PF\_RING}
 
 Este é um novo módulo para o núcleo de sistema, criado com base em duas técnicas \textit{mmap} e \textit{ring\_buffers} anteriormente descritas.
@@ -643,11 +517,6 @@ Para se utilizar esta técnica é necessário que a interface de rede, permita a
 Com o aparecimento de sistemas \textit{multi-core} e \textit{multi-processador} a que a generalidade do público tem acesso, a paralelização de código ou a forma de tirar partido destas arquitecturas, que permitem um melhor aproveitamento dos recursos, assumem uma particular importância.
 De forma a tirar partido das arquitecturas \textit{multi-core}, é necessário que o controlador e interfaces de rede, os \textit{buffers}, e os controladores de \textit{DMA} (\textit{Direct Memory Access}), sejam modificados de forma a conhecerem esta estrutura.
 É pois, determinante um esforço conjunto envolvendo todas estas componentes, com vista à obtenção do máximo rendimento destas arquitecturas\cite{Deri:2010}.
-
-
-% \paragraph*{}
-% Utilização de DCA (Direct Cache Access) E RSS (Receive Side Scaling) e TNAPI (Threaded NAPI)
-
 
 \subsection{Formas de melhorar o desempenho dos filtros dinâmicos}
  O dinamismo das aplicações, nomeadamente das aplicações multimédia, deu origem a diversos estudos sobre a forma de monitorização de rede, que estas necessitam.
@@ -719,9 +588,6 @@ Esta forma de monitorização consome demasiados recursos e não se mostra total
 O \textit{NetFilter} é o sistema de filtragem de pacotes do núcleo do \textit{Linux} que irá ser apresentado na secção \ref{}.
 Foi implementado um módulo no núcleo utilizando o \textit{NetFilter} que filtra os pacotes pertencentes a um processo ou utilizador.
 Este sistema, verifica relativamente a cada pacote que é recebido ou enviado, se este faz parte do processo ou processos pertencentes a um utilizador, verificando canal a canal se o identificador do canal do pacote é igual ao canal do processo.
-
-
-
 
 
 Falta falar do ipt\_owner do iptables entre outros ....
