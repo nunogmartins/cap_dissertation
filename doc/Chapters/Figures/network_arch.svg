@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="744.09448819"
+   height="1052.3622047"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.47 r22583"
+   sodipodi:docname="network_arch.svg">
+  <defs
+     id="defs4">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       id="perspective10" />
+    <inkscape:perspective
+       id="perspective3617"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3686"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3715"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3748"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective2852"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective2874"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective2896"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective2918"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective2918-8"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective2964"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.98994949"
+     inkscape:cx="389.41508"
+     inkscape:cy="826.8681"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1280"
+     inkscape:window-height="725"
+     inkscape:window-x="1680"
+     inkscape:window-y="24"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <text
+       xml:space="preserve"
+       style="font-size:14px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="251.31439"
+       y="31.100044"
+       id="text3674-5"><tspan
+         sodipodi:role="line"
+         id="tspan3676-9"
+         x="251.31439"
+         y="31.100044">AF_PACKET</tspan></text>
+    <rect
+       id="rect2816"
+       width="277.79196"
+       height="65.659912"
+       x="39.39595"
+       y="43.219791"
+       style="opacity:0" />
+    <rect
+       style="opacity:0;fill:#ffffff;stroke:#000000"
+       id="rect3593"
+       width="261.62952"
+       height="105.05586"
+       x="56.568542"
+       y="38.169025" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:1.82405984;stroke-opacity:1"
+       id="rect3595"
+       width="248.17593"
+       height="398.17593"
+       x="100.91203"
+       y="3.2742126" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1.42452168px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 100.71978,51.657364 596.51056,0 2.04988,0 -2.04988,0 0,0"
+       id="path3601" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1.37271309px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 225.68636,3.0485412 226.32381,301.67583"
+       id="path3603" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1.29931033px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 100.85197,124.6792 498.814,0"
+       id="path3605" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.91363251px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 100.41736,351.86218 249.16528,0"
+       id="path3607" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1.29270494px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 100.88347,301.86218 498.81935,0"
+       id="path3607-0" />
+    <text
+       xml:space="preserve"
+       style="font-size:14px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="45.524414"
+       y="24.219326"
+       id="text3668"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3670"
+         x="45.524414"
+         y="24.219326">Bsd</tspan><tspan
+         sodipodi:role="line"
+         x="45.524414"
+         y="41.719326"
+         id="tspan3672">Socket</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:14px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="137.57143"
+       y="29.219326"
+       id="text3674"><tspan
+         sodipodi:role="line"
+         id="tspan3676"
+         x="137.57143"
+         y="29.219326">AF_INET</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:14px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="638.74622"
+       y="33.903152"
+       id="text3703"><tspan
+         sodipodi:role="line"
+         id="tspan3705"
+         x="638.74622"
+         y="33.903152">User space</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:14px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="634.02899"
+       y="72.192627"
+       id="text3703-0"><tspan
+         sodipodi:role="line"
+         id="tspan3705-2"
+         x="634.02899"
+         y="72.192627">Kernel space</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:14px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="160.14285"
+       y="169.50505"
+       id="text3732"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3734"
+         x="160.14285"
+         y="169.50505">IP Stack</tspan><tspan
+         sodipodi:role="line"
+         x="160.14285"
+         y="187.00505"
+         id="tspan3736">and</tspan><tspan
+         sodipodi:role="line"
+         x="160.14285"
+         y="204.50505"
+         id="tspan3738">NetFilter Hooks</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.64559984px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 100.29244,259.5 124.41512,0 -124.41512,0 z"
+       id="path3607-0-4" />
+    <text
+       xml:space="preserve"
+       style="font-size:14px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="184.45692"
+       y="376.32648"
+       id="text3766"><tspan
+         sodipodi:role="line"
+         id="tspan3768"
+         x="184.45692"
+         y="376.32648">Device Driver</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:14px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="118.75639"
+       y="280.56503"
+       id="text3770"><tspan
+         sodipodi:role="line"
+         id="tspan3772"
+         x="118.75639"
+         y="280.56503">Traffic Control</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1.37271309px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 600.68636,3.0485331 601.32381,301.67583"
+       id="path3603-2" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1.37271309px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 475.68636,3.0485361 0.6374,298.6272939"
+       id="path3603-2-7" />
+    <text
+       xml:space="preserve"
+       style="font-size:14px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="369.07867"
+       y="28.581476"
+       id="text3674-5-5"><tspan
+         sodipodi:role="line"
+         id="tspan3676-9-6"
+         x="369.07867"
+         y="28.581476">AF_NETLINK</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:14px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="506.45941"
+       y="28.581467"
+       id="text3674-5-9"><tspan
+         sodipodi:role="line"
+         x="506.45941"
+         y="28.581467"
+         id="tspan2946">AF_UNIX</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.91397804px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 350.3231,1.7158301 249.35379,0"
+       id="path3607-0-6" />
+  </g>
+</svg>
