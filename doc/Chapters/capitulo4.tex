@@ -5,17 +5,9 @@ Para conceber a arquitectura do sistema de Monitorização de Rede orientado ao 
 Após conhecer a arquitectura de rede do \textit{Linux}, foi imprescindível compreender a forma, como se processa a comunicação e a monitorização de rede.
 
 Neste capítulo irá ser apresentada a constituição do sistema de rede do \textit{Linux}, desde o momento do envio dos dados pelo processo até que estes chegam à interface de rede e vice-versa.
-Considerando a abrangência desta visão, apenas serão focados os pontos essenciais da arquitectura. 
-
----- 
-
-TODO Dar a ideia de alguns pontos 
-
-----
+Considerando a abrangência desta visão, apenas serão focados os componentes essenciais da arquitectura, sendo estes o descritor de processo, as familias de \textit{sockets}, a \textit{firewall}, o sistema de escalonamento de rede e a monitorização de rede.
 
 Após esta visão geral do sistema de rede do \textit{Linux}, será apresentada a arquitectura proposta para o sistema de Monitorização de Rede orientado ao Processo (MRoP).
-
-
 
 \section{Arquitectura de rede em \textit{Linux}}
 \label{sub:network}
@@ -45,7 +37,7 @@ As comunicações locais podem efectuar-se entre processos (\textit{AF\_UNIX}), 
 
 Os canais possuem um conjunto de funções (\textit{API}) bem definidas, para utilização e controlo, permintindo criar uma forma estruturada de comunicação.
 
-Os administradores de sistemas necessitam filtrar o fluxo de informação que circula nas suas redes, pelo que se tem assitido ao desenvolvimento de sistemas de filtragem de comunicações, conhecidas por \textit{firewalls}.
+Os administradores de sistemas necessitam filtrar o fluxo de informação que circula nas suas redes, pelo que se tem assistido ao desenvolvimento de sistemas de filtragem de comunicações, conhecidas por \textit{firewalls}.
 Sendo o \textit{Linux} um sistema de operação frequentemente utilizado em ambientes de servidores, necessitou naturalmente deste controlo, daí que tenha sido desenvolvido o \textit{NetFilter}, uma \textit{firewall} que \color{red}filtra \color{black}o fluxo de dados que circulam na rede, entre o sistema e a periferia.
 
 Para além da filtragem do fluxo de dados, existe um sistema de controlo do escalonamento do fluxo de tráfego, (\textit{Traffic Control}), que como o \textit{netfilter} é definido no núcleo, e permite ao administrador indicar quais os fluxos de dados prioritários ou que necessitam de determinada largura de banda, possibilitando-lhe efectuar para estes, uma reserva antecipada.
@@ -384,7 +376,7 @@ Existe ainda um sistema para controlo/configuração, destinado a obter informa�
 
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics[scale=0.5]{arquitectura.pdf} 
+\includegraphics[scale=0.6]{arquitectura.pdf} 
 \caption{Arquitectura da solução}
 \label{arquitectura}
 \end{center}
