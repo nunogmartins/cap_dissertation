@@ -1,7 +1,7 @@
 \chapter{Sistema Proposto}
 \label{cap:Estrutura}
 
-Para conceber a arquitectura do sistema de Monitorização de Rede orientado ao Processo (MRoP), foi necessário conhecer como os processos em nível utilizador comunicam com o exterior.
+De modo a conceber a arquitectura do sistema de Monitorização de Rede orientado ao Processo (MRoP), foi necessário conhecer como os processos em nível utilizador comunicam com o exterior.
 Após conhecer a arquitectura de rede do \textit{Linux}, foi imprescindível compreender a forma, como se processa a comunicação e a monitorização de rede.
 
 Neste capítulo irá ser apresentada a constituição do sistema de rede do \textit{Linux}, desde o momento do envio dos dados pelo processo até que estes chegam à interface de rede e vice-versa.
@@ -19,10 +19,6 @@ Em geral as comunicações externas processam-se através de uma interface de re
 A(s) interface(s) de rede são recursos do sistema, e por isso partilhadas pelos diversos processos.
 Esta partilha é efectuada pelo núcleo, pois apenas este é capaz de a efectuar correctamente.
 
-A criação de canais de comunicação é executada através da chamada ao sistema \textit{socket}.
-
------------ --------- ----------- qualquer coisa sobre a Norma posix ------------
-
 \begin{figure}[htbp]
 \centering
 \includegraphics[scale=0.7]{network_arch.pdf} 
@@ -35,7 +31,7 @@ A chamada ao sistema \textit{socket}, é efectuada para a criação de um canal 
 Existe um agrupamento em família de endereços (\textit{Address Family}), que se destina à comunicação remota ou local.
 As comunicações locais podem efectuar-se entre processos (\textit{AF\_UNIX}), ou entre estes e o núcleo (\textit{AF\_NETLINK}), enquanto as remotas podem ter lugar sobre a \textit{internet}, dispondo igualmente de uma família própria a \textit{AF\_INET}.
 
-Os canais possuem um conjunto de funções (\textit{API}) bem definidas, para utilização e controlo, permintindo criar uma forma estruturada de comunicação.
+Os canais possuem um conjunto de funções (\textit{API POSIX}) bem definidas, para utilização e controlo, permintindo criar uma forma estruturada de comunicação.
 
 Os administradores de sistemas necessitam filtrar o fluxo de informação que circula nas suas redes, pelo que se tem assistido ao desenvolvimento de sistemas de filtragem de comunicações, conhecidas por \textit{firewalls}.
 Sendo o \textit{Linux} um sistema de operação frequentemente utilizado em ambientes de servidores, necessitou naturalmente deste controlo, daí que tenha sido desenvolvido o \textit{NetFilter}, uma \textit{firewall} que \color{red}filtra \color{black}o fluxo de dados que circulam na rede, entre o sistema e a periferia.
@@ -205,7 +201,7 @@ Falar sobre os controladores das interfaces de rede, que definem um conjunto de 
 Os dados envolvidos no fluxo de comunicação e utilizados pelos controladores são os \textit{socket buffers}, estruturas do tipo \textit{sk\_buff}.
 Esta estrutura contém diversos elementos, merecendo relevo os apontadores para a estrutura de rede do controlador, apontadores para secções do pacote (os diversos cabeçalhos pertencentes ao nível de rede e transporte), bem como a dimensão dos espaços alocados para estes e outros apontadores.
 
-\subsection{Recepção de dados}
+\subsection{Captura dos fluxos de dados das interfaces de rede}
 
 O sistema de monitorização de rede, opera de forma opaca à normal utilização da rede, pelas aplicações.
 Desta forma, quando um pacote chega à interface de rede, esta envia ao cpu um pedido de interrupção da computação.
@@ -218,7 +214,7 @@ Os pacotes recebidos são entregues aos \textit{sniffers} registados no sistema,
 A monitorização de rede é efectuada pelos \textit{sniffers}, sendo os pacotes entregues a cada um deles, para que possam proceder à sua análise.
 Cada \textit{sniffer} tem um filtro associado escrito em linguagem \textit{bpf}, a ser executado na máquina virtual, implementada para o efeito.
 
-\subsection{Transmissão de dados}
+\subsubsection{Transmissão de dados}
 
 Uma aplicação em nível utilizador, transfere dados sobre a rede através de chamadas ao sistema de operação, sendo que estas podem ser \textit{send}, \textit{sendto}, \textit{sendmsg}.
 Neste ponto de entrada, os dados são copiados e sobre eles são efectuadas diversas verificações.
