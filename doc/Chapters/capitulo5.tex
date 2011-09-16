@@ -1,4 +1,4 @@
-\chapter{Implementação da solução proposta}
+\chapter{Implementação do sistema proposto}
 \label{cap:Implementacao}
 
 % falta falar sobre filesystem vfs e como chegar ao socket file private\_data para alem da parte de interrupts, tasklets e bottomhalfs bem como sobre os contextos de execucao
@@ -43,7 +43,7 @@ Como apresentado na secção \ref{}, o sistema de monitorização de rede é uti
 Nas subsecções seguintes irão ser apresentados os quatro componentes do MRoP como o constante na figura \ref{fig:general_architecture}.
 
 
-\section{Estado dos \textit{sockets}}
+\section{Estado dos \textit{sockets} do processo}
 
 Para manter a informação sobre os endereços e portos que uma aplicação está a utilizar, sem que seja necessário consultar os canais de rede, foi necessário criar um repositório de dados, que contivesse informações relevantes para as decisões do filtro de captura.
 Neste repositório, existe a necessidades de ter funções de inserção, remoção e consulta, sendo que qualquer uma destas, deverá ser efectuada com celeridade, procurando estruturas que tenham uma complexidade temporal \textit{BigO}, O(1) ou O(log n).
