@@ -15,41 +15,35 @@ Existem diferentes formas de coligir, visualizar e até interactuar com as ferra
 
 Tendo em vista o conhecimento e um melhor aproveitamento das capacidades de cada uma, são apresentadas as diferentes formas de análise / avaliação:
 
-\begin{itemize}
- \item 
-
 Se considerarmos como referência a visualização da história dos eventos, podemos analisá-los de duas formas distintas:
  
 \subparagraph*{Online -}
-Enquanto decorre a monitorização da aplicação é possível observar os dados que são recolhidos pela aplicação.
-Como os eventos estão a ser recolhidos e visualizados em simultâneo, apenas podemos observar a história até ao momento.
+Enquanto decorre a monitorização da aplicação é possível observar os dados que são recolhidos pelo monitor.
+Como os eventos estão a ser recolhidos e visualizados em simultâneo, apenas podemos observar a história até ao momento, mas temos uma baixa latência entre os acontecimentos e a sua observação.
 
 \subparagraph*{Offline ou \textit{Post-Mortem} - }
 
 A história do programa é analisada após este se ter completado daí a designação \textit{Post-Mortem}.
-Este método permite-nos analisar integralmente a sua história.
+Este método permite-nos analisar integralmente a sua história e coleccioná-la.
+Permite análises mais completas e computacionalmente mais exigentes.
 
-\item
-
-Se a opção de monitorização se basear na interactividade do utilizador, é possível defini-la de duas formas:
+Se a monitorização necessitar de interactividade do utilizador, é possível defini-la de duas formas:
 
  \subparagraph*{Activa - }
 
-Por iniciativa explícita do utilizador, é possível inquirir o sistema de monitorização sobre o estado da computação.
-Este método, por vezes descrito como \textit{computacional steering}, é a forma com maior interactividade, uma vez que permite ir analisando e modificando os parâmetros da monitorização.
+Por iniciativa explícita do utilizador, é possível inquirir o sistema de monitorização sobre o estado da computação ou mesmo alterá-la.
+Este método, por vezes descrito como \textit{computacional steering}, é a forma com maior interactividade, uma vez que permite ir analisando e modificando os parâmetros da monitorização ou mesma da aplicação.
 
 \subparagraph*{Passiva - }
 Esta forma de monitorização é especialmente utilizada em ambientes onde é relevante a obtenção da totalidade dos dados e apenas no final nos debruçarmos sobre a sua análise.
 Esta forma é designada de passiva, por o utilizador não ter intervenção na forma como os dados estão a ser obtidos, o que reduz a perturbação do sistema. 
 
-\item
-
 A instrumentação pode ser de dois tipos: a estática e a dinâmica, cada uma com as suas características próprias.
 
 \subparagraph*{Estática - }
 
-Na instrumentação estática o código instrumentado é definido em tempo de compilação, utilizando bibliotecas próprias para o efeito, como a utilização da função \textit{assert}, que define os pontos a serem monitorizados.
-Durante a monitorização não podem ser adicionados ou removidos pontos de análise.
+Na instrumentação estática o código instrumentado é definido em tempo de compilação, ou utilizando bibliotecas próprias para o efeito, como a utilização da função \textit{assert}, que define os pontos a serem monitorizados.
+Durante a execução não podem ser adicionados ou removidos pontos de análise.
 
 \subparagraph*{Dinâmica - }
 
@@ -57,32 +51,31 @@ Em contraste com a instrumentação estática está a dinâmica.
 É mais complexa e permite a inserção e remoção dos pontos a serem monitorizados.
 O dinamismo verifica-se pela ausência do ciclo $introduzir ponto\rightarrow compilar programa\rightarrow executar\rightarrow remover ponto$.
 A utilização de pontos de instrumentação dinâmica, pode ajudar a reduzir o grau de perturbação, uma vez que apenas são definidos os que se desejam observar.
-\end{itemize}
+Tal pode ser efectuado no início da execução ou durante a sua execução, criando, alterando, destruindo os pontos de observação sobre os recursos monitorizados.
 
-\subparagraph*{}
-Todavia, é no uso combinado da história dos eventos, da interactividade e da instrumentação, que reside a melhor forma de monitorização.
 
 \subparagraph*{
 %Recolha de dados
 }
 A recolha de informação, é uma das componentes mais sensíveis relativamente ao grau de perturbação da monitorização.
-Em geral os dados vão sendo armazenados num \textit{buffer} em memória.
-Caso exista algum evento que indique que o \textit{buffer} se encontra cheio ou por acção explícita do utilizador que pretende armazenar esses dados, para posterior análise, estes são transferidos para a memória persistente.
+Em geral os pontos de instrumentação levam a que os dados vão sendo armazenados num \textit{buffer} em memória.
+Caso exista algum evento que indique que o \textit{buffer} se encontra cheio ou por acção explícita do utilizador tal é transferido para a interface com o utilizador ou em memória persistente, para posterior análise.
 
 \subparagraph*{
 %Grau de perturbação
 }
-Conforme referido anteriormente, existe a preocupação de que o sistema a ser monitorizado tenha um baixo grau de perturbação.
+Existe claro a preocupação de que o sistema a ser monitorizado tenha um baixo grau de perturbação, pois pode levar à alteração dos resultados obtidos e mesmo a comportamentos diferentes da aplicação (especialmente perante execuções concorrentes).
 Daí que, diversas abordagens foram criadas, para reduzirem o impacto da monitorização num sistema em produção.
 Uma destas abordagens traduz-se na utilização de instruções especializadas, de que alguns processadores dispõem para \textit{debug}, de modo a utilizar os recursos que mais se adequem à monitorização.
 Estes métodos, nem sempre são utilizados, devido à sua dependência da arquitectura, o que dificulta a sua portabilidade.
-Com vista a minimizar a perturbação, alguns sistemas de monitorização utilizam uma técnica de amostragem, que permite obter indicações sobre os estado da computação ao fim de um certo número de iterações.
-Esta técnica, em oposição à criação de um traço de execução, permite obter dados sobre os recursos apenas por amostra, enquanto que na criação de um traço de execução, é possível obter a totalidade dos dados de forma a criar uma história completa.
+Com vista a minimizar a perturbação, alguns sistemas de monitorização utilizam uma técnica de amostragem, que permite obter indicações sobre os estado da computação a cada intervalo de tempo.
+Esta técnica, em oposição à criação de um traço de execução, permite obter dados sobre os recursos apenas por amostra, limitando à partida a perturbação, enquanto que na criação de um traço de execução, é possível obter a totalidade dos eventos de forma a criar uma história completa, mas pode levar a uma grande sobrecarga do sistema perante uma grande taxa de eventos.
 
 \paragraph*{
 %Apresentação dos dados recolhidos
 }
-No entanto, capturar estes dados oriundos da monitorização pode revelar-se insuficiente, se não dispusermos de uma ferramenta onde estes possam ser tratados, de modo a obtermos análises mais ricas visualmente.
+No entanto, capturar estes dados oriundos da monitorização pode revelar-se insuficiente, se não dispusermos de uma ferramenta onde estes possam ser tratados, de modo a obtermos análises mais completas e relacionar com os detalhes de funcionamento da aplicação.
+Este não será o foco deste trabalho.
 
 \subsection{Monitorização de Rede}\label{sub:network_monitoring}
 
@@ -421,7 +414,7 @@ Em seguida é apresentada a arquitectura da biblioteca \textit{Pcap}.
 \label{sect:architecture_libpcap}
 A arquitectura do \textit{Pcap} divide-se em duas partes: a biblioteca a nível utilizador, e o módulo no núcleo de sistema composto por \textit{sockets} e filtros que são utilizados na captura.
 Como se constata na figura \ref{fig:pcap_architecture} a utilização de filtros é aplicada assim que os pacotes são recebidos.
-Este sistema de captura, permite que pacotes que não são visíveis às aplicações, devido à \textit{firewall} do \textit{Linux} possam ser capturados e analisados pelas ferramentas de monitorização de rede.
+Este sistema de captura, permite que pacotes que não são visíveis às aplicações, devido à \textit{firewall} do \textit{Linux}, possam ser capturados e analisados pelas ferramentas de monitorização de rede.
 
 \begin{figure}[h]
        \centering
