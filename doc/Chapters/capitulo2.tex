@@ -1,7 +1,7 @@
-\chapter{Trabalho relacionado}
+\chapter{Monitorização de processos}
 \label{cap:trabrelacionado}
  
-\section{Monitorização} \label{sect:descricao}
+\section{Visão geral} \label{sect:descricao}
 
 Pode ser necessário recorrer à monitorização para se compreender o comportamento das aplicações.
 Esta permite-nos obter dados relevantes sobre os recursos utilizados, de modo a proporcionar-nos um conhecimento mais profundo do seu comportamento.
@@ -84,7 +84,7 @@ Esta técnica, em oposição à criação de um traço de execução, permite ob
 }
 No entanto, capturar estes dados oriundos da monitorização pode revelar-se insuficiente, se não dispusermos de uma ferramenta onde estes possam ser tratados, de modo a obtermos análises mais ricas visualmente.
 
-\subsection{Monitorização de Rede}\label{sect:packet_capture}
+\subsection{Monitorização de Rede}\label{sub:network_monitoring}
 
 Em geral, as ferramentas de monitorização da interacção do processo com o exterior, são baseadas na captura de pacotes de forma passiva.
 As ferramentas capturam os pacotes que fluem na rede, para posterior análise ao tráfego, que pode incidir sobre a largura de banda utilizada, principais protocolos, eventuais problemas de segurança, etc.
@@ -118,25 +118,27 @@ Hoje em dia a utilização de máquinas equipadas com processadores \textit{mult
 Se for os processadores \textit{multi-core} atenderem em parelelo as diversas interrupções, originadas pelo envio ou recepção de pacotes, o desempenho da rede é passível de ser aumentado.
 No entanto, revela-se díficil atingir este paralelismo para todas as interfaces de rede, pois nem todas estão preparadas para beneficiar de arquitecturas com múltiplos \textit{cores}.
 
-\subsection{Transferência de informação}\label{sect:transf_information}
-
-Transferir informação de um para outro ponto, dentro de um sistema quase sempre envolve uma cópia de dados.
-Esta cópia pode revelar-se demasiado pesada no desempenho do sistema, especialmente se o meio for de transmissão lenta e o número de dados envolvidos nesta transferência for elevado, ou ainda, se for efectuada com demasiada frequência.
-Estas transferências/cópias de dados, para além da cópia própriamente dita, necessitam de trocas de contexto entre o núcleo de sistema e as aplicações, porque apenas o núcleo do sistema pode efectuar instruções privilegiadas, de forma a garantir a segurança e robustez do sistema.
-Diferentes técnicas têm sido desenvolvidas visando o aumento do desempenho destas operações. 
-
 \section{Sistemas de monitorização no núcleo do \textit{Linux}}\label{sect:instrumentacao_casos_linux}
 
 Como o anteriormente analisado na secção \ref{sect:instrumentation_overview} referente à monitorização, esta secção é dedicada à apresentação das diferentes ferramentas de monitorização do núcleo de sistema do \textit{Linux} sendo as mais recentemente utilizadas neste sistema de operação.
+Neste documento constam apenas as ferramentas de monitorização dinâmicas, pois apenas estas são desejadas para utilização na criação de uma componente de monitorização de rede orientada ao processo.
+De entre as ferramentas de monitorização dinâmica analisadas é possível agrupa-las em duas categorias: suporte à monitorização e lista de eventos.
+Na categoria suporte à monitorização existem dois sistemas mais relevantes: o \textit{KProbes} e o \textit{Linux Kernel Stace Tracer}, enquanto que para a lista de eventos foram verificados o \textit{Linux Trace Toolkit} e o \textit{OProfile}.
+Estes sistemas 4 sistemas são apresentados em seguida nas suas categorias.
 
-\subsection{KProbes}\label{sect:KProbes_overview}
+\subsection{Suporte à monitorização}
+
+Como suporte à monitorização destacam-se duas ferramentas: o \textit{KProbes} e o \textit{Linux Kernel Stace Tracer}.
+Em ambos é possível definir novos pontos, funções ou eventos a serem monitorizados, não ficando restrito a funcionalidades já existentes nestas ferramentas.
+
+\subsubsection{KProbes}\label{sect:KProbes_overview}
 
 O \textit{KProbes} é uma ferramenta de instrumentação dinâmica do núcleo do \textit{Linux}.
 A \textit{API} desta ferramenta permite que aplicações, como o \textit{DProbes} ou o \textit{SystemTap} possam aceder às suas funcionalidades.
 Esta encontra-se na versão principal do núcleo do sistema \textit{Linux} desde a versão 2.6.9, o que indica tratar-se de uma ferramenta bastante estável\cite{kernel_debug_printk_on_fly,KProbesSite}.
 
 
-Para se obterem informações sobre as funções ou instruções que estão a ser monitorizadas, o \textit{KProbes} disponibiliza-as por meio do \textit{DebugFs}.
+Para se obterem informações sobre as funções ou instruções que estão a ser monitorizadas, o \textit{KProbes} disponibiliza-as através de um ficheiro no \textit{DebugFs}.
 
 Existem três tipos de instrumentação que podem ser efectuados: \textit{KProbe}, \textit{JProbe} e \textit{KRetProbe}.
 Cada um destes três tipos é especifico de uma determinada funcionalidade.
@@ -144,7 +146,7 @@ Cada um destes três tipos é especifico de uma determinada funcionalidade.
 \begin{itemize}
  \item \textbf{KProbe - }
 
-Utilizando um KProbe pode-se detectar a chamada de funções ou apenas de uma instrução.
+Utilizando um \textit{KProbe} pode-se analisar a chamada de uma função ou de uma instrução.
 Para analisar apenas uma instrução, tem de ser indicado o \textit{offset} relativamente à distância ao inicio da função instrumentada.
 A indicação da função a instrumentar, pode ser definida recorrendo ao seu nome ou ao endereço de memória.
 Múltiplos \textit{KProbe} podem ser definidos para uma mesma função ou instrução.
@@ -181,7 +183,7 @@ Assim sendo, a função deixa de existir, impossibilitando a instrumentação de
 Existe uma nova optimização do \textit{KProbes} nas últimas versões do núcleo de operação do \textit{Linux}, nomeadamente nas versões 2.6.32 e 2.6.33.
 
 
-\subsubsection{DProbes}\label{cap:Dprobe_overview}
+%\subsubsection{DProbes}\label{cap:Dprobe_overview}
 
 O \textit{DProbes} utiliza o \textit{KProbes} como suporte para efectuar a instrumentação dinâmica do núcleo de sistema.
 Como a criação de pontos de análise é escrito em linguagem C ou \textit{assembly}, foi desenvolvida uma linguagem de mais alto nível de forma a simplificar  a utilização desta aplicação.
@@ -189,7 +191,7 @@ Como a criação de pontos de análise é escrito em linguagem C ou \textit{asse
 Após os dados terem sido obtidos, estes podem ser transferidos para um ficheiro, para o \textit{daemon logging} do núcleo de sistema, ou para uma porta série.
 Existe igualmente a opção de interoperabilidade com o \textit{Linux Trace Toolkit}\cite{:DProbes}.
 
-\subsubsection{SystemTap}\label{cap:Systemtap_overview}
+%\subsubsection{SystemTap}\label{cap:Systemtap_overview}
 
 O \textit{SystemTap} é uma ferramenta que possibilita o desenvolvimento de módulos para o \textit{KProbes}, utilizando uma linguagem específica, de forma a ser segura e fácil de trabalhar.
 
@@ -206,30 +208,7 @@ O \textit{System Tap Editor Plug-in} é um \textit{plug-in} para a ferramenta de
 
 O \textit{SystemTap} actualmente está a ser desenvolvido por empresas de reconhecido mérito internacional, nomeadamente a \textit{Red Hat}, a \textit{IBM}, a \textit{Hitachi} e a \textit{Oracle}.
 
-\subsection{Linux Trace ToolKit}\label{cap:linux_trace_toolkit_overview}
-
-% O Linux Trace Toolkit é uma ferramenta de ``tracing''
-% Utiliza o Klog com repositorio da informação obtida do kernel.
-O \textit{Linux Trace ToolKit} é uma ferramenta um pouco mais antiga que o \textit{KProbes}, constituída por quatro componentes: o \textit{Kernel Patch}, o \textit{Kernel Module} o \textit{Trace Daemon} e o \textit{Data Decoder}, foi substituída pelo \textit{Linux Trace Toolkit New Generation} que se apresenta em seguida.
-
-\subparagraph{Linux Trace Toolkit New Generation - }\label{cap:lttng_overview}
-
-% Nesta versão a comunicação entre o kernel e aplicação em user space é efectuada utilizando o relayfs.
-% O RelayFs é um sistema de ficheiros para comunicação entre o código dentro e fora do núcleo de operação.
-
-Representa uma evolução do \textit{LTT (Linux Trance ToolKit)}, e permite colaborar com ferramentas como o \textit{KProbes}, o \textit{Tracepoints}\cite{Mathieu2009} e \textit{Linux Kernel Markers}\cite{Mathieu2009}.
-As ferramentas \textit{Tracepoints} e Linux \textit{Kernel Markers} fazem parte da instrumentação estática pertencente ao núcleo de sistema \textit{Gnu Linux}.
-
-A transferência dos dados do núcleo de sistema para a aplicação, é efectuada utilizando o sistema de ficheiros virtual \textit{RelayFs}.
-
-%A utilização desta ferramenta em sistemas de tempo real é um bom indicador da sua performance.
-
-\subparagraph{Linux Trace Toolkit Viewer - }\label{cap:lttv_overview}
-O \textit{Linux Trace Toolkit Viewer (LTTV)} é um projecto desenvolvido em paralelo com o \textit{LTT} e \textit{LTTng}, de forma a possibilitar uma análise visual dos dados recolhidos por estas aplicações.
-Esta ferramenta possibilita igualmente realizar um traço de execução, uma vez que os dados recolhidos contêm uma estampilha temporal, do momento em que foram obtidos.
-
-
-\subsection{Linux Kernel State Tracer}
+\subsubsection{Linux Kernel State Tracer}
 % Linux Kernel State Tracer(LKST) records information as trace data about events in the Linux Kernel. It records various events like process context switch, send signal, exception, memory allocation, send packet, and so on. 
 
 O \textit{Linux Kernel State Tracer(LKST)} obtém informações referentes ao núcleo de sistema, de forma a criar um traço de execução, e consegue capturar diferentes eventos como trocas de contexto, envio de sinais, alocação de memória, transmissão de pacotes, etc.
@@ -243,8 +222,35 @@ O \textit{Linux Kernel State Tracer(LKST)} obtém informações referentes ao n�
 Actualmente, está a ser desenvolvido um subprojecto do \textit{Linux Kernel Stace Tracer} designado por \textit{Direct Jump Probe}.
 O \textit{Direct Jump Probe} é uma optimização à utilização do \textit{trap int3}, presente em alguns processadores, e que pode trabalhar em conjunto com o \textit{KProbes} \ref{sect:KProbes_overview}.
 Esta optimização pode ser verificada no relatório\cite{Hiramatsu2005}.
+
+\subsection{Lista de eventos}
+
+Nesta categoria encaixam-se duas ferramentas o \textit{Linux Trace ToolKit} e o \textit{OProfile}.
+Em cada uma destas ferramentas a monitorização é efectuada sobre pontos previamente definidos, não permitindo a adição de novos pontos de monitorização.
+Cada um destas ferramentas analisa todo o sistema, sendo a filtragem dos eventos efectuada em nível utilizador.
+Por isso a lista de eventos pode parecer uma limitação, mas uma vez que estas ferramentas analisam todo o sistema, deixa de o parecer.
+
+\subsubsection{Linux Trace ToolKit}\label{cap:linux_trace_toolkit_overview}
+
+% O Linux Trace Toolkit é uma ferramenta de ``tracing''
+% Utiliza o Klog com repositorio da informação obtida do kernel.
+O \textit{Linux Trace ToolKit} é uma ferramenta um pouco mais antiga que o \textit{KProbes}, constituída por quatro componentes: o \textit{Kernel Patch}, o \textit{Kernel Module} o \textit{Trace Daemon} e o \textit{Data Decoder}, foi substituída pelo \textit{Linux Trace Toolkit New Generation} que se apresenta em seguida.
+
+% Nesta versão a comunicação entre o kernel e aplicação em user space é efectuada utilizando o relayfs.
+% O RelayFs é um sistema de ficheiros para comunicação entre o código dentro e fora do núcleo de operação.
+
+O \textit{Linux Trace Toolkit New Generation} representa uma evolução do \textit{LTT (Linux Trance ToolKit)}, e permite colaborar com ferramentas como o \textit{KProbes}, o \textit{Tracepoints}\cite{Mathieu2009} e \textit{Linux Kernel Markers}\cite{Mathieu2009}.
+As ferramentas \textit{Tracepoints} e Linux \textit{Kernel Markers} fazem parte da instrumentação estática pertencente ao núcleo de sistema \textit{Gnu Linux}.
+
+A transferência dos dados do núcleo de sistema para a aplicação, é efectuada utilizando o sistema de ficheiros virtual \textit{RelayFs}.
+
+%A utilização desta ferramenta em sistemas de tempo real é um bom indicador da sua performance.
+
+%\subparagraph{Linux Trace Toolkit Viewer - }\label{cap:lttv_overview}
+O \textit{Linux Trace Toolkit Viewer (LTTV)} é um projecto desenvolvido em paralelo com o \textit{LTT} e \textit{LTTng}, de forma a possibilitar uma análise visual dos dados recolhidos por estas aplicações.
+Esta ferramenta possibilita igualmente realizar um traço de execução, uma vez que os dados recolhidos contêm uma estampilha temporal, do momento em que foram obtidos.
  
-\subsection{OProfile}\label{cap:Oprofile_overview}
+\subsubsection{OProfile}\label{cap:Oprofile_overview}
 As ferramentas anteriormente referidas utilizam mecanismos para formar um traço de execução, este difere neste facto.
 Em vez de a cada evento utilizar uma função para obter os dados, apenas a utiliza decorridos um certo número de eventos.
 O recurso a este critério permite ao \textit{OProfile} ser mais eficiente, uma vez que nem sempre é necessário o universo dos eventos que as ferramentas de monitorização capturam, mas tão somente uma amostra.
@@ -282,7 +288,6 @@ Da observação da tabela \ref{tab:inst_compare} pode inferir-se que: ToDo
 A tabela \ref{tab:inst_compare} permite fazer uma comparação entre alguns dos atributos destes sistemas de instrumentação presentes no núcleo de sistema do \textit{Linux}.
 Os diferentes sistemas de instrumentação dinâmica do núcleo do \textit{Linux} segundo os seguintes critérios: metodologia da captura (por traço ou por amostragem), análise dos parâmetros das funções instrumentadas e a necessidade de ter um \textit{deamon} de recolha de dados provenientes do sistema de monitorização.
 Se a necessidade de ter um \textit{deamon} a executar de forma a coligir e organizar os dados, pode penalizar o desempenho do sistema, a possibilidade de analisar os parâmetros das funções instrumentadas é um ponto a favor deste.
-
 \section{Transferência de dados}
 \label{sect:kernel_user_comm}
 
@@ -316,8 +321,6 @@ Os \textit{Ring Buffers} são utilizados tendo presente a relação custo / bene
 É igualmente utilizada em situações de \textit{"produtor-consumidor"}, ou seja, quando é necessário manter a ordem dos elementos.
 
 \paragraph*{NAPI - New API - }
-
-%VERIFICAR a origem do NAPI 
 
 Foi criada uma nova \textit{API} (\textit{Application Program Interface}) de atendimento de interrupções do processador, oriundos das interfaces de rede, com o objectivo de aumentar o desempenho da utilização de rede de elevado débito.
 Esta nova \textit{API}, permite desligar a atenção do processador a novas interrupções, oriundas da interface de rede, durante um certo período de tempo.
@@ -405,7 +408,7 @@ NetLink & Sem & Elevado \\
 Como se pode verificar através da tabela \ref{tab:transf_compare}, que compara a estruturação dos dados de cada Sistema, com o volume de dados que é possível transferir, o \textit{RelayFs} e o \textit{NetLink} são os dois sistemas de comunicação, que não tendo estruturação fixa dos dados, conseguem transferir um volume superior de dados, comparativamente com os restantes, objecto da análise.
 Se limitarmos a análise comparativa aos sistemas \textit{RelayFs} e \textit{NetLink}, constatamos que o volume de dados que é possível transferir pelo primeiro é superior ao verificado no \textit{NetLink}.
 
-\section{Biblioteca LibPcap}\label{sect:LibPcap}
+\section{LibPcap e Linux Socket Filtering}\label{sect:LibPcap}
 
 A monitorização de rede existente no \textit{Gnu Linux} permite capturar os pacotes de rede logo que eles chegam ao controlador de rede.
 Assim a biblioteca \textit{LibPcap}\cite{:LibPcap} faz uso desta possibilidade.
@@ -422,7 +425,7 @@ Este sistema de captura, permite que pacotes que não são visíveis às aplica�
 
 \begin{figure}[h]
        \centering
-       \includegraphics[height=2in]{pcap_architecture2}
+       \includegraphics[scale=1]{pcap_architecture3}
        \caption{Arquitectura do LibPcap}
       \label{fig:pcap_architecture}
 \end{figure}
@@ -431,15 +434,12 @@ A arquitectura de rede do núcleo de sistema \textit{Linux}, utiliza \textit{soc
 Esta estrutura que dispõe de toda a informação sobre o pacote, a receber pela aplicação, é igualmente utilizada nos sistemas de monitorização em nível utilizador.
 A monitorização da rede é efectuada directamente no controlador da interface de rede, utilizando para isso um \textit{socket} \textit{AF\_PACKET}.
 
-\subsubsection{UserLevel}
-
 A biblioteca dinâmica \textit{LibPcap} é utilizada pela generalidade dos programas de captura de pacotes.
 Esta biblioteca, como é multi-plataforma, permite ao programador utilizá-la nos principais sistemas de operação, porque a \textit{API} da \textit{LibPcap} é opaca relativamente à implementação, esta sim, específica de cada plataforma.
 Para ser possível efectuar a captura de pacotes, o programa tem de especificar qual a interface de rede que quer monitorizar.
 Se necessitar de filtrar pacotes, especificará os filtros a utilizar, recorrendo para isso à função \textit{setFilter}, que aplicará o filtro criado anteriormente, através da notação \textit{BPF}.
 Após esta inicialização, o programa poderá utilizar \textit{Polling}, de forma a obter os pacotes e analisá-los.
 
-\subsubsection{AF\_PACKET}
 
 O módulo \textit{AF\_PACKET} permite utilizar explicitamente o modo promiscuo, ou seja permite que sejam capturados pacotes que não são destinados à máquina utilizada.
 Na versão actual do núcleo de sistema do \textit{Linux} (2.6.32), o módulo \textit{AF\_PACKET} já pode utilizar um sistema de partilha de \textit{buffer}, com o espaço de utilizador.
@@ -457,12 +457,12 @@ O \textit{Linux Socket Filtering} é derivado do \textit{BPF (Berkeley Packet Fi
 Este sistema de filtros permite aos os utilizadores com permissões de \textit{Super User}, definir filtros e afectá-los aos \textit{sockets}.
 Os filtros definidos são descritos numa linguagem simples, de forma a efectuarem com rapidez a selecção dos pacotes a capturar, rejeitando todos os outros.
 Se o filtro for demasiado complexo, não poderá ser aplicado no núcleo, sendo apenas possível aplicá-lo em nível utilizador, perdendo algum desempenho.
-A linguagem utilizada para a criação dos filtros é compilada para o \textit{Instruction Set}, definido no \textit{BPF}.
-Este \textit{Instruction Set} utiliza operadores lógicos de forma a combinar as regras definidas nos filtros, criando-se apenas um fluxo que pode ser aplicado aos \textit{sockets}.
+A linguagem utilizada para a criação dos filtros é traduzida para o \textit{Instruction Set}, definido no \textit{BPF}.
+Este \textit{Instruction Set} utiliza operadores lógicos de forma a combinar as regras definidas nos filtros, criando-se apenas um filtro a ser aplicado aos pacotes.
 Para se poder definir uma nova instrução no \textit{Instruction Set}, é necessário alterar o ficheiro \textit{grammar.y}, na entrada correspondente à posição que deverá ocupar na \textit{AST (Abstract Sintax Tree)}, e modificar as funções de criação do novo filtro, quer em modo utilizador quer dentro do núcleo de sistema.
-Este desenvolvimento tem de ser efectuado par-a-par, pois a ser efectuado apenas de um lado, ou outro tornar-se-á incompatível.~\cite{Mccanne92thebsd}.
+Este desenvolvimento tem de ser efectuado par-a-par, pois a ser efectuado apenas de um lado, o outro tornar-se-á incompatível.~\cite{Mccanne92thebsd}.
 
-\subsection{Desempenho}
+\subsection{Limitações e optimizações}
 De forma a medir o desempenho da \textit{LibPcap}, é frequente utilizar-se uma métrica que nos permita determinar a percentagem de pacotes que é possível capturar, sem que se verifiquem perdas.
 Esta métrica é calculada sabendo o número de pacotes que atravessam um determinado \textit{router ou switch}, e compará-la com o número de pacotes capturados na interface.
 Uma variante desta medida de desempenho é combiná-la com o máximo número de regras que é possível aplicar, sem que se assista à perda de pacotes.
@@ -473,8 +473,8 @@ Quanto mais eficiente for a filtragem, menor o número de pacotes transferidos p
 % como etiquetar os pacotes 
 Um dos pontos que pode influenciar negativamente o desempenho da obtenção de pacotes, sem que contudo seja significativo, é a necessidade de colocar nestes, uma estampilha temporal, com o tempo da sua chegada ao sistema.
 O \textit{LibPcap} pode obter estes dados de duas formas distintas, dependo da interface de rede que esteja a ser utilizada.
-Se a interface de rede conseguir fornecer a estampilha temporal associada ao pacote, o \textit{LibPcap} pode utilizar este valor, caso contrário será necessário obter a estampilha temporal da chegada do pacote ao sistema.
-A forma de obtenção da estampilha pela \textit{LibPcap}, processa-se através da chamada ao sistema \textit{gettimeofday}.
+Se a interface de rede fornecer a estampilha temporal associada ao pacote, o \textit{LibPcap} pode utilizar este valor, caso contrário será necessário obter a estampilha temporal da chegada do pacote ao sistema.
+A forma de obtenção da estampilha pela \textit{LibPcap}, processa-se através da função \textit{gettimeofday}.
 
 \subsubsection{Implementações que permitem um aumento da taxa de transferência}
 
@@ -518,7 +518,7 @@ Com o aparecimento de sistemas \textit{multi-core} e \textit{multi-processador} 
 De forma a tirar partido das arquitecturas \textit{multi-core}, é necessário que o controlador e interfaces de rede, os \textit{buffers}, e os controladores de \textit{DMA} (\textit{Direct Memory Access}), sejam modificados de forma a conhecerem esta estrutura.
 É pois, determinante um esforço conjunto envolvendo todas estas componentes, com vista à obtenção do máximo rendimento destas arquitecturas\cite{Deri:2010}.
 
-\subsection{Formas de melhorar o desempenho dos filtros dinâmicos}
+\subsection{Formas de melhorar a filtragem}
  O dinamismo das aplicações, nomeadamente das aplicações multimédia, deu origem a diversos estudos sobre a forma de monitorização de rede, que estas necessitam.
 Estas aplicações utilizam diversos fluxos de dados, designadamente de transmissão e de recepção.
 Em geral, as aplicações multimédia, com base na \textit{internet} utilizam uma metodologia cliente/servidor, onde o servidor aguarda pedidos do cliente num determinado porto.
