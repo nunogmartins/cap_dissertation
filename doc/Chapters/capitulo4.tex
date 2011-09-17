@@ -144,14 +144,10 @@ A cópia do pacote é efectuada caso a avaliação do filtro indique que este de
 Este sistema, está implementado no núcleo do sistema de operação do \textit{Linux}, e controla o fluxo de dados dos processos para as interfaces de rede, bem como o oposto.
 O \textit{NetFilter} está presente na \textit{stack TCP/IP} em apenas cinco pontos (\textit{PRE ROUTING}, \textit{LOCAL IN}, \textit{FORWARD} \textit{LOCAL OUT} e \textit{POST ROUTING}), em cada um dos quais existe uma lista de funções a ser executada sobre o pacote que foi recebido ou transmitido, sendo que, após a finalização destas e dependendo do valor retornado, o pacote irá ou não, prosseguir para as restantes camadas, até atingir o \textit{Traffic Control}(apresentado na subseccção \ref{sub:traffic_control}) ou a aplicação, efectuando deste modo o controlo sobre o fluxo de rede.
 O \textit{NetFilter} pode ser controlado pelo \textit{iptables}, uma ferramenta em nível utilizador, que através de regras, define o acesso dos dados das comunicações \color{red} de \color{black} rede.
-Estas são baseadas em endereços \textit{IP}, portos, interfaces de rede, etc, pelo que desta forma os administradores de rede não têm que conhecer internamente o \textit{netfilter}, apenas a arquitectura de rede, para definir as politicas de acesso do tráfego de rede ao sistema, permitindo ou bloqueando o tráfego com vista à satisfação dos objectivos pretendidos. 
 
-Um dos componentes do \textit{netfilter} designado por \textit{connection tracking}, efectua o acompanhamento do início ao fim das ligações.
-Para efectuar este acompanhamento necessita conhecer os diferentes protocolos utilizados, para o que usa os \textit{connection tracking helpers}.
-Estes ao conhecerem o processo de estabelecimento de ligações/sessões indicam ao \textit{connection tracking}, se a conexão deve ser adicionada, removida ou se passa a efectiva, ficando registada numa tabela de conexões estabelecidas até ser removida.
-De forma a não dispender todos os recursos de memória, esta tabela tem dimensão fixa, e inicio de conexões que não ficam completas, ou por um temporizador que expirou ou por incorrecto estabelecimento de sessão, são removidas permitindo que novas conexões possam ser adicionadas.
-Tal como o \textit{netfilter} pode ser controlado por um programa em nível utilizador, esta componente \textit{connection tracking}, pode igualmente ser controlada pelo administrador, através do \textit{conntrack}.
-Como se depreende este componente, \textit{connection tracking}, permite efectuar uma gestão mais eficiente e mais inteligente das conexões, sendo geralmente referido como \textit{firewall} com estado, é também utilizada para efectuar \textit{NAT} (\textit{Network Address Translation}) sobre as interfaces de rede, permitindo que máquinas no interior de uma rede possam aceder ao exterior, sem que disponham de endereços públicos, possibilitando uma melhor gestão dos endereços públicos de \textit{IPv4}.
+Um dos componentes do \textit{netfilter} designado por \textit{connection tracking}, efectua o acompanhamento do início ao fim das ligações, para o que necessita conhecer os diferentes protocolos utilizados.
+Tal como o \textit{netfilter}, este componente pode igualmente ser controlada pelo administrador, através da aplicação \textit{conntrack}.
+Como se depreende este componente, \textit{connection tracking}, permite efectuar uma gestão mais eficiente e inteligente das conexões, sendo geralmente referido como \textit{firewall} com estado, é também utilizada para efectuar \textit{NAT} (\textit{Network Address Translation}) sobre as interfaces de rede.
 
 Na transmissão de dados, quando estes passam no \textit{netfilter}, existe a possibilidade de identificá-los de forma a serem reconhecidos pelo \textit{traffic control}, permitindo assim efectuar uma gestão conjunta e inteligente do tráfego.
 
@@ -264,7 +260,7 @@ Para atingir esse objectivo, foi necessário recorrer à monitorização das cha
 Fazendo uso do sistema de monitorização \textit{KProbes}, foi possível realizar a monitorização sob um limitado conjunto de chamadas ao sistema, nomeadamente: \textit{sendto}, \textit{recvfrom}, \textit{bind}, \textit{accept}, \textit{connect} e \textit{close}.
 Ao efectuar esta monitorização é possível detectar todas as modificações ao estado dos \textit{sockets} do processo.
 Com os dados relevantes saídos da monitorização, afectados ao repositório, este mantem-se permanentemente actualizado relativamente aos portos, endereços e protocolos, utilizados pela aplicação.
-O filtro de pacotes ao aceder ao repositório e decidir quais os pacotes a capturar, origina a filtragem dinâmica orientada ao processo.
+O filtro de pacotes ao aceder ao repositório e decidir quais os pacotes a capturar, origina a filtragem dinâmica orientada ao processo.0
 
 
 \subsection{Estado do processo}
