@@ -12,32 +12,28 @@ O dinamismo das aplicações dificulta bastante o processo de monitorização.
 Esta situação é particularmente sentida ao nível da monitorização dos dispositivos de \textit{IO}, nomeadamente nas interfaces de rede.
 Nas aplicações onde o dinamismo das ligações é um dos seus pontos fortes, a monitorização é particularmente difícil de ser efectuada.
 
-De modo a capturar dados relevantes, e simultaneamente minimizar os efeitos da monitorização, estes filtros são aplicados logo que possível, no núcleo do sistema.
+De modo a capturar dados relevantes e simultaneamente minimizar os efeitos da monitorização, estes filtros são aplicados logo que possível, no núcleo do sistema.
 
 Tendo em conta que aplicações \textit{P2P} utilizam diversos portos de comunicação, revela-se difícil capturar os pacotes com base nos actuais filtros, sem que se assista a uma elevada degradação do desempenho.
-Não sendo exclusivo das aplicações \textit{P2P} a utilização de um elevado número de portos, esta elevada utilização de portos também é visível em sistemas de \textit{Voice over IP}.
-Estas aplicações nas suas diversas comunicações não utilizam sempre portas conhecidas \textit{à priori}, pois por vezes fazem uso de protocolos em que na iniciação da sessão que negoceiam portos, o que dificulta bastante a utilização de filtros, pois é necessário conhecer todos os protocolos específicos das aplicações.
-Para além desta situação existem aplicações que são executadas pelo administrador que não permitem a monitorização em nível utilizador, como é o caso da utilização do carregamento dinâmico de bibliotecas instrumentadas para efectuar a monitorização de aplicações.
-
-
+Não sendo exclusiva das aplicações \textit{P2P}, a utilização de um elevado número de portos, também se verifica em sistemas \textit{Voice over IP}.
+Estas aplicações nas suas diversas comunicações não utilizam sempre portas conhecidas \textit{à priori}, pois por vezes fazem uso de protocolos em que no inicio da sessão negoceiam portos, o que dificulta substancialmente a utilização de filtros, pois é necessário conhecer todos os protocolos específicos das aplicações.
+Para além desta situação, existem aplicações que são executadas pelo administrador que não podem ser monitorizadas em nível utilizador, designadamente no caso da utilização do carregamento dinâmico de bibliotecas instrumentadas, para efectuar a monitorização de aplicações.
 
 \section{Motivação}
 \label{sub:intro_motivation}
 
 No contexto de uma dissertação anterior~\cite{Farruca:2009}, utilizou-se a biblioteca \textit{LibPcap} para a captura do tráfego de rede, sendo que o principal desafio solucionado foi isolar os pacotes que pertencem a determinado processo alvo.
-A solução encontrada, não é de fácil integração em qualquer outra ferramenta, e oferece um fraco desempenho.
+Porém, a solução encontrada, não é de fácil integração em qualquer outra ferramenta, e oferece fraco desempenho.
 
-É objectivo desta dissertação investigar mecanismos, incluindo os internos ao núcleo, que permitam incorporar a filtragem com base no identificador do processo, a sua possível integração nas funcionalidades do \textit{pcap}, e proceder à avaliação da sobrecarga introduzida a respectiva optimização.
+É objectivo desta dissertação investigar mecanismos, incluindo os internos ao núcleo, que permitam incorporar a filtragem com base no identificador do processo, a sua possível integração nas funcionalidades do \textit{pcap}, e proceder à avaliação da sobrecarga introduzida e respectiva optimização.
 
 Esta dissertação centra-se nos mecanismos de inspecção, oferecidos pelos sistemas de operação que permitem verificar o funcionamento e avaliar o desempenho do sistema e dos processos dos utilizadores (\textit{debugging}, \textit{profiling}, etc).
-
-
 
 \section{Principais contribuições} 
 \label{sec:intro_contribuicoes}
 
-A possibilidade de monitorizar apenas o fluxo de rede de um determinado programa, poderá permitir que muitos dos filtros construídos até ao momento possam ser simplificados.
-Para além desta simplificação, a monitorização do fluxo de rede de uma aplicação, permite a observação dos dados sem necessitar de um sistema prévio, que identifique os protocolos de mais alto nível aplicados sobre a rede.
+A possibilidade de monitorizar apenas o fluxo de rede de um determinado programa, poderá permitir que filtros construídos até ao momento possam ser simplificados.
+Para além desta simplificação, a monitorização do fluxo de rede de uma aplicação, permite a observação dos dados, sem necessitar de um sistema prévio que identifique os protocolos de mais alto nível, aplicados sobre a rede.
 A existência de um sistema de captura de tráfego de rede genérico, torna-se benéfico para a análise de protocolos, pois nem sempre se tem acesso às especificações destes, presentes nas aplicações.
 Com este componente, o desempenho na obtenção dos dados relevantes poderá ser incrementado, mitigando anteriores problemas de desempenho entre o núcleo de sistema de operação e as ferramentas de análise de tráfego.
 Possibilidade de análise dos fluxos do processo sem a necessidade de instrumentar o código da aplicação, uma vez que a instrumentação é efectuada no núcleo.
