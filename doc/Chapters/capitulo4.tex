@@ -30,8 +30,8 @@ A chamada ao sistema \textit{socket}, é efectuada para a criação de um canal 
 
 Existe um agrupamento em família de endereços (\textit{Address Family}), que se destina à comunicação remota ou local.
 As comunicações locais podem efectuar-se entre processos (\textit{AF\_UNIX}), ou entre estes e o núcleo (\textit{AF\_NETLINK}), enquanto as remotas podem ter lugar sobre a \textit{internet}, dispondo igualmente de uma família própria a \textit{AF\_INET}.
-
-Os canais possuem um conjunto de funções (\textit{API POSIX}) bem definidas, para utilização e controlo, permintindo criar uma forma estruturada de comunicação.
+Os canais possuem um conjunto de funções (\textit{API POSIX}) bem definidas, para utilização e controlo, permitindo criar uma forma estruturada de comunicação.
+Para caracterizar o canal não é suficiente a especificação da família, é igualmente necessário especificar o tipo e o protocolo a utilizar, pois diferentes combinações de valores para estes parâmetros, traduzem-se em canais com diferentes funcionalidades.
 
 Os administradores de sistemas necessitam filtrar o fluxo de informação que circula nas suas redes, pelo que se tem assistido ao desenvolvimento de sistemas de filtragem de comunicações, conhecidas por \textit{firewalls}.
 Sendo o \textit{Linux} um sistema de operação frequentemente utilizado em ambientes de servidores, necessitou naturalmente deste controlo, daí que tenha sido desenvolvido o \textit{NetFilter}, uma \textit{firewall} que \color{red}filtra \color{black}o fluxo de dados que circulam na rede, entre o sistema e a periferia.
@@ -66,11 +66,6 @@ Todavia, esta situação deixa de fazer sentido, quando se pretende controlar um
 \label{sub:sockets}
 
 
-
-Como o anteriormente referido em \ref{sub:network}, um processo para comunicar via rede, tem que criar um canal.
-Estes são criados para efectuar comunicações locais ou remotas, e apesar das acções que podem ser efectudas serem comuns, o meio de transmissão é diferente, como diferentes são os canais e as formas utilizadas.
-Os \textit{sockets}, podem ser agrupados por famílias de endereços \textit{Address Family}, que permitem especificar a forma de comunicação (local ou remota) utilizada.
-Para caracterizar o canal não é apenas suficiente a especificação da família, é igualmente necessário especificar o tipo de canal e o protocolo a utilizar, pois diferentes combinações de valores para estes parâmetros, traduzem-se em canais com diferentes funcionalidades.
 
 \paragraph*{}
 Seguidamente irão ser apresentadas diferentes famílias de endereços implementadas no núcleo, com especial ênfase para as famílias \textit{UNIX}, \textit{INET}, \textit{NETLINK} e \textit{PACKET}.
@@ -267,6 +262,10 @@ Este módulo do núcleo foi desenvolvido em quatro componentes, que a seguir se 
 A principal relevância deste sistema, assenta no pressuposto de que todas as interacções desencadeadas por um processo com o exterior são detectadas.
 Para atingir esse objectivo, foi necessário recorrer à monitorização das chamadas ao sistema de rede ao nível do núcleo, possibilitando reduzir as cópias de dados e as trocas de contexto.
 Fazendo uso do sistema de monitorização \textit{KProbes}, foi possível realizar a monitorização sob um limitado conjunto de chamadas ao sistema, nomeadamente: \textit{sendto}, \textit{recvfrom}, \textit{bind}, \textit{accept}, \textit{connect} e \textit{close}.
+Ao efectuar esta monitorização é possível detectar todas as modificações ao estado dos \textit{sockets} do processo.
+Com os dados relevantes saídos da monitorização, afectados ao repositório, este mantem-se permanentemente actualizado relativamente aos portos, endereços e protocolos, utilizados pela aplicação.
+O filtro de pacotes ao aceder ao repositório e decidir quais os pacotes a capturar, origina a filtragem dinâmica orientada ao processo.
+
 
 \subsection{Estado do processo}
 \label{sub:data_repository}
@@ -297,6 +296,9 @@ Como se verifica, este sistema interage com o filtro estático do \textit{LSF}, 
 \label{sub:data_information}
 
 Para facilmente controlar e configurar o sistema desenvolvido, foi definida uma interface baseada em ficheiros virtuais numa directoria do (\textit{DebugFS}).
+Esta interface que contém ficheiros para indicar ao \textit{MRoP} quais os identificadores do processo a monitorizar, permite ao administrador obter informações estatísticas da monitorização, bem como controlar o repositório de dados do estado do processo.
+É através desta interface, que os actuais sistemas de monitorização de rede, podem usufruir da funcionalidade disponível através do \textit{MRoP}.
+
 Estes ficheiros com permissões apenas acessíveis ao utilizador \textit{root}, impedem o acesso por parte dos restantes utilizadores da máquina ao sistema de monitorização.
 
 \section{Conclusão}
