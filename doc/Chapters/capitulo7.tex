@@ -14,8 +14,9 @@ Os dados relevantes desta interacção são adicionados num repositório de modo
 Esta extensão foi analisada funcionalmente através de programas que criavam, comunicavam e destruiam canais de comunicação, em que todas estas interacções eram registadas e verificadas.
 Na avaliação funcional foram também executados programas efectuaram transferências utilizando os protocolos \textit{HTTP} e \textit{FTP}, enquanto decorriam outros fluxos na rede. 
 O \textit{MRoP} foi aplicado a estes programas, de modo a capturar todo o trafego respeitante às transferências destes dois protocolos.
-Os fluxos capturados foram analisados na ferramenta \textit{WireShark}, através do ficheiro que contém os fluxos de rede das transferências, verificando que apenas os respeitantes a estes dois protocolos existiam neste ficheiro, desde modo foi possível verificar a correcção dos protocolos e que apenas as interacções da aplicação com o exterior foram capturados.
-Para além desta análise funcional, foi efectuada uma análise de desempenho onde são comparados os desempenhos do \textit{PCap} com e sem esta nova extensão, a fim de verificar qual a sobrecarga do \textit{MRoP} na monitorização já existente.
+Os fluxos capturados foram analisados na ferramenta \textit{WireShark}, através do ficheiro que contém os fluxos de rede das transferências, verificando que apenas os respeitantes a estes dois protocolos existiam neste ficheiro.
+Desde modo foi possível verificar a correcção dos protocolos e que apenas as interacções da aplicação com o exterior foram capturados.
+Para além desta análise funcional, foi efectuada uma outra onde foram comparados os desempenhos do \textit{PCap}, com e sem esta nova extensão, a fim de determinar qual a sobrecarga introduzida pelo \textit{MRoP} na monitorização já existente.
 Os resultados desta análise evidenciam que a sobrecarga é praticamente inexistente.
 
 Nas secções seguintes são apresentados as principais conclusões da realização desta dissertação, assim como possíveis melhoramentos e extensões ao \textit{MRoP}.
