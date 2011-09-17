@@ -35,10 +35,10 @@ Esta dissertação centra-se nos mecanismos de inspecção, oferecidos pelos sis
 A possibilidade de monitorizar apenas o fluxo de rede de um determinado programa, poderá permitir que filtros construídos até ao momento possam ser simplificados.
 Para além desta simplificação, a monitorização do fluxo de rede de uma aplicação, permite a observação dos dados, sem necessitar de um sistema prévio que identifique os protocolos de mais alto nível, aplicados sobre a rede.
 A existência de um sistema de captura de tráfego de rede genérico, torna-se benéfico para a análise de protocolos, pois nem sempre se tem acesso às especificações destes, presentes nas aplicações.
-Com este componente, o desempenho na obtenção dos dados relevantes poderá ser incrementado, mitigando anteriores problemas de desempenho entre o núcleo de sistema de operação e as ferramentas de análise de tráfego.
-Possibilidade de análise dos fluxos do processo sem a necessidade de instrumentar o código da aplicação, uma vez que a instrumentação é efectuada no núcleo.
-Existe a possibilidade de monitorizar o fluxo de diferentes máquinas virtuais dentro de um sistema, desde que estas sejam implementadas utilizando processos, desta forma é possível individualizar e capturar o tráfego de cada uma.
-Esta funcionalidade pode ser particularmente interessante em centro de dados, dado que não é possível efectuar esta análise ao tráfego sem a necessidade de parar a máquina.
+Com este componente, o desempenho na obtenção dos dados relevantes poderá ser incrementado, mitigando anteriores problemas constatados entre o núcleo de sistema de operação e as ferramentas de análise de tráfego.
+Merece igualmente referência, a possibilidade de análise dos fluxos do processo sem necessidade de instrumentar o código da aplicação, uma vez que a instrumentação é efectuada no núcleo.
+À possibilidade atrás referida acresce a de monitorizar o fluxo de diferentes máquinas virtuais dentro de um sistema, desde que estas sejam implementadas utilizando processos, o que permite individualizar e capturar o tráfego de cada uma.
+Esta funcionalidade pode ser particularmente interessante em centro de dados, dado que é possível efectuar esta análise ao tráfego sem a necessidade de parar a máquina.
 
 \bigskip 
 
@@ -49,14 +49,14 @@ Esta funcionalidade pode ser particularmente interessante em centro de dados, da
 Os restantes capítulos do documento, encontram-se assim distribuidos e estruturados:
 
 \begin{itemize}
-	\item \textbf{Capítulo \ref{cap:trabrelacionado} - \nameref{cap:trabrelacionado} - } Apresentação da temática monitorização, evidenciando a monitorização de rede. Apresentação do estado da arte da monitorização do núcleo do \textit{Linux} e trabalhos relacionados com a monitorização de processos
+	\item \textbf{Capítulo \ref{cap:trabrelacionado} - \nameref{cap:trabrelacionado} - } Introdução à monitorização de processos, evidenciando a monitorização de rede. Apresentação do estado da arte da monitorização do núcleo do \textit{Linux} e trabalhos relacionados com a monitorização de processos.
 
-	\item \textbf{Capítulo \ref{cap:Estrutura} - \nameref{cap:Estrutura}  - } Neste capítulo é exposto a estrutura de comunicação e monitorização de rede do \textit{Linux} bem como os seus constituintes. Apresentação da estrutura do \textit{MRoP} e da interligação com a estrutura de rede do \textit{Linux}.
+	\item \textbf{Capítulo \ref{cap:Estrutura} - \nameref{cap:Estrutura}  - } Estrutura de comunicação e monitorização de rede do \textit{Linux} bem como os seus constituintes. Apresentação da estrutura do \textit{MRoP} e da sua interligação com a estrutura de rede do \textit{Linux}.
 
-	\item \textbf{Capítulo \ref{cap:Implementacao} - \nameref{cap:Implementacao} - } Implementação do \textit{MRoP} e discussão de alternativas de implementação
+	\item \textbf{Capítulo \ref{cap:Implementacao} - \nameref{cap:Implementacao} - } Implementação do \textit{MRoP} e discussão de alternativas de implementação.
 
-	\item \textbf{Capítulo \ref{cap:avaliacao} - \nameref{cap:avaliacao} - } Avaliação funcional e de desempenho do \textit{MRoP} e dos seus componentes. Analisar o desempenho do sistema de monitorização utilizado (\textit{KProbes}).
+	\item \textbf{Capítulo \ref{cap:avaliacao} - \nameref{cap:avaliacao} - } Avaliação funcional e de desempenho do \textit{MRoP} e dos seus componentes. Analise do desempenho do sistema de monitorização utilizado (\textit{KProbes}).
 
-	\item \textbf{Capítulo \ref{cap:conclusao} - \nameref{cap:conclusao} - } Apresentação das conclusões referentes à avaliação efectuada, apresentando algumas propostas de melhoramentos.
+	\item \textbf{Capítulo \ref{cap:conclusao} - \nameref{cap:conclusao} - } Apresentação das conclusões referentes à avaliação efectuada ao \textit{MRoP}, e propostas para a sua evolução.
 
 \end{itemize}
