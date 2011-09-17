@@ -11,7 +11,6 @@ O recurso a esta nova forma de análise, ao fazer uso desta funcionalidade não 
 
 O \textit{MRoP} ao oferecer a possibilidade de capturar exclusivamente os pacotes de um determinado processo, facilita as análises que se pretendem efectuar e reduz a sobrecarga neste tipo de sistemas, dispensando a \textit{LibPCap} de capturar o tráfego não pretendido, e de conhecer os protocolos e portos utilizados pela aplicação.
 
-
 Esta funcionalidade é transparente para todas as ferramentas desenvolvidas com base no \textit{PCap}, pelo que todas podem dela usufruir.
 
 Relativamente à sobrecarga introduzida, tendo como referência a monitorização já existente, esta revelou-se insignificante, melhorando substancialmente nos casos em que a incidência sobre sobre o tráfego de um único processo, reduz o trabalho realizado pelo \textit{LSF} e pela \textit{LibPCap}.
@@ -21,12 +20,12 @@ As vantagens do sistema criado assumem maior notoriedade a máquina se encontra 
 
 \section{Trabalho Futuro}
 
-Em termos de implementação existe a possiblidade de expandir e melhorar o suporte para multiplos processos a serem monitorizados.
-Implementar suporte para controlo de concorrência utilizando \textit{spin locks}, ou outro método com suporte no núcleo de modo a não possibilitar a ocorrência de \textit{race conditions}.
+Como trabalho futuro existe a possiblidade de expandir e melhorar o suporte para multiplos processos a serem monitorizados.
+Acresce ainda a possibilidade de controlo de concorrência, utilizando \textit{spin locks}, ou outro método com suporte no núcleo de modo a impossibilitar a ocorrência de \textit{race conditions}.
 
-Como trabalho futuro existe a possibilidade de integrar este trabalho no anterior trabalho \cite{duarte10,Farruca:2009}, formando uma ferramenta de monitorização distribuída com baixa sobrecarga.
- Como o sistema implementado permite apenas monitorizar protocolos assentes em \textit{TCP} e \textit{UDP}, uma contribuição seria suportar outros protocolos que se pretendam monitorizar (\textit{icmp, arp ,stp}, etc).
- Outra possibilidade será procurar optimizar a instrumentação, aplicando-a apenas a funções internas específicas dos protocolos monitorizados.
- Pretende-se brevemente a partilha destas alterações, submetendo este sistema para análise, pela comunidade utilizadora do sistema \textit{Linux} e possível implementação na versão principal do núcleo do \textit{Linux}.
+Considerando que o sistema implementado se limita a monitorizar protocolos acentes em \textit{TCP} e \textit{UDP}, poderia ver a sua contribuição alargada se abrange-se outros protocolos como \textit{icmp, arp, stp}, etc.
 
+Outra possibilidade será procurar optimizar a instrumentação, restringindo a sua aplicação a funções internas especificas dos protocolos monitorizados.
 
+Pretende-se partilhar o uso destas funcionalidades submetendo este sistema a analise da comunidade utilizador do sistema \textit{Linux} com vista à sua implementação na versão principal do núcleo do \textit{Linux}.
+Considera-se a integração deste trabalho com o anterior \cite{duarte10,Farruca:2009}, com vista à obtenção de uma ferramenta de monitorização distribuída com baixa sobrecarga.
