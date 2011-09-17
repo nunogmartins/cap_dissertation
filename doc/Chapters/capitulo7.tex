@@ -2,26 +2,26 @@
 \label{cap:conclusao}
 
 O \textit{MRoP} é um módulo do núcleo que permite monitorizar as interacções de rede de um processo, sem que exista um conhecimento prévio dos portos que a aplicação utiliza.
-Esta monitorização não tem consequências algumas para a aplicação, pois esta nem se apercebe que está a ser monitorizada, permitindo ao administrador monitorizar aplicações que não tenha acesso ao código fonte.
+Esta monitorização não tem quaisquer consequências para a aplicação, pois esta nem se desconhece que está a ser monitorizada, possibilitando ao administrador monitorizar aplicações sem necessidade de ter acesso ao código fonte.
 
-Se analisarmos as aplicações do ponto de vista de segurança na rede é possível verificar se determinada aplicação está a enviar informação para fora da máquina.
-Desta forma é verifica-se se um determinado processo está a enviar dados que não deveria, pois com o normal funcionamento da \textit{LibPCap} é díficil observar quais os fluxos de cada processo sem que tenha de ser isolado de alguma forma, comprometendo a integridade da aplicação como um todo.
-Por isso este novo recurso de análise de fluxos de rede permite de uma forma não intrusiva a captura e análise do tráfego de um processo.
+Se analisarmos as aplicações do ponto de vista de segurança na rede é possível verificar se determinada aplicação está ou não a enviar indevidamente informação para o exterior.
 
-Foi apresentado o desenho e implementação de um sistema que estende o \textit{LSF}, usado na captura de tráfego de rede usando a \textit{LibPCap}, por forma a filtrar o tráfego de um processo.
- Este oferece a possibilidade de capturar só os pacotes pretendidos, facilitando as análises que se pretendam efectuar e reduzindo o \textit{overhead} neste tipo de sistemas.
- Por outro lado, deixa de ser necessário capturar mais do que o tráfego pretendido e de necessitar de conhecer os protocolos e portos usados pela aplicação.
+Esta situação não é possível de observar com o recurso ao normal funcionamento da \textit{LibPCap} sem que se assista a uma monitorização da aplicação de forma intrusiva, o que pode originar situações de comportamentos erráticos e afectar negativamente o desempenho da aplicação e do sistema.
+O recurso a esta nova forma de análise, ao fazer uso desta funcionalidade não intrusiva para a captura e análise do tráfego de um processo, representa um avanço relativamente à monitorização de rede efectuada através da \textit{LibPCap}.
 
-Esta funcionalidade é transparente para todas as ferramentas desenvolvidas com base no \textit{LibPCap}, podendo todas elas tirarem partido deste sistema.
+O \textit{MRoP} ao oferecer a possibilidade de capturar exclusivamente os pacotes de um determinado processo, facilita as análises que se pretendem efectuar e reduz a sobrecarga neste tipo de sistemas, dispensando a \textit{LibPCap} de capturar o tráfego não pretendido, e de conhecer os protocolos e portos utilizados pela aplicação.
 
-Em termos de sobrecarga introduzida, face à monitorização já existente, revelou-se insignificante como pode ser verificado na secção \ref{sub:eval_performance}.
-No entanto, esta situação é ainda melhor, nos casos em que o foco sobre o tráfego de um único processo, leva a reduzir o trabalho realizado pelo \textit{LSF}.
 
-As vantagens do sistema criado tornam-se ainda mais notórias quando a máquina está sobre uma carga mais elevada de trabalho, ou grande volume de tráfego via rede, dado manter o uso dos recursos na proporção aproximada apenas do tráfego do processo alvo.
+Esta funcionalidade é transparente para todas as ferramentas desenvolvidas com base no \textit{PCap}, pelo que todas podem dela usufruir.
+
+Relativamente à sobrecarga introduzida, tendo como referência a monitorização já existente, esta revelou-se insignificante, melhorando substancialmente nos casos em que a incidência sobre sobre o tráfego de um único processo, reduz o trabalho realizado pelo \textit{LSF} e pela \textit{LibPCap}.
+
+As vantagens do sistema criado assumem maior notoriedade a máquina se encontra ante uma carga mais elevada de trabalho ou um grande volume de tráfego de rede, dado manter o uso dos recursos na proporção aproximada apenas do tráfego do processo alvo.
+
 
 \section{Trabalho Futuro}
 
-Em termos de implementação existe a possiblidade de expandir e melhorar o suporte para multiplos processos ou conjunto de processos a serem monitorizados.
+Em termos de implementação existe a possiblidade de expandir e melhorar o suporte para multiplos processos a serem monitorizados.
 Implementar suporte para controlo de concorrência utilizando \textit{spin locks}, ou outro método com suporte no núcleo de modo a não possibilitar a ocorrência de \textit{race conditions}.
 
 Como trabalho futuro existe a possibilidade de integrar este trabalho no anterior trabalho \cite{duarte10,Farruca:2009}, formando uma ferramenta de monitorização distribuída com baixa sobrecarga.
