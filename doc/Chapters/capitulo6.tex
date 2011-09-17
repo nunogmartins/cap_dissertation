@@ -64,19 +64,19 @@ Esta validação foi verificada utilizando o programa \textit{wireshark}, que id
 \subsection{Avaliação do desempenho}
 \label{sub:eval_performance}
 Foram efectuados diversos testes para avaliar o \emph{overhead} introduzido por este sistema.
- Estes testes basearam-se na recepção ou transmissão de 1GigaByte de dados, utilizando diferentes programas e protocolos, entre duas máquinas conectadas directamente, por interfaces de rede a 100 Mbit/s.
- Ambas as máquinas (1 e 2) procederam à sua execução, utilizando apenas, um processador activo de 2 e 2.6 Ghz, respectivamente.
+Estes testes basearam-se na recepção ou transmissão de 1GigaByte de dados, utilizando diferentes programas e protocolos, entre duas máquinas conectadas directamente, por interfaces de rede a 100 Mbit/s.
+Ambas as máquinas (1 e 2) procederam à sua execução, utilizando apenas, um processador activo de 2 e 2.6 Ghz, respectivamente.
 
 A versão do sistema de operação utilizado em ambas as máquinas correspondeu ao 2.6.39, sendo que na máquina 1 se introduziram algumas modificações para incluir o \textit{hook} e as suas funções auxiliares, enquanto que na máquina 2 se executou o sistema original.
 
 Na execução destes testes, foram efectuadas 10 iterações para cada experiência considerada, de modo a obter um valor médio com um desvio padrão aceitável.\todo{qual foi o desvio padrao}
- Os resultados obtidos são os constantes das tabelas \ref{tab:desempenho} e \ref{tab:overhead}.
+Os resultados obtidos são os constantes das tabelas \ref{tab:desempenho} e \ref{tab:overhead}.
 
 Os testes identificados com os números de $^{1}$ a $^{4}$ foram efectuados utilizando apenas uma conexão ao servidor, enquanto que os testes $^{5}$ e $^{6}$ foram realizados utilizando mais uma comunicação, de modo a aumentar o peso sobre o processador e o número de pacotes a circular entre as máquinas. 
- Desta forma, foi possível identificar a sobrecarga exercida quando o \textit{tcpdump} estava a executar e a capturar todos os pacotes ou apenas um subconjunto destes (os pertencentes ao processo alvo).
+Desta forma, foi possível identificar a sobrecarga exercida quando o \textit{tcpdump} estava a executar e a capturar todos os pacotes ou apenas um subconjunto destes (os pertencentes ao processo alvo).
 
- A coluna "Original" corresponde aos valores resultantes do tempo médio das execuções das transferências sem qualquer monitorização.
- A coluna "Com TcpDump" apresenta a média dos tempos de transferência com a captura total do tráfego, enquanto que a coluna identificada com "Com TcpDump e módulo" regista a média dos tempos para a transferência com a captura pelo \textit{tcpdump} e o módulo desenvolvido no núcleo, de forma a apenas capturar o tráfego da transferência do processo alvo.
+A coluna "Original" corresponde aos valores resultantes do tempo médio das execuções das transferências sem qualquer monitorização.
+A coluna "Com TcpDump" apresenta a média dos tempos de transferência com a captura total do tráfego, enquanto que a coluna identificada com "Com TcpDump e módulo" regista a média dos tempos para a transferência com a captura pelo \textit{tcpdump} e o módulo desenvolvido no núcleo, de forma a apenas capturar o tráfego da transferência do processo alvo.
 %\vspace{-0.8cm}
 \begin{table}
 \begin{center}
@@ -101,8 +101,8 @@ IPerf - 1GB UDP 2 conexões$^{6}$ & 179.4930 & 179.6280 & 179.6369 \\
 %\vspace{-1.2cm}
 
 Nos primeiros 4 testes é possível verificar que a utilização do módulo no núcleo aumentou de forma irrelevante o tempo de execução.
- É também possível observar que em $^{1}$ e $^{3}$ aquando da utilização do \textit{tcpdump}, a execução sem monitorização, manifestou-se ligeiramente mais rápida.
- Esta situação pode dever-se ao facto de quando a máquina está em sobrecarga, o sistema provoca o aumento do tamanho médio dos pacotes, reduzindo o seu número e o volume de dados transferidos, em virtude da diminuição dos seus cabeçalhos.
+É também possível observar que em $^{1}$ e $^{3}$ aquando da utilização do \textit{tcpdump}, a execução sem monitorização, manifestou-se ligeiramente mais rápida.
+Esta situação pode dever-se ao facto de quando a máquina está em sobrecarga, o sistema provoca o aumento do tamanho médio dos pacotes, reduzindo o seu número e o volume de dados transferidos, em virtude da diminuição dos seus cabeçalhos.
 
 %\vspace{-0.5cm}
 \begin{table}
@@ -129,15 +129,15 @@ IPerf - 1GB UDP 2 conexões$^{6}$ & 0.0752 & 0.0802   \\
 %\vspace{-0.3cm}
 
 Nos testes $^{5}$ e $^{6}$, como o tráfego na interface é duplicado e o \textit{tcpdump} tem de capturar todos os pacotes, é possível evidenciar a sobrecarga exercida por estas cópias de dados e consequentes transferências, para nível utilizador.
- Na tabela \ref{tab:overhead} é possível observar que, para o teste $^{5}$, a sobrecarga do \textit{tcpdump} atinge os 3.6\% face ao original, enquanto que a sobrecarga do \textit{tcpdump} com módulo, permitiu uma ligeira melhoria face ao original (-0.0775\%).
- Conclui-se, portanto, que quando o fluxo de dados que não pretendemos capturar aumenta consideravelmente, torna-se mais vantajoso utilizar este sistema, do que capturar todos os pacotes, na medida em que seria necessário efectuar uma análise, em nível utilizador, para identificar e filtrar os pacotes pertencentes ao processo alvo.
+Na tabela \ref{tab:overhead} é possível observar que, para o teste $^{5}$, a sobrecarga do \textit{tcpdump} atinge os 3.6\% face ao original, enquanto que a sobrecarga do \textit{tcpdump} com módulo, permitiu uma ligeira melhoria face ao original (-0.0775\%).
+Conclui-se, portanto, que quando o fluxo de dados que não pretendemos capturar aumenta consideravelmente, torna-se mais vantajoso utilizar este sistema, do que capturar todos os pacotes, na medida em que seria necessário efectuar uma análise, em nível utilizador, para identificar e filtrar os pacotes pertencentes ao processo alvo.
 
 \subsubsection{Desempenho da estrutura de dados}
 
 Para além das avaliações anteriormente descritas, tornou-se essencial analisar o comportamento da estrutura de dados utilizada para manter o “estado do processo”, de modo a verificar o seu desempenho. 
- Assim, para esta análise, foi elaborado um teste que utiliza o sistema de alta resolução de temporizadores (\textit{HRTimer}), contido no núcleo do sistema de operação.
- O teste consistiu em obter o tempo anterior e posterior à inserção dos 1024 elementos, afim de determinar o tempo decorrido.
- De igual modo, foi calculado o tempo de remoção dos referidos elementos.
+Assim, para esta análise, foi elaborado um teste que utiliza o sistema de alta resolução de temporizadores (\textit{HRTimer}), contido no núcleo do sistema de operação.
+O teste consistiu em obter o tempo anterior e posterior à inserção dos 1024 elementos, afim de determinar o tempo decorrido.
+De igual modo, foi calculado o tempo de remoção dos referidos elementos.
 
 %\vspace{-0.5cm}
 \begin{table}
@@ -161,10 +161,10 @@ Remoção de 1024 elementos & 675 086 & 659.2637\\
 %\vspace{-0.8cm}
 
 Como se pode verificar, a inserção de um elemento na árvore é inferior a 1 microsegundo, demonstrando que a estrutura utilizada foi a correcta.
- Além de ter um bom compromisso de desempenho e utilização de memória, permitiu utilizar uma estrutura que já foi diversas vezes analisada, e a sua disponibilidade para utilização dentro do núcleo, permite ter um elevado grau de confiança na sua utilização.
+Além de ter um bom compromisso de desempenho e utilização de memória, permitiu utilizar uma estrutura que já foi diversas vezes analisada, e a sua disponibilidade para utilização dentro do núcleo, permite ter um elevado grau de confiança na sua utilização.
 
 O tempo médio despendido na procura do elemento com o menor valor de chave, nos 1024 elementos adicionados, foi de 1327 nanosegundos.
- Com este valor é possível verificar que para efectuar 10 iterações de procura na árvore, incorre-se numa penalização de 1.3 microsegundos. 
- Verifica-se assim, que o tempo médio de procura de elementos na estrutura, neste caso, é menor ou igual a 1.3 microsegundos.
- Considerando que a maior parte das aplicações não utiliza tantos portos em simultâneo, são expectáveis tempos inferiores em aplicações reais.
+Com este valor é possível verificar que para efectuar 10 iterações de procura na árvore, incorre-se numa penalização de 1.3 microsegundos. 
+Verifica-se assim, que o tempo médio de procura de elementos na estrutura, neste caso, é menor ou igual a 1.3 microsegundos.
+Considerando que a maior parte das aplicações não utiliza tantos portos em simultâneo, são expectáveis tempos inferiores em aplicações reais.
 
