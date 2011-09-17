@@ -1,11 +1,24 @@
 \chapter{Conclusões e Trabalho Futuro}
 \label{cap:conclusao}
 
-Este trabalho teve como objectivo a criação de uma extensão ao actual \textit{PCap} utilizado no \textit{Linux} de modo a apenas capturar os pacotes referentes a uma determinada aplicação, reduzindo assim a sobrecarga no sistema de monitorização e identificar os fluxos de rede de uma forma não intrusiva.
+Esta dissertação teve como objectivo a criação de uma extensão ao actual \textit{PCap}, utilizado no \textit{Linux}, de modo a restringir a captura dos pacotes referentes a uma determinada aplicação, contribuindo assim para a redução reduzindo da sobrecarga no sistema de monitorização e identificar os fluxos de rede de uma forma não intrusiva.
 
-Para a realização do \textit{MRoP} foi necessário compreender quais os pontos fundamentais onde anteriores trabalhos não foram bem sucedidos e descobrir/inventar alternativas viáveis para efectuar esta monitorização não intrusiva e de modo a minimizar a sobrecarga.
-Para isto foram estudados os mecanismos de monitorização internos ao núcleo e sistemas de comunicação entre o núcleo e as aplicações em nível utilizador.
+Para a realização da Monitorização de Rede orientada ao Processo ( \textit{MRoP} ), foi necessário para além de identificar os pontos e conhecer as razões que estiveram na génese do insucesso de anteriores trabalhos, criar alternativas que os permitissem ultrapassar.
+Para atingir este desiderato foram estudados os mecanismos de monitorização internos ao núcleo e os sistemas de comunicação entre o núcleo e as aplicações em nível utilizador.
 
+O estudo centrou-se nos mecanismos de monitorização ao nível do núcleo, pois estes permitem efectuar análises não intrusivas e devido à sua localização dispensam a permuta de dados entre o nível utilizador e o núcleo, o que a acontecer contribuiria para o aumento da sobrecarga.
+
+Para executar a extensão ao \textit{LibPCap}, foi arquitectada uma solução utilizando o sistema de instrumentação dinâmica do núcleo, \textit{KProbes}, para a análise das interacções do processo alvo com o exterior.
+Os dados relevantes desta interacção são adicionados num repositório de modo a que o sistema \textit{LSF} o pudesse consultar e decidir sobre quais os pacotes a capturar, com base nestas informações.
+
+Esta extensão foi analisada funcionalmente através de programas que criavam, comunicavam e destruiam canais de comunicação, em que todas estas interacções eram registadas e verificadas.
+Na avaliação funcional foram também executados programas efectuaram transferências utilizando os protocolos \textit{HTTP} e \textit{FTP}, enquanto decorriam outros fluxos na rede. 
+O \textit{MRoP} foi aplicado a estes programas, de modo a capturar todo o trafego respeitante às transferências destes dois protocolos.
+Os fluxos capturados foram analisados na ferramenta \textit{WireShark}, através do ficheiro que contém os fluxos de rede das transferências, verificando que apenas os respeitantes a estes dois protocolos existiam neste ficheiro, desde modo foi possível verificar a correcção dos protocolos e que apenas as interacções da aplicação com o exterior foram capturados.
+Para além desta análise funcional, foi efectuada uma análise de desempenho onde são comparados os desempenhos do \textit{PCap} com e sem esta nova extensão, a fim de verificar qual a sobrecarga do \textit{MRoP} na monitorização já existente.
+Os resultados desta análise evidenciam que a sobrecarga é praticamente inexistente.
+
+Nas secções seguintes são apresentados as principais conclusões da realização desta dissertação, assim como possíveis melhoramentos e extensões ao \textit{MRoP}.
 
 
 \section{Conclusões}
@@ -25,10 +38,7 @@ Esta funcionalidade é transparente para todas as ferramentas desenvolvidas com 
 
 Relativamente à sobrecarga introduzida, tendo como referência a monitorização já existente, esta revelou-se insignificante, melhorando substancialmente nos casos em que a incidência sobre sobre o tráfego de um único processo, reduz o trabalho realizado pelo \textit{LSF} e pela \textit{LibPCap}.
 
-As vantagens do sistema criado assumem maior notoriedade a máquina se encontra ante uma carga mais elevada de trabalho ou um grande volume de tráfego de rede, dado manter o uso dos recursos na proporção aproximada apenas do tráfego do processo alvo.
-
-
-Nas secções seguintes são apresentados as principais conclusões da realização desta dissertação, assim como possíveis melhoramentos e extensões ao \textit{MRoP}.
+As vantagens do sistema criado assumem maior notoriedade, quando a máquina se encontra perante uma carga mais elevada de trabalho, ou um grande volume de tráfego de rede, dado manter o uso dos recursos na proporção aproximada apenas do tráfego do processo alvo.
 
 \section{Trabalho Futuro}
 \label{sec:future_work}
