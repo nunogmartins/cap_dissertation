@@ -1,5 +1,15 @@
-\chapter{Conclusão}
+\chapter{Conclusões e Trabalho Futuro}
 \label{cap:conclusao}
+
+Este trabalho teve como objectivo a criação de uma extensão ao actual \textit{PCap} utilizado no \textit{Linux} de modo a apenas capturar os pacotes referentes a uma determinada aplicação, reduzindo assim a sobrecarga no sistema de monitorização e identificar os fluxos de rede de uma forma não intrusiva.
+
+Para a realização do \textit{MRoP} foi necessário compreender quais os pontos fundamentais onde anteriores trabalhos não foram bem sucedidos e descobrir/inventar alternativas viáveis para efectuar esta monitorização não intrusiva e de modo a minimizar a sobrecarga.
+Para isto foram estudados os mecanismos de monitorização internos ao núcleo e sistemas de comunicação entre o núcleo e as aplicações em nível utilizador.
+
+
+
+\section{Conclusões}
+\label{sec:conclusoes}
 
 O \textit{MRoP} é um módulo do núcleo que permite monitorizar as interacções de rede de um processo, sem que exista um conhecimento prévio dos portos que a aplicação utiliza.
 Esta monitorização não tem quaisquer consequências para a aplicação, pois esta nem se desconhece que está a ser monitorizada, possibilitando ao administrador monitorizar aplicações sem necessidade de ter acesso ao código fonte.
@@ -19,7 +29,7 @@ As vantagens do sistema criado assumem maior notoriedade a máquina se encontra 
 
 
 \section{Trabalho Futuro}
-
+\label{sec:future_work}
 Como trabalho futuro existe a possiblidade de expandir e melhorar o suporte para multiplos processos a serem monitorizados.
 Acresce ainda a possibilidade de controlo de concorrência, utilizando \textit{spin locks}, ou outro método com suporte no núcleo de modo a impossibilitar a ocorrência de \textit{race conditions}.
 
