@@ -342,14 +342,14 @@ Esta é uma das \textit{API's} de comunicação, entre o núcleo e as aplicaçõ
 \paragraph*{SysFs - }\label{cap:SysFs_overview}
 
 Este sistema de ficheiros virtual foi desenvolvido para colmatar algumas deficiências encontradas no \textit{ProcFs}.
-Estes problemas situam-se basicamente na forma como a quantidade de informação disponibilizada está distribuída sobre o \textit{ProcFs}.
-Este novo sistema de ficheiros virtual, evidencia algumas restrições, designadamente na forma como são disponibilizados os dados do núcleo de sistema.
-Esta limitação conduziu a que outros sistemas de ficheiros virtuais, nomeadamente o \textit{DebugFs} e o \textit{RelayFs}, fizessem a sua aparição.
+Estes problemas situam-se basicamente na forma desorganizada como a quantidade de informação disponibilizada está distribuída sobre o \textit{ProcFs}.
+Este novo sistema de ficheiros virtual, evidencia restrições na disponibilização das informações, uma vez que apenas é possível visualizar e modificar um \textit{KObject} por ficheiro.
+Esta limitação conduziu a que outros sistemas de ficheiros virtuais, nomeadamente o \textit{DebugFs} e o \textit{RelayFs}, fizessem a sua aparição com vista a colmatar esta situação.
 
 \paragraph*{DebugFs - }\label{cap:DebugFs_overview}
 
-Este sistema foi essencialmente criado a pensar nas necessidades sentidas pelos programadores.
-Apesar de já existirem dois sistemas de ficheiros virtuais, o \textit{ProcFs} e o \textit{SysFs}, este tentou colmatar os problemas que se apresentavam, não obstante não se mostrar tão estruturado como o \textit{SysFs}, e com melhor organização de dados que o \textit{ProcFs}.
+Este sistema foi essencialmente criado para ultrapassar as dificuldades sentidas pelos programadores, na utilização de um sistema de ficheiros tão restritivo como o \textit{SysFs}.
+Apesar de já existirem dois sistemas de ficheiros virtuais, o \textit{ProcFs} e o \textit{SysFs}, este tentou colmatar os problemas que se apresentavam, não obstante não se mostrar tão estruturado como o \textit{SysFs}, tem melhor organização de dados que o \textit{ProcFs}.
 
 O sistema de instrumentação do núcleo de sistema \textit{Linux}, \textit{KProbes}, utiliza este sistema de ficheiros virtual, de forma a apresentar os pontos, onde existe instrumentação no núcleo de sistema.
 
@@ -359,7 +359,7 @@ Este sistema de ficheiros virtual foi desenvolvido tendo em mente a transferênc
 O \textit{RelayFs} responde a esta exigência, fazendo uso de novas primitivas onde são mais reduzidas as zonas de controlo de concorrência\cite{Donovan2007}.
 
 \paragraph*{NetLink - }\label{cap:NetLink_overview}
-O \textit{NetLink} utiliza uma método de comunicação baseado em \textit{sockets}, para estabelecer a comunicação entre o núcleo de sistema e os processos em nível utilizador. 
+O \textit{NetLink} utiliza uma método de comunicação baseado em \textit{sockets}, para estabelecer a comunicação entre o núcleo de sistema e os processos, em nível utilizador. 
  Tendo como abstracção os \textit{sockets}, este sistema tem igualmente a possibilidade de enviar dados para múltiplos processos, devido à utilização das primitivas de envio colectivo (\textit{Multicast}).
 % \todo{Explicar melhor o NetLink}
  É com base no \textit{NetLink}, que a comunicação entre processos dentro da mesma máquina (\textit{IPC}) é implementada.
@@ -397,17 +397,17 @@ Se limitarmos a análise comparativa aos sistemas \textit{RelayFs} e \textit{Net
 \section{LibPcap e Linux Socket Filtering}\label{sect:LibPcap}
 
 A monitorização de rede existente em muitos dos sistemas tipo \textit{Unix} e mesmo no \textit{Windows} permite capturar os pacotes de rede logo que eles chegam ao controlador de rede.
-Assim a biblioteca \textit{LibPcap}\cite{:LibPcap} faz uso deste mecanismo.
+Assim a biblioteca \textit{LibPcap}\cite{:LibPcap} permite às ferramentas fazerem uso deste mecanismo.
 Uma das principais características desta biblioteca, é a sua \textit{API} de alto nível para a captura de pacotes, que é igual em todas as plataformas.
-Para filtrar os pacotes indesejados a \textit{LibPcap}, utiliza filtros baseados no \textit{BPF (Berkeley Packet Filtering)}, normalmente implementados no núcleo de sistema, de modo a que a monitorização se torne mais eficiente e menos intrusivas.
+Para filtrar os pacotes indesejados a \textit{LibPcap}, utiliza filtros baseados no \textit{BPF (Berkeley Packet Filtering)}, normalmente implementados no núcleo de sistema, de modo a que a monitorização se torne mais eficiente e menos intrusiva.
 
-Em seguida é apresentada a arquitectura da biblioteca \textit{Pcap} e o seu suporte no \textit{Linux} (\textit{LSF}).
+Em seguida é apresentada a arquitectura da biblioteca \textit{Pcap} e o seu suporte no \textit{Linux}, \textit{LSF}.
 
 \subsection {Arquitectura}
 \label{sect:architecture_libpcap}
 A arquitectura do \textit{Pcap} divide-se em duas partes: a biblioteca a nível utilizador, e o módulo no núcleo de sistema composto por \textit{sockets} e filtros que são utilizados na captura.
 Como se constata na figura \ref{fig:pcap_architecture} a utilização de filtros é aplicada assim que os pacotes são recebidos.
-Este sistema de captura, permite que pacotes que não são visíveis às aplicações, devido à \textit{firewall} do \textit{Linux}, possam ser capturados e analisados pelas ferramentas de monitorização de rede.
+Este sistema de captura, evita imediatamente a captura de pacotes que não interessam e permite que aqueles que não são visíveis às aplicações, devido à \textit{firewall} do \textit{Linux}, possam ser capturados e analisados pelas ferramentas de monitorização de rede.
 
 \begin{figure}[htbp]
        \centering
@@ -421,10 +421,11 @@ A arquitectura de rede do núcleo de sistema \textit{Linux}, utiliza \textit{soc
 Esta estrutura que dispõe de toda a informação sobre o pacote, a receber pela aplicação, é igualmente utilizada nos sistemas de monitorização em nível utilizador.
 A monitorização da rede é efectuada directamente no controlador da interface de rede, utilizando para isso um \textit{socket} \textit{AF\_PACKET}.
 
-A biblioteca dinâmica \textit{LibPcap} é utilizada pela generalidade dos programas de captura de pacotes.
-Esta biblioteca, como é multi-plataforma, permite ao programador utilizá-la nos principais sistemas de operação, porque a \textit{API} da \textit{LibPcap} é opaca relativamente à implementação, esta sim, específica de cada plataforma.
+A biblioteca dinâmica \textit{LibPcap} é utilizada pela generalidade das ferramentas de captura de pacotes.
+Esta biblioteca, como é multi-plataforma, permite ao programador utilizá-la nos principais sistemas de operação, porque a \textit{API} da \textit{LibPCap} é opaca relativamente à implementação, esta sim, específica de cada plataforma.
 Para ser possível efectuar a captura de pacotes, o programa tem de especificar qual a interface de rede que quer monitorizar.
-Se necessitar de filtrar pacotes, especificará os filtros a utilizar, recorrendo para isso à função \textit{setFilter}, que aplicará o filtro criado anteriormente, através da notação \textit{BPF}.
+Se necessitar de filtrar pacotes, especificará o filtro a utilizar, recorrendo às instruções presentes na \textit{LibPCap}, que através da função  \textit{pcap_compile} o traduzirá e optimizará para o conjunto de instruções do \textit{BPF}, sendo posteriormente aplicado através da função \textit{setfilter}.
+Antes da introdução do novo filtro no canal, este tem de ser objecto de drenagem, para receber apenas os pacotes do novo filtro.
 Após esta inicialização, o programa poderá utilizar \textit{Polling}, de forma a obter os pacotes e analisá-los.
 
 
