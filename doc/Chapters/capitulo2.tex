@@ -122,11 +122,14 @@ No entanto, revela-se díficil atingir este paralelismo para todas as interfaces
 
 \section{Sistemas de monitorização no núcleo do \textit{Linux}}\label{sect:instrumentacao_casos_linux}
 
-Como o anteriormente analisado na secção \ref{sect:instrumentation_overview} referente à monitorização, esta secção é dedicada à apresentação das diferentes ferramentas de monitorização do núcleo de sistema do \textit{Linux} sendo as mais recentemente utilizadas neste sistema de operação.
-Neste documento constam apenas mecanismos e ferramentas de monitorização dinâmicas, pois apenas estas são desejadas para utilização na criação de uma componente de monitorização de rede orientada ao processo.
+Como o anteriormente analisado na secção \ref{sect:instrumentation_overview} referente à monitorização, esta secção é dedicada à apresentação das diferentes ferramentas de monitorização do núcleo do \textit{Linux}, sendo as mais recentemente utilizadas neste sistema de operação.
+A utilização dos sistemas de monitorização ao nível do núcleo permitem efectuar a monitorização genérica dos processos, sendo efectuada de forma não intrusiva para as aplicações.
+Ao efectuar a monitorização no núcleo, a sobrecarga imposta ao sistema é menor que em nível utilizador, dado que é possível recolher apenas as informações relevantes, evitando assim ter de filtrar os eventos não relevantes para análise.
+
+Neste documento constam apenas mecanismos e ferramentas de monitorização dinâmicas, pois apenas estas são as desejadas para a criação de uma componente de monitorização de rede orientada ao processo.
 De entre as ferramentas de monitorização dinâmica analisadas é possível agrupa-las em duas categorias: eventos pré-definidos e instrumentação dinâmica.
 Na categoria instrumentação dinâmica existem dois sistemas mais relevantes: o \textit{KProbes} e o \textit{Linux Kernel Stace Tracer}, enquanto que para os eventos pré-definidos foram verificados o \textit{Linux Trace Toolkit} e o \textit{OProfile}.
-Estes quatro sistemas são apresentados em seguida nas considerando as suas categorias:
+Estes quatro sistemas são apresentados em seguida considerando as suas categorias:
 
 \subsection{Eventos pré-definidos}
 
