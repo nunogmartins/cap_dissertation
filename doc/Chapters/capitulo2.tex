@@ -86,7 +86,7 @@ As ferramentas capturam os pacotes que fluem na rede, para posterior análise ao
 As aplicações são dinâmicas quanto às interacções via rede (por exemplo criando e destruindo de canais de comunicação).
 A este dinamismo se devem algumas dificuldades com que nos deparamos, ao monitorizar as interacções dos vários processos das aplicações.
 
-Relativamente à monitorização das interacções com o exterior, utilizando os mecanismos do sistema de operação, este dinamismo é um factor chave, pois existem dificuldades na forma de identificar os fluxos pertencentes a um processo face aos restantes irrelevantes na nossa análise.
+Relativamente à monitorização das interacções com o exterior, utilizando os mecanismos do sistema de operação, este dinamismo é um factor chave, pois existem dificuldades na forma de identificar os fluxos pertencentes a um processo face aos restantes, irrelevantes na nossa análise.
 
 \subparagraph*{Formas de reduzir o volume de dados utilizando filtros - }
 A utilização de filtros na captura do tráfego que circula na rede, é uma forma eficiente de apenas se obterem os dados relevantes, com vista à satisfação dos nossos objectivos e são particularmente importantes, quando o volume de dados que circula na rede é extremamente elevado.
@@ -105,7 +105,7 @@ Quando os filtros são demasiado complexos, os módulos do núcleo têm de passa
 Diferentes técnicas têm vindo a ser desenvolvidas para aumentar a performance de monitorização das interfaces de rede.
 Como já referido, o aumento da sobrecarga é muito penalizante, daí que esta deva ser mantida bastante reduzida, o que contribuirá para aumentar o desempenho da captura.
 
-Um exemplo é nova \textit{API} de atendimento de interrupções criada com este propósito, e encontra-se analisada na subsecção \ref{par:NAPI}.
+Um exemplo é nova \textit{API} de atendimento de interrupções, criada com este propósito, e encontra-se analisada na subsecção \ref{par:NAPI}.
 
 Hoje em dia a utilização de máquinas equipadas com processadores \textit{multi-core} é uma realidade, daí que a sua utilização permita ultrapassar algumas dificuldades sentidas na captura de pacotes.
 Se for os processadores \textit{multi-core} atenderem em parelelo as diversas interrupções, originadas pelo envio ou recepção de pacotes, o desempenho da rede é passível de ser aumentado.
@@ -116,15 +116,16 @@ No entanto, revela-se díficil atingir este paralelismo para todas as interfaces
 Como o anteriormente analisado na secção \ref{sect:instrumentation_overview} referente à monitorização, esta secção é dedicada à apresentação das diferentes ferramentas de monitorização do núcleo de sistema do \textit{Linux} sendo as mais recentemente utilizadas neste sistema de operação.
 Neste documento constam apenas mecanismos e ferramentas de monitorização dinâmicas, pois apenas estas são desejadas para utilização na criação de uma componente de monitorização de rede orientada ao processo.
 De entre as ferramentas de monitorização dinâmica analisadas é possível agrupa-las em duas categorias: eventos pré-definidos e instrumentação dinâmica.
-Na categoria suporte à monitorização existem dois sistemas mais relevantes: o \textit{KProbes} e o \textit{Linux Kernel Stace Tracer}, enquanto que para a lista de eventos foram verificados o \textit{Linux Trace Toolkit} e o \textit{OProfile}.
-Estes sistemas 4 sistemas são apresentados em seguida nas suas categorias.
+Na categoria instrumentação dinâmica existem dois sistemas mais relevantes: o \textit{KProbes} e o \textit{Linux Kernel Stace Tracer}, enquanto que para os eventos pré-definidos foram verificados o \textit{Linux Trace Toolkit} e o \textit{OProfile}.
+Estes quatro sistemas são apresentados em seguida nas considerando as suas categorias:
 
 \subsection{Eventos pré-definidos}
 
 Nesta categoria encaixam-se duas ferramentas o \textit{Linux Trace ToolKit} e o \textit{OProfile}.
 Em cada uma destas ferramentas a monitorização é efectuada sobre pontos previamente definidos, não permitindo a adição de novos pontos de monitorização.
 Cada um destas ferramentas analisa todo o sistema, sendo a filtragem extra dos eventos efectuada em nível utilizador.
-Por isso a lista de eventos pode parecer uma limitação, mas uma vez que estas ferramentas analisam todo o sistema, deixa de o parecer.
+\todo{ver}
+Como os eventos detectados através destas ferramentas geram um mapa de execução, a utilização de apenas alguns eventos pré-definidos não é limitativa de uma ferramenta.
 
 \subsubsection{Linux Trace ToolKit}\label{cap:linux_trace_toolkit_overview}
 
@@ -147,8 +148,8 @@ O \textit{Linux Trace Toolkit Viewer (LTTV)} é um projecto desenvolvido em para
 Esta ferramenta possibilita igualmente realizar um traço de execução, uma vez que os dados recolhidos contêm uma estampilha temporal, do momento em que foram obtidos.
  
 \subsubsection{OProfile}\label{cap:Oprofile_overview}
-As ferramentas anteriormente referidas utilizam mecanismos para obter um traço de execução, este difere neste facto.
-Em vez de a cada evento utilizar uma função para obter os dados, apenas a utiliza decorridos um certo número de eventos.
+As ferramentas anteriormente referidas utilizam mecanismos para obter um traço de execução.
+Com o \textit{OProfile}, em vez de a cada evento utilizar uma função para obter os dados, apenas a utiliza decorridos um certo número de eventos.
 O recurso a este critério permite ao \textit{OProfile} ser menos perturbador, uma vez que nem sempre é necessário o universo dos eventos que as ferramentas de monitorização capturam, mas tão somente uma amostra.
 Deste modo ao utilizar a amostragem, o \textit{OProfile}, beneficia de um menor grau de perturbação no sistema\cite{Will:TuninProgrOProf}.
 % ser menos perturbador do sistema.
@@ -193,8 +194,6 @@ Para efectuar esta operação é utilizada a técnica do trampolim~\cite{Holling
 Para se obterem informações sobre as funções ou instruções que estão a ser monitorizadas, o \textit{KProbes} disponibiliza-as através de um ficheiro no \textit{DebugFs}.
 Para utilizar o \textit{KProbes} é necessário criar um módulo para o núcleo do sistema de operação, com informações relativas às rotinas a instrumentar.
 Para além destas, o módulo tem de conter igualmente os \textit{handlers} de análise, assim como outros parâmetros necessários à realização da instrumentação.
-Uma vez que os módulos são escritos em linguagem C ou \textit{assembly}, foram desenvolvidas as ferramentas, \textit{DProbes} e \textit{SystemTap}.
-Estas novas ferramentas de mais alto nível, ajudam no desenvolvimento de \textit{scripts}, simplificando e melhorando a segurança na utilização desta ferramenta de instrumentação (\textit{KProbes}).
 
 Quando o módulo é inserido no núcleo de sistema, o registo dos \textit{handlers} das funções a serem instrumentadas é efectuado de forma atómica.
 A execução do \textit{KProbes} não utiliza nenhum \textit{mutex} ou outra forma de controlo de concorrência, apenas funciona com a preempção desligada.
@@ -210,7 +209,7 @@ Assim sendo, a função deixa de existir, impossibilitando a instrumentação de
 %\subsubsection{DProbes}\label{cap:Dprobe_overview}
 
 O \textit{DProbes} utiliza o \textit{KProbes} como suporte para efectuar a instrumentação dinâmica do núcleo de sistema.
-Como a criação de pontos de análise é escrito em linguagem C ou \textit{assembly}, foi desenvolvida uma linguagem de mais alto nível de forma a simplificar  a utilização desta aplicação.
+Como a criação de pontos de análise é escrito em linguagem C ou \textit{assembly}, foi desenvolvida uma linguagem de mais alto nível de forma a simplificar a utilização desta aplicação.
 
 Após os dados terem sido obtidos, estes podem ser transferidos para um ficheiro, para o \textit{daemon logging} do núcleo de sistema, ou para uma porta série.
 Existe igualmente a opção de interoperabilidade com o \textit{Linux Trace Toolkit}\cite{:DProbes}.
@@ -272,8 +271,8 @@ OProfile & Amostragem & Não permite & Necessita \\
 
 Da observação da tabela \ref{tab:inst_compare} pode inferir-se que: ToDo
 
-A tabela \ref{tab:inst_compare} permite fazer uma comparação entre algumas caracteristicas destes sistemas de instrumentação presentes no núcleo de sistema do \textit{Linux} segundo os seguintes critérios: metodologia da captura (por traço ou por amostragem), análise dos parâmetros das funções instrumentadas e a necessidade de ter um \textit{deamon} para a recolha de dados provenientes do sistema de monitorização.
-Se a necessidade de ter um \textit{deamon} a executar de forma a coligir e organizar os dados, pode penalizar o desempenho do sistema, a possibilidade de analisar os parâmetros das funções instrumentadas é um ponto a favor deste.
+A tabela \ref{tab:inst_compare} permite fazer uma comparação entre algumas das caracteristicas destes sistemas de instrumentação presentes no núcleo de sistema do \textit{Linux}, segundo os seguintes critérios: metodologia da captura (por traço ou por amostragem), análise dos parâmetros das funções instrumentadas e a necessidade de ter um \textit{deamon} para a recolha de dados provenientes do sistema de monitorização.
+Se a necessidade de ter um \textit{deamon} a executar de forma a coligir e organizar os dados, pode penalizar o desempenho do sistema, a possibilidade de analisar os parâmetros das funções instrumentadas é um ponto a favor dos sistemas \textit{KProbes} e do \textit{LKST}.
 \section{Transferência de dados}
 \label{sect:kernel_user_comm}
 
@@ -288,17 +287,17 @@ No intuíto de melhorar a partilha dos recursos externos, o controlo dá-se ao n
 \subsection{Interno ao sistema}
 
 Devido há necessidade de transferir informações entre diferentes \textit{buffers} dentro do núcleo de sistema, foram desenvolvidas novas técnicas tendo sempre como referência a minimização da sobrecarga.
-
 De entre as diferentes técnicas de transferência interna de informação ao núcleo do sistema, merecem especial relevo:
 
 \paragraph*{\textit{MMAP} - }
 
-Esta técnica é implementada utilizando páginas de memória partilhadas, reduzindo as transferências e gastos de memória, proporciona a possibilidade de mapear um canal para memória potenciando assim, a partilha de dados entre diferentes processos que necessitem aceder aos dados do mesmo canal.
-A possibilidade de partilha de dados de \textit{IO} é uma vertente que tem sido objecto de desenvolvimento, de forma a aumentar o desempenho, porquanto permite a partilha de dados entre um ou mais programas, e o núcleo de operação.
+Esta técnica é implementada utilizando páginas de memória partilhadas, reduzindo as transferências e gastos de memória, proporciona a possibilidade de mapear um canal para memória potenciando assim, a partilha de dados não só entre diferentes processos como igualmente entre os processos e o núcleo, que necessitem de aceder aos dados do mesmo canal.
+A partilha de dados de \textit{IO} é uma vertente que tem sido objecto de desenvolvimento, de forma a aumentar o desempenho, porquanto permite a partilha de dados entre um ou mais programas, e o núcleo de operação.
+Esta partilha evita a necessidade de copiar dados dos espaços de endereçamento do núcleo para o do utilizador e vice versa.
 
 \paragraph*{Zero Copy - }
 
-Esta técnica de transferência de dados sem que existam cópias dos \textit{buffers} pertencentes ao núcleo de sistema e ao espaço de utilizador, permite que os dados sejam partilhados por diferentes entidades, sem a necessidade de criação de novos \textit{buffers} e cópias de dados, uma vez que apenas são passadas as referências.
+Esta técnica de transferência de dados sem que existam cópias dos \textit{buffers} pertencentes ao núcleo de sistema e ao espaço de utilizador, permite que os dados sejam partilhados por diferentes entidades, sem necessidade de criação de novos \textit{buffers} e cópias de dados, uma vez que apenas são passadas as referências.
 
 \paragraph*{Ring Buffers - }
 
@@ -337,7 +336,8 @@ De forma a obter informações relativas a estruturas dentro do núcleo de siste
 \paragraph*{ProcFs - }\label{cap:ProcFs_overview}
 
 Desenvolvido para obter informações relativas aos processos tem sido utilizado desde as primeiras versões do núcleo de sistema do \textit{Linux}.
-Apesar de novos subsistemas como o \textit{SysFs} terem sido criados, é ainda utilizado por algumas aplicações.
+Apesar de novos sistemas como o \textit{SysFs} terem sido criados, continua a ser extensivamente utilizado pelas aplicações, pois este contém informações disponíveis para o nível utilizador, sobre estruturas e dados dos processos localizadas no núcleo.
+Esta é uma das \textit{API's} de comunicação, entre o núcleo e as aplicações, mais utilizadas, não obstante ter crescido de forma desorganizada.
 
 \paragraph*{SysFs - }\label{cap:SysFs_overview}
 
