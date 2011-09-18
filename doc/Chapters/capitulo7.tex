@@ -25,9 +25,9 @@ Nas secções seguintes são apresentados as principais conclusões da realizaç
 \label{sec:conclusoes}
 
 O \textit{MRoP} é um módulo do núcleo que permite monitorizar as interacções de rede de um processo, sem que exista um conhecimento prévio dos portos que a aplicação utiliza.
-Esta monitorização não tem quaisquer consequências para a aplicação, pois esta nem se desconhece que está a ser monitorizada, possibilitando ao administrador monitorizar aplicações sem necessidade de ter acesso ao código fonte.
+Esta monitorização não tem quaisquer consequências para a aplicação, pois esta desconhece que está a ser monitorizada, possibilitando ao administrador monitorizar aplicações sem necessidade de ter acesso ao código fonte.
 
-Se analisarmos as aplicações do ponto de vista de segurança na rede é possível verificar se determinada aplicação está ou não a enviar indevidamente informação para o exterior.
+Se analisarmos as aplicações do ponto de vista de segurança na rede é possível verificar se determinada aplicação está, ou não, a enviar indevidamente informação para o exterior.
 
 Esta situação não é possível de observar com o recurso ao normal funcionamento da \textit{LibPCap} sem que se assista a uma monitorização da aplicação de forma intrusiva, o que pode originar situações de comportamentos erráticos e afectar negativamente o desempenho da aplicação e do sistema.
 O recurso a esta nova forma de análise, ao fazer uso desta funcionalidade não intrusiva para a captura e análise do tráfego de um processo, representa um avanço relativamente à monitorização de rede efectuada através da \textit{LibPCap}.
@@ -45,7 +45,7 @@ As vantagens do sistema criado assumem maior notoriedade, quando a máquina se e
 Como trabalho futuro existe a possiblidade de expandir e melhorar o suporte para multiplos processos a serem monitorizados.
 Acresce ainda a possibilidade de controlo de concorrência, utilizando \textit{spin locks}, ou outro método com suporte no núcleo de modo a impossibilitar a ocorrência de \textit{race conditions}.
 
-Considerando que o sistema implementado se limita a monitorizar protocolos acentes em \textit{TCP} e \textit{UDP}, poderia ver a sua contribuição alargada se abrange-se outros protocolos como \textit{icmp, arp, stp}, etc.
+Considerando que o sistema implementado se limita a monitorizar protocolos acentes em \textit{TCP} e \textit{UDP}, poderia ver a sua contribuição alargada se abrangesse outros protocolos como \textit{icmp, arp, stp}, etc.
 
 Outra possibilidade será procurar optimizar a instrumentação, restringindo a sua aplicação a funções internas especificas dos protocolos monitorizados.
 
