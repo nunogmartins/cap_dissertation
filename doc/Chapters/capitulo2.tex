@@ -3,19 +3,18 @@
  
 \section{Visão geral} \label{sect:descricao}
 
-Pode ser necessário recorrer à monitorização para se compreender o comportamento das aplicações.
-Esta permite-nos obter dados relevantes sobre os recursos utilizados, de modo a proporcionar-nos um conhecimento mais profundo do seu comportamento.
-As informações recolhidas podem servir para analisarmos comparativamente o desempenho de diferentes versões de uma mesma aplicação, porquanto ao conseguir-se obter dados da utilização do \textit{cpu}, da memória, dos dispositivos de \textit{IO}, etc, é possível compreender o comportamento dinâmico das aplicações.
-Daí ser comum a utilização da monitorização como auxiliar na depuração de programas.~\cite{DuartePhd05}.
+O recurso à monitorização do comportamento das aplicações, permite-nos obter dados relevantes sobre os recursos realmente utilizados, de modo a proporcionar-nos um conhecimento mais profundo do seu comportamento em execuções mas permitem também analisar o plano de execução, os métodos mais executados, e detectar situações de eventos interessantes.
+As informações recolhidas podem servir para analisarmos o desempenho ou correcção da aplicação sequencial ou distribuida, porquanto ao conseguir-se obter dados da utilização do \textit{cpu}, da memória, dos dispositivos de \textit{IO}, interacções, etc, é possível compreender o comportamento dinâmico das aplicações.
+Daí ser comum a utilização da monitorização como auxiliar na avaliação e depuração de programas conseguindo um bom compromisso entre a qualidade dos dados recolhidos e a perturbação das aplicações.~\cite{DuartePhd05}.
 
 \subsection{Obtenção de informação}\label{sect:instrumentation_overview}
 
-Os dados relativos ao comportamento das aplicações, obtidos de diferentes fontes, são coligidos e posteriormente analisados por ferramentas especializadas.
-Existem diferentes formas de coligir, visualizar e até interactuar com as ferramentas de monitorização, cada uma com as suas especificidades e capacidades próprias.
+Os dados relativos ao comportamento das aplicações, obtidos de diferentes fontes, são normalmente coligidos e posteriormente analisados por ferramentas especializadas.
+Existem diferentes formas de coligir, visualizar e até interactuar com os monitores, cada uma com as suas especificidades e capacidades próprias.
+Algumas são desenvolvidas para objectivos específicos.
+Tendo em vista o conhecimento geral das capacidades de cada uma, podemos analisar estes sistemas de variados pontos de vista.
 
-Tendo em vista o conhecimento e um melhor aproveitamento das capacidades de cada uma, são apresentadas as diferentes formas de análise / avaliação:
-
-Se considerarmos como referência a visualização da história dos eventos, podemos analisá-los de duas formas distintas:
+Se considerarmos por exemplo quanto à análise e visualização face ao instante da execução da aplicação alvo, podemos dividir os sistemas em:
  
 \subparagraph*{Online -}
 Enquanto decorre a monitorização da aplicação é possível observar os dados que são recolhidos pelo monitor.
@@ -24,25 +23,26 @@ Como os eventos estão a ser recolhidos e visualizados em simultâneo, apenas po
 \subparagraph*{Offline ou \textit{Post-Mortem} - }
 
 A história do programa é analisada após este se ter completado daí a designação \textit{Post-Mortem}.
-Este método permite-nos analisar integralmente a sua história e coleccioná-la.
+Este método permite-nos analisar integralmente a sua história e correlacioná-la.
 Permite análises mais completas e computacionalmente mais exigentes.
 
 Se a monitorização necessitar de interactividade do utilizador, é possível defini-la de duas formas:
 
- \subparagraph*{Activa - }
+\subparagraph*{Activa - }
 
 Por iniciativa explícita do utilizador, é possível inquirir o sistema de monitorização sobre o estado da computação ou mesmo alterá-la.
 Este método, por vezes descrito como \textit{computacional steering}, é a forma com maior interactividade, uma vez que permite ir analisando e modificando os parâmetros da monitorização ou mesma da aplicação.
 
 \subparagraph*{Passiva - }
 Esta forma de monitorização é especialmente utilizada em ambientes onde é relevante a obtenção da totalidade dos dados e apenas no final nos debruçarmos sobre a sua análise.
-Esta forma é designada de passiva, por o utilizador não ter intervenção na forma como os dados estão a ser obtidos, o que reduz a perturbação do sistema. 
+Esta forma é designada de passiva, por o utilizador não ter intervenção na forma como os dados estão a ser obtidos, o que reduz a perturbação do sistema.
+Quanto muito a sua acção acontece antes da execução, para configuração da informação a recolher.
 
-A instrumentação pode ser de dois tipos: a estática e a dinâmica, cada uma com as suas características próprias.
+A própria instrumentação da aplicação pode ser de dois tipos: a estática e a dinâmica, cada uma com as suas características próprias:
 
 \subparagraph*{Estática - }
 
-Na instrumentação estática o código instrumentado é definido em tempo de compilação, ou utilizando bibliotecas próprias para o efeito, como a utilização da função \textit{assert}, que define os pontos a serem monitorizados.
+Na instrumentação estática o código instrumentado é definido em tempo de compilação ou utilizando bibliotecas próprias para o efeito, como a utilização da função \textit{assert}, que define os pontos a serem monitorizados.
 Durante a execução não podem ser adicionados ou removidos pontos de análise.
 
 \subparagraph*{Dinâmica - }
@@ -51,7 +51,7 @@ Em contraste com a instrumentação estática está a dinâmica.
 É mais complexa e permite a inserção e remoção dos pontos a serem monitorizados.
 O dinamismo verifica-se pela ausência do ciclo $introduzir ponto\rightarrow compilar programa\rightarrow executar\rightarrow remover ponto$.
 A utilização de pontos de instrumentação dinâmica, pode ajudar a reduzir o grau de perturbação, uma vez que apenas são definidos os que se desejam observar.
-Tal pode ser efectuado no início da execução ou durante a sua execução, criando, alterando, destruindo os pontos de observação sobre os recursos monitorizados.
+Tal pode ser efectuado no início ou durante a sua execução, criando, alterando, destruindo os pontos de observação sobre os recursos monitorizados.
 
 
 \subparagraph*{
@@ -59,17 +59,17 @@ Tal pode ser efectuado no início da execução ou durante a sua execução, cri
 }
 A recolha de informação, é uma das componentes mais sensíveis relativamente ao grau de perturbação da monitorização.
 Em geral os pontos de instrumentação levam a que os dados sejam armazenados num \textit{buffer} em memória.
-Caso exista algum evento que indique que o \textit{buffer} se encontra cheio ou por acção explícita do utilizador tal é transferido para a interface com o utilizador que a visualiza ou armazena em memória persistente, para posterior análise.
+Caso exista algum evento que indique que o \textit{buffer} se encontra cheio ou por acção explícita do utilizador, tal é transferido para a interface com o utilizador ou armazena em memória persistente, para posterior análise.
 
 \subparagraph*{
 %Grau de perturbação
 }
-Existe claro a preocupação de que o sistema a ser monitorizado tenha um baixo grau de perturbação, pois pode levar à alteração dos resultados obtidos e mesmo a comportamentos diferentes da aplicação (especialmente perante execuções concorrentes).
+Existe, claro a preocupação de que o sistema a ser monitorizado tenha um baixo grau de perturbação, pois pode levar à alteração dos resultados obtidos e mesmo a comportamentos diferentes da aplicação (especialmente perante execuções concorrentes).
 Daí que, diversas abordagens foram criadas, para reduzirem o impacto da monitorização num sistema em produção.
 Uma destas abordagens traduz-se na utilização de instruções especializadas, de que alguns processadores dispõem para \textit{debug}, de modo a utilizar os recursos que mais se adequem à monitorização.
 Estes métodos, nem sempre são utilizados, devido à sua dependência da arquitectura, o que dificulta a sua portabilidade.
 Com vista a minimizar a perturbação, alguns sistemas de monitorização utilizam uma técnica de amostragem, que permite obter indicações sobre os estado da computação a cada intervalo de tempo.
-Esta técnica, em oposição à criação de um traço de execução, permite obter dados sobre os recursos apenas por amostra, limitando à partida a perturbação, enquanto que na criação de um traço de execução, é possível obter a totalidade dos eventos de forma a criar uma história completa, mas pode levar a uma grande sobrecarga do sistema perante uma grande taxa de eventos.
+Esta técnica, em oposição à criação de um traço de execução, permite obter dados sobre os recursos apenas por amostra, limitando à partida a perturbação, enquanto que na criação de um traço de execução, é possível obter a totalidade dos eventos de forma a criar uma história completa, mas pode levar a uma grande sobrecarga do sistema perante uma elevada taxa de eventos.
 
 \paragraph*{
 %Apresentação dos dados recolhidos
@@ -83,7 +83,8 @@ Em geral, as ferramentas de monitorização da interacção do processo com o ex
 As ferramentas capturam os pacotes que fluem na rede, para posterior análise ao tráfego, que pode incidir sobre a largura de banda utilizada, principais protocolos, eventuais problemas de segurança, etc.
 
 \subparagraph*{Dinamismo das aplicações - }
-Como o anteriormente referido, as aplicações são dinâmicas e a este dinamismo se devem algumas dificuldades com que nos deparamos, ao monitorizar as aplicações.
+As aplicações são dinâmicas quanto às interacções via rede (por exemplo criando e destruindo de canais de comunicação).
+A este dinamismo se devem algumas dificuldades com que nos deparamos, ao monitorizar as interacções dos vários processos das aplicações.
 
 Relativamente à monitorização das interacções com o exterior, utilizando os mecanismos do sistema de operação, este dinamismo é um factor chave, pois existem dificuldades na forma de identificar os fluxos pertencentes a um processo face aos restantes irrelevantes na nossa análise.
 
@@ -302,7 +303,7 @@ Esta técnica de transferência de dados sem que existam cópias dos \textit{buf
 \paragraph*{Ring Buffers - }
 
 Esta técnica consiste num aproveitamento dos recursos já alocados, mas que se tornaram desnecessários, estando desta forma disponíveis para nova utilização.
-Os \textit{Ring Buffers} são utilizados tendo presente a relação custo / benefício, isto é, quando o peso da criação de novos elementos é compartivamente superior aos recursos já alocados.
+Os \textit{Ring Buffers} são utilizados tendo presente a relação custo / benefício, isto é, quando o peso da criação e destruição de elementos é compartivamente superior à reutilização dos recursos já alocados.
 É igualmente utilizada em situações de \textit{"produtor-consumidor"}, ou seja, quando é necessário manter a ordem dos elementos.
 
 \paragraph*{NAPI - New API - }
@@ -317,7 +318,7 @@ Actualmente a arquitectura de rede, está balanceada de forma a mudar o modo de 
 Utilizando esta nova \textit{API}, é possível explorar um escalonamento mais eficiente das interrupções, em situações de intensa actividade do processador.
 O \textit{NAPI} apenas pode ser aplicado nos caso em que os controladores das interfaces de rede estejam preparados para utilizar alguma forma de mitigação da interrupção, caso contrário esta \textit{API} não é aplicada.
 
-\subsection{Com o exterior do sistema}
+\subsection{Interface do sistema com os processos}
 % {\color{red}
 % \paragraph*{}
 % INDICAR QUAIS OS SISTEMAS QUE OS UTILIZAM
@@ -395,12 +396,12 @@ Se limitarmos a análise comparativa aos sistemas \textit{RelayFs} e \textit{Net
 
 \section{LibPcap e Linux Socket Filtering}\label{sect:LibPcap}
 
-A monitorização de rede existente no \textit{Gnu Linux} permite capturar os pacotes de rede logo que eles chegam ao controlador de rede.
-Assim a biblioteca \textit{LibPcap}\cite{:LibPcap} faz uso desta possibilidade.
+A monitorização de rede existente em muitos dos sistemas tipo \textit{Unix} e mesmo no \textit{Windows} permite capturar os pacotes de rede logo que eles chegam ao controlador de rede.
+Assim a biblioteca \textit{LibPcap}\cite{:LibPcap} faz uso deste mecanismo.
 Uma das principais características desta biblioteca, é a sua \textit{API} de alto nível para a captura de pacotes, que é igual em todas as plataformas.
-Para filtrar os pacotes indesejados a \textit{LibPcap}, utiliza filtros baseados no \textit{BPF (Berkeley Packet Filtering)}, implementados no núcleo de sistema, de modo a que a monitorização se torne mais eficiente.
+Para filtrar os pacotes indesejados a \textit{LibPcap}, utiliza filtros baseados no \textit{BPF (Berkeley Packet Filtering)}, normalmente implementados no núcleo de sistema, de modo a que a monitorização se torne mais eficiente e menos intrusivas.
 
-Em seguida é apresentada a arquitectura da biblioteca \textit{Pcap}.
+Em seguida é apresentada a arquitectura da biblioteca \textit{Pcap} e o seu suporte no \textit{Linux} (\textit{LSF}).
 
 \subsection {Arquitectura}
 \label{sect:architecture_libpcap}
@@ -408,9 +409,10 @@ A arquitectura do \textit{Pcap} divide-se em duas partes: a biblioteca a nível 
 Como se constata na figura \ref{fig:pcap_architecture} a utilização de filtros é aplicada assim que os pacotes são recebidos.
 Este sistema de captura, permite que pacotes que não são visíveis às aplicações, devido à \textit{firewall} do \textit{Linux}, possam ser capturados e analisados pelas ferramentas de monitorização de rede.
 
-\begin{figure}[h]
+\begin{figure}[htbp]
        \centering
        \includegraphics[scale=1]{pcap_architecture3}
+%       \includegraphics[scale=0.5]{tcpdump}
        \caption{Arquitectura do LibPcap}
       \label{fig:pcap_architecture}
 \end{figure}
