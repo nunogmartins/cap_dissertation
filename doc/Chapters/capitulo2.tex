@@ -305,17 +305,6 @@ Esta técnica consiste num aproveitamento dos recursos já alocados, mas que se 
 Os \textit{Ring Buffers} são utilizados tendo presente a relação custo / benefício, isto é, quando o peso da criação e destruição de elementos é compartivamente superior à reutilização dos recursos já alocados.
 É igualmente utilizada em situações de \textit{"produtor-consumidor"}, ou seja, quando é necessário manter a ordem dos elementos.
 
-\paragraph*{NAPI - New API - }
-
-Foi criada uma nova \textit{API} (\textit{Application Program Interface}) de atendimento de interrupções do processador, oriundos das interfaces de rede, com o objectivo de aumentar o desempenho da utilização de rede de elevado débito.
-Esta nova \textit{API}, permite desligar a atenção do processador a novas interrupções, oriundas da interface de rede, durante um certo período de tempo.
-
-Este tempo foi definido, de forma a que não se verifiquem situações de elevada latência na chegada dos pacotes às aplicações.
-A forma anterior de recepção de pacotes, era efectuada de modo a atender uma interrupção por cada pacote que chegava à interface de rede, gerando assim demasiada sobrecarga no sistema.
-Actualmente a arquitectura de rede, está balanceada de forma a mudar o modo de atendimento de interrupções para NAPI, caso existam demasiadas interrupções por unidade de tempo.~\cite{administrator:napi}.
-
-Utilizando esta nova \textit{API}, é possível explorar um escalonamento mais eficiente das interrupções, em situações de intensa actividade do processador.
-O \textit{NAPI} apenas pode ser aplicado nos caso em que os controladores das interfaces de rede estejam preparados para utilizar alguma forma de mitigação da interrupção, caso contrário esta \textit{API} não é aplicada.
 
 \subsection{Interface do sistema com os processos}
 % {\color{red}
@@ -438,8 +427,6 @@ Para atingir este objectivo o utilizador tem de pedir ao núcleo, uma região de
 Como o referido anteriormente, o \textit{AF\_PACKET}, permite a comunicação directa com o controlador da interface de rede, possibilitando capturar os diversos pacotes ainda antes destes poderem ser filtrados pela \textit{firewall}, presente no núcleo de sistema, neste caso o \textit{netfilter}.
 Podem ser aplicados filtros aos \textit{sockets} de modo a aumentar a eficiência na captura dos pacotes, excluindo aqueles que são irrelevantes para a monitorização.
 
-Dos filtros em questão merece especial referência:
-
 \subsubsection{Linux Socket Filtering}
 O \textit{Linux Socket Filtering} é derivado do \textit{BPF (Berkeley Packet Filtering)} que é o standard de \textit{de facto} para a criação de filtros dentro do núcleo de sistema. 
 Este sistema de captura e filtros permite aos os utilizadores com permissões de \textit{Super User}, definir filtros e afectá-los aos \textit{sockets}.
@@ -470,7 +457,17 @@ Diversos esforços no sentido de aumentar o desempenho da captura de pacotes tê
 Relativamente ao \textit{software}, são conhecidos esforços na utilização da técnica de \textit{mmap}, de forma a reduzir o número de cópias de dados entre as aplicações e o núcleo de sistema.
 Igualmente no \textit{hardware}, tem-se assistido a uma evolução no sentido de reduzir as interrupções efectuadas ao cpu, adicionando nas interfaces de rede processadores dedicados às funcionalidades presentes no núcleo, de modo a libertá-lo da execução destas tarefas.
 
-\paragraph*{NAPI}
+\paragraph*{NAPI - New API - }
+
+Foi criada uma nova \textit{API} (\textit{Application Program Interface}) de atendimento de interrupções do processador, oriundos das interfaces de rede, com o objectivo de aumentar o desempenho da utilização de rede de elevado débito.
+Esta nova \textit{API}, permite desligar a atenção do processador a novas interrupções, oriundas da interface de rede, durante um certo período de tempo.
+
+Este tempo foi definido, de forma a que não se verifiquem situações de elevada latência na chegada dos pacotes às aplicações.
+A forma anterior de recepção de pacotes, era efectuada de modo a atender uma interrupção por cada pacote que chegava à interface de rede, gerando assim demasiada sobrecarga no sistema.
+Actualmente a arquitectura de rede, está balanceada de forma a mudar o modo de atendimento de interrupções para NAPI, caso existam demasiadas interrupções por unidade de tempo.~\cite{administrator:napi}.
+
+Utilizando esta nova \textit{API}, é possível explorar um escalonamento mais eficiente das interrupções, em situações de intensa actividade do processador.
+O \textit{NAPI} apenas pode ser aplicado nos caso em que os controladores das interfaces de rede estejam preparados para utilizar alguma forma de mitigação da interrupção, caso contrário esta \textit{API} não é aplicada.
 
 A utilização desta nova \textit{API} permite diminuir o número de trocas de contexto entre o controlador da interface e o núcleo de sistema.
 Sempre que o cpu atende uma interrupção de rede, obtem um número maior de dados, que combinado com um sistema de memória partilhada aumenta substancialmente o desempenho.
@@ -502,8 +499,6 @@ Para se utilizar esta técnica é necessário que a interface de rede, permita a
 Com o aparecimento de sistemas \textit{multi-core} e \textit{multi-processador} a que a generalidade do público tem acesso, a paralelização de código ou a forma de tirar partido destas arquitecturas, que permitem um melhor aproveitamento dos recursos, assumem uma particular importância.
 De forma a tirar partido das arquitecturas \textit{multi-core}, é necessário que o controlador e interfaces de rede, os \textit{buffers}, e os controladores de \textit{DMA} (\textit{Direct Memory Access}), sejam modificados de forma a conhecerem esta estrutura.
 É pois, determinante um esforço conjunto envolvendo todas estas componentes, com vista à obtenção do máximo rendimento destas arquitecturas\cite{Deri:2010}.
-
-\subsection{Formas de melhorar a filtragem}
  
 \section{Captura de tráfego de um processo especifico}
 \label{sect:outras_abordagens}
@@ -569,12 +564,19 @@ A aplicação destes filtros a partir da biblioteca \textit{LibPcap} compreende 
 De forma a diminuir a latência de actualização dos filtros, foi criada uma especificação de modo a que estes não necessitassem de ser analisados relativamente à segurança, visto que a própria linguagem garante as propriedades de segurança necessárias.
 Com este novo \textit{instruction set}, e sem necessidade de verificação, foi reduzida a latência de actualização dos filtros, o que conduziu a um aumento de desempenho na utilização de filtros dinâmicos.
 
-\section{Filtragem de pacotes de um processo através do \textit{Netfilter}}
 
-O \textit{NetFilter} é o sistema de filtragem de pacotes do núcleo do \textit{Linux} que irá ser apresentado na secção \ref{}.
-Foi implementado um módulo no núcleo utilizando o \textit{NetFilter} que filtra os pacotes pertencentes a um processo ou utilizador.
-Este sistema, verifica relativamente a cada pacote que é recebido ou enviado, se este faz parte do processo ou processos pertencentes a um utilizador, verificando canal a canal se o identificador do canal do pacote é igual ao canal do processo.
+\subsection{Conclusão}
+
+Quaisquer das soluções tem limitações e defeitos ...
 
 
-Falta falar do ipt\_owner do iptables entre outros ....
+
+%\section{Filtragem de pacotes de um processo através do \textit{Netfilter}}
+
+%O \textit{NetFilter} é o sistema de filtragem de pacotes do núcleo do \textit{Linux} que irá ser apresentado na secção \ref{}.
+%Foi implementado um módulo no núcleo utilizando o \textit{NetFilter} que filtra os pacotes pertencentes a um processo ou utilizador.
+%Este sistema, verifica relativamente a cada pacote que é recebido ou enviado, se este faz parte do processo ou processos pertencentes a um utilizador, verificando canal a canal se o identificador do canal do pacote é igual ao canal do processo.
+
+
+%Falta falar do ipt\_owner do iptables entre outros ....
 
