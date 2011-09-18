@@ -424,7 +424,7 @@ A monitorização da rede é efectuada directamente no controlador da interface 
 A biblioteca dinâmica \textit{LibPcap} é utilizada pela generalidade das ferramentas de captura de pacotes.
 Esta biblioteca, como é multi-plataforma, permite ao programador utilizá-la nos principais sistemas de operação, porque a \textit{API} da \textit{LibPCap} é opaca relativamente à implementação, esta sim, específica de cada plataforma.
 Para ser possível efectuar a captura de pacotes, o programa tem de especificar qual a interface de rede que quer monitorizar.
-Se necessitar de filtrar pacotes, especificará o filtro a utilizar, recorrendo às instruções presentes na \textit{LibPCap}, que através da função  \textit{pcap_compile} o traduzirá e optimizará para o conjunto de instruções do \textit{BPF}, sendo posteriormente aplicado no núcleo através da função \textit{setfilter}.
+Se necessitar de filtrar pacotes, especificará o filtro a utilizar, recorrendo às instruções presentes na \textit{LibPCap}, que através da função  \textit{pcap\_compile} o traduzirá e optimizará para o conjunto de instruções do \textit{BPF}, sendo posteriormente aplicado no núcleo através da função \textit{setfilter}.
 Se o filtro for demasiado complexo, não poderá ser aplicado no núcleo, sendo apenas possível aplicá-lo em nível utilizador, perdendo algum desempenho.
 Antes da introdução do novo filtro no canal, este tem de ser objecto de drenagem, para receber apenas os pacotes do novo filtro.
 Após esta inicialização, o programa poderá utilizar \textit{Polling}, de forma a obter os pacotes e analisá-los.
@@ -568,8 +568,6 @@ Nesta ferramenta, foi avaliado o tempo de alteração dos filtros, utilizando o 
 A aplicação destes filtros a partir da biblioteca \textit{LibPcap} compreende três fases: cópia do filtro definido em nível utilizador para o núcleo de sistema, verificação de segurança, e aplicação do filtro.
 De forma a diminuir a latência de actualização dos filtros, foi criada uma especificação de modo a que estes não necessitassem de ser analisados relativamente à segurança, visto que a própria linguagem garante as propriedades de segurança necessárias.
 Com este novo \textit{instruction set}, e sem necessidade de verificação, foi reduzida a latência de actualização dos filtros, o que conduziu a um aumento de desempenho na utilização de filtros dinâmicos.
-
-
 
 \section{Filtragem de pacotes de um processo através do \textit{Netfilter}}
 
