@@ -301,6 +301,11 @@ Assim, além da definição de um \textit{hook} para activação e desactivaçã
 
 Esta alteração permitiu adicionar uma nova funcionalidade, não obstante se assistir a uma ligeira sobrecarga no sistema de monitorização, independentemente da funcionalidade estar ou não activa.
 
+
+Para se poder definir uma nova instrução no \textit{Instruction Set}, é necessário alterar o ficheiro \textit{grammar.y}, na entrada correspondente à posição que deverá ocupar na \textit{AST (Abstract Sintax Tree)}, e modificar as funções de criação do novo filtro, quer em modo utilizador quer dentro do núcleo de sistema.
+Este desenvolvimento tem de ser efectuado par-a-par, pois a ser efectuado apenas de um lado, o outro tornar-se-á incompatível.
+
+
 \begin{figure}[ht]
 \centering
 \includegraphics[scale=0.7]{run_filter.pdf}
