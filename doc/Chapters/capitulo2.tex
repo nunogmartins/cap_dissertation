@@ -14,6 +14,7 @@ Existem diferentes formas de coligir, visualizar e até interactuar com os monit
 Algumas são desenvolvidas para objectivos específicos.
 Tendo em vista o conhecimento geral das capacidades de cada uma, podemos analisar estes sistemas de variados pontos de vista.
 
+\paragraph*{}
 Se considerarmos por exemplo quanto à análise e visualização face ao instante da execução da aplicação alvo, podemos dividir os sistemas em:
  
 \subparagraph*{Online -}
@@ -25,6 +26,8 @@ Como os eventos estão a ser recolhidos e visualizados em simultâneo, apenas po
 A história do programa é analisada após este se ter completado daí a designação \textit{Post-Mortem}.
 Este método permite-nos analisar integralmente a sua história e correlacioná-la.
 Permite análises mais completas e computacionalmente mais exigentes.
+
+\paragraph*{}
 
 Se a monitorização necessitar de interactividade do utilizador, é possível defini-la de duas formas:
 
@@ -38,6 +41,7 @@ Esta forma de monitorização é especialmente utilizada em ambientes onde é re
 Esta forma é designada de passiva, por o utilizador não ter intervenção na forma como os dados estão a ser obtidos, o que reduz a perturbação do sistema.
 Quanto muito a sua acção acontece antes da execução, para configuração da informação a recolher.
 
+\paragraph*{}
 A própria instrumentação da aplicação pode ser de dois tipos: a estática e a dinâmica, cada uma com as suas características próprias:
 
 \subparagraph*{Estática - }
@@ -79,8 +83,13 @@ Este não será o foco deste trabalho.
 
 \subsection{Monitorização de Rede}\label{sub:network_monitoring}
 
-Em geral, as ferramentas de monitorização da interacção do processo com o exterior, são baseadas na captura de pacotes de forma passiva.
-As ferramentas capturam os pacotes que fluem na rede, para posterior análise ao tráfego, que pode incidir sobre a largura de banda utilizada, principais protocolos, eventuais problemas de segurança, etc.
+Em geral, as ferramentas de monitorização de rede, são baseadas na captura de pacote de forma passiva.
+Estas capturam os pacotes que fluem na rede, para posterior análise ao tráfego, que pode incidir sobre a largura de banda utilizada, principais protocolos, eventuais problemas de segurança, etc.
+
+A monitorização das interacções dos processos com o exterior, pode ser efectuada de duas formas distintas: Utilizando bibliotecas instrumentadas, que obtêm os pacotes de dados quando estes chegam à aplicação ou recorrendo a mecanismos genéricos de monitorização de rede do \textit{Linux}. 
+Relativamente à primeira, é necessário conhecer o código da aplicação e instrumentá-lo, obtendo-se apenas os dados que chegam à aplicação.
+Este processo é específico a cada aplicação e pode ver o seu uso limitado por questões de segurança do sistema.
+No que à segunda forma se refere, a monitorização é efectuada de forma genérica, não sendo intrusiva para as aplicações, necessitando apenas de efectuar a monitorização do processo e da rede, separadamente. 
 
 \subparagraph*{Dinamismo das aplicações - }
 As aplicações são dinâmicas quanto às interacções via rede (por exemplo criando e destruindo de canais de comunicação).
