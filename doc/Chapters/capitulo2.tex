@@ -254,7 +254,7 @@ O \textit{Linux Kernel State Tracer(LKST)} obtém informações referentes ao n�
 % Não utiliza o int 3 para fazer o trap por isso segundo o artigo fica mais leve que o KProbe e o JProbe.
 % DJProbe  quer dizer Direct Jump Probe faz um jmp e não usa o int 3.
 Actualmente, está a ser desenvolvido um subprojecto do \textit{Linux Kernel Stace Tracer} designado por \textit{Direct Jump Probe}.
-O \textit{Direct Jump Probe} é uma optimização à utilização do \textit{trap int3}, presente em alguns processadores, e que pode trabalhar em conjunto com o \textit{KProbes} \ref{sect:KProbes_overview}.
+O \textit{Direct Jump Probe} é uma optimização à utilização do \textit{trap int3}, presente em alguns processadores, e que pode trabalhar em conjunto com o \textit{KProbes}.
 Esta optimização pode ser verificada no relatório\cite{Hiramatsu2005}.
 
 
@@ -285,6 +285,9 @@ Da observação da tabela \ref{tab:inst_compare} pode inferir-se que: ToDo
 
 A tabela \ref{tab:inst_compare} permite fazer uma comparação entre algumas das caracteristicas destes sistemas de instrumentação presentes no núcleo de sistema do \textit{Linux}, segundo os seguintes critérios: metodologia da captura (por traço ou por amostragem), análise dos parâmetros das funções instrumentadas e a necessidade de ter um \textit{deamon} para a recolha de dados provenientes do sistema de monitorização.
 Se a necessidade de ter um \textit{deamon} a executar de forma a coligir e organizar os dados, pode penalizar o desempenho do sistema, a possibilidade de analisar os parâmetros das funções instrumentadas é um ponto a favor dos sistemas \textit{KProbes} e do \textit{LKST}.
+
+
+
 \section{Transferência de dados}
 \label{sect:kernel_user_comm}
 
@@ -298,7 +301,7 @@ No intuíto de melhorar a partilha dos recursos externos, o controlo dá-se ao n
 %texto explicativo de interno e externo 
 \subsection{Interno ao sistema}
 
-Devido há necessidade de transferir informações entre diferentes \textit{buffers} dentro do núcleo de sistema, foram desenvolvidas novas técnicas tendo sempre como referência a minimização da sobrecarga.
+Devido há necessidade de transferir informações entre diferentes \textit{buffers} dentro do núcleo de sistema, foram desenvolvidas técnicas tendo sempre como referência a minimização da sobrecarga.
 De entre as diferentes técnicas de transferência interna de informação ao núcleo do sistema, merecem especial relevo:
 
 \paragraph*{\textit{MMAP} - }
@@ -314,7 +317,7 @@ Esta técnica de transferência de dados sem que existam cópias dos \textit{buf
 \paragraph*{Ring Buffers - }
 
 Esta técnica consiste num aproveitamento dos recursos já alocados, mas que se tornaram desnecessários, estando desta forma disponíveis para nova utilização.
-Os \textit{Ring Buffers} são utilizados tendo presente a relação custo / benefício, isto é, quando o peso da criação e destruição de elementos é compartivamente superior à reutilização dos recursos já alocados.
+Os \textit{Ring Buffers} são utilizados tendo presente a relação custo / benefício, isto é, quando o peso da criação e destruição de elementos é comparativamente superior à reutilização dos recursos já alocados.
 É igualmente utilizada em situações de \textit{"produtor-consumidor"}, ou seja, quando é necessário manter a ordem dos elementos.
 
 
