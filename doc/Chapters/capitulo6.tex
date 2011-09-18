@@ -41,49 +41,46 @@
 
 %----------------------------------------------------------------------------------------------------------
 
+Antes de se implementar qualquer alteração, é conveniente proceder-se a testes alargados de verificação, para que se tome conhecimento do correcto funcionamento da aplicação e para que esta possa ser utilizada como uma mais–valia. 
+O sistema implementado (MRoP) foi avaliado funcionalmente através da utilização dos protocolos \textit{ftp}, \textit{http} e da aplicação \textit{iperf}\cite{iperf}.
+Para o efeito recorreu-se a um conjunto alargado de testes, tendo como principal objectivo verificar o correcto funcionamento da aplicação, a capacidade de capturar todos os pacotes envolvidos nas comunicações do processo alvo (e apenas estes), bem como o seu desempenho.
+A verificação da captura dos pacotes envolvidos nas comunicações do processo alvo foi feita através da ferramenta \textit{WireShark}, processo descrito na secção \ref{sec:eval_functional}.
+Tendo em vista a realização de testes que avaliam o desempenho da aplicação, foram utilizadas duas máquinas, ligadas directamente, as quais se descreverá na secção \ref{sec:eval_performance}.
+E por último descrever-se-á, mais alargadamente, sobre o desempenho efectivo da aplicação.
 
-\section{Avaliação}
-\label{sec:evaluation}
 
-O sistema implementado foi avaliado através da utilização dos protocolos \textit{ftp}, \textit{http} e da aplicação \textit{iperf}\cite{iperf}.
-Para o efeito recorreu-se a um conjunto alargado de testes, tendo como principal objectivo verificar a correcção do funcionamento, a capacidade de capturar todos os pacotes envolvidos nas comunicações do processo alvo (e apenas estes), bem como observar o seu desempenho.
+\section{Avaliação Funcional}
+\label{sec:eval_functional}
 
-Tendo em vista a realização dos testes de desempenho, foram utilizadas duas máquinas com interfaces de rede de 100Mbits/s, ligadas directamente através de um cabo Ethernet cruzado.
-Uma das máquinas ficou responsável pela execução dos serviços \textit{ftp}, \textit{http} e \textit{iperf}.
 
-\subsection{Avaliação Funcional}
-\label{sub:eval_functional}
-A análise funcional foi efectuada recorrendo a programas simples, que desencadeiam chamadas sucessivas de criação de \textit{sockets} e comunicação, obtendo-se o estado destes (portos e endereços) dentro do módulo no núcleo.
-Estes dados foram confirmados no sistema \textit{DebugFs}, por consulta aos ficheiros existentes para o efeito.
-Este ficheiro, quando acedido, contém toda a informação relativa aos portos e endereços em utilização, por parte da aplicação monitorizada.
-Deste modo, para obter um grau de comparação dos dados produzidos e validar esta análise, foi utilizada a ferramenta \textit{netstat}, que indica os portos e os endereços utilizados pelos processos no sistema (esta ferramenta utiliza o sistema de ficheiros virtual \textit{ProcFs}, para obter esses dados).
-Para além desta análise, foi efectuada a confirmação de que todos os pacotes pertencentes às comunicações foram de facto correctamente obtidos.
-Para tal, recorreu-se à captura de pacotes, por intermédio do \textit{tcpdump} com o módulo activo, constantando-se que todo o tráfego respeitante ao protocolo (\textit{ftp} e \textit{http}) estava de facto completo e correcto, desde a abertura ao fecho das conexões, não existindo outros pacotes na captura.
-Esta validação foi verificada utilizando o programa \textit{wireshark}, que identificou os fluxos de dados dos protocolos.
+A análise funcional foi efectuada recorrendo a programas simples, que desencadeiam chamadas sucessivas de criação de sockets e comunicação, obtendo-se o estado destes (portos e endereços) dentro do módulo do núcleo.
+Estes dados foram confirmados no sistema de ficheiros \textit{DebugFs}, por consulta aos ficheiros existentes para o efeito.
+Este ficheiro quando acedido, contém toda a informação relativa aos portos e endereços em utilização, por parte da aplicação monitorizada.
+Deste modo, para obter um grau de comparação dos dados produzidos e avaliar esta análise, foi utilizada a ferramenta, \textit{netstat}, que indica os portos e endereços utilizados pelos processos no sistema.
+A ferramenta anteriormente referida utiliza o sistema de ficheiros virtual \textit{ProcFs}, para obter os dados dos portos e endereços.
+Para além desta análise, foi executada a confirmação de que todos os pacotes pertencentes às comunicações foram, de facto, correctamente obtidos.
+Para tal, recorreu-se à captura de pacotes, por intermédio do \textit{tcpdump} com o módulo MRoP activo, constatando-se que todo o tráfego respeitante aos protocolos (\textit{ftp} e \textit{http}) estavam de facto completos e correctos, desde a abertura ao fecho das conexões, não existindo outros pacotes na captura.
+Esta validação foi verificada utilizando o programa \textit{WireShark}, que identificou os fluxos de dados dos protocolos.
 
-\subsection{Avaliação do desempenho}
-\label{sub:eval_performance}
-Foram efectuados diversos testes para avaliar o \emph{overhead} introduzido por este sistema.
-Estes testes basearam-se na recepção ou transmissão de 1GigaByte de dados, utilizando diferentes programas e protocolos, entre duas máquinas conectadas directamente, por interfaces de rede a 100 Mbit/s.
-Ambas as máquinas (1 e 2) procederam à sua execução, utilizando apenas, um processador activo de 2 e 2.6 Ghz, respectivamente.
 
-A versão do sistema de operação utilizado em ambas as máquinas correspondeu ao 2.6.39, sendo que na máquina 1 se introduziram algumas modificações para incluir o \textit{hook} e as suas funções auxiliares, enquanto que na máquina 2 se executou o sistema original.
+\section{Avaliação do desempenho}
+\label{sec:eval_performance}
 
-Na execução destes testes, foram efectuadas 10 iterações para cada experiência considerada, de modo a obter um valor médio com um desvio padrão aceitável.\todo{qual foi o desvio padrao}
-Os resultados obtidos são os constantes das tabelas \ref{tab:desempenho} e \ref{tab:overhead}.
 
-Os testes identificados com os números de $^{1}$ a $^{4}$ foram efectuados utilizando apenas uma conexão ao servidor, enquanto que os testes $^{5}$ e $^{6}$ foram realizados utilizando mais uma comunicação, de modo a aumentar o peso sobre o processador e o número de pacotes a circular entre as máquinas. 
-Desta forma, foi possível identificar a sobrecarga exercida quando o \textit{tcpdump} estava a executar e a capturar todos os pacotes ou apenas um subconjunto destes (os pertencentes ao processo alvo).
+Foram efectuados diversos testes com o objectivo de avaliar a sobrecarga gerada pela introdução do \textit{MRoP}.
+Estes testes basearam-se na recepção ou transmissão de 1 GigaByte de dados, utilizando diferentes programas e protocolos, entre duas máquinas conectadas directamente, por interfaces de rede a 100 Mbit/s.
 
-A coluna "Original" corresponde aos valores resultantes do tempo médio das execuções das transferências sem qualquer monitorização.
-A coluna "Com TcpDump" apresenta a média dos tempos de transferência com a captura total do tráfego, enquanto que a coluna identificada com "Com TcpDump e módulo" regista a média dos tempos para a transferência com a captura pelo \textit{tcpdump} e o módulo desenvolvido no núcleo, de forma a apenas capturar o tráfego da transferência do processo alvo.
-%\vspace{-0.8cm}
-\begin{table}
+Ambas as máquinas, que se optou pela designação de máquina 1 e máquina 2, procederam à transmissão/recepção de dados utilizando, apenas, um processador activo cada, um de 2 e outro de 2.6 Ghz, respectivamente.
+A versão do sistema de operação utilizado, em ambas as máquinas, correspondeu ao 2.6.39, sendo que na máquina 1 se introduziram algumas modificações para incluir o \textit{hook} do MRoP e as suas funções auxiliares, enquanto na máquina 2 se executou o sistema original, 2.6.39.
+Na execução destes testes, foram efectuadas 10 iterações, isto é, cada teste executado dez vezes, para cada experiencia considerada, de modo a obter um valor médio e um desvio padrão aceitável.
+Os resultados obtidos constam nas seguintes tabelas:
+
+\begin{table}[!htb]
 \begin{center}
 \caption{Tempos médios em segundos (s)}
 \begin{tabular}{ | c | c | c | c |  }
 \hline
-Teste & \hspace {0.3cm} Original \hspace {0.3cm}& \hspace {0.2cm} Com TcpDump \hspace {0.2cm} & Com TcpDump e módulo \\
+Teste & \hspace {0.3cm} Original \hspace {0.3cm}& \hspace {0.2cm} Com TcpDump \hspace {0.2cm} & Com TcpDump e MRoP \\
 \hline
 1GB - FTP$^{1}$ & 91.8508	& 91.8500 & 91.8854 \\
 1GB - HTTP$^{2}$ & 91.6391 & 91.6472 & 91.6674 \\ 
@@ -98,19 +95,13 @@ IPerf - 1GB UDP 2 conexões$^{6}$ & 179.4930 & 179.6280 & 179.6369 \\
 \label{tab:desempenho}
 \end{center}
 \end{table}
-%\vspace{-1.2cm}
 
-Nos primeiros 4 testes é possível verificar que a utilização do módulo no núcleo aumentou de forma irrelevante o tempo de execução.
-É também possível observar que em $^{1}$ e $^{3}$ aquando da utilização do \textit{tcpdump}, a execução sem monitorização, manifestou-se ligeiramente mais rápida.
-Esta situação pode dever-se ao facto de quando a máquina está em sobrecarga, o sistema provoca o aumento do tamanho médio dos pacotes, reduzindo o seu número e o volume de dados transferidos, em virtude da diminuição dos seus cabeçalhos.
-
-%\vspace{-0.5cm}
-\begin{table}
+\begin{table}[!htb]
 \begin{center}
 \caption{Sobrecarga das transferências (valores em percentagem)}
 \begin{tabular}{ | c | c | c |}
 \hline
-Teste & \hspace {0.3cm} TcpDump \hspace {0.3cm} & TcpDump com módulo  \\
+Teste & \hspace {0.3cm} TcpDump \hspace {0.3cm} & TcpDump com MRoP  \\
 
 \hline
 1GB - FTP$^{1}$ & -0.0009  & 0.0377  \\
@@ -126,21 +117,28 @@ IPerf - 1GB UDP 2 conexões$^{6}$ & 0.0752 & 0.0802   \\
 \label{tab:overhead}
 \end{center}
 \end{table}
-%\vspace{-0.3cm}
 
-Nos testes $^{5}$ e $^{6}$, como o tráfego na interface é duplicado e o \textit{tcpdump} tem de capturar todos os pacotes, é possível evidenciar a sobrecarga exercida por estas cópias de dados e consequentes transferências, para nível utilizador.
-Na tabela \ref{tab:overhead} é possível observar que, para o teste $^{5}$, a sobrecarga do \textit{tcpdump} atinge os 3.6\% face ao original, enquanto que a sobrecarga do \textit{tcpdump} com módulo, permitiu uma ligeira melhoria face ao original (-0.0775\%).
-Conclui-se, portanto, que quando o fluxo de dados que não pretendemos capturar aumenta consideravelmente, torna-se mais vantajoso utilizar este sistema, do que capturar todos os pacotes, na medida em que seria necessário efectuar uma análise, em nível utilizador, para identificar e filtrar os pacotes pertencentes ao processo alvo.
+Os testes identificados com os números de 1 a 4 foram efectuados utilizando apenas uma conexão ao servidor, enquanto os testes 5 e 6 foram efectuados utilizando mais uma comunicação, de modo a aumentar o peso sobre o processador e o número de pacotes a circular entre as máquinas.
+Desta forma, foi possível identificar a sobrecarga exercida quando o tcpdump estava a executar e a capturar todos os pacotes ou apenas um subconjunto destes, ou seja, os pertencentes aos processos alvo.
+A coluna "Original" corresponde aos valores resultantes dos tempos médios das execuções das transferências sem qualquer monitorização.
+A coluna "Com TcpDump" apresenta a média dos tempos de transferência com a captura total do tráfego, enquanto que a coluna identificada com "Com TcpDump e MRoP" regista a média dos tempos para a transferência com captura pelo tcpdump e o módulo MRoP desenvolvido no núcleo, de forma a capturar, apenas, o tráfego da transferência do processo alvo.
+Nos primeiros quatro testes é possível verificar que a utilização do MRoP, no núcleo, aumentou de forma irrelevante o tempo de execução, Gráfico….
+É também possível observar que em 1 e 3 aquando da utilização do tcpdump, a execução sem monitorização, mostrou-se ligeiramente mais rápida, como se pode verificar na tabela (tal tal) e no gráfico (xy).
 
-\subsubsection{Desempenho da estrutura de dados}
 
-Para além das avaliações anteriormente descritas, tornou-se essencial analisar o comportamento da estrutura de dados utilizada para manter o “estado do processo”, de modo a verificar o seu desempenho. 
-Assim, para esta análise, foi elaborado um teste que utiliza o sistema de alta resolução de temporizadores (\textit{HRTimer}), contido no núcleo do sistema de operação.
-O teste consistiu em obter o tempo anterior e posterior à inserção dos 1024 elementos, afim de determinar o tempo decorrido.
-De igual modo, foi calculado o tempo de remoção dos referidos elementos.
+Esta situação pode dever-se ao facto de quando a máquina se encontra em sobrecarga, o sistema provoca o aumento do tamanho médio dos pacotes, reduzindo o seu número e o volume de dados transferidos, em virtude da diminuição dos seus cabeçalhos.
 
-%\vspace{-0.5cm}
-\begin{table}
+Nos testes 5 e 6, como o tráfego na interface é duplicado e o \textit{tcpdump} tem que capturar todos os pacotes, é possível evidenciar a sobrecarga exercida por estas cópias de dados e consequentes transferências, para nível utilizador.
+Na tabela \ref{tab:overhead} e no gráfico tal tal é possível observar que, para o teste 5, a sobrecarga do \textit{tcpdump} atinge os 3.6\% face ao original, enquanto que a sobrecarga do \textit{tcpdump} com o MRoP, permitiu uma ligeira melhoria face ao original (-0.0775\%), como se pode observar no gráfico (tal tal).
+Conclui-se, portanto, que quando o fluxo de dados que não pretendemos capturar aumenta consideravelmente, torna-se mais vatajoso utilizar o MRoP, do que capturar todos os pacotes, na medida em que seria necessário efectuar uma análise em nível utilizador, para identificar e filtrar os pacotes pertencentes ao processo alvo.
+
+\subsection{Desempenho da estrutura de dados}
+
+Para além das avaliações anteriormente descritas, tornou-se essencial analisar o comportamento da estrutura de dados utilizada para manter o “estado do processo”, de modo a verificar o seu desempenho.
+Assim, para esta análise, foi elaborado um teste que utiliza o sistema de alta resolução de temporizadores (HRTimer), contido no núcleo do sistema de operação. O teste consistiu em obter o tempo anterior e posterior à inserção dos 1024 elementos, afim de determinar o tempo decorrido.
+De igual modo, foi calculado o tempo de remoção dos referidos elementos. Os resultados obtidos estão presentes na tabela \ref{tab:tree_info}.
+
+\begin{table}[!htb]
 \begin{center}
 \caption{Custo das operações (tempos em nanosegundos)}
 \begin{tabular}{ | r | c | c | }
@@ -158,13 +156,10 @@ Remoção de 1024 elementos & 675 086 & 659.2637\\
 \label{tab:tree_info}
 \end{center}
 \end{table}
-%\vspace{-0.8cm}
 
-Como se pode verificar, a inserção de um elemento na árvore é inferior a 1 microsegundo, demonstrando que a estrutura utilizada foi a correcta.
+Como se pode verificar, pela tabela \ref{tab:tree_info}, a inserção de um elemento na árvore é inferior a 1 microsegundo, demonstrando que a estrutura utilizada foi a correcta.
 Além de ter um bom compromisso de desempenho e utilização de memória, permitiu utilizar uma estrutura que já foi diversas vezes analisada, e a sua disponibilidade para utilização dentro do núcleo, permite ter um elevado grau de confiança na sua utilização.
-
 O tempo médio despendido na procura do elemento com o menor valor de chave, nos 1024 elementos adicionados, foi de 1327 nanosegundos.
-Com este valor é possível verificar que para efectuar 10 iterações de procura na árvore, incorre-se numa penalização de 1.3 microsegundos. 
+Com este valor é possível verificar que para efectuar 10 iterações de procura na árvore, incorre-se numa penalização de 1.3 microsegundos.
 Verifica-se assim, que o tempo médio de procura de elementos na estrutura, neste caso, é menor ou igual a 1.3 microsegundos.
 Considerando que a maior parte das aplicações não utiliza tantos portos em simultâneo, são expectáveis tempos inferiores em aplicações reais.
-
