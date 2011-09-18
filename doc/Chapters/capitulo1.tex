@@ -12,7 +12,7 @@ O dinamismo das aplicações dificulta bastante o processo de monitorização.
 Esta situação é particularmente sentida ao nível da monitorização dos dispositivos de \textit{IO}, nomeadamente nas interfaces de rede.
 Nas aplicações onde o dinamismo das ligações é um dos seus pontos fortes, a monitorização é particularmente difícil de ser efectuada.
 
-De modo a capturar dados relevantes e simultaneamente minimizar os efeitos da monitorização, estes filtros são aplicados logo que possível, no núcleo do sistema.
+De modo a capturar dados relevantes e simultaneamente minimizar os efeitos da monitorização, são aplicados filtros logo que possível, no núcleo do sistema.
 
 Tendo em conta que aplicações \textit{P2P} utilizam diversos portos de comunicação, revela-se difícil capturar os pacotes com base nos actuais filtros, sem que se assista a uma elevada degradação do desempenho.
 Não sendo exclusiva das aplicações \textit{P2P}, a utilização de um elevado número de portos, também se verifica em sistemas \textit{Voice over IP}.
@@ -38,7 +38,7 @@ A existência de um sistema de captura de tráfego de rede genérico, torna-se b
 Com este componente, o desempenho na obtenção dos dados relevantes poderá ser incrementado, mitigando anteriores problemas constatados entre o núcleo de sistema de operação e as ferramentas de análise de tráfego.
 Merece igualmente referência, a possibilidade de análise dos fluxos do processo sem necessidade de instrumentar o código da aplicação, uma vez que a instrumentação é efectuada no núcleo.
 À possibilidade atrás referida acresce a de monitorizar o fluxo de diferentes máquinas virtuais dentro de um sistema, desde que estas sejam implementadas utilizando processos, o que permite individualizar e capturar o tráfego de cada uma.
-Esta funcionalidade pode ser particularmente interessante em centro de dados, dado que é possível efectuar esta análise ao tráfego sem a necessidade de parar a máquina.
+Esta funcionalidade pode ser particularmente interessante em centro de dados, visto ser possível efectuar esta análise ao tráfego, sem necessidade de parar a máquina.
 
 \bigskip 
 
