@@ -24,11 +24,12 @@ Nas secções seguintes são apresentados as principais conclusões da realizaç
 \section{Conclusões}
 \label{sec:conclusoes}
 
+Os objectivos propostos de criar uma extensão ao actual sistemas de monitorização genérico de rede, para incluir a monitorização das interacções de rede de um processo com base no identificador deste e efectuar a captura dos pacotes da aplicação, foram atingidos verificando-se ainda que a sobrecarga imposta sobre o actual sistema de monitorização é praticamente irrelevante.
+
 O \textit{MRoP} é um módulo do núcleo que permite monitorizar as interacções de rede de um processo, sem que exista um conhecimento prévio dos portos que a aplicação utiliza.
-Esta monitorização não tem quaisquer consequências para a aplicação, pois esta desconhece que está a ser monitorizada, possibilitando ao administrador monitorizar aplicações sem necessidade de ter acesso ao código fonte.
+Esta monitorização não tem quaisquer consequências para a aplicação, pois esta desconhece que está a ser monitorizada, possibilitando ao administrador monitorizar aplicações sem acesso ao código fonte.
 
 Se analisarmos as aplicações do ponto de vista de segurança na rede é possível verificar se determinada aplicação está, ou não, a enviar indevidamente informação para o exterior.
-
 Esta situação não é possível de observar com o recurso ao normal funcionamento da \textit{LibPCap} sem que se assista a uma monitorização da aplicação de forma intrusiva, o que pode originar situações de comportamentos erráticos e afectar negativamente o desempenho da aplicação e do sistema.
 O recurso a esta nova forma de análise, ao fazer uso desta funcionalidade não intrusiva para a captura e análise do tráfego de um processo, representa um avanço relativamente à monitorização de rede efectuada através da \textit{LibPCap}.
 
@@ -36,9 +37,9 @@ O \textit{MRoP} ao oferecer a possibilidade de capturar exclusivamente os pacote
 
 Esta funcionalidade é transparente para todas as ferramentas desenvolvidas com base no \textit{PCap}, pelo que todas podem dela usufruir.
 
-Relativamente à sobrecarga introduzida, tendo como referência a monitorização já existente, esta revelou-se insignificante, melhorando substancialmente nos casos em que a incidência sobre sobre o tráfego de um único processo, reduz o trabalho realizado pelo \textit{LSF} e pela \textit{LibPCap}.
+Relativamente à sobrecarga introduzida, tendo como referência a monitorização já existente, esta revelou-se insignificante mesmo nos piores casos, melhorando substancialmente nos casos em que a incidência sobre o tráfego de um único processo, reduz o trabalho realizado pelo \textit{LSF} e pela \textit{LibPCap}.
 
-As vantagens do sistema criado assumem maior notoriedade, quando a máquina se encontra perante uma carga mais elevada de trabalho, ou um grande volume de tráfego de rede, dado manter o uso dos recursos na proporção aproximada apenas do tráfego do processo alvo.
+As vantagens do sistema criado assumem maior notoriedade, quando a máquina se encontra perante uma carga mais elevada de trabalho, ou um grande volume de tráfego de rede e/ou muitos fluxos irrelevantes, dado manter o uso dos recursos na proporção aproximada apenas do tráfego do processo alvo.
 
 \section{Trabalho Futuro}
 \label{sec:future_work}
@@ -47,7 +48,7 @@ Acresce ainda a possibilidade de controlo de concorrência, utilizando \textit{s
 
 Considerando que o sistema implementado se limita a monitorizar protocolos acentes em \textit{TCP} e \textit{UDP}, poderia ver a sua contribuição alargada se abrangesse outros protocolos como \textit{icmp, arp, stp}, etc.
 
-Outra possibilidade será procurar optimizar a instrumentação, restringindo a sua aplicação a funções internas especificas dos protocolos monitorizados.
+Outra possibilidade será procurar optimizar a instrumentação e evitar a instrumentação das funções \textit{sendto} e \textit{recvfrom}, restringindo a sua aplicação a funções internas especificas dos protocolos monitorizados.
 
 Pretende-se partilhar o uso destas funcionalidades submetendo este sistema a analise da comunidade utilizador do sistema \textit{Linux} com vista à sua implementação na versão principal do núcleo do \textit{Linux}.
 Considera-se a integração deste trabalho com o anterior \cite{duarte10,Farruca:2009}, com vista à obtenção de uma ferramenta de monitorização distribuída com baixa sobrecarga.
