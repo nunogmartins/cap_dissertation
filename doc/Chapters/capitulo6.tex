@@ -105,7 +105,7 @@ Teste & \hspace {0.3cm} TcpDump \hspace {0.3cm} & TcpDump com MRoP  \\
 \hline
 1GB - FTP$^{1}$ & -0.0009  & 0.0377  \\
 1GB - HTTP$^{2}$ & 0.0088 &  0.0309   \\
-IPerf - 1GB TCP$^{3}$ & 0.1373 &  -0.1223   \\
+IPerf - 1GB TCP$^{3}$ & -0.1373 &  -0.1223   \\
 IPerf - 1GB UDP$^{4}$ & 0.0036 & 0.0545 \\
 \hline
 \hline
@@ -122,7 +122,7 @@ Desta forma, foi possível identificar a sobrecarga exercida quando o tcpdump es
 A coluna "Original" corresponde aos valores resultantes dos tempos médios das execuções das transferências sem qualquer monitorização.
 A coluna "Com TcpDump" apresenta a média dos tempos de transferência com a captura total do tráfego, enquanto que a coluna identificada com "Com TcpDump e MRoP" regista a média dos tempos para a transferência com captura pelo tcpdump e o módulo MRoP desenvolvido no núcleo, de forma a capturar, apenas, o tráfego da transferência do processo alvo.
 Nos primeiros quatro testes é possível verificar que a utilização do MRoP, aumentou de forma irrelevante o tempo de execução, Gráfico….
-É igualmente possível observar que em 1 e 3, aquando da utilização do \textit{tcpdump}, a execução sem monitorização, mostrou-se ligeiramente mais rápida, como se pode verificar na tabela \ref{tab:desempenho} e no gráfico (xy).
+É igualmente possível observar que em 1 e 3, aquando da utilização do \textit{tcpdump}, a execução sem o MRoP, mostrou-se ligeiramente mais rápida, como se pode verificar na tabela \ref{tab:desempenho} e no gráfico (xy).
 
 
 Esta situação pode dever-se ao facto, de quando a máquina se encontra em sobrecarga, o sistema provoca o aumento do tamanho médio dos pacotes, reduzindo o seu número e o volume de dados transferidos, em virtude da diminuição dos seus cabeçalhos.
