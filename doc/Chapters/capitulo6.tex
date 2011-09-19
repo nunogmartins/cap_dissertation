@@ -163,4 +163,28 @@ Com este valor é possível verificar que para efectuar 10 iterações de procur
 Verifica-se assim, que o tempo médio de procura de elementos na estrutura, neste caso, é menor ou igual a 1.3 microsegundos.
 Considerando que a maior parte das aplicações não utiliza tantos portos em simultâneo, são expectáveis tempos inferiores em aplicações reais.
 
+
+\subsection{Desempenho do Sistema de instrumentação}
+Sendo a instrumentação das chamadas ao sistema um ponto fundamental na execução da monitorização de uma aplicação, a análise ao seu comportamento é bastante importante, na medida em que é necessário verificar se a introdução deste tipo de sistema irá produzir uma elevada penalização sobre o sistema de operação. A análise efectuada foi colocar um \textit{KRetProbe} na chamada ao sistema \textit{getpid} e avaliar o tempo decorrido entre o inicio e o fim do total das chamadas, com e sem o \textit{KRetProbe} de forma a avaliar o overhead e verificar se coincide com o indicado pelos criadores do sistema.
+
+\providecommand{\e}[1]{\ensuremath{\times 10^{#1}}}
+
+\begin{table}[!htb]
+\begin{center}
+
+\begin{tabular}{ | c | c | c | c |}
+\hline
+Teste & Original & Com KretProbe & Sobrecarga por chamada\\
+\hline
+100 000 000 chamadas & 12.65 &  73.6600 & 610.10\e{-9}\\
+1 000 000 000 chamadas & 126.85 & 737.2100 & 610.36\e{-9}\\
+\hline
+\end{tabular}
+\caption{Duração das chamadas em segundos}
+\label{tab:kprobes_info}
+\end{center}
+\end{table}
+
+Os valores de referencia são de 0.7 microsegundos, os valores que foram obtidos foram de 0.61 microsegundos um pouco inferiores, pois a máquina de referência também tem velocidade inferior à máquina onde foram efectuados estes testes.
+
 \section{Conclusão}
