@@ -43,7 +43,7 @@
 
 Antes de se implementar qualquer alteração, é conveniente proceder-se a testes alargados de verificação, para que se tome conhecimento do correcto funcionamento da aplicação e para que esta possa ser utilizada como uma mais–valia. 
 O sistema implementado (MRoP) foi avaliado funcionalmente através da utilização dos protocolos \textit{ftp}, \textit{http} e da aplicação \textit{iperf}\cite{iperf}.
-Para o efeito recorreu-se a um conjunto alargado de testes, tendo como principal objectivo verificar o correcto funcionamento da aplicação, a capacidade de capturar todos os pacotes envolvidos nas comunicações do processo alvo (e apenas estes), bem como o seu desempenho.
+Para o efeito recorreu-se a um conjunto alargado de testes, tendo como principal objectivo verificar o correcto funcionamento da aplicação, a capacidade de capturar todos os pacotes envolvidos nas comunicações do processo alvo (e apenas estes), bem como o seu desempenho e a sobrecarga introduzida.
 A verificação da captura dos pacotes envolvidos nas comunicações do processo alvo foi feita através da ferramenta \textit{WireShark}, processo descrito na secção \ref{sec:eval_functional}.
 Tendo em vista a realização de testes que avaliam o desempenho da aplicação, foram utilizadas duas máquinas, ligadas directamente, conforme o descrito  na secção \ref{sec:eval_performance}.
 E por fim abordar-se-à detalhadamente o desempenho efectivo da aplicação.
@@ -67,9 +67,9 @@ Esta validação foi efectuada utilizando o programa \textit{WireShark}, que ide
 \label{sec:eval_performance}
 
 Tendo presente a avaliação do desempenho, foram efectuados diversos testes com o objectivo de avaliar a sobrecarga gerada pela introdução do \textit{MRoP}.
-Estes testes basearam-se na recepção ou transmissão de 1 GigaByte de dados, utilizando diferentes programas e protocolos, entre duas máquinas conectadas directamente, por interfaces de rede a 100 Mbit/s.
-
+Estes testes basearam-se na recepção ou transmissão de 1 GigaByte de dados, utilizando diferentes programas e protocolos.
 Ambas as máquinas, que se optou por designar de máquina 1 e máquina 2, procederam à transmissão/recepção de dados, utilizando cada uma apenas um processador activo, de 2 e 2.6 Ghz, respectivamente.
+As máquinas anteriormente descritas encontravam-se conectadas directamente, por interfaces de rede a 100 MBit/s, ficando uma das máquinas responsável pela execução dos servidores \textit{ftp}, \textit{http} e \textit{iperf}, e a outra pelos respectivos clientes.
 A versão do sistema de operação utilizado, em ambas as máquinas, correspondeu ao 2.6.39, sendo que na máquina 1 foram introduzidas algumas modificações para incluir o \textit{hook} do MRoP e as suas funções auxiliares, enquanto na máquina 2 se executou o sistema original, 2.6.39.
 Na execução destes testes, foram efectuadas 10 iterações, isto é, cada teste executado dez vezes, para cada experiência considerada, de modo a obter um valor médio e um desvio padrão considerado aceitável.
 Os resultados obtidos constam das seguintes tabelas:
@@ -171,7 +171,7 @@ Sendo a instrumentação das chamadas ao sistema um ponto fundamental na execuç
 
 \begin{table}[!htb]
 \begin{center}
-
+\caption{Duração das chamadas em segundos}
 \begin{tabular}{ | c | c | c | c |}
 \hline
 Teste & Original & Com KretProbe & Sobrecarga por chamada\\
@@ -180,7 +180,6 @@ Teste & Original & Com KretProbe & Sobrecarga por chamada\\
 1 000 000 000 chamadas & 126.85 & 737.2100 & 610.36\e{-9}\\
 \hline
 \end{tabular}
-\caption{Duração das chamadas em segundos}
 \label{tab:kprobes_info}
 \end{center}
 \end{table}
