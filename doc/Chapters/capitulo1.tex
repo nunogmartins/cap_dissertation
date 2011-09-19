@@ -2,42 +2,48 @@
 
 \section{Contexto}
 \label{sec:intro_context}
-A monitorização de uma aplicação destina-se à obtenção de informações relevantes acerca do seu comportamento.
-Não obstante, esta monitorização pode igualmente servir para verificar a correcção, recursos atribuídos e desempenho de execução, etc.
+A monitorização de uma aplicação destina-se normalmente à obtenção de informações relevantes acerca do seu comportamento durante a execução.
+Esta monitorização pode igualmente servir para verificar a correcção, recursos atribuídos e usados, desempenho de execução, etc.
 
-A maioria dos sistemas de operação generalistas apresentam métodos de monitorização, devido à importância de que estes se revestem, no desenvolvimento das aplicações.
-Se algumas ferramentas são específicas na monitorização de determinados recursos (como a biblioteca \textit{LibPcap}, que é específica nas interacções com o exterior utilizando interfaces de rede), outras são mais generalistas podendo monitorizar recursos diversos.
+A maioria dos sistemas de operação generalistas apresentam métodos de monitorização, devido à importância de que estes se revestem, quer no desenvolvimento das aplicações, quer na gestão destes sistemas.
+Se algumas ferramentas são específicas na monitorização de determinados recursos (como a biblioteca \textit{LibPcap}, que é específica nas interacções com o exterior utilizando interfaces de rede), outras são mais generalistas podendo monitorizar recursos diversos (como o \textit{LTT}, \textit{OProfile}, etc, sistemas de monitorização do núcleo).
 
-O dinamismo das aplicações dificulta bastante o processo de monitorização.
-Esta situação é particularmente sentida ao nível da monitorização dos dispositivos de \textit{IO}, nomeadamente nas interfaces de rede.
-Nas aplicações onde o dinamismo das ligações é um dos seus pontos fortes, a monitorização é particularmente difícil de ser efectuada.
+Esta dissertação foca-se na monitorização no núcleo das interacções das aplicações através de interfaces de rede.
 
-De modo a capturar dados relevantes e simultaneamente minimizar os efeitos da monitorização, são aplicados filtros logo que possível, no núcleo do sistema.
-
+O dinamismo das aplicações pode dificultar bastante o processo de monitorização.
+Esta situação é particularmente sentida ao nível da monitorização dos dispositivos de \textit{IO}, e interfaces de rede.
+Nas aplicações onde as ligações e interacções são bastante dinâmicas e efectuadas em cada execução de modo nem sempre previsível, a monitorização é particularmente difícil de ser efectuada.
+A monitorização no núcleo pode gerar um excesso de informação que pode ser irrelevante para as análises efectuadas.
+Se juntarmos a esta situação a necessidade de transferir todos estes dados, gerados através da monitorização, pois em geral apenas as ferramentas de análises de dados se encontram em nível utilizador, verificamos que existe uma elevada sobrecarga quase se efectuam monitorizações no sistema.
+De modo a capturar apenas dados relevantes e simultaneamente minimizar os efeitos da monitorização, são aplicados filtros logo que possível, no núcleo do sistema.
 Tendo em conta que aplicações \textit{P2P} utilizam diversos portos de comunicação, revela-se difícil capturar os pacotes com base nos actuais filtros, sem que se assista a uma elevada degradação do desempenho.
 Não sendo exclusiva das aplicações \textit{P2P}, a utilização de um elevado número de portos, também se verifica em sistemas \textit{Voice over IP}.
 Estas aplicações nas suas diversas comunicações não utilizam sempre portas conhecidas \textit{à priori}, pois por vezes fazem uso de protocolos em que no inicio da sessão negoceiam portos, o que dificulta substancialmente a utilização de filtros, pois é necessário conhecer todos os protocolos específicos das aplicações.
 Para além desta situação, existem aplicações que são executadas pelo administrador que não podem ser monitorizadas em nível utilizador, designadamente no caso da utilização do carregamento dinâmico de bibliotecas instrumentadas, para efectuar a monitorização de aplicações.
 
-\section{Motivação}
-\label{sub:intro_motivation}
+No contexto de uma dissertação anterior~\cite{Farruca:2009}, utilizou-se a biblioteca \textit{LibPcap} para a captura do tráfego de rede com vista à monitorização das interacções entre processos distribuídos, sendo que um dos principais desafios solucionados consistiu no isolamento de pacotes pertencentes a um processo.
+Porém, a solução encontrada, não é de fácil integração em qualquer outra ferramenta, e acarreta elevada sobrecarga.
 
-No contexto de uma dissertação anterior~\cite{Farruca:2009}, utilizou-se a biblioteca \textit{LibPcap} para a captura do tráfego de rede, sendo que o principal desafio solucionado foi isolar os pacotes que pertencem a determinado processo alvo.
-Porém, a solução encontrada, não é de fácil integração em qualquer outra ferramenta, e oferece fraco desempenho.
+Nos actuais sistemas de monitorização de rede não existe suporte para a monitorização das interacções de rede dos processos.
+Para efectuar esta tarefa é exige que métodos alternativos de monitorização de processos sejam combinados com a monitorização genérica de rede.
+Esta combinação quando possível oferece fraco desempenho e uma elevada especificação/especialização à monitorização dos programas.
 
-É objectivo desta dissertação investigar mecanismos, incluindo os internos ao núcleo, que permitam incorporar a filtragem com base no identificador do processo, a sua possível integração nas funcionalidades do \textit{pcap}, e proceder à avaliação da sobrecarga introduzida e respectiva optimização.
 
-Esta dissertação centra-se nos mecanismos de inspecção, oferecidos pelos sistemas de operação que permitem verificar o funcionamento e avaliar o desempenho do sistema e dos processos dos utilizadores (\textit{debugging}, \textit{profiling}, etc).
+%Esta dissertação centra-se nos mecanismos de inspecção, oferecidos pelos sistemas de operação que permitem verificar o funcionamento e avaliar o desempenho do sistema e dos processos dos utilizadores (\textit{debugging}, \textit{profiling}, etc).
 
 \section{Principais contribuições} 
 \label{sec:intro_contribuicoes}
 
+É objectivo desta dissertação investigar mecanismos, incluindo os internos ao núcleo, que permitam incorporar a filtragem com base no identificador do processo, a sua possível integração nas funcionalidades do \textit{PCap}, e proceder à avaliação da sobrecarga introduzida e respectiva optimização.
+
+A abordagem efectuada beneficia dos mecanismos de instrumentação do núcleo para obter as interacções das aplicações com as interfaces de rede, criando uma extensão ao sistema de filtragem de pacotes do \textit{Linux}, que apenas devolve à monitorização os pacotes referentes à aplicação instrumentada, reduzindo eficientemente o número de pacotes, de modo a transferir apenas os dados relevantes para o monitor, evitando assim trocas de contexto e cópias de dados desnecessárias.
+
 A possibilidade de monitorizar apenas o fluxo de rede de um determinado programa, poderá permitir que filtros construídos até ao momento possam ser simplificados.
 Para além desta simplificação, a monitorização do fluxo de rede de uma aplicação, permite a observação dos dados, sem necessitar de um sistema prévio que identifique os protocolos de mais alto nível, aplicados sobre a rede.
-A existência de um sistema de captura de tráfego de rede genérico, torna-se benéfico para a análise de protocolos, pois nem sempre se tem acesso às especificações destes, presentes nas aplicações.
+A existência de um sistema de captura de tráfego de rede genérico, torna-se benéfico para a análise de protocolos, na medida em que nem sempre se tem acesso às especificações destes, presentes nas aplicações.
 Com este componente, o desempenho na obtenção dos dados relevantes poderá ser incrementado, mitigando anteriores problemas constatados entre o núcleo de sistema de operação e as ferramentas de análise de tráfego.
 Merece igualmente referência, a possibilidade de análise dos fluxos do processo sem necessidade de instrumentar o código da aplicação, uma vez que a instrumentação é efectuada no núcleo.
-À possibilidade atrás referida acresce a de monitorizar o fluxo de diferentes máquinas virtuais dentro de um sistema, desde que estas sejam implementadas utilizando processos, o que permite individualizar e capturar o tráfego de cada uma.
+À possibilidade anteriormente referida acresce a de monitorizar o fluxo de diferentes máquinas virtuais dentro de um sistema, desde que estas sejam implementadas utilizando processos, permitindo individualizar e capturar o tráfego de cada uma.
 Esta funcionalidade pode ser particularmente interessante em centro de dados, visto ser possível efectuar esta análise ao tráfego, sem necessidade de parar a máquina.
 
 \bigskip 
@@ -46,17 +52,17 @@ Esta funcionalidade pode ser particularmente interessante em centro de dados, vi
 \section{Organização do Documento}
 \label{sec:intro_document_outline}
 
-Os restantes capítulos do documento, encontram-se assim distribuidos e estruturados:
+Os restantes capítulos do documento, encontram-se assim distribuídos e estruturados:
 
 \begin{itemize}
 	\item \textbf{Capítulo \ref{cap:trabrelacionado} - \nameref{cap:trabrelacionado} - } Introdução à monitorização de processos, evidenciando a monitorização de rede. Apresentação do estado da arte da monitorização do núcleo do \textit{Linux} e trabalhos relacionados com a monitorização de processos.
 
-	\item \textbf{Capítulo \ref{cap:Estrutura} - \nameref{cap:Estrutura}  - } Estrutura de comunicação e monitorização de rede do \textit{Linux} bem como os seus constituintes. Apresentação da estrutura do \textit{MRoP} e da sua interligação com a estrutura de rede do \textit{Linux}.
+	\item \textbf{Capítulo \ref{cap:Estrutura} - \nameref{cap:Estrutura}  - } Estrutura de comunicação e monitorização de rede do \textit{Linux}, bem como os seus constituintes. Apresentação da estrutura do \textit{MRoP} e da sua interligação com a estrutura de rede do \textit{Linux}.
 
-	\item \textbf{Capítulo \ref{cap:Implementacao} - \nameref{cap:Implementacao} - } Implementação do \textit{MRoP} e discussão de alternativas de implementação.
+	\item \textbf{Capítulo \ref{cap:Implementacao} - \nameref{cap:Implementacao} - } Implementação do \textit{MRoP} e discussão da implementação.
 
-	\item \textbf{Capítulo \ref{cap:avaliacao} - \nameref{cap:avaliacao} - } Avaliação funcional e de desempenho do \textit{MRoP} e dos seus componentes. Analise do desempenho do sistema de monitorização utilizado (\textit{KProbes}).
+	\item \textbf{Capítulo \ref{cap:avaliacao} - \nameref{cap:avaliacao} - } Avaliação funcional e de desempenho do \textit{MRoP} e dos seus componentes. Análise do desempenho do sistema de monitorização utilizado (\textit{KProbes}).
 
-	\item \textbf{Capítulo \ref{cap:conclusao} - \nameref{cap:conclusao} - } Apresentação das conclusões referentes à avaliação efectuada ao \textit{MRoP}, e propostas para a sua evolução.
+	\item \textbf{Capítulo \ref{cap:conclusao} - \nameref{cap:conclusao} - } Apresentação das conclusões referentes à avaliação efectuada ao \textit{MRoP} e propostas para a sua evolução.
 
 \end{itemize}
