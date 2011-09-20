@@ -3,18 +3,18 @@
 
 Esta dissertação teve como objectivo a criação de uma extensão ao actual \textit{PCap}, utilizado no \textit{Linux}, de modo a restringir a captura dos pacotes referentes a uma determinada aplicação, contribuindo assim para a redução da sobrecarga no sistema de monitorização e identificar os fluxos de rede de uma forma não intrusiva.
 
-Para a realização da Monitorização de Rede orientada ao Processo ( \textit{MRoP} ), foi necessário, para além de identificar os pontos e conhecer as razões que estiveram na génese do insucesso de anteriores trabalhos, criar alternativas que os permitissem ultrapassar.
-Para atingir este objectivo, foram estudados os mecanismos de monitorização internos ao núcleo e os sistemas de comunicação entre o núcleo e as aplicações em nível utilizador.
+Para a realização da \textit{Monitorização de Rede orientada ao Processo} (\textit{MRoP}), foi necessário, para além de identificar os pontos e conhecer as razões que estiveram na génese do insucesso de anteriores trabalhos, criar alternativas permitissem ultrapassá-los.
+Para atingir tal objectivo, foram estudados os mecanismos de monitorização internos ao núcleo e os sistemas de comunicação entre o núcleo e as aplicações em nível utilizador.
 
-O estudo centrou-se nos mecanismos de monitorização ao nível do núcleo, pois estes permitem efectuar análises não intrusivas, e devido à sua localização, dispensam a permuta de dados entre o nível utilizador e o núcleo, o que a não acontecer contribuiria para o aumento da sobrecarga.
+O estudo centrou-se, principalmente, nos mecanismos de monitorização ao nível do núcleo, pois estes permitem efectuar análises não intrusivas e, devido à sua localização, dispensam a permuta de dados entre o nível utilizador e o núcleo, o que a não acontecer contribuiria para o aumento da sobrecarga.
 
-Para executar a extensão ao \textit{LibPCap}, foi arquitectada uma solução utilizando o sistema de instrumentação dinâmica do núcleo, \textit{KProbes}, para a análise das interacções do processo alvo com o exterior.
-Os dados relevantes desta interacção, são adicionados a um repositório, de modo a que o sistema \textit{LSF} os possa consultar e decidir, com base nestas informações, quais os pacotes a capturar.
+Para executar a extensão ao \textit{LibPCap}, foi arquitectada uma solução utilizando o sistema de instrumentação dinâmica do núcleo (\textit{KProbes}), para a análise das interacções do processo alvo com o exterior.
+Os dados relevantes desta interacção, são adicionados a um repositório, de modo a que o sistema \textit{LSF} os possa consultar e decidir quais os pacotes a capturar, com base nestas informações.
 
-Esta extensão foi analisada funcionalmente através de programas que criavam, comunicavam e destruiam canais de comunicação, em que todas estas interacções eram registadas e verificadas.
+Esta extensão foi analisada funcionalmente através de programas que criavam, comunicavam e destruiam canais de comunicação, onde todas estas interacções eram registadas e verificadas.
 Na avaliação funcional, foram igualmente executados programas que efectuavam transferências utilizando os protocolos \textit{HTTP} e \textit{FTP}, enquanto decorriam outros fluxos na rede. 
 O \textit{MRoP} foi aplicado a estes programas, de modo a capturar todo o trafego respeitante às transferências destes dois protocolos.
-Os fluxos capturados foram analisados na ferramenta \textit{WireShark}, através do ficheiro que contém os fluxos de rede das transferências, constatando-se que apenas os respeitantes a estes dois protocolos lá se encontravam.
+Os fluxos capturados foram analisados na ferramenta \textit{WireShark}, através do ficheiro que contém os fluxos de rede das transferências, verificando-se que apenas os respeitantes a estes dois protocolos lá se encontravam.
 Deste modo, foi possível constatar a correcção dos protocolos e verificar que apenas as interacções da aplicação com o exterior, foram capturadas.
 Para além desta análise funcional, foi efectuada uma outra, onde foram comparados os desempenhos do \textit{PCap}, com e sem esta nova extensão, a fim de determinar qual a sobrecarga introduzida pelo \textit{MRoP} na monitorização já existente.
 Os resultados apurados evidenciam que a sobrecarga é praticamente inexistente.
