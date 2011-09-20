@@ -72,7 +72,7 @@ Ambas as máquinas, que se optou por designar de máquina 1 e máquina 2, proced
 As máquinas anteriormente descritas encontravam-se conectadas directamente, por interfaces de rede a 100 MBit/s, ficando uma das máquinas responsável pela execução dos servidores \textit{ftp}, \textit{http} e \textit{iperf}, e a outra pelos respectivos clientes.
 A versão do sistema de operação utilizado, em ambas as máquinas, correspondeu ao 2.6.39, sendo que na máquina 1 foram introduzidas algumas modificações para incluir o \textit{hook} do MRoP e as suas funções auxiliares, enquanto na máquina 2 se executou o sistema original, 2.6.39.
 Na execução destes testes, foram efectuadas 10 iterações, isto é, cada teste executado dez vezes, para cada experiência considerada, de modo a obter um valor médio e um desvio padrão considerado aceitável.
-Os resultados obtidos constam das seguintes tabelas:
+Os resultados obtidos constam das tabelas \ref{tab:desempenho} e \ref{tab:overhead}:
 
 \begin{table}[!htb]
 \begin{center}
@@ -117,19 +117,33 @@ IPerf - 1GB UDP 2 conexões$^{6}$ & 0.0752 & 0.0802   \\
 \end{center}
 \end{table}
 
+\begin{figure}[!ht]
+\centering
+\includegraphics[scale=0.7]{testes.jpg}
+\caption{Testes}
+\label{fig:tests_graphics}
+\end{figure}
+
+\begin{figure}[!ht]
+\centering
+\includegraphics[scale=0.7]{overhead.jpg}
+\caption{Sobrecarga nos testes 5 e 6 }
+\label{fig:tests_overhead}
+\end{figure}
+
 Os testes identificados com os números de 1 a 4 foram efectuados utilizando apenas uma conexão ao servidor, enquanto os testes 5 e 6 foram efectuados utilizando mais uma comunicação, de modo a aumentar o peso sobre o processador e o número de pacotes a circular entre as máquinas.
-Desta forma, foi possível identificar a sobrecarga exercida quando o tcpdump estava a executar e a capturar todos os pacotes ou apenas um subconjunto destes, ou seja, os pertencentes aos processos alvo.
+Desta forma, foi possível identificar a sobrecarga exercida enquando o tcpdump estava a executar e a capturar todos os pacotes ou apenas um subconjunto destes, ou seja, os pertencentes aos processos alvo no novo sistema.
 A coluna "Original" corresponde aos valores resultantes dos tempos médios das execuções das transferências sem qualquer monitorização.
 A coluna "Com TcpDump" apresenta a média dos tempos de transferência com a captura total do tráfego, enquanto que a coluna identificada com "Com TcpDump e MRoP" regista a média dos tempos para a transferência com captura pelo tcpdump e o módulo MRoP desenvolvido no núcleo, de forma a capturar, apenas, o tráfego da transferência do processo alvo.
-Nos primeiros quatro testes é possível verificar que a utilização do MRoP, aumentou de forma irrelevante o tempo de execução, Gráfico….
-É igualmente possível observar que em 1 e 3, aquando da utilização do \textit{tcpdump}, a execução sem o MRoP, mostrou-se ligeiramente mais rápida, como se pode verificar na tabela \ref{tab:desempenho} e no gráfico (xy).
+Nos primeiros quatro testes é possível verificar que a utilização do MRoP, aumentou de forma irrelevante o tempo de execução, Gráfico \ref{fig:tests_graphics}.
+É igualmente possível observar que em 1 e 3, aquando da utilização do \textit{tcpdump}, a execução sem o MRoP, mostrou-se ligeiramente mais rápida, como se pode verificar na tabela \ref{tab:desempenho}.
 
 
 Esta situação pode dever-se ao facto, de quando a máquina se encontra em sobrecarga, o sistema provoca o aumento do tamanho médio dos pacotes, reduzindo o seu número e o volume de dados transferidos, em virtude da diminuição dos seus cabeçalhos.
 
-Nos testes 5 e 6, como o tráfego na interface é duplicado e o \textit{tcpdump} tem que capturar todos os pacotes, é possível evidenciar a sobrecarga exercida por estas cópias de dados e consequentes transferências, para nível utilizador.
-Na tabela \ref{tab:overhead} e no gráfico tal tal é possível observar que, para o teste 5, a sobrecarga do \textit{tcpdump} atinge os 3.6\% face ao original, enquanto que a sobrecarga do \textit{tcpdump} com o MRoP, permitiu uma ligeira melhoria face ao original (-0.0775\%), como se pode observar no gráfico (tal tal).
-Conclui-se, portanto, que quando o fluxo de dados que não pretendemos capturar aumenta consideravelmente, torna-se mais vatajoso utilizar o MRoP, do que capturar todos os pacotes, na medida em que seria necessário efectuar uma análise em nível utilizador, para identificar e filtrar os pacotes pertencentes ao processo alvo.
+Nos testes 5 e 6, como o tráfego na interface é duplicado e o \textit{tcpdump} tem que capturar todos os pacotes, é possível evidenciar a sobrecarga exercida por estas cópias de dados e consequentes transferências, para nível utilizador face ao novo sistema que apenas captura um fluxo de dados.
+Na tabela \ref{tab:overhead} e no gráfico tal tal é possível observar que, para o teste 5, a sobrecarga do \textit{tcpdump} atinge os 3.6\% face ao original, enquanto que a sobrecarga do \textit{tcpdump} com o MRoP, permitiu uma ligeira melhoria face ao original (-0.0775\%), como se pode observar no gráfico \ref{fig:tests_overhead}.
+Conclui-se, portanto, que quando o fluxo de dados que não pretendemos capturar aumenta consideravelmente, torna-se mais vatajoso utilizar o MRoP, do que capturar todos os pacotes, na medida em que minimiza-se a sobrecarga, captura-se apenas os dados relevantes e evita-se a eventual análise em nível utilizador, para identificar e filtrar os pacotes pertencentes ao processo alvo, que acarreta ainda nova sobrecarga para além da aqui reportada.
 
 \subsection{Desempenho da estrutura de dados}
 
@@ -165,7 +179,7 @@ Considerando que a maior parte das aplicações não utiliza tantos portos em si
 
 
 \subsection{Desempenho do Sistema de instrumentação}
-Sendo a instrumentação das chamadas ao sistema um ponto fundamental na execução da monitorização de uma aplicação, a análise ao seu comportamento é bastante importante, na medida em que é necessário verificar se a introdução deste tipo de sistema irá produzir uma elevada penalização sobre o sistema de operação. A análise efectuada foi colocar um \textit{KRetProbe} na chamada ao sistema \textit{getpid} e avaliar o tempo decorrido entre o inicio e o fim do total das chamadas, com e sem o \textit{KRetProbe} de forma a avaliar o overhead e verificar se coincide com o indicado pelos criadores do sistema.
+Sendo a instrumentação das chamadas ao sistema um ponto fundamental na execução da monitorização de uma aplicação, a análise ao seu comportamento é bastante importante, na medida em que é necessário verificar se a introdução deste tipo de sistema irá produzir uma elevada penalização sobre o sistema de operação. A análise efectuada foi colocar um \textit{KRetProbe} na chamada ao sistema \textit{getpid} e avaliar o tempo decorrido entre o inicio e o fim do total das chamadas, com e sem o \textit{KRetProbe} de forma a avaliar a sobrecarga e verificar se coincide com o indicado pelos criadores do sistema.
 
 \providecommand{\e}[1]{\ensuremath{\times 10^{#1}}}
 
