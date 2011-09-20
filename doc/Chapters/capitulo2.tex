@@ -114,7 +114,7 @@ Quando os filtros são demasiado complexos, os módulos do núcleo têm de passa
 Diferentes técnicas têm vindo a ser desenvolvidas para aumentar a performance de monitorização das interfaces de rede.
 Como já referido, o aumento da sobrecarga é muito penalizante, daí que esta deva ser mantida bastante reduzida, o que contribuirá para aumentar o desempenho da captura.
 
-Um exemplo é nova \textit{API} de atendimento de interrupções, criada com este propósito, e encontra-se analisada na subsecção \ref{par:NAPI}.
+%Um exemplo é nova \textit{API} de atendimento de interrupções, criada com este propósito, e encontra-se analisada na subsecção \ref{par:NAPI}.
 
 Hoje em dia a utilização de máquinas equipadas com processadores \textit{multi-core} é uma realidade, daí que a sua utilização permita ultrapassar algumas dificuldades sentidas na captura de pacotes.
 Se for os processadores \textit{multi-core} atenderem em parelelo as diversas interrupções, originadas pelo envio ou recepção de pacotes, o desempenho da rede é passível de ser aumentado.
@@ -281,7 +281,7 @@ OProfile & Amostragem & Não permite & Necessita \\
 \end{center}
 \end{table}
 
-Da observação da tabela \ref{tab:inst_compare} pode inferir-se que: ToDo
+%Da observação da tabela \ref{tab:inst_compare} pode inferir-se que: ToDo
 
 A tabela \ref{tab:inst_compare} permite fazer uma comparação entre algumas das caracteristicas destes sistemas de instrumentação presentes no núcleo de sistema do \textit{Linux}, segundo os seguintes critérios: metodologia da captura (por traço ou por amostragem), análise dos parâmetros das funções instrumentadas e a necessidade de ter um \textit{deamon} para a recolha de dados provenientes do sistema de monitorização.
 Se a necessidade de ter um \textit{deamon} a executar de forma a coligir e organizar os dados, pode penalizar o desempenho do sistema, a possibilidade de analisar os parâmetros das funções instrumentadas é um ponto a favor dos sistemas \textit{KProbes} e do \textit{LKST}.
@@ -370,6 +370,8 @@ O \textit{NetLink} utiliza uma método de comunicação baseado em \textit{socke
 %Isto ja e novo
  A comunicação com diferentes partes do subsistema de rede é efectuada recorrendo a este sistema de \textit{sockets}.
 
+
+\subsection{Comparação entre sistemas de transferência de dados}
 % \todo{Corrigir esta tabela}
 \begin{table}[h]
 \begin{center}
@@ -434,10 +436,10 @@ Antes da introdução do novo filtro no canal, este tem de ser objecto de drenag
 Após esta inicialização, o programa poderá utilizar \textit{Polling}, de forma a obter os pacotes e analisá-los.
 
 
-O módulo \textit{AF\_PACKET} permite utilizar explicitamente o modo promiscuo, ou seja permite que sejam capturados pacotes que não são destinados à máquina utilizada.
-Na versão actual do núcleo de sistema do \textit{Linux} (2.6.32), o módulo \textit{AF\_PACKET} já pode utilizar um sistema de partilha de \textit{buffer}, com o espaço de utilizador.
+O módulo \textit{AF\_PACKET} permite activar o modo promiscuo da interface a monitorizar, ou seja permite que sejam capturados pacotes que não são destinados à máquina utilizada.
+Na versão actual do núcleo de sistema do \textit{Linux} (2.6.39), o \textit{socket} \textit{AF\_PACKET} pode utilizar um sistema de partilha de \textit{buffer} (\textit{MMAP}), com o espaço de utilizador.
 Neste caso cabe ao utilizador definir explicitamente a forma como pretende utilizar o \textit{socket}. 
-Para atingir este objectivo o utilizador tem de pedir ao núcleo, uma região de memória, sendo esta, posteriormente indicada como argumento de configuração do novo \textit{socket}.
+Para atingir este objectivo o utilizador tem de pedir ao núcleo, uma região de memória, sendo esta, posteriormente indicada como argumento de configuração do \textit{socket}.
 
 Como o referido anteriormente, o \textit{AF\_PACKET}, permite a comunicação directa com o controlador da interface de rede, possibilitando capturar os diversos pacotes ainda antes destes poderem ser filtrados pela \textit{firewall}, presente no núcleo de sistema, neste caso o \textit{netfilter}.
 Podem ser aplicados filtros aos \textit{sockets} de modo a aumentar a eficiência na captura dos pacotes, excluindo aqueles que são irrelevantes para a monitorização.
@@ -463,8 +465,8 @@ O \textit{LibPcap} pode obter estes dados de duas formas distintas, dependo da i
 Se a interface de rede fornecer a estampilha temporal associada ao pacote, o \textit{LibPcap} pode utilizar este valor, caso contrário será necessário obter a estampilha temporal da chegada do pacote ao sistema.
 A forma de obtenção da estampilha pela \textit{LibPcap}, processa-se através da função \textit{gettimeofday}, o que incorre numa maior sobrecarga do sistema face à solução anterior.
 
-\subsubsection{Implementações que permitem um aumento da taxa de transferência}
-
+%\subsubsection{Implementações que permitem um aumento da taxa de transferência}
+\paragraph*{}
 Apesar da \textit{API} da \textit{LibPcap} ser igual em diferentes plataformas (\textit{Windows}, \textit{Linux}, \textit{FreeBSD}, etc), o desempenho desta pode variar.
 Quando exista pouco tráfego de rede estas diferenças são pouco notórias, mas logo que este se intensifica, estas acentuam-se bastante, como demonstra o estudo \textit{Improving Passive Packet Capture: Beyond Device Polling} \cite{Deri2004}.
 
@@ -580,7 +582,7 @@ De forma a diminuir a latência de actualização dos filtros, foi criada uma es
 Com este novo \textit{instruction set}, e sem necessidade de verificação, foi reduzida a latência de actualização dos filtros, o que conduziu a um aumento de desempenho na utilização de filtros dinâmicos.
 
 
-\subsection{Conclusão}
+\section{Conclusão}
 
 Quaisquer das soluções tem limitações e defeitos ...
 
