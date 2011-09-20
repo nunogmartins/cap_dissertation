@@ -2,31 +2,38 @@
 
 \section{Contexto}
 \label{sec:intro_context}
-A monitorização de uma aplicação destina-se normalmente à obtenção de informações relevantes acerca do seu comportamento durante a execução.
-Esta monitorização pode igualmente servir para verificar a correcção, recursos atribuídos e usados, desempenho de execução, etc.
+A monitorização de uma aplicação destina-se normalmente à obtenção de informações relevantes acerca do seu comportamento durante a execução, mas pode igualmente servir para verificar a correcção, recursos atribuídos e usados, desempenho de execução, etc.
 
 A maioria dos sistemas de operação generalistas apresentam métodos de monitorização, devido à importância de que estes se revestem, quer no desenvolvimento das aplicações, quer na gestão destes sistemas.
-Se algumas ferramentas são específicas na monitorização de determinados recursos (como a biblioteca \textit{LibPcap}, que é específica nas interacções com o exterior utilizando interfaces de rede), outras são mais generalistas podendo monitorizar recursos diversos (como o \textit{LTT}, \textit{OProfile}, etc, sistemas de monitorização do núcleo).
+Se algumas ferramentas são específicas na monitorização de determinados recursos (como a biblioteca \textit{LibPCap}, que é específica nas interacções com o exterior utilizando interfaces de rede), outras são mais generalistas podendo monitorizar recursos diversos (como o \textit{LTT}, \textit{OProfile}, etc).
 
 Esta dissertação foca-se na monitorização no núcleo das interacções das aplicações através de interfaces de rede.
 
 O dinamismo das aplicações pode dificultar bastante o processo de monitorização.
 Esta situação é particularmente sentida ao nível da monitorização dos dispositivos de \textit{IO}, e interfaces de rede.
-Nas aplicações onde as ligações e interacções são bastante dinâmicas e efectuadas em cada execução de modo nem sempre previsível, a monitorização é particularmente difícil de ser efectuada.
-A monitorização no núcleo pode gerar um excesso de informação que pode ser irrelevante para as análises efectuadas.
-Se juntarmos a esta situação a necessidade de transferir todos estes dados, gerados através da monitorização, pois em geral apenas as ferramentas de análises de dados se encontram em nível utilizador, verificamos que existe uma elevada sobrecarga quase se efectuam monitorizações no sistema.
-De modo a capturar apenas dados relevantes e simultaneamente minimizar os efeitos da monitorização, são aplicados filtros logo que possível, no núcleo do sistema.
-Tendo em conta que aplicações \textit{P2P} utilizam diversos portos de comunicação, revela-se difícil capturar os pacotes com base nos actuais filtros, sem que se assista a uma elevada degradação do desempenho.
-Não sendo exclusiva das aplicações \textit{P2P}, a utilização de um elevado número de portos, também se verifica em sistemas \textit{Voice over IP}.
-Estas aplicações nas suas diversas comunicações não utilizam sempre portas conhecidas \textit{à priori}, pois por vezes fazem uso de protocolos em que no inicio da sessão negoceiam portos, o que dificulta substancialmente a utilização de filtros, pois é necessário conhecer todos os protocolos específicos das aplicações.
-Para além desta situação, existem aplicações que são executadas pelo administrador que não podem ser monitorizadas em nível utilizador, designadamente no caso da utilização do carregamento dinâmico de bibliotecas instrumentadas, para efectuar a monitorização de aplicações.
+Nas aplicações onde as ligações e interacções são bastante dinâmicas e efectuadas em cada execução de modo nem sempre previsível, a monitorização é particularmente difícil de ser realizada.
 
-No contexto de uma dissertação anterior~\cite{Farruca:2009}, utilizou-se a biblioteca \textit{LibPcap} para a captura do tráfego de rede com vista à monitorização das interacções entre processos distribuídos, sendo que um dos principais desafios solucionados consistiu no isolamento de pacotes pertencentes a um processo.
-Porém, a solução encontrada, não é de fácil integração em qualquer outra ferramenta, e acarreta elevada sobrecarga.
+---------------------------------------------------------------------------------------------------------
+
+A monitorização no núcleo pode gerar um excesso de informação que pode não se mostrar irrelevante para as análises efectuadas.
+Se considerarmos que a passagem dos dados gerados pela monitorização, do núcleo para o nível utilizador, onde se localizam as ferramentas que procedem à sua análise, é necessário efectuar a cópia e proceder à filtragem dos eventos pretendidos, podemos estar perante uma sobrecarga do sistema.
+
+Se juntarmos a esta situação a necessidade de transferir todos estes dados, gerados através da monitorização, pois em geral apenas as ferramentas de análises de dados se encontram em nível utilizador, verificamos que existe uma elevada sobrecarga quase se efectuam monitorizações no sistema.
+
+---------------------------------------------------------------------------------------------------------
+
+De modo a capturar apenas dados relevantes e simultaneamente minimizar os efeitos da monitorização, são aplicados filtros logo que possível, no núcleo do sistema.
+Considerando que aplicações \textit{P2P} utilizam diversos portos de comunicação, revela-se difícil capturar os pacotes com base nos actuais filtros, sem que se assista a uma elevada degradação do desempenho.
+Não sendo exclusiva das aplicações \textit{P2P}, a utilização de um elevado número de portos, também se verifica em sistemas \textit{Voice over IP}.
+Estas aplicações, nas suas diversas comunicações, não utilizam sempre portas conhecidas \textit{à priori}, pois por vezes fazem uso de protocolos em que no inicio da sessão negoceiam portos, o que dificulta substancialmente a utilização de filtros, por se revelar necessário conhecer todos os protocolos específicos das aplicações.
+Para além desta dificuldade, existem aplicações que são executadas pelo administrador que não podem ser monitorizadas em nível utilizador, designadamente no caso da utilização do carregamento dinâmico de bibliotecas instrumentadas, para efectuar a monitorização de aplicações.
+
+No contexto de uma dissertação anterior~\cite{Farruca:2009}, utilizou-se a biblioteca \textit{LibPCap} para a captura do tráfego de rede com vista à monitorização das interacções entre processos distribuídos, sendo que um dos principais desafios solucionados consistiu no isolamento de pacotes pertencentes a um processo.
+Porém, a solução encontrada, não se revela de fácil integração em qualquer outra ferramenta, e acarreta elevada sobrecarga.
 
 Nos actuais sistemas de monitorização de rede não existe suporte para a monitorização das interacções de rede dos processos.
-Para efectuar esta tarefa é exige que métodos alternativos de monitorização de processos sejam combinados com a monitorização genérica de rede.
-Esta combinação quando possível oferece fraco desempenho e uma elevada especificação/especialização à monitorização dos programas.
+Para levar a cabo esta tarefa é imprescindível que métodos alternativos de monitorização de processos sejam combinados com a monitorização genérica de rede.
+Esta combinação, quando possível, manifesta fraco desempenho e implica uma elevada especificidade na monitorização dos programas.
 
 
 %Esta dissertação centra-se nos mecanismos de inspecção, oferecidos pelos sistemas de operação que permitem verificar o funcionamento e avaliar o desempenho do sistema e dos processos dos utilizadores (\textit{debugging}, \textit{profiling}, etc).
@@ -34,17 +41,17 @@ Esta combinação quando possível oferece fraco desempenho e uma elevada especi
 \section{Principais contribuições} 
 \label{sec:intro_contribuicoes}
 
-É objectivo desta dissertação investigar mecanismos, incluindo os internos ao núcleo, que permitam incorporar a filtragem com base no identificador do processo, a sua possível integração nas funcionalidades do \textit{PCap}, e proceder à avaliação da sobrecarga introduzida e respectiva optimização.
+É objectivo desta dissertação investigar mecanismos, incluindo os internos ao núcleo, que permitam incorporar a filtragem com base no identificador do processo, assim como a sua possível integração nas funcionalidades do \textit{PCap}, e proceder igualmente à avaliação da sobrecarga introduzida e respectiva optimização.
 
-A abordagem efectuada beneficia dos mecanismos de instrumentação do núcleo para obter as interacções das aplicações com as interfaces de rede, criando uma extensão ao sistema de filtragem de pacotes do \textit{Linux}, que apenas devolve à monitorização os pacotes referentes à aplicação instrumentada, reduzindo eficientemente o número de pacotes, de modo a transferir apenas os dados relevantes para o monitor, evitando assim trocas de contexto e cópias de dados desnecessárias.
+A abordagem efectuada beneficia dos mecanismos de instrumentação do núcleo para obter as interacções das aplicações com as interfaces de rede, criando uma extensão ao sistema de filtragem de pacotes do \textit{Linux}, que apenas devolve à monitorização os pacotes referentes à aplicação instrumentada, reduzindo substancialmente o seu número, de modo a transferir apenas os dados relevantes para o monitor, evitando trocas de contexto e cópias de dados desnecessárias.
 
 A possibilidade de monitorizar apenas o fluxo de rede de um determinado programa, poderá permitir que filtros construídos até ao momento possam ser simplificados.
-Para além desta simplificação, a monitorização do fluxo de rede de uma aplicação, permite a observação dos dados, sem necessitar de um sistema prévio que identifique os protocolos de mais alto nível, aplicados sobre a rede.
+Para além desta simplificação, a monitorização do fluxo de rede de uma aplicação, permite a observação dos dados, sem necessitar de um sistema que previamente identifique os protocolos de mais alto nível, aplicados sobre a rede.
 A existência de um sistema de captura de tráfego de rede genérico, torna-se benéfico para a análise de protocolos, na medida em que nem sempre se tem acesso às especificações destes, presentes nas aplicações.
 Com este componente, o desempenho na obtenção dos dados relevantes poderá ser incrementado, mitigando anteriores problemas constatados entre o núcleo de sistema de operação e as ferramentas de análise de tráfego.
 Merece igualmente referência, a possibilidade de análise dos fluxos do processo sem necessidade de instrumentar o código da aplicação, uma vez que a instrumentação é efectuada no núcleo.
-À possibilidade anteriormente referida acresce a de monitorizar o fluxo de diferentes máquinas virtuais dentro de um sistema, desde que estas sejam implementadas utilizando processos, permitindo individualizar e capturar o tráfego de cada uma.
-Esta funcionalidade pode ser particularmente interessante em centro de dados, visto ser possível efectuar esta análise ao tráfego, sem necessidade de parar a máquina.
+À possibilidade anteriormente referida acresce a de monitorizar o fluxo de diferentes máquinas virtuais dentro de um sistema, sempre que estas sejam implementadas utilizando processos, permitindo individualizar e capturar o tráfego de cada uma.
+Esta funcionalidade pode ser particularmente interessante em centros de dados, visto ser possível efectuar a análise ao tráfego, sem necessidade de proceder à paragem da máquina.
 
 \bigskip 
 
