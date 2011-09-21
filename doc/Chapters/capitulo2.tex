@@ -111,7 +111,7 @@ Quando os filtros são demasiado complexos, os módulos do núcleo têm de passa
 
 \subparagraph*{Técnicas para o aumento de desempenho}
 % \todo{performance ou desempenho}
-Diferentes técnicas têm vindo a ser desenvolvidas para aumentar a performance de monitorização das interfaces de rede.
+Diferentes técnicas têm vindo a ser desenvolvidas para aumentar o desempenho da monitorização das interfaces de rede.
 Como já referido, o aumento da sobrecarga é muito penalizante, daí que esta deva ser mantida bastante reduzida, o que contribuirá para aumentar o desempenho da captura.
 
 %Um exemplo é nova \textit{API} de atendimento de interrupções, criada com este propósito, e encontra-se analisada na subsecção \ref{par:NAPI}.
@@ -122,7 +122,7 @@ No entanto, revela-se díficil atingir este paralelismo para todas as interfaces
 
 \section{Sistemas de monitorização no núcleo do \textit{Linux}}\label{sect:instrumentacao_casos_linux}
 
-Como o anteriormente analisado na secção \ref{sect:instrumentation_overview} referente à monitorização, esta secção é dedicada à apresentação das diferentes ferramentas de monitorização do núcleo do \textit{Linux}, sendo as mais recentemente utilizadas neste sistema de operação.
+Como o anteriormente analisado, na secção \ref{sect:instrumentation_overview} referente à monitorização, esta secção é dedicada à apresentação das diferentes ferramentas de monitorização do núcleo do \textit{Linux}, sendo as mais recentemente utilizadas neste sistema de operação.
 A utilização dos sistemas de monitorização ao nível do núcleo, permitem efectuar a monitorização genérica dos processos, de forma não intrusiva para as aplicações.
 Ao efectuar a monitorização no núcleo, a sobrecarga imposta ao sistema é menor que em nível utilizador, por ser possível recolher apenas as informações relevantes, evitando filtrar os elementos não relevantes, para análise.
 
@@ -292,7 +292,7 @@ Se a necessidade de ter um \textit{deamon} a executar de forma a coligir e organ
 \label{sect:kernel_user_comm}
 
 Quando se recorre a alguma fonte para a obtenção de dados, não é imprescindível que estes sejam requeridos no sítio onde são capturados.
-Assim, foram criados dois modos de transferência de dados: os internas e os externos.
+Assim, foram criados dois modos de transferência de dados: os internos e os externos.
 No intuíto de melhorar a partilha dos recursos externos, o controlo dá-se ao nível do núcleo do sistema, pelo que parte das comunicações dos utilizadores com dispositivos externos, é efectuada através do núcleo de sistema.
 
 %Incluir por aqui a informação de mmaps, ring buffers e afins ....
@@ -428,7 +428,7 @@ Esta estrutura que dispõe de toda a informação sobre o pacote, a receber pela
 A monitorização da rede é efectuada directamente no controlador da interface de rede, utilizando para isso um \textit{socket} \textit{AF\_PACKET}.
 
 A biblioteca dinâmica \textit{LibPcap} é utilizada pela generalidade das ferramentas de captura de pacotes.
-Esta biblioteca, como é multi-plataforma, permite ao programador utilizá-la nos principais sistemas de operação, porque a \textit{API} da \textit{LibPCap} é opaca relativamente à implementação, esta sim, específica de cada plataforma.
+Esta biblioteca, como é multi-plataforma, permite ao programador utilizá-la nos principais sistemas de operação, porque a \textit{API} da \textit{LibPCap} é transparante relativamente à implementação, esta sim, específica de cada plataforma.
 Para ser possível efectuar a captura de pacotes, o programa tem de especificar qual a interface de rede que quer monitorizar.
 Se necessitar de filtrar pacotes, especificará o filtro a utilizar, recorrendo às instruções presentes na \textit{LibPCap}, que através da função  \textit{pcap\_compile} o traduzirá e optimizará para o conjunto de instruções do \textit{BPF}, sendo posteriormente aplicado no núcleo através da função \textit{setfilter}.
 Se o filtro for demasiado complexo, não poderá ser aplicado no núcleo, sendo apenas possível aplicá-lo em nível utilizador, perdendo algum desempenho.
@@ -472,7 +472,7 @@ Quando exista pouco tráfego de rede estas diferenças são pouco notórias, mas
 
 Diversos esforços no sentido de aumentar o desempenho da captura de pacotes têm sido efectuados.
 Relativamente ao \textit{software}, são conhecidos esforços na utilização da técnica de \textit{mmap}, de forma a reduzir o número de cópias de dados entre as aplicações e o núcleo de sistema.
-Igualmente no \textit{hardware}, tem-se assistido a uma evolução no sentido de reduzir as interrupções efectuadas ao cpu, adicionando nas interfaces de rede processadores dedicados às funcionalidades presentes no núcleo, de modo a libertá-lo da execução destas tarefas.
+Igualmente no \textit{hardware}, tem-se assistido a uma evolução no sentido de reduzir as interrupções efectuadas ao \textit{cpu}, adicionando nas interfaces de rede processadores dedicados às funcionalidades presentes no núcleo, de modo a libertá-lo da execução destas tarefas.
 
 \paragraph*{NAPI - New API - }
 
@@ -488,11 +488,10 @@ O \textit{NAPI} apenas pode ser aplicado nos caso em que os controladores das in
 
 A utilização desta nova \textit{API} permite diminuir o número de trocas de contexto entre o controlador da interface e o núcleo de sistema.
 Sempre que o cpu atende uma interrupção de rede, obtem um número maior de dados, que combinado com um sistema de memória partilhada aumenta substancialmente o desempenho.
-Esta técnica encontra-se descrita na sub-secção \ref{par:NAPI}
 
 \paragraph*{PACKET\_MMAP}
 
-Com base na técnica \textit{MMAP} descrita em \ref{par:MMAP_overview}, foi criado o \textit{PACKET\_MMAP}, disponível a partir da versão 1.0.0 da biblioteca do \textit{LibPcap}.
+Com base na técnica \textit{MMAP}, foi criado o \textit{PACKET\_MMAP}, disponível a partir da versão 1.0.0 da biblioteca do \textit{LibPcap}.
 Este módulo permite algumas melhorias em termos de desempenho, visto que foi reduzido o número de cópias efectuadas e de trocas de contexto, face à anterior versão 0.9.8 da biblioteca \textit{LibPcap}.
 
 Para além destas modificações no \textit{Packet\_MMAP}, o núcleo de sistema de operação \textit{Linux} na sua versão 2.6, passou a contar com a nova \textit{API} de rede (\textit{NAPI}).

@@ -1,10 +1,10 @@
 \chapter{Sistema Proposto}
 \label{cap:Estrutura}
 
-De modo a conceber a arquitectura do sistema de Monitorização de Rede orientado ao Processo (\textit{MRoP}), foi necessário conhecer, como os processos em nível utilizador interagem com o exterior através da rede.
+De modo a conceber a arquitectura do sistema de Monitorização de Rede orientado ao Processo (\textit{MRoP}), foi necessário conhecer, como os processos em nível utilizador interagem com o exterior via rede.
 Uma vez conhecida a arquitectura de rede do \textit{Linux}, tornou-se imprescindível compreender a forma, como se processa a comunicação e a monitorização de rede.
 
-Assim, tendo em conta os factores anteriormente mencionados, neste capítulo irá ser apresentada a constituição do sistema de rede do \textit{Linux}, desde o momento do envio dos dados pelo processo até que estes chegam à interface de rede e vice-versa.
+Assim, tendo em conta os factores anteriormente mencionados, neste capítulo irá ser apresentada a constituição do sistema de rede do \textit{Linux}, desde o momento do envio dos dados pelo processo até que estes chegam à interface de rede, tendo em vista desenhar o sistema \textit{MRoP}.
 Considerando a abrangência desta visão, apenas serão focados os componentes essenciais da arquitectura, nomeadamente o descritor de processo, as familias de \textit{sockets}, a \textit{firewall}, o sistema de escalonamento de rede e a monitorização de rede.
 
 Após esta visão geral do sistema de rede do \textit{Linux}, será apresentada a arquitectura proposta para o sistema de Monitorização de Rede orientado ao Processo (\textit{MRoP}).
@@ -12,7 +12,6 @@ Após esta visão geral do sistema de rede do \textit{Linux}, será apresentada 
 \section{Arquitectura de rede em \textit{Linux}}
 \label{sub:network}
 
-Os processos são instâncias de programas, e estes num sistema multiprogramado partilham recursos.
 Os processos necessitam de comunicar para obter dados, de modo a completar as suas execuções.
 Estas comunicações podem ser efectuadas tanto internamente, como externamente ao sistema.
 Em geral, as comunicações externas processam-se através de uma interface de rede, sendo necessário, para tal, criar canais de comunicação.
@@ -95,7 +94,7 @@ Embora as interfaces de rede serem configuradas através do programa \textit{ifc
 \subsubsection{AF\_INET}
 \label{subsub:af_inet}
 
-A \textit{AF\_INET} é a família de endereços utilizada na comunicação através da \textit{internet}, e que faz uso do protocolo \textit{IP versão 4} (ver figura \ref{fig:stack_tcp_ip}).
+A \textit{AF\_INET} representa a família de protocolos utilizada na comunicação através da \textit{internet}, e que faz uso do protocolo \textit{IP versão 4} (ver figura \ref{fig:stack_tcp_ip}).
 
 \begin{figure}[ht]
 \centering
@@ -190,7 +189,7 @@ Esta estrutura contém diversos elementos, destacando-se os apontadores para a e
 
 \subsection{Captura dos fluxos de dados das interfaces de rede}
 \label{sub:network_cap}
-O sistema de monitorização de rede, opera de forma opaca à normal utilização da rede, por parte das aplicações.
+O sistema de monitorização de rede, opera de forma transparente à normal utilização da rede, por parte das aplicações.
 Desta forma, quando um pacote chega à interface de rede, esta envia ao cpu um pedido de interrupção da computação.
 Neste ponto, é desligada a atenção do processador a novas interrupções, passando a computação para o controlador da interface de rede.
 Com a atenção do processador a novas interrupções desligada, a computação deve ser breve e restabelecer-se de imediato a atenção do processador, a novas interrupções, para que o normal funcionamento seja retomado.
@@ -216,7 +215,7 @@ Cada \textit{sniffer} tem um filtro associado escrito em linguagem \textit{bpf},
 %Durante parte da execução da chamada ao sistema de operação, é possível referenciar qual o processo que efectuou a chamada, pois caso esta seja síncrona, é agendado um processamento sobre os dados e a aplicação fica bloqueada aguardando ser re-escalonada através da função \textit{schedule}.
 %O sistema de ficheiros mantém a referência sobre quais os canais abertos para cada processo, sendo possível determinar a que processo pertence cada descritor de ficheiro. 
 
-\section{Desenho e arquitectura do MRoP}
+\section{Arquitectura do MRoP}
 \label{sec:mrop_architecture}
 
 O sistema proposto foi desenvolvido procurando cumprir os seguintes requisitos:
@@ -224,7 +223,7 @@ O sistema proposto foi desenvolvido procurando cumprir os seguintes requisitos:
 \item seleccionar as comunicações que envolvem apenas um processo (ou um conjunto de processos);
 \item manter a compatibilidade com o sistema já existente, incrementando a sua funcionalidade;
 \item minimizar eventuais perdas de desempenho;
-\item a implementação deve envolver poucas alterações ao código do sistema, de modo a facilitar a sua manutenção e evolução a quando das novas versões do sistema \textit{Linux}.
+\item a implementação deve envolver poucas alterações ao código do sistema, de modo a facilitar a sua manutenção e evolução aquando das novas versões do sistema \textit{Linux}.
 \end{itemize}
 
 Assim, o sistema criado está dividido em quatro componentes principais: filtragem dos pacotes de rede, instrumentação das chamadas ao sistema, repositório do estado das interacções via rede, e controlo e informação sobre o estado da monitorização (ver figura \ref{arquitectura}).
@@ -235,7 +234,7 @@ Existe ainda um sistema para controlo/configuração, destinado a obter informa�
 \begin{figure}[htbp]
 \begin{center}
 \includegraphics[scale=0.6]{arquitectura.pdf} 
-\caption{Arquitectura da solução}
+\caption{Arquitectura do MRoP}
 \label{arquitectura}
 \end{center}
 \end{figure}

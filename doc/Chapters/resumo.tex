@@ -1,20 +1,25 @@
 \resumo 
 
-A monitorização de aplicações permite analisar e compreender o comportamento destas. 
-É possível monitorizar apenas parte dos recursos computacionais das aplicações tais como: utilização do cpu, da memória, dos dispositivos de \textit{IO} (em que nestes se enquadra a utilização dos dispositivos de rede), etc. 
+A monitorização de aplicações permite analisar e compreender o comportamento das mesmas, sendo possível monitorizar durante execuções reais os seus recursos computacionais, nomeadamente a utilização do \textit{cpu}, da memória, dos dispositivos de \textit{IO} (incluindo os dispositivos de rede), etc. 
 
-As aplicações de monitorização de rede em geral utilizam a biblioteca \textit{LibPCap}, para capturar os fluxos de rede das interfaces de rede.
-Como esta biblioteca é genérica de modo a abstrair o modo como o sistema de operação lida com a captura dos fluxos, por isso o núcleo do sistema de operação \textit{Linux} fornece o suporte à monitorização genérica de rede.
+As ferramentas de monitorização de rede, em geral, utilizam a biblioteca \textit{LibPCap}, de modo a capturar os fluxos das interfaces de rede.
+Como esta biblioteca é genérica, permite abstrair o modo como o sistema de operação lida com a captura dos fluxos, sendo que no \textit{Linux} o suporte é garantido pelo sistema de captura e filtragem de pacotes de rede \textit{Linux Socket Filter}.
 
-De modo geral o volume de tráfego obtido pela monitorização é elevado por isso é necessário filtrá-lo, para que apenas os fluxos relevantes sejam transmitidos para o monitor em nível utilizador.
-Os filtros utilizados na monitorização são baseados no \textit{BPF}, que não tem suporte para a captura baseada nas interacções dos processos.
-Se tivesse possivelmente muitos dos actuais filtros poderiam ser simplificados e o volume de dados transferidos para o monitor seria mais reduzido, contendo apenas os fluxos realmente relevantes melhorando o desempenho da monitorização.
-Existem ferramentas que capturam monitorizam as interacções das aplicações com a rede, mas são demasiado específicas e oferecem fraco desempenho.
 
-A solução proposta e implementada nesta dissertação resolve este problema através da Monitorização de Rede Orientada ao Processo (\textit{MRoP}), que através da extensão ao sistema de monitorização de rede do \textit{Linux} com um módulo no núcleo, instrumenta as chamadas ao sistema de rede, de modo a capturar as interacções das aplicações e com estes dados, filtrar os fluxos de rede da aplicação alvo.
-Esta solução foi avaliada funcionalmente, de modo a verificar que apenas, e somente, os fluxos de dados pretendidos foram de facto capturados.
-Para além desta avaliação, foi também efectuada a avaliação de desempenho que, no pior caso, aquele em que todos os pacotes da rede pertencem ao processo alvo, verificou-se que a sobrecarga foi praticamente nula.
-No caso em que se pretendia um subconjunto dos pacotes, os pertencentes ao processo alvo, o desempenho da captura foi melhorado substancialmente, resultado já expectável.
+De modo geral, o volume de tráfego obtido pela monitorização é elevado, sendo necessário filtrá-lo, de forma a que apenas os fluxos de dados relevantes sejam transmitidos para o monitor, em nível utilizador.
+Quer no libPCap quer no suporte dos sistemas não existe suporte para a captura baseada nas interacções dos processos.
+%Caso tivesse, muitos dos actuais filtros poderiam ser simplificados e o volume de dados transferidos para o monitor seria mais reduzido e relevante, melhorando o desempenho da monitorização.
+%Existem ferramentas que monitorizam as interacções das aplicações com a rede, sendo demasiado específicas e de fraco desempenho.
+Esta é uma funcionalidade bastante útil para os utilizadores e com vantagens, como na sobrecarga do sistema e desempenho.
+
+A solução proposta pretende resolver esta problemática, através da Monitorização de Rede Orientada ao Processo (\textit{MRoP}), extendendo o sistema de monitorização de rede do \textit{Linux}, por meio da introdução de um módulo no núcleo, permitindo capturar as interacções das aplicações e filtrando os fluxos de rede da aplicação alvo.
+Esta solução foi avaliada funcionalmente, verificando que apenas os fluxos de dados pretendidos existiam na captura.
+Para além desta avaliação, foi também realizada a avaliação de desempenho, a qual dependeu do conjunto de pacotes capturados, relativos ao processo alvo.
+
+
+
+
+%No caso em que se pretendia um subconjunto dos pacotes, os pertencentes ao processo alvo, o desempenho da captura foi melhorado substancialmente, resultado já expectável.
 
 %De forma a monitorizar a utilização de rede de uma aplicação é habitual utilizar-se a biblioteca \textit{LibPCap} especializada na monitorização de rede. Para capturar apenas os dados desejados em geral é necessário criar filtros de forma a separar os dados relevantes para a análise, daqueles que não o são. 
 
@@ -32,6 +37,6 @@ No caso em que se pretendia um subconjunto dos pacotes, os pertencentes ao proce
 
 % Palavras-chave do resumo em Português
 \begin{keywords}
-Monitorização, rede, aplicação, libpcap, captura de pacotes, instrumentação do núcleo de sistema, filtro
+Monitorização, rede, aplicação, LibPCap, captura de pacotes, instrumentação do núcleo de sistema, filtro
 \end{keywords}
 % to add an extra black line
