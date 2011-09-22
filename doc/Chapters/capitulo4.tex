@@ -9,6 +9,31 @@ Considerando a abrangência desta visão, apenas serão focados os componentes e
 
 Após esta visão geral do sistema de rede do \textit{Linux}, será apresentada a arquitectura proposta para o sistema de Monitorização de Rede orientado ao Processo (\textit{MRoP}).
 
+\subsection{Estrutura de um processo}
+% ou recursos de rede de um processo
+
+Um processo é a instânciação de um programa em execução, sendo igualmente uma unidade de escalonamento de execução (\textit{task}) no sistema operativo.
+Este consome recursos (físicos e lógicos), partilhados com outros processos num sistema multiprogramado.
+O núcleo de sistema gere uma estrutura para cada processo (\textit{struct\_task}), onde estão identificados todos os recursos a este atribuídos.
+Esta estrutura contém apontadores para diversos recursos nomeadamente: zonas de memória requisitadas, canais abertos (ficheiros, \textit{sockets}, entre outros), contabilização de utilização de \textit{cpu}, apontadores para a sua árvore genealógica (pai, irmãos e filhos), etc.
+
+A árvore genealógica anteriormente indicada contém o apontador para o processo pai (o processo que efectuou um \textit{fork}, para lhe dar origem), a lista de irmãos e dos descententes.
+O processo pai, tal como cada um dos elementos presentes na lista, são também estruturas do tipo \textit{task\_struct}, possibilitando, desta forma, a navegação ao longo da árvore genealógica do processo.
+
+Um dos recursos partilhados pelos diferentes processos é o acesso à rede, ou seja, o recurso que permite a comunicação com o exterior.
+De modo a que as comunicações possam ter lugar, é necessário a alocação de canais de comunicação, cuja criação, utilização e destruição é efectuada pela \textit{API} definida no sistema de operação.
+Quando um processo cria um canal, o núcleo devolve-lhe um identificador, que permitindo ao processo referenciar o canal dentro do núcleo e, deste modo, efectivar o seu controlo e realizar futuras comunicações.
+No núcleo, este identificador é gerido na estrutura que identifica os canais abertos, pelo processo.
+
+Para reconhecer qual o tipo do canal aberto, existem algumas funções específicas que o analisam e lhe permitem efectuar operações.
+Assim, ao manipular um ficheiro, existe a possibilidade de avançar e recuar, tendo como referência um determinado ponto.
+Todavia, esta situação deixa de fazer sentido, quando se pretende controlar um \textit{socket} ou um \textit{pipe}, na medida em que as comunicações nestes são destruídas quando consumidas (situação essa, que não se verifica aquando da manipulação de um ficheiro).
+
+Apesar destas informações estarem disponíveis no descritor de processo, não existe suporte neste descritor de modo a obter as interacções do processo com as interfaces de rede.
+Desta forma, apenas através da instrumentação das chamadas ao sistema, é possível obter as interacções anteriormente referidas.
+Assim quando um processo comunica com a rede, executa uma chamada ao sistema e através da instrumentação destas é possível obter algumas informações relevantes que combinadas com os dados do descritor do processo, permite que se obtenha as informações relativas aos portos, endereços e protocolos utilizados na comunicação com a rede.
+Com estes dados (protocolos, portos e endereços) é possível filtrar e capturar eficientemente os dados, através da extensão efectuada ao \textit{LSF}.
+
 \section{Arquitectura de rede em \textit{Linux}}
 \label{sub:network}
 
@@ -26,8 +51,8 @@ Esta partilha é efectuada pelo núcleo, pois apenas este é capaz de a efectuar
 \end{figure}
 
 A chamada ao sistema \textit{socket}, é efectuada para a criação de um canal de comunicação e este varia em função dos parâmetros: família, tipo e protocolo.
-Existe um agrupamento em família de endereços (\textit{Address Family}), que se destina à comunicação remota ou local.
-Em termos gerais, as comunicações locais podem incidir na comunicação entre processos (\textit{AF\_UNIX}), ou entre estes e o núcleo (\textit{AF\_NETLINK}), enquanto as comunicações remotas podem ter lugar sobre a internet, dispondo igualmente de uma família própria para o efeito (\textit{AF\_INET}).
+Existe um agrupamento em família de endereços (\textit{Address Family}), consoante se destina à comunicação remota ou local.
+Em termos gerais, as comunicações locais podem incidir na comunicação entre processos (\textit{AF\_UNIX}), ou entre estes e o núcleo (\textit{AF\_NETLINK}), enquanto as comunicações remotas podem ter lugar sobre protocolos da internet, dispondo igualmente de uma família própria para o efeito (\textit{AF\_INET}).
 %As comunicações locais podem efectuar-se entre processos (\textit{AF\_UNIX}), ou entre estes e o núcleo (\textit{AF\_NETLINK}), enquanto as remotas podem ter lugar sobre a \textit{internet}, dispondo igualmente de uma família própria a \textit{AF\_INET}.
 Estes canais possuem um conjunto de funções (\textit{API POSIX}) bem definidas, para utilização e controlo das operações, permitindo estruturar a comunicação de um modo eficiente.
 
@@ -39,31 +64,12 @@ Para tal, tem-se assistido ao desenvolvimento de sistemas de filtragem de comuni
 Sendo o \textit{Linux} um sistema de operação frequentemente utilizado em ambientes de servidores, tornou-se essencial a aplicação deste tipo controlo.
 Para tal a solulção encontrada resultou do desenvolvido de uma \textit{firewall} (a qual foi denominada por \textit{NetFilter}) capaz de filtrar o fluxo de dados que circula na rede, entre o sistema e a periferia.
 
-Para além da existência da filtragem do fluxo de dados, o sistema de operação \textit{Linux} é constituido por um sistema de controlo do escalonamento do fluxo de tráfego, (\textit{Traffic Control}), que tal como o \textit{netfilter}, é definido no núcleo, permitindo ao administrador indicar quais os fluxos de dados prioritários ou que necessitam de determinada largura de banda, possibilitando-lhe efectuar uma reserva antecipada da mesma.
+Para além da existência da filtragem do fluxo de dados, o sistema de operação \textit{Linux} é constituido por um sistema de controlo do escalonamento do fluxo de tráfego, (\textit{Traffic Control}), que permite ao administrador indicar quais os fluxos de dados prioritários ou que necessitam de determinada largura de banda, possibilitando-lhe efectuar uma reserva antecipada da mesma.
  
 Adiante apresentar-se-ão diferentes constituintes da estrutura de rede do \textit{Linux}, iniciando-se pelo processo em nível utilizador terminando nos controladores de interfaces de rede.
 
 Por último será apresentado o sistema de monitorização genérica de rede do \textit{Linux}.
 
-\subsection{Estrutura de um processo}
-% ou recursos de rede de um processo
-
-Um processo é a instânciação de um programa, sendo igualmente uma unidade de escalonamento de execução (\textit{task}) no sistema operativo.
-Este consome recursos (físicos e lógicos), partilhados com outros processos num sistema multiprogramado.
-O núcleo de sistema gere uma estrutura para cada processo (\textit{struct\_task}), onde estão identificados todos os recursos a este atribuídos.
-Esta estrutura contém apontadores para diversos recursos nomeadamente: zonas de memória requisitadas, canais abertos (ficheiros, \textit{sockets}, entre outros), contabilização de utilização de \textit{cpu}, apontadores para a sua árvore genealógica (pai, irmãos e filhos), etc.
-
-A árvore genealógica anteriormente indicada contém o apontador para o processo pai (o processo que efectuou um \textit{fork}, para lhe dar origem), a lista de irmãos e dos descententes.
-O processo pai, tal como cada um dos elementos presentes na lista, são também estruturas do tipo \textit{task\_struct}, possibilitando, desta forma, a navegação ao longo da árvore genealógica do processo.
-
-Um dos recursos partilhados pelos diferentes processos é o acesso à rede, ou seja, o recurso que permite a comunicação com o exterior.
-De modo a que as comunicações possam ter lugar, é necessário a alocação de canais de comunicação, cuja criação, utilização e destruição é efectuada pela \textit{API} definida no sistema de operação.
-Quando um processo cria um canal, o núcleo devolve-lhe um identificador, que permitindo ao processo referenciar o canal dentro do núcleo e, deste modo, efectivar o seu controlo e realizar futuras comunicações.
-No núcleo, este identificador é gerido na estrutura que identifica os canais abertos, pelo processo.
-
-Para reconhecer qual o tipo do canal aberto, existem algumas funções específicas que o analisam e lhe permitem efectuar operações.
-Assim, ao manipular um ficheiro, existe a possibilidade de avançar e recuar, tendo como referência um determinado ponto.
-Todavia, esta situação deixa de fazer sentido, quando se pretende controlar um \textit{socket} ou um \textit{pipe}, na medida em que as comunicações nestes são destruídas quando consumidas (situação essa, que não se verifica aquando da manipulação de um ficheiro).
  
 \subsection{Sockets e as suas famílias}
 \label{sub:sockets}
@@ -200,6 +206,8 @@ Os pacotes recebidos são entregues aos \textit{sniffers} registados no sistema,
 A monitorização de rede é efectuada pelos \textit{sniffers}, sendo os pacotes entregues a cada um deles, para que possam proceder à sua análise.
 Cada \textit{sniffer} tem um filtro associado escrito em linguagem \textit{bpf}, a ser executado na máquina virtual, implementada para o efeito.
 
+Ao modificar a função que executa o filtro, de modo a incluir a chamada de um novo sistema de filtragem, permitirá a extensão do \textit{LSF}, sem que contudo se assista a um elevado aumento da sobrecarga quando esse sistema de filtragem não esteja activo.
+
 %\subsubsection{Transmissão de dados}
 
 %Uma aplicação em nível utilizador, transfere dados sobre a rede através de chamadas ao sistema de operação, sendo que estas podem ser \textit{send}, \textit{sendto}, \textit{sendmsg}.
@@ -251,9 +259,9 @@ Este módulo do núcleo foi desenvolvido em quatro componentes, que em seguida s
 \label{sub:mon_syscalls}
 
 A principal relevância deste sistema, assenta no pressuposto de que todas as interacções desencadeadas por um processo com o exterior são detectadas.
-Para atingir esse objectivo, foi necessário recorrer à monitorização das chamadas ao sistema de rede ao nível do núcleo, possibilitando reduzir as cópias de dados e as trocas de contexto.
+Para atingir esse objectivo, foi necessário recorrer à monitorização das chamadas ao sistema de rede ao nível do núcleo, para obter as interacções dos processos, de modo não intrusivo, com as interfaces de rede, possibilitando assim reduzir as cópias de dados e as trocas de contexto.
 Fazendo uso do sistema de monitorização \textit{KProbes}, foi possível realizar a monitorização sob um limitado conjunto de chamadas ao sistema, nomeadamente: \textit{sendto}, \textit{recvfrom}, \textit{bind}, \textit{accept}, \textit{connect} e \textit{close}.
-Ao efectuar esta monitorização é possível detectar todas as modificações ao estado dos \textit{sockets} do processo.
+Ao efectuar esta monitorização é possível obter os portos, endereços e protocolos utilizados, de modo a detectar todas as modificações ao estado dos \textit{sockets} do processo.
 Com os dados relevantes obtidos da monitorização, afectados ao repositório, este mantem-se permanentemente actualizado relativamente aos portos, endereços e protocolos, utilizados pela aplicação.
 O filtro de pacotes ao aceder ao repositório e ao decidir quais os pacotes a capturar, origina a filtragem dinâmica orientada ao processo.
 

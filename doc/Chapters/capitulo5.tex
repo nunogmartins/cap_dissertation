@@ -6,7 +6,7 @@
 
 
 
-O principal desta dissertação consiste no desenvolvimento de um módulo do núcleo que consiga estender as funcionalidades do \textit{LSF} de forma a introduzir a funcionalidade de monitorização do tráfego realizado por um processo, tirando partido da instrumentação de código do núcleo.
+O objectivo principal desta dissertação consiste no desenvolvimento de um módulo do núcleo que consiga estender as funcionalidades do \textit{LSF} de forma a introduzir a funcionalidade de monitorização do tráfego realizado por um processo, tirando partido da instrumentação de código do núcleo.
 O facto desta instrumentação ser efectuada no núcleo permite que qualquer aplicação possa ser monitorizada, sem que o seu código tenha de ser alterado.
 Como se pode compreender, esta instrumentação é não instrusiva para as aplicações, havendo, deste modo a necessidade de criar uma método de verificação que identifique o processo que irá cada função instrumentada.
 Esta adição ao \textit{LSF} irá conter um sistema externo, possibilitando a sua utilização sem a necessidade de modificar qualquer aplicação que tire partido da utilização do \textit{LSF}.
@@ -16,12 +16,12 @@ As modificações necessárias às extensões das funcionalidades do \textit{LSF
 \label{sec:mrop_implementation}
 
 A implementação da solução \textit{MRoP} teve em consideração o desenvolvimento de um código minimalista, que implicasse ligeiras alterações ao código do núcleo, e ao mesmo tempo, tirasse partido de \textit{APIs} internas.
-É opaco à implementação da biblioteca \textit{PCap}, e pode ser integrado nesta.
+É transparente à implementação da biblioteca \textit{PCap}, e pode ser integrado nesta.
 A implementação está autocontida num módulo do núcleo, de modo a ser carregada e libertada, do mesmo, pelo administrador.
 A modularização das diversas componentes, permite um desenvolvimento autónomo de cada subcomponente.
 
 No capítulo \ref{cap:trabrelacionado} foram apresentados, a título exemplificativo (secção \ref{sect:instrumentacao_casos_linux}), alguns sistemas que permitem efectuar monitorização ou filtragem de pacotes, com a indicação de um processo.
-O \textit{MRoP}, embora utilize o sistema de instrumentação do núcleo \textit{KProbes}, diferencia-se das soluções apresentadas, por se encontrar totalmente implementado no núcleo, com reduzida utilização de memória e perturbação do sistema.
+O \textit{MRoP}, embora utilize o sistema de instrumentação do núcleo \textit{KProbes}, apenas o utiliza para instrumentar as interacções com o sistema de rede, diferenciando-se assim das soluções apresentadas, o que lhe permite encontrar-se totalmente implementado no núcleo, com reduzida utilização de memória e perturbação do sistema.
 
 Como apresentado na secção \ref{sub:network_cap}, o sistema de monitorização de rede é utilizado para cada pacote que passa pelo controlador de rede.
 
@@ -32,7 +32,9 @@ Como apresentado na secção \ref{sub:network_cap}, o sistema de monitorização
 \label{fig:general_architecture}
 \end{figure}
 
-
+Assim quando uma aplicação efectua uma chamada ao sistema (\textit{connect}, \textit{accept}, \textit{bind}, \textit{sendto}, \textit{recvfrom}), o \textit{handler} da função instrumentada é executado.
+Na execução deste \textit{handler}, obtido do identicador do processo que efectuou a chamada ao sistema e comparado com os identificadores, \textit{pid}, \textit{ppid} e \textit{tgid} internos do \textit{MRoP}, caso um destes seja igual, é obtido o canal através dos parâmetros passado à chamada ao sistema e obtidos os dados sobre o \textit{socket} (porto, endereço e protocolo), para serem adicionados ao repositório.
+Deste modo quando o \textit{LSF} executar o novo sistema de filtragem irá verificar se os dados do pacote recebido ou enviado existe no repositório \textit{Estado do processo} e, caso exista retorna à função de filtragem do \textit{LSF} que o deve capturar, sendo posteriormente passado para o monitor em nível utilizador.
 
 
 
@@ -145,6 +147,7 @@ Desta análise concluí-se que, os identificadores \textit{pid}, \textit{tid} e 
 
 De modo a manter a informação relativa aos endereços e portos em utilização por uma aplicação, sem requer a consulta sobre os canais de rede, foi necessário criar um repositório de dados, que contivesse informações relevantes para as decisões do filtro de captura.
 Neste repositório, existe a necessidade de ter funções de inserção, remoção e consulta, sendo que qualquer uma destas, deverá ser efectuada com celeridade, procurando estruturas que tenham uma complexidade temporal \textit{BigO}, \textit{O(1)} ou \textit{O(log n)}.
+A estrutura de dados necessária para suportar o \textit{Estado dos sockets do processo}, será uma estrutura que tenha no máximo tenha uma complexidade temporal de \textit{O(log n)} sobre as pesquisas, dado que as estas irão ser muito superiores às inserções e remoções.
 
 Assim, as estruturas de dados com suporte no núcleo, que permitem a criação de um repositório de dados, como o requerido, são:
 
@@ -157,16 +160,17 @@ Assim, as estruturas de dados com suporte no núcleo, que permitem a criação d
 %\subsubsection{Bitmap}
 
 O recurso a um mapa de \textit{bits}, permite, de um modo bastante rápido e com uma reduzida utilização de memória, conhecer se um determinado porto está em utilização, por um determinado processo.
-O núcleo do sistema possui suporte para o tratamento de mapas de \textit{bits}, ou seja, este verifica se um determinado \textit{bit}, num conjunto de memória, está ou não activo, podendo igualmente afectar um determinado \textit{bit} num conjunto de memória.
+O núcleo do sistema possui suporte para o tratamento de mapas de \textit{bits}, permitindo representar cada porto usado pela aplicação por um \textit{bit}.
 Embora este processo seja extremamente rápido, carece de modularidade, na medida em que apenas controla os portos, não dispondo de suporte para protocolos ou múltiplos endereços de rede.
+
  
-----------------------------------------------------------------------------------------------------------
+%----------------------------------------------------------------------------------------------------------
 
-Uma solução seria agrupar os diferentes mapas de bits sob a terminologia de um endereço, mas e se fosse udp ou tcp ?
-E quando um processo efectua um bind sob todas as interfaces do sistema ? 
-E quando é utilizada mais uma interface virtual sob uma real ? .....
+%Uma solução seria agrupar os diferentes mapas de bits sob a terminologia de um endereço, mas e se fosse udp ou tcp ?
+%E quando um processo efectua um bind sob todas as interfaces do sistema ? 
+%E quando é utilizada mais uma interface virtual sob uma real ? .....
 
-----------------------------------------------------------------------------------------------------------
+%----------------------------------------------------------------------------------------------------------
 
 \item[Listas - ]
 
@@ -183,8 +187,7 @@ No entanto quando o número de elementos não é elevado, a utilização de uma 
 %Apesar de não ser necessário percorrer os elementos ou obter os indíces de forma ordenada. 
 
 %\paragraph{Arvores Balanceadas}
-\item[Árvore Balanceada- ]
-\textit{Red-black Tree} 
+\item[Árvore Balanceada - ] \textit{Red-black Tree} 
 
 No núcleo existe uma implementação parcial de uma árvore \textit{Red-black} genérica, a fim de permitir o acesso aos dados através de chaves, ou seja, trata-se de uma estrutura associativa.%\cite{}
 A árvore \textit{Red-black} é semi-balanceada, isto é, a diferença de alturas entre o ramo mais profundo e o mais curto é de apenas de nível 1.
@@ -212,12 +215,19 @@ Os ganhos provenientes deste balanceamento, face às àrvores não balanceadas, 
 \end{description}
 
 \paragraph*{}
-Outras estruturas de dados passíveis de serem consideradas, apesar de não possuirem suporte no núcleo.
+Outra estrutura de dados passível de ser considerada foi a tabela de dispersão, apesar de não possuir suporte no núcleo.
 
 \begin{description}
 %\subsubsection{Tabela de dispersão}
 \item[Tabela de Dispersão]
 No núcleo existe uma implementação de tabelas de dispersão que efectuam a dispersão e o controlo sobre as suas chaves.
+O controlo sobre as chaves e a forma de dispersão é efectuada pela implementação, ou seja, não existe controlo do programador sobre as chaves nem sobre a forma de dispersar estas.
+
+No núcleo existem subsistemas que implementaram tabelas de dispersão com base em \textit{arrays} e listas, permitindo assim utilizar as vantagens desta estrutura de dados.
+Estas implementações tiram partido do conhecimento do dominio do problema que resolvem, assim, os \textit{arrays} são criados com dimensões fixas, dado que não necessitarão de efectuar redispersão dos elementos nela contidos.
+
+Como existe a necessidade de uma estrutura que se adapte ao comportamento dinâmico das interacções das aplicções com as interfaces de rede, seria necessário um estudo aprofundado sobre estatisticas do número de portos utilizados pelas aplicações, e mesmo que este estudo fosse efectuado seria necessário continuar a efectuar uma redispersão dos elementos, a não ser que, fosse utilizado um \textit{array} com 65535 posições, valor este que representa o valor máximo de portos possiveis através dos protocolos \textit{TCP} e \textit{UDP}, desperdiçando assim memória do sistema.
+
 
 \end{description}
 \paragraph*{}
