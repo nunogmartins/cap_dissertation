@@ -9,8 +9,8 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="744.09448819"
-   height="1052.3622047"
+   width="699.862"
+   height="401.10333"
    id="svg2"
    version="1.1"
    inkscape:version="0.47 r22583"
@@ -94,6 +94,41 @@
        inkscape:vp_y="0 : 1000 : 0"
        inkscape:vp_x="0 : 0.5 : 1"
        sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective6109"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective6109-3"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective6109-6"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective6156"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective6183"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -103,8 +138,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.98994949"
-     inkscape:cx="389.41508"
-     inkscape:cy="826.8681"
+     inkscape:cx="185.59777"
+     inkscape:cy="217.2742"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -121,14 +156,15 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
   <g
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
-     id="layer1">
+     id="layer1"
+     transform="translate(-23,-1.2588411)">
     <text
        xml:space="preserve"
        style="font-size:14px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
@@ -300,5 +336,134 @@
        style="fill:none;stroke:#000000;stroke-width:0.91397804px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 350.3231,1.7158301 249.35379,0"
        id="path3607-0-6" />
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot5530"
+       style="font-size:14px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       transform="translate(-4,4)"><flowRegion
+         id="flowRegion5532"><rect
+           id="rect5534"
+           width="64.649765"
+           height="18.182745"
+           x="272.74118"
+           y="276.56503" /></flowRegion><flowPara
+         id="flowPara5536">LSF</flowPara></flowRoot>    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 226.27417,274.54472 122.22846,0"
+       id="path5538" />
+    <text
+       xml:space="preserve"
+       style="font-size:14px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="147.48227"
+       y="335.15387"
+       id="text5540"><tspan
+         sodipodi:role="line"
+         id="tspan5542"
+         x="147.48227"
+         y="335.15387">Network Devices API</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:14px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="235.36554"
+       y="199.79343"
+       id="text5544"><tspan
+         sodipodi:role="line"
+         x="235.36554"
+         y="199.79343"
+         id="tspan5550">Packet_MMAP</tspan><tspan
+         sodipodi:role="line"
+         x="235.36554"
+         y="217.29343"
+         id="tspan5556" /></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 100.5,85.646194 494.97475,1.010152"
+       id="path5561" />
+    <rect
+       style="fill-opacity:0.05882353;stroke:#ffffff;stroke-width:1.26988089;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect5563"
+       width="501.11578"
+       height="30.384697"
+       x="98.954887"
+       y="52.271099" />
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot6075"
+       style="font-size:14px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       transform="translate(50,4)"><flowRegion
+         id="flowRegion6077"><rect
+           id="rect6079"
+           width="249.50768"
+           height="28.284271"
+           x="223.24371"
+           y="54.331467" /></flowRegion><flowPara
+         id="flowPara6081">Socket abstraction</flowPara></flowRoot>    <text
+       xml:space="preserve"
+       style="font-size:14px;font-style:normal;font-weight:normal;text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="160.14725"
+       y="111.82894"
+       id="text6083"><tspan
+         sodipodi:role="line"
+         id="tspan6085"
+         x="160.14725"
+         y="111.82894">INET sock</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:14px;font-style:normal;font-weight:normal;text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="287.23383"
+       y="108.03803"
+       id="text6083-6"><tspan
+         sodipodi:role="line"
+         id="tspan6085-9"
+         x="287.23383"
+         y="108.03803">packet sock</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:14px;font-style:normal;font-weight:normal;text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="412.89883"
+       y="112.87564"
+       id="text6083-4"><tspan
+         sodipodi:role="line"
+         id="tspan6085-8"
+         x="412.89883"
+         y="112.87564">netlink sock</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:14px;font-style:normal;font-weight:normal;text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="532.95972"
+       y="113.46448"
+       id="text6083-61"><tspan
+         sodipodi:role="line"
+         id="tspan6085-85"
+         x="532.95972"
+         y="113.46448">unix sock</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:14px;font-style:normal;font-weight:normal;text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="410.52371"
+       y="190.87053"
+       id="text6083-4-8"><tspan
+         sodipodi:role="line"
+         id="tspan6085-8-7"
+         x="410.52371"
+         y="190.87053">netlink</tspan><tspan
+         sodipodi:role="line"
+         x="410.52371"
+         y="208.37053"
+         id="tspan6173">implementation</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:14px;font-style:normal;font-weight:normal;text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="539.36334"
+       y="205.00726"
+       id="text6083-4-8-4"><tspan
+         sodipodi:role="line"
+         id="tspan6085-8-7-2"
+         x="539.36334"
+         y="205.00726">unix sock</tspan><tspan
+         sodipodi:role="line"
+         x="539.36334"
+         y="222.50726"
+         id="tspan6173-8">implementation</tspan></text>
   </g>
 </svg>

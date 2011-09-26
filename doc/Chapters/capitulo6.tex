@@ -44,7 +44,7 @@
 Antes de se utilizar um novo sistema, é conveniente proceder-se a testes alargados de verificação, para que se tome conhecimento do seu correcto funcionamento e das sobrecargas introduzidas que de modo a este possa ser utilizada como uma mais–valia. 
 O sistema implementado (\textit{MRoP}) foi avaliado funcionalmente através da utilização de comandos específicos para a transferência de dados, baseados nos protocolos \textit{ftp}, \textit{http} e da aplicação \textit{iperf}.
 Para esse efeito recorreu-se a um conjunto alargado de testes, tendo como principal objectivo verificar o correcto funcionamento da aplicação, a capacidade de capturar todos os pacotes envolvidos nas comunicações do processo alvo (e apenas estes), bem como o seu desempenho e a sobrecarga introduzida.
-A verificação da captura dos pacotes envolvidos nas comunicações do processo alvo foi realizada, recorrendo à ferramenta \textit{WireShark}(processo esse, descrito na secção \ref{sec:eval_functional}).
+A verificação da captura dos pacotes envolvidos nas comunicações do processo alvo foi realizada, recorrendo à ferramenta \textit{WireShark} (processo esse, descrito na secção \ref{sec:eval_functional}).
 Tendo em vista a realização de testes que avaliam o desempenho da aplicação, foram utilizadas duas máquinas, conectadas directamente, conforme o descrito  na secção \ref{sec:eval_performance}.
 Por fim abordar-se-à, detalhadamente, o desempenho efectivo da aplicação.
 
@@ -137,7 +137,7 @@ IPerf - 1GB UDP 2 conexões$^{6}$ & 0.0752 & 0.0802   \\
 \label{fig:tests_overhead}
 \end{figure}
 
-Os testes identificados com os números de 1 a 4 foram efectuados utilizando apenas uma conexão ao servidor, enquanto os testes 5 e 6 utilizaram mais uma comunicação, de modo a aumentar o peso sobre o processador e o número de pacotes a circular entre as máquinas.
+Os primeiros 4 testes foram efectuados utilizando apenas uma conexão ao servidor, enquanto o 5º e o 6º teste utilizaram mais uma comunicação, de modo a aumentar o peso sobre o processador e o número de pacotes a circular entre as máquinas.
 Desta forma, foi possível identificar a sobrecarga exercida enquando o \textit{tcpdump} executava e capturava todos os pacotes ou apenas um subconjunto destes, ou seja, os pacotes relativos aos processos alvo no novo sistema.
 A coluna "Original" corresponde aos valores resultantes dos tempos médios das execuções das transferências na ausência de monitorização.
 A coluna "Com \textit{TcpDump}" apresenta a média dos tempos de transferência com a captura total do tráfego utilizando a \textit{LibPCap}/\textit{LSF} original, enquanto que a coluna identificada com "Com \textit{TcpDump} e \textit{MRoP}" regista a média dos tempos para a transferência com captura pelo tcpdump e o módulo \textit{MRoP} desenvolvido no núcleo, de forma a capturar, apenas, o tráfego da transferência do processo alvo.

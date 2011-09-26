@@ -127,7 +127,7 @@ A utilização dos sistemas de monitorização ao nível do núcleo, permitem ef
 Ao efectuar a monitorização no núcleo, a sobrecarga imposta ao sistema é menor que em nível utilizador, por ser possível recolher apenas as informações relevantes, evitando filtrar os elementos não relevantes, para análise.
 
 Neste documento constam apenas mecanismos e ferramentas de monitorização dinâmicas, pois apenas estas são as desejadas para a criação de uma componente de monitorização de rede orientada ao processo.
-De entre as ferramentas de monitorização dinâmica analisadas é possível agrupa-las em duas categorias: eventos pré-definidos e instrumentação dinâmica.
+De entre as ferramentas de monitorização dinâmica analisadas é possível agrupá-las em duas categorias: eventos pré-definidos e instrumentação dinâmica.
 Na categoria instrumentação dinâmica existem dois sistemas mais relevantes: o \textit{KProbes} e o \textit{Linux Kernel Stace Tracer}, enquanto que para os eventos pré-definidos foram verificados o \textit{Linux Trace Toolkit} e o \textit{OProfile}.
 Estes quatro sistemas são apresentados em seguida considerando as suas categorias:
 
@@ -136,7 +136,7 @@ Estes quatro sistemas são apresentados em seguida considerando as suas categori
 Nesta categoria encaixam-se duas ferramentas o \textit{Linux Trace ToolKit} e o \textit{OProfile}.
 Em cada uma destas ferramentas a monitorização é efectuada sobre pontos previamente definidos, não permitindo a adição de novos pontos de monitorização.
 Cada um destas ferramentas analisa todo o sistema, sendo a filtragem extra dos eventos efectuada em nível utilizador.
-\todo{ver}
+%\todo{ver}
 Como os eventos detectados através destas ferramentas geram um mapa de execução, a utilização de apenas alguns eventos pré-definidos não é limitativa de uma ferramenta.
 
 \subsubsection{Linux Trace ToolKit}\label{cap:linux_trace_toolkit_overview}
@@ -224,7 +224,7 @@ O \textit{DProbes} utiliza o \textit{KProbes} como suporte para efectuar a instr
 Como a criação de pontos de análise é escrito em linguagem C ou \textit{assembly}, foi desenvolvida uma linguagem de mais alto nível de forma a simplificar a utilização desta aplicação.
 
 Após os dados terem sido obtidos, estes podem ser transferidos para um ficheiro, para o \textit{daemon logging} do núcleo de sistema, ou para uma porta série.
-Existe igualmente a opção de interoperabilidade com o \textit{Linux Trace Toolkit}\cite{:DProbes}.
+Existe igualmente a opção de interoperabilidade com o \textit{Linux Trace Toolkit}\cite{DProbes}.
 
 %\subsubsection{SystemTap}\label{cap:Systemtap_overview}
 
@@ -360,7 +360,7 @@ O sistema de instrumentação do núcleo de sistema \textit{Linux}, \textit{KPro
 \paragraph*{RelayFs - }\label{cap:RelayFs_overview}
 
 Este sistema de ficheiros virtual foi desenvolvido tendo em mente a transferência de grandes quantidades de dados entre o núcleo de sistema e o espaço de utilizador.
-O \textit{RelayFs} responde a esta exigência, fazendo uso de novas primitivas onde são mais reduzidas as zonas de controlo de concorrência\cite{Donovan2007}.
+O \textit{RelayFs} responde a esta exigência, fazendo uso de novas primitivas onde são mais reduzidas as zonas de controlo de concorrência\cite{Donovan2007,To03relayfs:an}.
 
 \paragraph*{NetLink - }\label{cap:NetLink_overview}
 O \textit{NetLink} utiliza uma método de comunicação baseado em \textit{sockets}, para estabelecer a comunicação entre o núcleo de sistema e os processos, em nível utilizador. 
@@ -398,12 +398,12 @@ NetLink & Sem & Elevado \\
 
 \paragraph*{}
 Como se pode verificar através da tabela \ref{tab:transf_compare}, que compara a estruturação dos dados de cada Sistema, com o volume de dados que é possível transferir, o \textit{RelayFs} e o \textit{NetLink} são os dois sistemas de comunicação, que não tendo estruturação fixa dos dados, conseguem transferir um volume superior de dados, comparativamente com os restantes, objecto da análise.
-Se limitarmos a análise comparativa aos sistemas \textit{RelayFs} e \textit{NetLink}, constatamos que o volume de dados que é possível transferir pelo primeiro é superior ao verificado no \textit{NetLink}.
+%Se limitarmos a análise comparativa aos sistemas \textit{RelayFs} e \textit{NetLink}, constatamos que o volume de dados que é possível transferir pelo primeiro é superior ao verificado no \textit{NetLink}.
 
 \section{LibPcap e Linux Socket Filtering}\label{sect:LibPcap}
 
 A monitorização de rede existente em muitos dos sistemas tipo \textit{Unix} e mesmo no \textit{Windows} permite capturar os pacotes de rede logo que eles chegam ao controlador de rede.
-Assim a biblioteca \textit{LibPcap}\cite{:LibPcap} permite às ferramentas fazerem uso deste mecanismo.
+Assim a biblioteca \textit{LibPcap}\cite{LibPcap} permite às ferramentas fazerem uso deste mecanismo.
 Uma das principais características desta biblioteca, é a sua \textit{API} de alto nível para a captura de pacotes, que é igual em todas as plataformas.
 Para filtrar os pacotes indesejados a \textit{LibPcap}, utiliza filtros baseados no \textit{BPF (Berkeley Packet Filtering)}, normalmente implementados no núcleo de sistema, de modo a que a monitorização se torne mais eficiente e menos intrusiva.
 
@@ -411,13 +411,12 @@ Em seguida é apresentada a arquitectura da biblioteca \textit{Pcap} e o seu sup
 
 \subsection {Arquitectura}
 \label{sect:architecture_libpcap}
-A arquitectura do \textit{Pcap} divide-se em duas partes: a biblioteca a nível utilizador, e o módulo no núcleo de sistema composto por \textit{sockets} e filtros que são utilizados na captura.
-Como se constata na figura \ref{fig:pcap_architecture} a utilização de filtros é aplicada assim que os pacotes são recebidos.
-Este sistema de captura, evita imediatamente a captura de pacotes que não interessam e permite que aqueles que não são visíveis às aplicações, devido à \textit{firewall} do \textit{Linux}, possam ser capturados e analisados pelas ferramentas de monitorização de rede.
+A arquitectura do \textit{Pcap} divide-se em duas partes: a biblioteca a nível utilizador, e o módulo no núcleo de sistema composto por \textit{sockets} e filtros que são utilizados na captura, como se constata na figura \ref{fig:pcap_architecture}.
+Este sistema de captura, evita imediatamente a captura de pacotes irrelevantes para a captura e permite que aqueles que não são visíveis às aplicações, devido à \textit{firewall} do \textit{Linux}, possam ser capturados e analisados pelas ferramentas de monitorização de rede.
 
 \begin{figure}[htbp]
        \centering
-       \includegraphics[scale=1]{pcap_architecture3}
+       \includegraphics[scale=0.7]{tcpdump.jpg}
 %       \includegraphics[scale=0.5]{tcpdump}
        \caption{Arquitectura do LibPcap}
       \label{fig:pcap_architecture}
@@ -438,7 +437,7 @@ Após esta inicialização, o programa poderá utilizar \textit{Polling}, de for
 
 O módulo \textit{AF\_PACKET} permite activar o modo promiscuo da interface a monitorizar, ou seja permite que sejam capturados pacotes que não são destinados à máquina utilizada.
 Na versão actual do núcleo de sistema do \textit{Linux} (2.6.39), o \textit{socket} \textit{AF\_PACKET} pode utilizar um sistema de partilha de \textit{buffer} (\textit{MMAP}), com o espaço de utilizador.
-Neste caso cabe ao utilizador definir explicitamente a forma como pretende utilizar o \textit{socket}. 
+Neste caso, cabe ao utilizador definir explicitamente a forma como pretende utilizar o \textit{socket}. 
 Para atingir este objectivo o utilizador tem de pedir ao núcleo, uma região de memória, sendo esta, posteriormente indicada como argumento de configuração do \textit{socket}.
 
 Como o referido anteriormente, o \textit{AF\_PACKET}, permite a comunicação directa com o controlador da interface de rede, possibilitando capturar os diversos pacotes ainda antes destes poderem ser filtrados pela \textit{firewall}, presente no núcleo de sistema, neste caso o \textit{netfilter}.
@@ -452,7 +451,7 @@ A linguagem utilizada para a criação dos filtros é traduzida para o \textit{I
 Este \textit{Instruction Set} utiliza operadores lógicos de forma a combinar as regras definidas nos filtros, criando-se apenas um filtro a ser aplicado aos pacotes.~\cite{Mccanne92thebsd}.
 
 \subsection{Limitações e optimizações}
-De forma a medir o desempenho da \textit{LibPcap}, é frequente utilizar-se uma métrica que nos permita determinar a percentagem de pacotes que é possível capturar, sem que se verifiquem perdas.
+De modo geral, para a avaliar o desempenho da \textit{LibPcap}, é frequente utilizar-se uma métrica que nos permita determinar a percentagem de pacotes que é possível capturar, sem que se verifiquem perdas.
 Esta métrica é calculada sabendo o número de pacotes que atravessam um determinado \textit{router ou switch}, e compará-la com o número de pacotes capturados na interface.
 Uma variante desta medida de desempenho é combiná-la com o máximo número de regras que é possível aplicar, sem que se assista à perda de pacotes.
 É particularmente importante conhecer o número máximo de pacotes capturados ou regras aplicáveis aos filtros, afim de determinar a velocidade máxima expectável de captura.
@@ -483,8 +482,8 @@ Este tempo foi definido, de forma a que não se verifiquem situações de elevad
 A forma anterior de recepção de pacotes, era efectuada de modo a atender uma interrupção por cada pacote que chegava à interface de rede, gerando assim demasiada sobrecarga no sistema.
 Actualmente a arquitectura de rede, está balanceada de forma a mudar o modo de atendimento de interrupções para NAPI, caso existam demasiadas interrupções por unidade de tempo.~\cite{administrator:napi}.
 
-Utilizando esta nova \textit{API}, é possível explorar um escalonamento mais eficiente das interrupções, em situações de intensa actividade do processador.
-O \textit{NAPI} apenas pode ser aplicado nos caso em que os controladores das interfaces de rede estejam preparados para utilizar alguma forma de mitigação da interrupção, caso contrário esta \textit{API} não é aplicada.
+Utilizando esta nova \textit{API}, é possível explorar um escalonamento mais eficiente das interrupções, em situações de intensa actividade da interface de rede e do processador.
+O \textit{NAPI} apenas pode ser aplicado nos caso em que os controladores das interfaces de rede estejam preparados para utilizar alguma forma de mitigação da interrupção, caso contrário esta \textit{API} não é aplicada, resultando em interrupções por cada pacote, enviado ou recebido.
 
 A utilização desta nova \textit{API} permite diminuir o número de trocas de contexto entre o controlador da interface e o núcleo de sistema.
 Sempre que o cpu atende uma interrupção de rede, obtem um número maior de dados, que combinado com um sistema de memória partilhada aumenta substancialmente o desempenho.
@@ -503,10 +502,10 @@ Se as interfaces de rede suportarem um mecanismo de mitigação de interrupçõe
 Este é um novo módulo para o núcleo de sistema, criado com base em duas técnicas \textit{mmap} e \textit{ring\_buffers} anteriormente descritas.
 
 Este módulo difere na abordagem utilizada no \textit{Packet\_MMAP}, porquanto nesta a memória é mapeada entre a ferramenta e o controlador da interface, enquanto que no \textit{Packet\_MMAP} a memória é mapeada entre a ferramenta e um \textit{buffer} externo ao controlador da interface, mas interno ao núcleo de sistema.
-Esta abordagem permite que os dados fiquem disponíveis para a aplicação directamente, verificando-se a inexistência de cópia dos dados do \textit{buffer} do controlador, para o \textit{buffer} partilhado entre a ferramenta e o núcleo\cite{:PF_RING}.
+Esta abordagem permite que os dados fiquem disponíveis para a aplicação directamente, verificando-se a inexistência de cópia dos dados do \textit{buffer} do controlador, para o \textit{buffer} partilhado entre a ferramenta e o núcleo\cite{PFRING}.
  
 \paragraph*{PF\_RING com DNA (Direct NIC Access)}
-Baseando-se na técnica anteriormente descrita de utilizar um \textit{buffer} partilhado entre a ferramenta de monitorização e o controlador, assiste-se a uma evolução desta técnica, ao permitir que a interface de rede partilhe um \textit{buffer} com a ferramenta de monitorização, possibilitando que os pacotes passem directamente para esta.\cite{:IntroPF_RIDNADirecNICAcces}.
+Baseando-se na técnica anteriormente descrita de utilizar um \textit{buffer} partilhado entre a ferramenta de monitorização e o controlador, assiste-se a uma evolução desta técnica, ao permitir que a interface de rede partilhe um \textit{buffer} com a ferramenta de monitorização, possibilitando que os pacotes passem directamente para esta.\cite{IntroPF_RIDNADirecNICAcces}.
 Esta partilha é efectuada utilizando \textit{mmap}, \textit{ring\_buffers} e \textit{DMA}.
 Para se utilizar esta técnica é necessário que a interface de rede, permita a utilização de memória partilhada e \textit{DMA}.
 
@@ -552,7 +551,7 @@ O dinamismo das aplicações, nomeadamente das aplicações multimédia, deu ori
 Estas aplicações utilizam diversos fluxos de dados, designadamente de transmissão e de recepção.
 Em geral, as aplicações multimédia, com base na \textit{internet} utilizam uma metodologia cliente/servidor, onde o servidor aguarda pedidos do cliente num determinado porto.
 O cliente, conhecendo antecipadamente este porto, liga-se.
-A partir deste ponto, iniciam-se trocas de informações que irão originar a troca de portos dinâmicos e posteriormente o processo de transmissão/recepção de dados multimédia.
+A partir deste ponto, iniciam-se trocas de informações, que irão originar a troca de portos dinâmicos e posteriormente o processo de transmissão/recepção de dados multimédia.
 
 As aplicações multimédia assentes na \textit{internet} são apenas um exemplo de aplicações com diversos fluxos, em que as portas de comunicação entre as aplicações, são negociadas dinamicamente.
 
@@ -581,9 +580,9 @@ De forma a diminuir a latência de actualização dos filtros, foi criada uma es
 Com este novo \textit{instruction set}, e sem necessidade de verificação, foi reduzida a latência de actualização dos filtros, o que conduziu a um aumento de desempenho na utilização de filtros dinâmicos.
 
 
-\section{Conclusão}
+%\section{Conclusão}
 
-Quaisquer das soluções tem limitações e defeitos ...
+%Quaisquer das soluções tem limitações e defeitos ...
 
 
 
