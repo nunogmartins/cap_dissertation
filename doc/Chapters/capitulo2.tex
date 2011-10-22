@@ -143,17 +143,13 @@ Como os eventos detectados através destas ferramentas geram um mapa de execuç�
 
 % O Linux Trace Toolkit é uma ferramenta de ``tracing''
 % Utiliza o Klog com repositorio da informação obtida do kernel.
-O \textit{Linux Trace ToolKit} é uma ferramenta um pouco mais antiga que o \textit{KProbes}, constituída por quatro componentes: o \textit{Kernel Patch}, o \textit{Kernel Module} o \textit{Trace Daemon} e o \textit{Data Decoder}, foi substituída pelo \textit{Linux Trace Toolkit New Generation} que se apresenta em seguida.
-
 % Nesta versão a comunicação entre o kernel e aplicação em user space é efectuada utilizando o relayfs.
 % O RelayFs é um sistema de ficheiros para comunicação entre o código dentro e fora do núcleo de operação.
-
+%A utilização desta ferramenta em sistemas de tempo real é um bom indicador da sua performance.
+O \textit{Linux Trace ToolKit} é uma ferramenta constituída por quatro componentes: o \textit{Kernel Patch}, o \textit{Kernel Module} o \textit{Trace Daemon} e o \textit{Data Decoder}, foi substituída pelo \textit{Linux Trace Toolkit New Generation} que se apresenta em seguida.
 O \textit{Linux Trace Toolkit New Generation}, e permite utilizar mecanismos como o \textit{KProbes}, o \textit{Tracepoints}\cite{Mathieu2009} e \textit{Linux Kernel Markers}\cite{Mathieu2009} para efectuar as suas monitorizações.
 Os \textit{Tracepoints} e Linux \textit{Kernel Markers} fazem parte da instrumentação estática pertencente ao núcleo de sistema do \textit{Linux}.
-
 A transferência dos dados do núcleo de sistema para a aplicação, é efectuada utilizando o sistema de ficheiros virtual \textit{RelayFs}.
-
-%A utilização desta ferramenta em sistemas de tempo real é um bom indicador da sua performance.
 
 %\subparagraph{Linux Trace Toolkit Viewer - }\label{cap:lttv_overview}
 O \textit{Linux Trace Toolkit Viewer (LTTV)} é um projecto desenvolvido em paralelo com o \textit{LTT} e \textit{LTTng}, de forma a possibilitar uma análise visual dos dados recolhidos por estas aplicações.
@@ -162,10 +158,18 @@ Esta ferramenta possibilita igualmente realizar um traço de execução, uma vez
 \subsubsection{OProfile}\label{cap:Oprofile_overview}
 As ferramentas anteriormente referidas utilizam mecanismos para obter um traço de execução.
 Com o \textit{OProfile}, em vez de a cada evento utilizar uma função para obter os dados, apenas a utiliza decorridos um certo número de eventos.
-O recurso a este critério permite ao \textit{OProfile} ser menos perturbador, uma vez que nem sempre é necessário o universo dos eventos que as ferramentas de monitorização capturam, mas tão somente uma amostra.
+O recurso a este critério permite ao \textit{OProfile} ser menos perturbador, uma vez que nem sempre é necessário o universo dos eventos que as ferramentas de monitorização capturam, mas tão somente uma amostra \ref{fig:oprofile_arch}.
 Deste modo ao utilizar a amostragem, o \textit{OProfile}, beneficia de um menor grau de perturbação no sistema\cite{Will:TuninProgrOProf}.
 % ser menos perturbador do sistema.
 % it uses data sampling ... the others don't
+
+\begin{figure}[!htb]
+       \centering
+       \includegraphics[scale=0.7]{oprofile_arch.jpg}
+       \caption{Arquitectura do \textit{OProfile} \cite{Will:TuninProgrOProf}}
+	\label{fig:oprofile_arch}
+\end{figure}
+
 
 % outra abordagem 
 
