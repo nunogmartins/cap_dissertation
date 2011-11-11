@@ -54,9 +54,9 @@ Por fim abordar-se-à, detalhadamente, o desempenho efectivo da aplicação.
 
 
 A análise funcional foi efectuada recorrendo a programas simples, que desencadeavam chamadas sucessivas de criação, comunicação e remoção de \textit{sockets}, verificando-se o estado dos mesmos (relativamente aos portos e endereços), nos \textit{handlers} das funções instrumentadas no núcleo.
-Como os dados relativos aos \textit{sockets} ficavam no repositório de dados, foi possível obter também aqui a verificação, através do ficheiro criado no \textit{DebugFs}, que os dados estavam correctos e de acordo com o que a função de filtragem iria utilizar.
+Como os dados relativos aos \textit{sockets} são adicionados ao repositório de dados, foi possível obter também aqui a verificação, através do ficheiro criado no \textit{DebugFs}, que os dados estavam correctos e de acordo com o que a função de filtragem iria utilizar.
 
-No \textit{handler} os dados obtidos oriundos são os oriundos da applicação, ou seja ainda sujeitos a verificação pelo núcleo.
+No \textit{handler} os dados obtidos oriundos são oriundos da applicação, ou seja ainda sujeitos a verificação pelo núcleo.
 A funções instrumentadas foram \textit{sys\_connect}, \textit{sys\_accept}, \textit{sys\_bind}, \textit{sys\_recvfrom}, \textit{sys\_sendto} e \textit{close ...}, através da instrumentação destas funções foi possível obter todas as interacções com o exterior via rede, realizadas pelas aplicações.
 
 
@@ -227,9 +227,9 @@ Teste & Original & Com \textit{KRetProbe} & Sobrecarga por chamada\\
 \end{center}
 \end{table}
 
-Os valores de referência nos manuais do \textit{KRetProbe} são de 0.7 microsegundos\cite{KProbeKernel}, sendo que os valores obtidos foram de 0.61 microsegundos, ou seja, ligeiramente inferiores, visto que a máquina de referência apresenta frequências de \textit{cpu} inferiores à máquina onde foram realizados estes testes.
+O valor de referência obtido pelos criadores do \textit{KProbes}, referentes ao \textit{KRetProbe} é de 0.7 microsegundos\cite{KProbeKernel}, sendo que o valor médio obtido foi de 0.61 microsegundos, ou seja, ligeiramente inferior, visto que a máquina de referência apresenta uma frequência de \textit{cpu} inferior à máquina onde foram realizados estes testes.
 
-Consideram-se estes valores bastante aceitáveis e espera-se que tenham ainda pouco impacto no desempenho normal do sistema.
+Consideram-se estes valores bastante aceitáveis e espera-se que tenham ainda reduzido impacto no desempenho normal do sistema.
 Note-se ainda que esta instrumentação só é introduzida aquando do carregamento do módulo para executar a monitorização com esta nova funcionalidade.
 
 \section{Conclusão}
