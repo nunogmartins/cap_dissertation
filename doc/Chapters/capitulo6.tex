@@ -1,52 +1,12 @@
 \chapter{Avaliação}
 \label{cap:avaliacao}
 
-%Durante as fases de análise e desenvolvimento existiu sempre a preocupação de efectuar uma análise funcional e de desempenho.
-
-
-
-%\section{Ferramenta de testes e}
-%Como efectuar a monitorização
-
-%Foi desenvolvida uma aplicação para testar o desenvolvimento da ferramenta.
-%Esta aplicação 
-
-%\subsection{Test Unit}
-
-%De forma a testar o repositório de dados foram efectuados diferentes \textit{unit tests}, de forma a assegurar que todas as alterações efectuadas na ferramenta ficavam de correctas.
-
-%\subsection{Aplicação Monitora}
-%\label{sub:monitor_app}
-
-%Para poder mais facilmente efectuar os testes de avaliação, foi criado uma ferramenta em nível utilizador que permite lançar a aplicação e configurar automaticamente o sistema para a monitorizar. Esta verifica o identificador do processos e o momento em que se dá o inicio e o fim da sua execução, de forma a iniciar e terminar a monitorização quando necessário.
-
-%\subsection{Aplicação de testes de performance}
-
-%Para ajudar na avaliação da ferramenta desenvolvida foi criado um conjunto de aplicações independentes ( scripts e aplicações ) para monitorizar a actividade de algumas aplicações que se consideraram pertinentes no processo de avaliação do desempenho da ferramenta.
-
-%A aplicação desenvolvida \textit{manager} tem de ser executada sob o controlo do utilizador \textit{root}, devido à necessidade de executar processos que só este utilizador tem acesso. Estes processos anteriormente mencionados são \textit{insmod}, \textit{rmmod} e \textit{tcpdump}.
-
-%Os \textit{scripts} \textit{bash} criados serviram para obter o número de dados e pacotes transferidos na interface, bem como fazer a separação dos tempos que as aplicações de testes executaram para conseguir automatizar o processo de execução e recolha de dados dos testes.
-
-
-%\section{Temporizadores}
-
-%Temporizadores no núcleo do sistema.
-
-
-%\subsection{Temporizadores de Alta-Resolução}
-
-%\textit{HrTimer}
-
-
-%----------------------------------------------------------------------------------------------------------
-
 Antes de se utilizar um novo sistema, é conveniente proceder-se a testes alargados de verificação, para que se tome conhecimento do seu correcto funcionamento e das sobrecargas introduzidas, que de modo a este possa ser utilizado como uma mais–valia. 
 O mecanismo implementado (\textit{MRoP}) foi avaliado funcionalmente através da utilização de programas específicos para a transferência de dados, baseados nos protocolos \textit{ftp}, \textit{http} e na aplicação de análise de desempenho e largura de banda \textit{iperf}.
 Para esse efeito recorreu-se a um conjunto alargado de testes, tendo como principal objectivo verificar o correcto funcionamento da aplicação, a capacidade de capturar todos os pacotes envolvidos nas comunicações do processo alvo (e apenas estes), bem como o seu desempenho e a sobrecarga introduzida.
 A verificação da captura dos pacotes envolvidos nas comunicações do processo alvo foi realizada, recorrendo à ferramenta \textit{WireShark} (processo esse, descrito na secção \ref{sec:eval_functional}).
 Tendo em vista a realização de testes que avaliam o desempenho da aplicação, foram utilizadas duas máquinas, conectadas directamente, conforme o descrito  na secção \ref{sec:eval_performance}.
-Por fim abordar-se-à, detalhadamente, o desempenho efectivo da aplicação.
+Por fim abordar-se-à, detalhadamente, o desempenho efectivo do \textit{MRoP} através de diversos testes.
 
 
 \section{Avaliação Funcional}
@@ -56,7 +16,7 @@ Por fim abordar-se-à, detalhadamente, o desempenho efectivo da aplicação.
 A análise funcional foi efectuada recorrendo a programas simples, que desencadeavam chamadas sucessivas de criação, comunicação e remoção de \textit{sockets}, verificando-se o estado dos mesmos (relativamente aos portos e endereços), nos \textit{handlers} das funções instrumentadas no núcleo.
 Como os dados relativos aos \textit{sockets} são adicionados ao repositório de dados, foi possível obter também aqui a verificação, através do ficheiro criado no \textit{DebugFs}, que os dados estavam correctos e de acordo com o que a função de filtragem iria utilizar.
 
-No \textit{handler} os dados obtidos oriundos são oriundos da applicação, ou seja ainda sujeitos a verificação pelo núcleo.
+No \textit{handler} os dados obtidos são oriundos da applicação, ou seja ainda sujeitos a verificação pelo núcleo.
 A funções instrumentadas foram \textit{sys\_connect}, \textit{sys\_accept}, \textit{sys\_bind}, \textit{sys\_recvfrom}, \textit{sys\_sendto} e \textit{close ...}, através da instrumentação destas funções foi possível obter todas as interacções com o exterior via rede, realizadas pelas aplicações.
 
 
@@ -70,7 +30,7 @@ Através deste procedimento constatou-se que todo o tráfego, referente aos prot
 Esta validação foi ainda conseguida, por intermédio da utilização do programa \textit{WireShark}, o qual permitiu identificar os fluxos de dados referentes aos protocolos das novas aplicações alvo.
 
 
-Foram criados dois sistema simples de cliente/servidor, um utilizando canais \textit{tcp} e o canais \textit{udp}, de modo a verificar como ambos os protocolos apresentam as suas informações no núcleo.
+Foram criados dois sistema simples de cliente/servidor, um utilizando canais \textit{tcp} e o outro canais \textit{udp}, de modo a verificar como os diferentes \textit{sockets} representam os dados referentes aos portos, endereços e protocolos no núcleo.
 Os servidores esperavam conecções numa porta escolhida previamente, permitindo que os clientes efectuassem conecções para estes.
 Nos servidores e nos clientes eram apresentados os endereços de memória da estrutura de dados (\textit{struct sockaddr}), que contém as propriedades dos \textit{sockets}, tais como, porto, endereço, protocolo, etc.
 
@@ -96,7 +56,7 @@ A versão do sistema de operação utilizado, em ambas as máquinas, corresponde
 
 
 Na execução destes testes, foram efectuadas dez iterações, isto é, cada teste foi executado dez vezes, para cada experiência considerada, de modo a obter um valor médio e um desvio padrão considerado aceitável.
-os testes efectuados, em particular os primeiros, ilustram situações em que não há grande vantagem em ter o sistema o \textit{MRoP} activo, com vista a medir a sobrecarga do \textit{MRoP}.
+Os testes efectuados, em particular os primeiros, ilustram situações em que não há grande vantagem em ter o sistema o \textit{MRoP} activo, com vista a medir a sobrecarga do \textit{MRoP}.
 Os resultados obtidos constam nas tabelas \ref{tab:desempenho} e \ref{tab:overhead}:
 
 \begin{table}[!htb]
@@ -156,7 +116,7 @@ IPerf - 1GB UDP 2 conexões$^{6}$ & 0.0752 & 0.0802   \\
 \label{fig:tests_overhead}
 \end{figure}
 
-Os primeiros 4 testes foram efectuados utilizando apenas uma conexão ao servidor, enquanto o 5º e o 6º testes utilizaram mais uma comunicação, de modo a aumentar o peso sobre o processador e o número de pacotes a circular entre as máquinas.
+Os primeiros quatro testes foram efectuados utilizando apenas uma conexão ao servidor, enquanto o 5º e o 6º testes utilizaram mais uma comunicação, de modo a aumentar o peso sobre o processador e o número de pacotes a circular entre as máquinas.
 Desta forma, foi possível identificar a sobrecarga exercida enquando o \textit{tcpdump} executava e capturava todos os pacotes ou apenas um subconjunto destes, ou seja, os pacotes relativos aos processos alvo no novo sistema.
 A coluna "Original" corresponde aos valores resultantes dos tempos médios das execuções das transferências na ausência de monitorização.
 A coluna "Com \textit{TcpDump}" apresenta a média dos tempos de transferência com a captura total do tráfego utilizando a \textit{LibPCap}/\textit{LSF} original, enquanto que a coluna identificada com "Com \textit{TcpDump} e \textit{MRoP}" regista a média dos tempos para a transferência com captura pelo tcpdump e o módulo \textit{MRoP} desenvolvido no núcleo, de forma a capturar, apenas, o tráfego da transferência do processo alvo.
@@ -164,7 +124,7 @@ Nos primeiros quatro testes é possível verificar que a utilização do \textit
 É igualmente possível observar que no 1º e 3º testes, aquando da utilização do \textit{tcpdump}, a execução sem o \textit{MRoP}, mostrou-se muito ligeiramente mais rápida, como se pode verificar na tabela \ref{tab:desempenho} e \ref{tab:overhead}.
 
 
-Esta situação pode dever-se ao facto de, quando a máquina se encontra em sobrecarga, leva ao aumento do tamanho médio dos pacotes, reduzindo o seu número e o volume de dados transferidos, em virtude da diminuição dos seus cabeçalhos.
+Esta situação pode dever-se / deve-se ao facto de, quando a máquina se encontra em sobrecarga, leva ao aumento do tamanho médio dos pacotes, reduzindo o seu número e o volume de dados transferidos, em virtude da diminuição dos seus cabeçalhos.
 
 Nos testes 5º e 6º testes, como o tráfego na interface é duplicado e o \textit{tcpdump} tem que capturar todos os pacotes, é possível evidenciar a sobrecarga exercida por estas cópias de dados e consequentes transferências (para nível utilizador) face ao novo sistema onde apenas captura um fluxo de dados.
 Na tabela \ref{tab:overhead} e na figura \ref{fig:tests_overhead} é possível observar que, para o teste 5, a sobrecarga do \textit{tcpdump} atinge os 3.6\% face ao original, enquanto que a sobrecarga do \textit{tcpdump} com o \textit{MRoP}, permitiu uma ligeira melhoria face ao original (-0.0775\%).
@@ -227,7 +187,7 @@ Teste & Original & Com \textit{KRetProbe} & Sobrecarga por chamada\\
 \end{center}
 \end{table}
 
-O valor de referência obtido pelos criadores do \textit{KProbes}, referentes ao \textit{KRetProbe} é de 0.7 microsegundos\cite{KProbeKernel}, sendo que o valor médio obtido foi de 0.61 microsegundos, ou seja, ligeiramente inferior, visto que a máquina de referência apresenta uma frequência de \textit{cpu} inferior à máquina onde foram realizados estes testes.
+O valor de referência obtido pelos criadores do \textit{KProbes}, referentes ao \textit{KRetProbe} sem optimizações, é de 0.7 microsegundos\cite{KProbeKernel}, sendo que o valor médio obtido foi de 0.61 microsegundos, ou seja, ligeiramente inferior, visto que a máquina de referência apresenta uma frequência de \textit{cpu} inferior à máquina onde foram realizados estes testes.
 
 Consideram-se estes valores bastante aceitáveis e espera-se que tenham ainda reduzido impacto no desempenho normal do sistema.
 Note-se ainda que esta instrumentação só é introduzida aquando do carregamento do módulo para executar a monitorização com esta nova funcionalidade.
