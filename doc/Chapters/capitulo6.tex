@@ -138,6 +138,20 @@ Assim para esta análise, foi elaborado um teste que utiliza o sistema de alta r
 O teste consistiu em obter o tempo anterior e posterior à inserção dos 1024 elementos, representando outros tantos portos/endereços, afim de determinar o tempo decorrido.
 De igual modo, foi calculado o tempo de remoção dos referidos elementos. Os resultados obtidos estão reproduzidos na tabela \ref{tab:tree_info}.
 
+
+----------------------------------------------------------------------------------------------------------
+
+A análise de desempenho da estrutura de dados
+
+O número de elementos foi 1024, pois este valor foi obtido através da chamada ao sistema ------ que indica qual o máximo de canais que podem estar a ser utilizados por um processo.
+Como os canais podem ser ficheiros, \textit{pipes}, \textit{sockets}, etc, o valor de uma utilização real deverá ser inferior a este, por isso considerou-se o valor de 1024 como um bom indicador do número de elementos que estrutura de dados, poderá conter num dado momento, permitindo assim verificar o desempenho desta com elevada carga.
+
+A inserção de dados no repositório, não é efectuada com um desempenho constante, dado que quando é necessário efectuar um rebalanceamento da árvore, o processo de inserção é mais demorado devido à necessidade de efectuar rotações na árvore.
+
+Os testes foram efectuados de modo a obtermos valores nos piores casos.
+
+----------------------------------------------------------------------------------------------------------
+ 
 \begin{table}[!htb]
 \begin{center}
 \caption{Custo das operações (tempos em nanosegundos)}
@@ -158,7 +172,7 @@ Remoção de 1024 elementos & 675 086 & 659.2637\\
 \end{table}
 
 Como se pode verificar, pela tabela \ref{tab:tree_info}, a inserção de um elemento na árvore é inferior a 1 microsegundo, possivelmente demonstrando que a estrutura utilizada foi a correcta.
-Para além de estabelecer um bom compromisso de desempenho e utilização de memória, a sua disponibilidade de utilização no núcleo do sistema, possibilitou obter ter um elevado grau de confiança na sua utilização.
+Para além de estabelecer um bom compromisso de desempenho e utilização de memória, a sua disponibilidade de utilização no núcleo do sistema, possibilitou ter um elevado grau de confiança na sua utilização.
 O tempo médio despendido na procura do elemento com o menor valor de chave, nos 1024 elementos adicionados, foi de 1327 nanosegundos.
 Com este valor é possível verificar que para efectuar 10 iterações de procura na árvore, incorre-se numa penalização de 1.3 microsegundos.
 Verifica-se assim, que o tempo médio de procura de elementos na estrutura, é menor ou igual a 1.3 microsegundos.
