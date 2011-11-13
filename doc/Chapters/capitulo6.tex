@@ -43,6 +43,16 @@ Foram também efectuados testes para verificar que apesar de um processos estar 
 Terminado esta primeira análise eram verificados se todos os canais de rede, relativamente aos protocolos \textit{tcp} e \textit{udp} estavam com as informações correctas e em igual número ao que era reportado através do programa \textit{netstat}, respectivamente ao processo.
 
 
+----------------------------------------------------------------------------------------------------------
+
+Para além dos testes à correcção de que todos os dados oriundos do processo monitorizado, bem como do administrador estão correctos, foram também efectuados testes à correcção dos fluxos de rede e de que todo o conteúdo destes estava correcto e completo.
+
+O \textit{MRoP} é um mecanismo que executa no núcleo \textit{Linux} e que necessita de obter dados do administrador e do processo a ser monitorizado.
+Foi necessário avaliar diversos parâmetros de modo a garantir que todas as componentes obtinham os seus parâmetros correctamente, tanto em nível utilizador, como no núcleo.
+
+----------------------------------------------------------------------------------------------------------
+
+
 \section{Avaliação do desempenho}
 \label{sec:eval_performance}
 
