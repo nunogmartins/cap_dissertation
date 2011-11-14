@@ -1,22 +1,17 @@
 \chapter{Avaliação}
 \label{cap:avaliacao}
 
-Antes de se utilizar um novo sistema, é conveniente proceder-se a testes alargados de verificação, para que se tome conhecimento do seu correcto funcionamento e das sobrecargas introduzidas, que de modo a este possa ser utilizado como uma mais–valia. 
-O mecanismo implementado (\textit{MRoP}) foi avaliado funcionalmente através de diversos testes em relação aos dados de entrada nos componentes, oriundos do processo a monitorizar, do administrador e das estruturas de dados dos \textit{sockets} no núcleo, bem como dos diferentes fluxos de rede do processo a monitorizar.
+Antes de se utilizar um novo sistema, é conveniente proceder-se a testes alargados de verificação, para que se tome conhecimento do seu correcto funcionamento e das sobrecargas introduzidas, que de modo a este possa ser utilizado como uma mais–valia.
+O mecanismo implementado (\textit{MRoP}) foi avaliado funcionalmente através de diversos testes relativamente aos dados de entrada nos diversos componentes que o constituem.
+Como existem diversas fontes de dados, administrador para controlar a monitorização, o processo a ser monitorizado, estruturas de dados do núcleo, etc, foram criados vários testes de modo a que todas estas fontes de dados sejam analisadas.
+Para além destas fontes directas de dados foi também testado a correcção de que todos os fluxos de dados obtidos através da monitorização, são exclusivos ao processo alvo.
+Assim todas estes testes e avaliações foram executados com sucesso e serão apresentados na secção \ref{sec:eval_functional}.
 
-Todos estes testes servem para garantir que todos os componentes do \textit{MRoP} apenas funcionam com os dados correctos e que não existem falhas, uma vez que o núcleo é uma parte muito sensível do sistema do ponte de vista de segurança e um qualquer dado erradamente validado, pode comprometer a segurança e a disponobilidade do sistema.
+Como o \textit{MRoP} não deve apenas estar correcto, mas um dos principais objectivos desta dissertação era criar um mecanismo com melhor desempenho que os anteriores, apresentados na secção \ref{sect:outras_abordagens}.
+Assim para verificar se este objectivo foi atingido, existiu a necessidade de efectuar testes de desempenho sobre \textit{MRoP}.
+Os testes de desempenho estão apresentados na secção \ref{sec:eval_performance}, incidindo sobre o desempenho global na transferência de 1GB de dados, através de protocolos conhecidos, bem como através de testes de desempenho que visam o mecanismo de instrumentação e a estrutura de dados escolhida para manter o estado do processo alvo.
 
-Para este tipo de mecanismo não encontrei literatura relevante para a criação de testes de validação, desta forma todos os testes efectuados foram desenvolvidos de modo a testar particularidades do \textit{MRoP}, de modo a ter a certeza que está a funcionar correctamente.
-
-
-da utilização de programas específicos para a transferência de dados, baseados nos protocolos \textit{ftp}, \textit{http} e na aplicação de análise de desempenho e largura de banda \textit{iperf}.
-Para esse efeito recorreu-se a um conjunto alargado de testes, tendo como principal objectivo verificar o correcto funcionamento da aplicação, a capacidade de capturar todos os pacotes envolvidos nas comunicações do processo alvo (e apenas estes), bem como o seu desempenho e a sobrecarga introduzida.
-A verificação da captura dos pacotes envolvidos nas comunicações do processo alvo foi realizada, recorrendo à ferramenta \textit{WireShark} (processo esse, descrito na secção \ref{sec:eval_functional}).
-Tendo em vista a realização de testes que avaliam o desempenho da aplicação, foram utilizadas duas máquinas, conectadas directamente, conforme o descrito  na secção \ref{sec:eval_performance}.
-Por fim abordar-se-à, detalhadamente, o desempenho efectivo do \textit{MRoP} através de diversos testes.
-
-
-Na secção \ref{sec:eval_functional} serão apresentados os testes funcionais efectuados, tanto a nível de validação dos dados de entrada, nos diversos componentes, como de detecção e correcção de que todos os fluxos de rede do processo monitorizado são de facto obtidos.
+Por último serão apresentadas algumas conclusões sobre as análises efectuadas ao \textit{MRoP} na secção \ref{sec:five_chap_conclusion}.
 
 \section{Avaliação Funcional}
 \label{sec:eval_functional}
@@ -90,7 +85,7 @@ Ambas as máquinas, que se optou por designar de máquina 1 e máquina 2, proced
 As máquinas anteriormente descritas encontravam-se conectadas directamente, por interfaces de rede a 100 MBit/s, ficando uma das máquinas responsável pela execução dos servidores \textit{ftp}, \textit{http} e \textit{iperf}, e a outra pelos respectivos clientes.
 A versão do sistema de operação utilizado, em ambas as máquinas, correspondeu ao 2.6.39, sendo que na máquina 1 foram introduzidas as modificações, para incluir o \textit{hook} do \textit{MRoP} e as suas funções auxiliares, enquanto na máquina 2 se executou o sistema original.
 
-\subsection{Desempenho do MRoP}
+\subsection{Desempenho do \textit{MRoP}}
 
 
 Na execução destes testes, foram efectuadas dez iterações, isto é, cada teste foi executado dez vezes, para cada experiência considerada, de modo a obter um valor médio e um desvio padrão considerado aceitável.
@@ -253,7 +248,7 @@ Consideram-se estes valores bastante aceitáveis e espera-se que tenham ainda re
 Note-se ainda que esta instrumentação só é introduzida aquando do carregamento do módulo para executar a monitorização com esta nova funcionalidade.
 
 \section{Conclusão}
-
+\label{sec:five_chap_conclusion}
 
 Com os testes efectuados ao nível funcional e ao nível de desempenho ao \textit{MRoP} verificou-se que este mecanismo oferece um desempenho aceitável nas condições mais adversas, o que indica que para as condições das aplicações reais o seu desempenho será superior, enquanto que a sobrecarga introduzida no sistema poderá ser inferior ao constatado.
 
