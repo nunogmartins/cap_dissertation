@@ -16,6 +16,16 @@ Por último serão apresentadas algumas conclusões sobre as análises efectuada
 \section{Avaliação Funcional}
 \label{sec:eval_functional}
 
+A análise funcional ao \textit{MRoP} teve várias vertentes, uma vez que este mecanismo recebe dados de diferentes fontes, assim os testes visaram a verificação dos dados indicados pelo administrador, pelo processo alvo, e os das estruturas do núcleo.
+Foi necessário garantir que não existiam falhas nos mecanismo de entrada de dados ao \textit{MRoP}, porque uma vez que este está a executar no núcleo tem acesso a todo o sistema, assim qualquer problema na validação de dados poderia comprometer o sistema a nível de segurança como a nível de disponibilidade.
+
+
+
+\subsection{Teste funcionais}
+
+
+começando por verificar que os dados fornecidos pelo administrador estavam correctos
+
 
 A análise funcional foi efectuada recorrendo a programas simples, que desencadeavam chamadas sucessivas de criação, comunicação e remoção de \textit{sockets}, verificando-se o estado dos mesmos (relativamente aos portos e endereços), nos \textit{handlers} das funções instrumentadas no núcleo.
 Como os dados relativos aos \textit{sockets} são adicionados ao repositório de dados, foi possível obter também aqui a verificação, através do ficheiro criado no \textit{DebugFs}, que os dados estavam correctos e de acordo com o que a função de filtragem iria utilizar.
@@ -28,41 +38,12 @@ O ficheiro responsável destes dados, contém toda a informação relativa aos p
 Deste modo, efectua a comparação dos dados produzidos e valida esta análise utilizando, para além de comportar com o próprio programa, foi a ferramenta (\textit{netstat}), que indicou os portos e endereços utilizados pelos processos no sistema.
 A ferramenta anteriormente referida, utiliza o sistema de ficheiros virtual \textit{ProcFs}, para obter os dados relativos aos portos e endereços utilizados,  de modo a estabelecer uma análise comparativa com os dados produzidos pelo \textit{MRoP}.
 
+\subsection{Avaliação de monitorização de rede}
+
 Para além desta verificação, foi efectuada a confirmação de que todos os pacotes pertencentes às comunicações foram, de facto, correctamente capturadas.
 Para tal, recorreu-se à captura de pacotes, por intermédio do \textit{TcpDump} com o módulo \textit{MRoP} activo.
 Através deste procedimento constatou-se que todo o tráfego, referente aos protocolos (\textit{ftp} e \textit{http}), estava de facto completo e correcto, desde a abertura ao fecho das conexões, não existindo pacotes pertencentes a outros processos na captura.
 Esta validação foi ainda conseguida, por intermédio da utilização do programa \textit{WireShark}, o qual permitiu identificar os fluxos de dados referentes aos protocolos do processo alvo.
-
-
-Foram criados dois sistema simples de cliente/servidor, um utilizando canais \textit{tcp} e o outro canais \textit{udp}, de modo a verificar como os diferentes \textit{sockets} representam os dados referentes aos portos, endereços e protocolos no núcleo.
-Os servidores esperavam conecções numa porta escolhida previamente, permitindo que os clientes efectuassem conecções para estes.
-Nos servidores e nos clientes eram apresentados os endereços de memória da estrutura de dados (\textit{struct sockaddr}), que contém as propriedades dos \textit{sockets}, tais como, porto, endereço, protocolo, etc.
-
-A utilização de \textit{KRetProbes} permitiu que se garantisse a correcção dos dados, uma vez que se os dados não estivessem de acordo com o esperado, o núcleo através do valor de retorno indicaria que existia algum problema.
-Estas situações estão contempladas dado que na função de \textit{handler} de retorno, um dos primeiros dados a verificar é o valor de retorno indicado pela função instrumentada, caso este valor seja de erro, todas as alterações previamente introduzidas no repositório serão removidas, deixando assim o repositório consistente com o núcleo.
-
-Foram também efectuados testes para verificar que apesar de um processos estar em execução, quando se indicava ao \textit{MRoP} qual o processo a monitorizar, este analisava todos os canais pertencentes ao processo, procedendo em seguida à inserção dos portos, endereços e protocolos, no repositório.
-Terminado esta primeira análise eram verificados se todos os canais de rede, relativamente aos protocolos \textit{tcp} e \textit{udp} estavam com as informações correctas e em igual número ao que era reportado através do programa \textit{netstat}, respectivamente ao processo.
-
-
-----------------------------------------------------------------------------------------------------------
-
-Para além dos testes à correcção de que todos os dados oriundos do processo monitorizado, bem como do administrador estão correctos, foram também efectuados testes à correcção dos fluxos de rede e de que todo o conteúdo destes estava correcto e completo.
-
-O \textit{MRoP} é um mecanismo que executa no núcleo \textit{Linux} e que necessita de obter dados do administrador e do processo a ser monitorizado.
-Foi necessário avaliar diversos parâmetros de modo a garantir que todas as componentes obtinham os seus parâmetros correctamente, tanto em nível utilizador, como no núcleo.
-
-Diversas análises foram efectuadas de modo a garantir que não existem falhas na obtenção dos dados oriundos do processo, ou do núcleo.
-
-Os dados pertencentes às estruturas dos \textit{sockets} no núcleo, assumem-se correctas.
-
-A função de \textit{pre-handler} da instrumentação da chamada ao sistema \textit{connect}, tem a particularidade de utilizar os valores indicados nas estruturas do processo monitorizado para incluir no repositório.
-Após a função \textit{connect} terminar é verificado o valor de retorno e caso este indique que não existiram problemas os dados anteriormente inseridos no repositório são retirados e adicionados os novos dados referentes ao porto e endereço local utilizado para estabelecer esta conexão.
-Caso o valor de retorno indique que existiram problemas apenas são retirados os dados adicionados ao repositório no \textit{pre-handler} e nada mais é adicionado ao repositório nesta função.
-Assim através das validações efectuadas pelas restantes funções do núcleo respeitante às conexões de rede, é possível garantir o correcto estado do repositório.
-
-
-Os testes no núcleo utilizaram a função \textit{printk} para mostrar as informações necessárias no registo do núcleo, que pode ser acedido em nível utilizador através do programa \textit{dmesg} ou directamente do ficheiro \textit{messages} no directório $\backslash$ \textit{var} $\backslash$ \textit{log}.
 
 Após a monitorização de rede, foi possível recuperar o ficheiro que foi transmitido via rede utilizando o \textit{Wireshark}
 
@@ -73,7 +54,29 @@ Seguidamente procedeu-se à utilização de funções de sintese \textit{md5} e 
 
 
 
-----------------------------------------------------------------------------------------------------------
+
+\subsection{Obtenção do estado dos canais do processo alvo}
+
+Foram também efectuados testes para verificar que apesar de um processos estar em execução, quando se indicava ao \textit{MRoP} qual o processo a monitorizar, este analisava todos os canais pertencentes ao processo, procedendo em seguida à inserção dos portos, endereços e protocolos, no repositório.
+Terminado esta primeira análise eram verificados se todos os canais de rede, relativamente aos protocolos \textit{tcp} e \textit{udp} estavam com as informações correctas e em igual número ao que era reportado através do programa \textit{netstat}, respectivamente ao processo alvo.
+
+Os dados pertencentes às estruturas dos \textit{sockets} no núcleo, assumem-se correctas.
+
+A função de \textit{pre-handler} da instrumentação da chamada ao sistema \textit{connect}, tem a particularidade de utilizar os valores indicados nas estruturas do processo monitorizado para incluir no repositório.
+Após a função \textit{connect} terminar é verificado o valor de retorno e caso este indique que não existiram problemas os dados anteriormente inseridos no repositório são retirados e adicionados os novos dados referentes ao porto e endereço local utilizado para estabelecer esta conexão.
+Caso o valor de retorno indique que existiram problemas apenas são retirados os dados adicionados ao repositório no \textit{pre-handler} e nada mais é adicionado ao repositório nesta função.
+Assim através das validações efectuadas pelas restantes funções do núcleo respeitante às conexões de rede, é possível garantir o correcto estado do repositório.
+
+\subsection{Avaliação das estruturas dos \textit{sockets} no núcleo}
+
+Os testes no núcleo utilizaram a função \textit{printk} para mostrar as informações necessárias no registo do núcleo, que pode ser acedido em nível utilizador através do programa \textit{dmesg} ou directamente do ficheiro \textit{messages} no directório $\backslash$\textit{var}$\backslash$\textit{log}.
+
+Foram criados dois sistema simples de cliente/servidor, um utilizando canais \textit{tcp} e o outro canais \textit{udp}, de modo a verificar como os diferentes \textit{sockets} representam os dados referentes aos portos, endereços e protocolos no núcleo.
+Os servidores esperavam conecções numa porta escolhida previamente, permitindo que os clientes efectuassem conecções para estes.
+Nos servidores e nos clientes eram apresentados os endereços de memória da estrutura de dados (\textit{struct sockaddr}), que contém as propriedades dos \textit{sockets}, tais como, porto, endereço, protocolo, etc.
+
+A utilização de \textit{KRetProbes} permitiu que se garantisse a correcção dos dados, uma vez que se os dados não estivessem de acordo com o esperado, o núcleo através do valor de retorno indicaria que existia algum problema.
+Estas situações estão contempladas dado que na função de \textit{handler} de retorno, um dos primeiros dados a verificar é o valor de retorno indicado pela função instrumentada, caso este valor seja de erro, todas as alterações previamente introduzidas no repositório serão removidas, deixando assim o repositório consistente com o núcleo.
 
 
 \section{Avaliação do desempenho}
