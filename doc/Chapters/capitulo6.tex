@@ -37,8 +37,6 @@ Nos servidores e nos clientes eram apresentados os endereços de memória da est
 A utilização de \textit{KRetProbes} permitiu que se garantisse a correcção dos dados, uma vez que se os dados não estivessem de acordo com o esperado, o núcleo através do valor de retorno indicaria que existia algum problema.
 Estas situações estão contempladas dado que na função de \textit{handler} de retorno, um dos primeiros dados a verificar é o valor de retorno indicado pela função instrumentada, caso este valor seja de erro, todas as alterações previamente introduzidas no repositório serão removidas, deixando assim o repositório consistente com o núcleo.
 
-Após a monitorização de rede, foi possível recuperar o ficheiro que foi transmitido via rede utilizando o \textit{Wireshark}
-
 Foram também efectuados testes para verificar que apesar de um processos estar em execução, quando se indicava ao \textit{MRoP} qual o processo a monitorizar, este analisava todos os canais pertencentes ao processo, procedendo em seguida à inserção dos portos, endereços e protocolos, no repositório.
 Terminado esta primeira análise eram verificados se todos os canais de rede, relativamente aos protocolos \textit{tcp} e \textit{udp} estavam com as informações correctas e em igual número ao que era reportado através do programa \textit{netstat}, respectivamente ao processo.
 
@@ -49,6 +47,14 @@ Para além dos testes à correcção de que todos os dados oriundos do processo 
 
 O \textit{MRoP} é um mecanismo que executa no núcleo \textit{Linux} e que necessita de obter dados do administrador e do processo a ser monitorizado.
 Foi necessário avaliar diversos parâmetros de modo a garantir que todas as componentes obtinham os seus parâmetros correctamente, tanto em nível utilizador, como no núcleo.
+
+
+Após a monitorização de rede, foi possível recuperar o ficheiro que foi transmitido via rede utilizando o \textit{Wireshark}
+
+
+Após verificar que apenas os pacotes pertencentes à transferência e que mais nenhum pacote existia no ficheiro resultante da monitorização, utilizou-se a funcionalidade de guardar os dados expostos à aplicação de modo a reconstruir o ficheiro e guardá-lo em disco.
+Seguidamente procedeu-se à utilização de funções de sintese \textit{md5} e \textit{sha1}, sobre o ficheiro original, sobre o ficheiro obtido através da transferência por \textit{ftp} e ao ficheiro obtido da reconstrução do fluxo, sendo que todos os valores das funções de sintese foram iguais demonstrando que, a transferência por \textit{ftp} estava correcta e que foram capturados todos os pacotes da transferência e de modo correcto.
+
 
 ----------------------------------------------------------------------------------------------------------
 
@@ -218,4 +224,8 @@ Note-se ainda que esta instrumentação só é introduzida aquando do carregamen
 
 \section{Conclusão}
 
+
+Com os testes efectuados ao nível funcional e ao nível de desempenho ao \textit{MRoP} verificou-se que este mecanismo oferece um desempenho aceitável nas condições mais adversas, o que indica que para as condições das aplicações reais o seu desempenho será superior, enquanto que a sobrecarga introduzida no sistema poderá ser inferior ao constatado.
+
+Como se pode verificar em relação ao trabalho \cite{}, a sobrecarga gerada pelo \textit{MRoP} foi muito inferior, o que demonstra que apesar da dificuldade de trabalhar no núcleo, evitar situações de análise em nível utilizador foi largamente compensado pelo trabalho efectuado no núcleo.
 
