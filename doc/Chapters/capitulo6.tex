@@ -2,12 +2,21 @@
 \label{cap:avaliacao}
 
 Antes de se utilizar um novo sistema, é conveniente proceder-se a testes alargados de verificação, para que se tome conhecimento do seu correcto funcionamento e das sobrecargas introduzidas, que de modo a este possa ser utilizado como uma mais–valia. 
-O mecanismo implementado (\textit{MRoP}) foi avaliado funcionalmente através da utilização de programas específicos para a transferência de dados, baseados nos protocolos \textit{ftp}, \textit{http} e na aplicação de análise de desempenho e largura de banda \textit{iperf}.
+O mecanismo implementado (\textit{MRoP}) foi avaliado funcionalmente através de diversos testes em relação aos dados de entrada nos componentes, oriundos do processo a monitorizar, do administrador e das estruturas de dados dos \textit{sockets} no núcleo, bem como dos diferentes fluxos de rede do processo a monitorizar.
+
+Todos estes testes servem para garantir que todos os componentes do \textit{MRoP} apenas funcionam com os dados correctos e que não existem falhas, uma vez que o núcleo é uma parte muito sensível do sistema do ponte de vista de segurança e um qualquer dado erradamente validado, pode comprometer a segurança e a disponobilidade do sistema.
+
+Para este tipo de mecanismo não encontrei literatura relevante para a criação de testes de validação, desta forma todos os testes efectuados foram desenvolvidos de modo a testar particularidades do \textit{MRoP}, de modo a ter a certeza que está a funcionar correctamente.
+
+
+da utilização de programas específicos para a transferência de dados, baseados nos protocolos \textit{ftp}, \textit{http} e na aplicação de análise de desempenho e largura de banda \textit{iperf}.
 Para esse efeito recorreu-se a um conjunto alargado de testes, tendo como principal objectivo verificar o correcto funcionamento da aplicação, a capacidade de capturar todos os pacotes envolvidos nas comunicações do processo alvo (e apenas estes), bem como o seu desempenho e a sobrecarga introduzida.
 A verificação da captura dos pacotes envolvidos nas comunicações do processo alvo foi realizada, recorrendo à ferramenta \textit{WireShark} (processo esse, descrito na secção \ref{sec:eval_functional}).
 Tendo em vista a realização de testes que avaliam o desempenho da aplicação, foram utilizadas duas máquinas, conectadas directamente, conforme o descrito  na secção \ref{sec:eval_performance}.
 Por fim abordar-se-à, detalhadamente, o desempenho efectivo do \textit{MRoP} através de diversos testes.
 
+
+Na secção \ref{sec:eval_functional} serão apresentados os testes funcionais efectuados, tanto a nível de validação dos dados de entrada, nos diversos componentes, como de detecção e correcção de que todos os fluxos de rede do processo monitorizado são de facto obtidos.
 
 \section{Avaliação Funcional}
 \label{sec:eval_functional}
@@ -27,7 +36,7 @@ A ferramenta anteriormente referida, utiliza o sistema de ficheiros virtual \tex
 Para além desta verificação, foi efectuada a confirmação de que todos os pacotes pertencentes às comunicações foram, de facto, correctamente capturadas.
 Para tal, recorreu-se à captura de pacotes, por intermédio do \textit{TcpDump} com o módulo \textit{MRoP} activo.
 Através deste procedimento constatou-se que todo o tráfego, referente aos protocolos (\textit{ftp} e \textit{http}), estava de facto completo e correcto, desde a abertura ao fecho das conexões, não existindo pacotes pertencentes a outros processos na captura.
-Esta validação foi ainda conseguida, por intermédio da utilização do programa \textit{WireShark}, o qual permitiu identificar os fluxos de dados referentes aos protocolos das novas aplicações alvo.
+Esta validação foi ainda conseguida, por intermédio da utilização do programa \textit{WireShark}, o qual permitiu identificar os fluxos de dados referentes aos protocolos do processo alvo.
 
 
 Foram criados dois sistema simples de cliente/servidor, um utilizando canais \textit{tcp} e o outro canais \textit{udp}, de modo a verificar como os diferentes \textit{sockets} representam os dados referentes aos portos, endereços e protocolos no núcleo.
@@ -48,12 +57,25 @@ Para além dos testes à correcção de que todos os dados oriundos do processo 
 O \textit{MRoP} é um mecanismo que executa no núcleo \textit{Linux} e que necessita de obter dados do administrador e do processo a ser monitorizado.
 Foi necessário avaliar diversos parâmetros de modo a garantir que todas as componentes obtinham os seus parâmetros correctamente, tanto em nível utilizador, como no núcleo.
 
+Diversas análises foram efectuadas de modo a garantir que não existem falhas na obtenção dos dados oriundos do processo, ou do núcleo.
+
+Os dados pertencentes às estruturas dos \textit{sockets} no núcleo, assumem-se correctas.
+
+A função de \textit{pre-handler} da instrumentação da chamada ao sistema \textit{connect}, tem a particularidade de utilizar os valores indicados nas estruturas do processo monitorizado para incluir no repositório.
+Após a função \textit{connect} terminar é verificado o valor de retorno e caso este indique que não existiram problemas os dados anteriormente inseridos no repositório são retirados e adicionados os novos dados referentes ao porto e endereço local utilizado para estabelecer esta conexão.
+Caso o valor de retorno indique que existiram problemas apenas são retirados os dados adicionados ao repositório no \textit{pre-handler} e nada mais é adicionado ao repositório nesta função.
+Assim através das validações efectuadas pelas restantes funções do núcleo respeitante às conexões de rede, é possível garantir o correcto estado do repositório.
+
+
+Os testes no núcleo utilizaram a função \textit{printk} para mostrar as informações necessárias no registo do núcleo, que pode ser acedido em nível utilizador através do programa \textit{dmesg} ou directamente do ficheiro \textit{messages} no directório $\backslash$ \textit{var} $\backslash$ \textit{log}.
 
 Após a monitorização de rede, foi possível recuperar o ficheiro que foi transmitido via rede utilizando o \textit{Wireshark}
 
 
 Após verificar que apenas os pacotes pertencentes à transferência e que mais nenhum pacote existia no ficheiro resultante da monitorização, utilizou-se a funcionalidade de guardar os dados expostos à aplicação de modo a reconstruir o ficheiro e guardá-lo em disco.
 Seguidamente procedeu-se à utilização de funções de sintese \textit{md5} e \textit{sha1}, sobre o ficheiro original, sobre o ficheiro obtido através da transferência por \textit{ftp} e ao ficheiro obtido da reconstrução do fluxo, sendo que todos os valores das funções de sintese foram iguais demonstrando que, a transferência por \textit{ftp} estava correcta e que foram capturados todos os pacotes da transferência e de modo correcto.
+
+
 
 
 ----------------------------------------------------------------------------------------------------------
@@ -63,7 +85,7 @@ Seguidamente procedeu-se à utilização de funções de sintese \textit{md5} e 
 \label{sec:eval_performance}
 
 Tendo presente a avaliação do desempenho, foram efectuados diversos testes com o objectivo de avaliar a sobrecarga gerada pela introdução do \textit{MRoP}.
-Estes testes basearam-se na recepção ou transmissão de \textit{1 GigaByte} de dados, utilizando diferentes programas e protocolos.
+Estes testes basearam-se na recepção ou transmissão de \textit{1 GigaByte} de dados, utilizando diferentes programas e protocolos, entre duas máquinas ligadas directamente.
 Ambas as máquinas, que se optou por designar de máquina 1 e máquina 2, procederam à transmissão/recepção de dados, utilizando cada uma, apenas, um processador activo de 2 e de 2.6 Ghz, respectivamente.
 As máquinas anteriormente descritas encontravam-se conectadas directamente, por interfaces de rede a 100 MBit/s, ficando uma das máquinas responsável pela execução dos servidores \textit{ftp}, \textit{http} e \textit{iperf}, e a outra pelos respectivos clientes.
 A versão do sistema de operação utilizado, em ambas as máquinas, correspondeu ao 2.6.39, sendo que na máquina 1 foram introduzidas as modificações, para incluir o \textit{hook} do \textit{MRoP} e as suas funções auxiliares, enquanto na máquina 2 se executou o sistema original.
@@ -144,15 +166,23 @@ Esta situação pode dever-se / deve-se ao facto de, quando a máquina se encont
 
 Nos testes 5º e 6º testes, como o tráfego na interface é duplicado e o \textit{tcpdump} tem que capturar todos os pacotes, é possível evidenciar a sobrecarga exercida por estas cópias de dados e consequentes transferências (para nível utilizador) face ao novo sistema onde apenas captura um fluxo de dados.
 Na tabela \ref{tab:overhead} e na figura \ref{fig:tests_overhead} é possível observar que, para o teste 5, a sobrecarga do \textit{tcpdump} atinge os 3.6\% face ao original, enquanto que a sobrecarga do \textit{tcpdump} com o \textit{MRoP}, permitiu uma ligeira melhoria face ao original (-0.0775\%).
-Conclui-se, portanto, que quando o fluxo de dados que não pretendemos capturar aumenta consideravelmente, torna-se mais vantajoso utilizar o \textit{MRoP}, do que capturar todos os pacotes, na medida em que minimiza-se a sobrecarga, capturando apenas os dados relevantes, evitando-se eventuais análise em nível utilizador, ou seja, na identificação e filtragem dos pacotes pertencentes ao processo alvo (o que acarretaria uma sobrecarga adicional).
+Conclui-se, portanto, que quando o fluxo de dados que não pretendemos capturar aumenta consideravelmente, torna-se mais vantajoso utilizar o \textit{MRoP}, do que capturar todos os pacotes, na medida em que minimiza-se a sobrecarga, capturando apenas os dados relevantes, evitando-se assim a identificação e filtragem dos pacotes pertencentes ao processo alvo em nível utilizador (o que acarretaria uma sobrecarga adicional).
+
+---------------------------
+
+Comentar em relação ao efectuado por farruca 10 onde o overhead era cerca de 2\% 
+
+----------------------------
 
 \subsection{Desempenho da estrutura de dados}
 
 Para além das avaliações anteriormente descritas, tornou-se essencial analisar o comportamento da estrutura de dados utilizado no componente “estado do processo”, de modo a verificar o seu desempenho.
-Assim para esta análise, foi elaborado um teste que utiliza o sistema de alta resolução de temporizadores (\textit{HRTimer})\cite{hrtimerKernel}, contido no núcleo do sistema de operação.
+Assim para esta análise, foi elaborado um teste para determinar o desempenho da estrutura de dados, em relação às insercções e remoções.
+Este teste utiliza o sistema de alta resolução de temporizadores (\textit{HRTimer})\cite{hrtimerKernel}, presente no núcleo do sistema de operação.
 
 O teste consistiu em obter o tempo anterior e posterior à inserção dos 1024 elementos, representando outros tantos portos/endereços, afim de determinar o tempo decorrido.
-De igual modo, foi calculado o tempo de remoção dos referidos elementos. Os resultados obtidos estão reproduzidos na tabela \ref{tab:tree_info}.
+De igual modo, foi calculado o tempo de remoção dos referidos elementos.
+Os resultados obtidos estão reproduzidos na tabela \ref{tab:tree_info}.
 
 
 ----------------------------------------------------------------------------------------------------------
@@ -187,7 +217,7 @@ Remoção de 1024 elementos & 675 086 & 659.2637\\
 \end{center}
 \end{table}
 
-Como se pode verificar, pela tabela \ref{tab:tree_info}, a inserção de um elemento na árvore é inferior a 1 microsegundo, possivelmente demonstrando que a estrutura utilizada foi a correcta.
+Como se pode verificar, pela tabela \ref{tab:tree_info}, a inserção de um elemento na árvore é inferior a 1 microsegundo, demonstrando que a estrutura utilizada não introduz uma elevada sobrecarga.
 Para além de estabelecer um bom compromisso de desempenho e utilização de memória, a sua disponibilidade de utilização no núcleo do sistema, possibilitou ter um elevado grau de confiança na sua utilização.
 O tempo médio despendido na procura do elemento com o menor valor de chave, nos 1024 elementos adicionados, foi de 1327 nanosegundos.
 Com este valor é possível verificar que para efectuar 10 iterações de procura na árvore, incorre-se numa penalização de 1.3 microsegundos.
