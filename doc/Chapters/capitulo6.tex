@@ -1,11 +1,11 @@
 \chapter{Avaliação}
 \label{cap:avaliacao}
 
-Antes de se utilizar um novo sistema, é conveniente proceder-se a testes alargados de verificação, para que se tome conhecimento do seu correcto funcionamento e das sobrecargas introduzidas, que de modo a este possa ser utilizado como uma mais–valia.
+Antes de se utilizar um novo sistema, é conveniente proceder-se a testes alargados de verificação, para que se tome conhecimento do seu correcto funcionamento e das sobrecargas introduzidas, para que de modo possa ser utilizado como uma mais–valia.
 O mecanismo implementado (\textit{MRoP}) foi avaliado funcionalmente através de diversos testes relativamente aos dados de entrada nos diversos componentes que o constituem.
 Como existem diversas fontes de dados, administrador para controlar a monitorização, o processo a ser monitorizado, estruturas de dados do núcleo, etc, foram criados vários testes de modo a que todas estas fontes de dados sejam analisadas.
-Para além destas fontes directas de dados foi também testado a correcção de que todos os fluxos de dados obtidos através da monitorização, são exclusivos ao processo alvo.
-Assim todas estes testes e avaliações foram executados com sucesso e serão apresentados na secção \ref{sec:eval_functional}.
+Para além destas fontes directas de dados foi, também testada a correcção de que todos os fluxos de dados obtidos, através da monitorização de rede, são exclusivos ao processo alvo.
+Assim todos estes testes e avaliações foram executados com sucesso e serão apresentados na secção \ref{sec:eval_functional}.
 
 Como o \textit{MRoP} não deve apenas estar correcto, mas um dos principais objectivos desta dissertação era criar um mecanismo com melhor desempenho que os anteriores, apresentados na secção \ref{sect:outras_abordagens}.
 Assim para verificar se este objectivo foi atingido, existiu a necessidade de efectuar testes de desempenho sobre \textit{MRoP}.
@@ -17,7 +17,7 @@ Por último serão apresentadas algumas conclusões sobre as análises efectuada
 \label{sec:eval_functional}
 
 A análise funcional ao \textit{MRoP} teve várias vertentes, uma vez que este mecanismo recebe dados de diferentes fontes, assim os testes visaram a verificação dos dados indicados pelo administrador, pelo processo alvo, e os das estruturas do núcleo.
-Foi necessário garantir que não existiam falhas nos mecanismo de entrada de dados ao \textit{MRoP}, porque uma vez que este está a executar no núcleo tem acesso a todo o sistema, assim qualquer problema na validação de dados poderia comprometer o sistema a nível de segurança como a nível de disponibilidade.
+Foi necessário garantir que não existiam falhas nos mecanismo de entrada de dados ao \textit{MRoP}, porque uma vez que este está a executar no núcleo tem acesso a todo o sistema, assim qualquer problema na validação de dados poderia comprometer o sistema a tanto nível de segurança como a nível de disponibilidade.
 
 
 
@@ -30,11 +30,11 @@ começando por verificar que os dados fornecidos pelo administrador estavam corr
 A análise funcional foi efectuada recorrendo a programas simples, que desencadeavam chamadas sucessivas de criação, comunicação e remoção de \textit{sockets}, verificando-se o estado dos mesmos (relativamente aos portos e endereços), nos \textit{handlers} das funções instrumentadas no núcleo.
 Como os dados relativos aos \textit{sockets} são adicionados ao repositório de dados, foi possível obter também aqui a verificação, através do ficheiro criado no \textit{DebugFs}, que os dados estavam correctos e de acordo com o que a função de filtragem iria utilizar.
 
-No \textit{handler} os dados obtidos são oriundos da applicação, ou seja ainda sujeitos a verificação pelo núcleo.
+No \textit{handler} os dados obtidos são oriundos da aplicação, ou seja ainda sujeitos a verificação pelo núcleo.
 A funções instrumentadas foram \textit{sys\_connect}, \textit{sys\_accept}, \textit{sys\_bind}, \textit{sys\_recvfrom}, \textit{sys\_sendto} e \textit{close ...}, através da instrumentação destas funções foi possível obter todas as interacções com o exterior via rede, realizadas pelas aplicações.
 
 
-O ficheiro responsável destes dados, contém toda a informação relativa aos portos e endereços em utilização, por parte da aplicação monitorizada.
+O ficheiro responsável por estes dados, contém toda a informação relativa aos portos e endereços em utilização, por parte da aplicação monitorizada.
 Deste modo, efectua a comparação dos dados produzidos e valida esta análise utilizando, para além de comportar com o próprio programa, foi a ferramenta (\textit{netstat}), que indicou os portos e endereços utilizados pelos processos no sistema.
 A ferramenta anteriormente referida, utiliza o sistema de ficheiros virtual \textit{ProcFs}, para obter os dados relativos aos portos e endereços utilizados,  de modo a estabelecer uma análise comparativa com os dados produzidos pelo \textit{MRoP}.
 
@@ -175,7 +175,7 @@ Comentar em relação ao efectuado por farruca 10 onde o overhead era cerca de 2
 \subsection{Desempenho da estrutura de dados}
 
 Para além das avaliações anteriormente descritas, tornou-se essencial analisar o comportamento da estrutura de dados utilizado no componente “estado do processo”, de modo a verificar o seu desempenho.
-Assim para esta análise, foi elaborado um teste para determinar o desempenho da estrutura de dados, em relação às insercções e remoções.
+Assim para esta análise, foi elaborado um teste para determinar o desempenho da estrutura de dados, em relação às inserções e remoções.
 Este teste utiliza o sistema de alta resolução de temporizadores (\textit{HRTimer})\cite{hrtimerKernel}, presente no núcleo do sistema de operação.
 
 O teste consistiu em obter o tempo anterior e posterior à inserção dos 1024 elementos, representando outros tantos portos/endereços, afim de determinar o tempo decorrido.
