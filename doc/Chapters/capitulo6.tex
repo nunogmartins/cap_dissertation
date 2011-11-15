@@ -7,8 +7,8 @@ Como existem diversas fontes de dados, administrador para controlar a monitoriza
 Para além destas fontes directas de dados foi, também testada a correcção de que todos os fluxos de dados obtidos, através da monitorização de rede, são exclusivos ao processo alvo.
 Assim todos estes testes e avaliações foram executados com sucesso e serão apresentados na secção \ref{sec:eval_functional}.
 
-Como o \textit{MRoP} não deve apenas estar correcto, mas um dos principais objectivos desta dissertação era criar um mecanismo com melhor desempenho que os anteriores, apresentados na secção \ref{sect:outras_abordagens}.
-Assim para verificar se este objectivo foi atingido, existiu a necessidade de efectuar testes de desempenho sobre \textit{MRoP}.
+Como um dos principais objectivos desta dissertação é criar um mecanismo com melhor desempenho que os anteriores, apresentados na secção \ref{sect:outras_abordagens}, foi assim necessário verificar se este tinha sido atingido.
+Desta forma foi necessário efectuar testes de desempenho sobre \textit{MRoP}, de modo a verificar se este objectivo tinha sido atingido.
 Os testes de desempenho estão apresentados na secção \ref{sec:eval_performance}, incidindo sobre o desempenho global na transferência de 1GB de dados, através de protocolos conhecidos, bem como através de testes de desempenho que visam o mecanismo de instrumentação e a estrutura de dados escolhida para manter o estado do processo alvo.
 
 Por último serão apresentadas algumas conclusões sobre as análises efectuadas ao \textit{MRoP} na secção \ref{sec:five_chap_conclusion}.
@@ -21,7 +21,7 @@ Foi necessário garantir que não existiam falhas nos mecanismo de entrada de da
 
 
 
-\subsection{Teste funcionais}
+\subsection{Teste funcionais de dados de entrada}
 
 
 começando por verificar que os dados fornecidos pelo administrador estavam correctos
@@ -37,21 +37,6 @@ A funções instrumentadas foram \textit{sys\_connect}, \textit{sys\_accept}, \t
 O ficheiro responsável por estes dados, contém toda a informação relativa aos portos e endereços em utilização, por parte da aplicação monitorizada.
 Deste modo, efectua a comparação dos dados produzidos e valida esta análise utilizando, para além de comportar com o próprio programa, foi a ferramenta (\textit{netstat}), que indicou os portos e endereços utilizados pelos processos no sistema.
 A ferramenta anteriormente referida, utiliza o sistema de ficheiros virtual \textit{ProcFs}, para obter os dados relativos aos portos e endereços utilizados,  de modo a estabelecer uma análise comparativa com os dados produzidos pelo \textit{MRoP}.
-
-\subsection{Avaliação de monitorização de rede}
-
-Para além desta verificação, foi efectuada a confirmação de que todos os pacotes pertencentes às comunicações foram, de facto, correctamente capturadas.
-Para tal, recorreu-se à captura de pacotes, por intermédio do \textit{TcpDump} com o módulo \textit{MRoP} activo.
-Através deste procedimento constatou-se que todo o tráfego, referente aos protocolos (\textit{ftp} e \textit{http}), estava de facto completo e correcto, desde a abertura ao fecho das conexões, não existindo pacotes pertencentes a outros processos na captura.
-Esta validação foi ainda conseguida, por intermédio da utilização do programa \textit{WireShark}, o qual permitiu identificar os fluxos de dados referentes aos protocolos do processo alvo.
-
-Após a monitorização de rede, foi possível recuperar o ficheiro que foi transmitido via rede utilizando o \textit{Wireshark}
-
-
-Após verificar que apenas os pacotes pertencentes à transferência e que mais nenhum pacote existia no ficheiro resultante da monitorização, utilizou-se a funcionalidade de guardar os dados expostos à aplicação de modo a reconstruir o ficheiro e guardá-lo em disco.
-Seguidamente procedeu-se à utilização de funções de sintese \textit{md5} e \textit{sha1}, sobre o ficheiro original, sobre o ficheiro obtido através da transferência por \textit{ftp} e ao ficheiro obtido da reconstrução do fluxo, sendo que todos os valores das funções de sintese foram iguais demonstrando que, a transferência por \textit{ftp} estava correcta e que foram capturados todos os pacotes da transferência e de modo correcto.
-
-
 
 
 
@@ -75,8 +60,25 @@ Foram criados dois sistema simples de cliente/servidor, um utilizando canais \te
 Os servidores esperavam conecções numa porta escolhida previamente, permitindo que os clientes efectuassem conecções para estes.
 Nos servidores e nos clientes eram apresentados os endereços de memória da estrutura de dados (\textit{struct sockaddr}), que contém as propriedades dos \textit{sockets}, tais como, porto, endereço, protocolo, etc.
 
-A utilização de \textit{KRetProbes} permitiu que se garantisse a correcção dos dados, uma vez que se os dados não estivessem de acordo com o esperado, o núcleo através do valor de retorno indicaria que existia algum problema.
+A utilização de \textit{KRetProbes} permitiu que se garantisse a correcção dos dados, uma vez que se os dados que não estivessem de acordo com o esperado, o núcleo através do valor de retorno indicaria que existia algum problema.
 Estas situações estão contempladas dado que na função de \textit{handler} de retorno, um dos primeiros dados a verificar é o valor de retorno indicado pela função instrumentada, caso este valor seja de erro, todas as alterações previamente introduzidas no repositório serão removidas, deixando assim o repositório consistente com o núcleo.
+
+\subsection{Avaliação de monitorização de rede}
+
+Para além desta verificação, foi efectuada a confirmação de que todos os pacotes pertencentes às comunicações foram, de facto, correctamente capturadas.
+Para tal, recorreu-se à captura de pacotes, por intermédio do \textit{TcpDump} com o módulo \textit{MRoP} activo.
+Através deste procedimento constatou-se que todo o tráfego, referente aos protocolos (\textit{ftp} e \textit{http}), estava de facto completo e correcto, desde a abertura ao fecho das conexões, não existindo pacotes pertencentes a outros processos na captura.
+Esta validação foi ainda conseguida, por intermédio da utilização do programa \textit{WireShark}, o qual permitiu identificar os fluxos de dados referentes aos protocolos do processo alvo.
+
+Após a monitorização de rede, foi possível recuperar o ficheiro que foi transmitido via rede utilizando o \textit{Wireshark}
+
+
+Após verificar que apenas os pacotes pertencentes à transferência e que mais nenhum pacote existia no ficheiro resultante da monitorização, utilizou-se a funcionalidade de guardar os dados expostos à aplicação de modo a reconstruir o ficheiro e guardá-lo em disco.
+Seguidamente procedeu-se à utilização de funções de sintese \textit{md5} e \textit{sha1}, sobre o ficheiro original, sobre o ficheiro obtido através da transferência por \textit{ftp} e ao ficheiro obtido da reconstrução do fluxo, sendo que todos os valores das funções de sintese foram iguais demonstrando que, a transferência por \textit{ftp} estava correcta e que foram capturados todos os pacotes da transferência e de modo correcto.
+
+
+
+
 
 
 \section{Avaliação do desempenho}
