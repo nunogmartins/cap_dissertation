@@ -65,6 +65,29 @@ Estas situações estão contempladas dado que na função de \textit{handler} d
 
 \subsection{Avaliação de monitorização de rede}
 
+Foi efectuada uma avaliação da correcção dos dados transferidos entre dois processos, um cliente e outro servidor.
+Estes testes apenas foram efectuados para protocolos assentes sobre \textit{tcp}, pois nestes temos a certeza que devido ao sistema de controlo de comunicação não existem falhas, permitindo assim analisar a transferência desde o seu início até ao seu término.
+Assim a execução do teste consistiu na transferência de um ficheiro entre duas máquinas, ligadas por um \textit{switch} com portas a 100 \textit{Mbit/s}, através do protocolo aplicacional \textit{ftp}, enquanto existiam outros fluxos de rede de outros processos.
+Foi escolhido este protocolo pois apesar de ser necessário conhecer \textit{à prior} a porta de comunicação com o servidor, a transmissão de dados é efectuada em outra porta negociada dinamicamente, permitindo assim demonstrar também o potêncial do \textit{MRoP}.
+Todas as comunicações remotas referentes a esta transferência foram monitorizadas através do programa \textit{tcpdump}, com o módulo do núcleo \textit{MRoP} activo e com a indicação do processo a monitorizar.
+Esta monitorização foi guardada através do \textit{tcpdump} num ficheiro para posterior análise através do \textit{Wireshark}.
+Utilizando o ficheiro capturado no \textit{Wireshark}, foi possível observar que apenas os fluxos de rede da transferência existiam no ficheiro.
+Após esta verificação, foi efectuada a recuperação do ficheiro transmitido através da agregação dos dados presentes nos pacotes, exceptuando os cabeçalhos.
+Esta recuperação foi guardada num ficheiro temporário, de modo a poderem ser aplicadas funções de sintese (\textit{md5} e \textit{sha1}), a fim de verificar que o conteúdo dos pacotes recuperado era exactamente igual ao ficheiro original, e à sua transferência.
+Esta verificação foi confirmada através do mesmo valor retornado para os três ficheiros, para cada uma das funções de síntese utilizadas.
+
+Como era necessário verificar também a correcção de transferências sobre o protocolo \textit{udp}, realizou-se um teste utilizado o programa \textit{iperf} com recurso a \textit{sockets} \textit{udp}.
+Para a realização deste teste foi utilizada a mesma infra-estrutura de rede, em que numa das máquinas foi executado o \textit{iperf} em modo servidor utilizando \textit{sockets udp}, e na outra máquina foi executado o modo cliente também utilizando \textit{sockets udp}.
+Foi efectuada a monitorização de rede na máquina que executou o \textit{iperf} em modo cliente, através do programa \textit{tcpdump} com o módulo do núcleo activo e com a indicação do identificador do processo \textit{iperf}, enquanto existiam outros fluxos de rede de outros processos.
+O resultado da monitorização pelo \textit{tcpdump} foi guardado num ficheiro, que indicou que o total de \textit{bytes} correctamente recebidos pelo \textit{iperf} em modo servidor, foram também obtidos pela monitorização.
+Neste ficheiro não existiam mais fluxos de dados que não os respeitantes à utilização do \textit{iperf}.
+
+Como anteriormente referido, aquando dos testes existiram outros fluxos de rede, nomeadamente de tráfego \textit{web}, de aplicações de conversação instantânea, entre outros, de modo a comprovar a eficácia de filtragem por processo.
+
+----------------------------------------------------------------------------------------------------------
+
+antigo
+
 Para além desta verificação, foi efectuada a confirmação de que todos os pacotes pertencentes às comunicações foram, de facto, correctamente capturadas.
 Para tal, recorreu-se à captura de pacotes, por intermédio do \textit{TcpDump} com o módulo \textit{MRoP} activo.
 Através deste procedimento constatou-se que todo o tráfego, referente aos protocolos (\textit{ftp} e \textit{http}), estava de facto completo e correcto, desde a abertura ao fecho das conexões, não existindo pacotes pertencentes a outros processos na captura.
@@ -78,7 +101,7 @@ Seguidamente procedeu-se à utilização de funções de sintese \textit{md5} e 
 
 
 
-
+----------------------------------------------------------------------------------------------------------
 
 
 \section{Avaliação do desempenho}
