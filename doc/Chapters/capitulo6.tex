@@ -21,36 +21,29 @@ Foi necessário garantir que não existiam falhas nos mecanismo de entrada de da
 
 
 
-\subsection{Teste funcionais de dados de entrada}
+\subsection{Teste ao componente de controlo}
 
-
-começando por verificar que os dados fornecidos pelo administrador estavam correctos
-
-
-A análise funcional foi efectuada recorrendo a programas simples, que desencadeavam chamadas sucessivas de criação, comunicação e remoção de \textit{sockets}, verificando-se o estado dos mesmos (relativamente aos portos e endereços), nos \textit{handlers} das funções instrumentadas no núcleo.
-Como os dados relativos aos \textit{sockets} são adicionados ao repositório de dados, foi possível obter também aqui a verificação, através do ficheiro criado no \textit{DebugFs}, que os dados estavam correctos e de acordo com o que a função de filtragem iria utilizar.
-
-No \textit{handler} os dados obtidos são oriundos da aplicação, ou seja ainda sujeitos a verificação pelo núcleo.
-A funções instrumentadas foram \textit{sys\_connect}, \textit{sys\_accept}, \textit{sys\_bind}, \textit{sys\_recvfrom}, \textit{sys\_sendto} e \textit{close ...}, através da instrumentação destas funções foi possível obter todas as interacções com o exterior via rede, realizadas pelas aplicações.
-
-
-O ficheiro responsável por estes dados, contém toda a informação relativa aos portos e endereços em utilização, por parte da aplicação monitorizada.
-Deste modo, efectua a comparação dos dados produzidos e valida esta análise utilizando, para além de comportar com o próprio programa, foi a ferramenta (\textit{netstat}), que indicou os portos e endereços utilizados pelos processos no sistema.
-A ferramenta anteriormente referida, utiliza o sistema de ficheiros virtual \textit{ProcFs}, para obter os dados relativos aos portos e endereços utilizados,  de modo a estabelecer uma análise comparativa com os dados produzidos pelo \textit{MRoP}.
-
-
+Como o \textit{MRoP} foi desenvolvido para ser um módulo para o núcleo, é necessário que seja adicionado a este através do programa \textit{insmod} ou semelhante.
+Após a adição do \textit{MRoP} ao núcleo, para funcionar é necessário ser um utilizador com permissões de administrador (\textit{root}), e escrever em determinados ficheiros criados no \textit{DebugFs} para o controlo do \textit{MRoP}.
+Dado que o \textit{MRoP} é parte do núcleo, é necessário garantir que qualquer dado que lhe é passado não compromete a segurança nem a disponibildade do sistema, por isso as funções que recebem dados oriundos do sistema de controlo efectuam verificações antes de os passar para as restantes componentes do \textit{MRoP}.
+Como os dados de controlo são cadeias de caracteres, a função de verificação limita o tamanho máximo de caracteres, baseado no valor máximo expectável para a utilização do ficheiro.
+Assim cadeias de caracteres maiores que um certo tamanho são truncadas, não existindo a possibilidade de explorar falhas de "\textit{under}" ou "\textit{overflow}", pois os valores inteiros são declarados sem sinal.
+O valor zero (\textit{0}) serviu como valor inicializador, sendo que valores superiores a este, indicadores de que existe uma opção activa no \textit{MRoP}.
+Para além destas análise, foram também verificadas que as permissões dos ficheiros estão de acordo com o estritamente necessário, e que apenas estão disponíveis ao utilizador \textit{root}.
 
 \subsection{Obtenção do estado dos canais do processo alvo}
 
-Foram também efectuados testes para verificar que apesar de um processos estar em execução, quando se indicava ao \textit{MRoP} qual o processo a monitorizar, este analisava todos os canais pertencentes ao processo, procedendo em seguida à inserção dos portos, endereços e protocolos, no repositório.
-Terminado esta primeira análise eram verificados se todos os canais de rede, relativamente aos protocolos \textit{tcp} e \textit{udp} estavam com as informações correctas e em igual número ao que era reportado através do programa \textit{netstat}, respectivamente ao processo alvo.
+A análise funcional de detecção dos protocolos, portos e endereços locais, foi efectuada recorrendo à criação de dois conjuntos de programas \textit{cliente/servidor}.
+Para o primeiro conjunto foi criado um servidor e um cliente, ambos utilizando o protocolo \textit{tcp}, em que o programa servidor esperava conexões numa porta e endereço pré-definidos.
+Como o \textit{MRoP} instrumenta as chamadas ao sistema \textit{connect}, \textit{accept}, \textit{bind}, \textit{recvfrom}, \textit{sendto} e a função \textit{sock\_close}, é possível capturar todas as operações relativamente às comunicações de rede utilizando os protocolos \textit{tcp} e \textit{udp}.
+Nas chamadas ao sistema \textit{bind} e \textit{connect}, um dos seus argumentos é uma estrutura \textit{sockaddr} que contém informações sobre o endereço e porto, sendo que na função \textit{connect} estes são relativos ao destino, e na função \textit{bind} são relativos à origem.
+Num \textit{socket} recentemente criado, as estruturas \textit{socket} e \textit{sock} que lhe pertencem no núcleo, ainda não contém os dados relativos aos portos e endereços, assim os dados anteriormente mencionados são de extrema utilidade para a construção do repositório do \textit{MRoP}, de modo a capturar apenas o tráfego respeitante ao processo alvo.
+Como os dados são provenientes do processo alvo, não é possível confiar que estão correctos, assim caso a função a executar retorne com um valor de erro, os valores adicionados são retirados do repositório, ficando novamente num estado consistente com a realidade.
+De modo a verificar que os dados que se encontram no repositório estão completos e correctos, é efectuada a leitura de todos os valores do repositório e apresentados através da função \textit{printk} para o terminal do núcleo, ou então são apresentados no ficheiro criado para o efeito no sistema de ficheiros virtual \textit{DebugFs}, verificando se são os mesmo que a aplicação \textit{netstat} declara para o processo alvo.
 
-Os dados pertencentes às estruturas dos \textit{sockets} no núcleo, assumem-se correctas.
+Quando o processo alvo já se encontra em execução e se inicia a monitorização, os dados relativos aos protocolos, portos e endereços dos \textit{sockets}, estão presentes nas estruturas do núcleo, e por isso consideram-se correctos e válidos, caso tenham sido inicializados, sendo automaticamente adicionados ao repositório.
 
-A função de \textit{pre-handler} da instrumentação da chamada ao sistema \textit{connect}, tem a particularidade de utilizar os valores indicados nas estruturas do processo monitorizado para incluir no repositório.
-Após a função \textit{connect} terminar é verificado o valor de retorno e caso este indique que não existiram problemas os dados anteriormente inseridos no repositório são retirados e adicionados os novos dados referentes ao porto e endereço local utilizado para estabelecer esta conexão.
-Caso o valor de retorno indique que existiram problemas apenas são retirados os dados adicionados ao repositório no \textit{pre-handler} e nada mais é adicionado ao repositório nesta função.
-Assim através das validações efectuadas pelas restantes funções do núcleo respeitante às conexões de rede, é possível garantir o correcto estado do repositório.
+
 
 \subsection{Avaliação das estruturas dos \textit{sockets} no núcleo}
 
@@ -82,27 +75,7 @@ Foi efectuada a monitorização de rede na máquina que executou o \textit{iperf
 O resultado da monitorização pelo \textit{tcpdump} foi guardado num ficheiro, que indicou que o total de \textit{bytes} correctamente recebidos pelo \textit{iperf} em modo servidor, foram também obtidos pela monitorização.
 Neste ficheiro não existiam mais fluxos de dados que não os respeitantes à utilização do \textit{iperf}.
 
-Como anteriormente referido, aquando dos testes existiram outros fluxos de rede, nomeadamente de tráfego \textit{web}, de aplicações de conversação instantânea, entre outros, de modo a comprovar a eficácia de filtragem por processo.
-
-----------------------------------------------------------------------------------------------------------
-
-antigo
-
-Para além desta verificação, foi efectuada a confirmação de que todos os pacotes pertencentes às comunicações foram, de facto, correctamente capturadas.
-Para tal, recorreu-se à captura de pacotes, por intermédio do \textit{TcpDump} com o módulo \textit{MRoP} activo.
-Através deste procedimento constatou-se que todo o tráfego, referente aos protocolos (\textit{ftp} e \textit{http}), estava de facto completo e correcto, desde a abertura ao fecho das conexões, não existindo pacotes pertencentes a outros processos na captura.
-Esta validação foi ainda conseguida, por intermédio da utilização do programa \textit{WireShark}, o qual permitiu identificar os fluxos de dados referentes aos protocolos do processo alvo.
-
-Após a monitorização de rede, foi possível recuperar o ficheiro que foi transmitido via rede utilizando o \textit{Wireshark}
-
-
-Após verificar que apenas os pacotes pertencentes à transferência e que mais nenhum pacote existia no ficheiro resultante da monitorização, utilizou-se a funcionalidade de guardar os dados expostos à aplicação de modo a reconstruir o ficheiro e guardá-lo em disco.
-Seguidamente procedeu-se à utilização de funções de sintese \textit{md5} e \textit{sha1}, sobre o ficheiro original, sobre o ficheiro obtido através da transferência por \textit{ftp} e ao ficheiro obtido da reconstrução do fluxo, sendo que todos os valores das funções de sintese foram iguais demonstrando que, a transferência por \textit{ftp} estava correcta e que foram capturados todos os pacotes da transferência e de modo correcto.
-
-
-
-----------------------------------------------------------------------------------------------------------
-
+Como anteriormente referido, aquando dos testes existiram outros fluxos de rede, nomeadamente tráfego \textit{web}, de aplicações de conversação instantânea, entre outros, de modo a comprovar a eficácia de filtragem por processo.
 
 \section{Avaliação do desempenho}
 \label{sec:eval_performance}
