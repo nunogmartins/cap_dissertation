@@ -6,27 +6,26 @@
 
 
 
-O objectivo principal desta dissertação consiste no desenvolvimento de um módulo do núcleo que consiga estender as funcionalidades do \textit{LSF}, de forma a introduzir a funcionalidade de monitorização do tráfego realizado por um processo, tirando partido da instrumentação de código do núcleo.
+O principal objectivo desta dissertação consiste no desenvolvimento de um módulo do núcleo que consiga estender as funcionalidades do \textit{LSF}, de forma a introduzir a funcionalidade de monitorização do tráfego realizado por um processo, tirando partido da instrumentação de código do núcleo.
 O facto desta instrumentação ser efectuada no núcleo permite que qualquer aplicação possa ser monitorizada, sem que o seu código tenha de ser alterado.
-Como se pode compreender, esta instrumentação é não instrusiva para as aplicações, havendo, deste modo a necessidade de criar uma método de verificação que identifique o processo que irá cada função instrumentada.
-Esta adição ao \textit{LSF} irá conter um sistema externo, possibilitando a sua utilização sem a necessidade de modificar qualquer aplicação que tire partido da utilização do \textit{LSF}.
+%Como se pode compreender, esta instrumentação é não intrusiva para as aplicações, havendo, deste modo a necessidade de criar uma método de verificação que identifique o processo que irá cada função instrumentada.
+Assim esta extensão ao \textit{LSF} irá conter um sistema externo, possibilitando a sua utilização sem a necessidade de modificar qualquer aplicação que tire partido da utilização do \textit{LSF}.
 As modificações necessárias às extensões das funcionalidades do \textit{LSF} no núcleo estão confinadas ao ficheiro \textit{filter.c}, presente no directório \textit{net/core} do código do \textit{Linux}.
 
 \section{MRoP e a sua implementação}
 \label{sec:mrop_implementation}
 
-A implementação da solução \textit{MRoP} teve em consideração o desenvolvimento de um código minimalista, que implicasse ligeiras alterações ao código do núcleo e, ao mesmo tempo, tirasse partido de \textit{APIs} internas.
+A implementação do \textit{MRoP} teve em consideração o desenvolvimento de um código minimalista, que implicasse ligeiras alterações ao código do núcleo e, ao mesmo tempo, tirasse partido de \textit{APIs} internas.
 Por outro lado, é transparente à implementação da biblioteca \textit{PCap}, podendo ser integrado na mesma.
-A implementação está autocontida num módulo do núcleo, de modo a ser carregada e libertada, do mesmo, pelo administrador.
+A implementação está contida num módulo do núcleo, de modo a ser carregada e libertada, do mesmo, pelo administrador.
 A modularização das diversas componentes, permite um desenvolvimento autónomo de cada subcomponente.
 
-No capítulo \ref{cap:trabrelacionado} foram apresentados, a título exemplificativo (secção \ref{sect:instrumentacao_casos_linux}), alguns sistemas que permitem efectuar monitorização ou filtragem de pacotes, com a indicação de um processo.
+No capítulo \ref{cap:trabrelacionado} apresentaram-se, a título exemplificativo (secção \ref{sect:instrumentacao_casos_linux}), alguns sistemas que permitem efectuar monitorização ou filtragem de pacotes, com a indicação de um processo.
 O \textit{MRoP}, embora utilize o sistema de instrumentação do núcleo \textit{KProbes}, apenas o utiliza para instrumentar as interacções com o sistema de rede, diferenciando-se assim das soluções apresentadas, o que lhe permite encontrar-se totalmente implementado no núcleo, com reduzida utilização de memória e perturbação do sistema.
 
 Como apresentado na secção \ref{sub:network_cap}, o sistema de monitorização de rede é utilizado para cada pacote que passa pelo controlador de rede.
-
 Assim quando uma aplicação efectua uma chamada ao sistema (\textit{connect}, \textit{accept}, \textit{bind}, \textit{sendto}, \textit{recvfrom}), o \textit{handler} da função instrumentada é executado.
-Na execução deste \textit{handler}, obtido do identicador do processo que efectuou a chamada ao sistema e comparado com os identificadores, \textit{pid}, \textit{ppid} e \textit{tgid} internos do \textit{MRoP}, caso um destes seja igual, é obtido o canal através dos parâmetros passados à chamada ao sistema e obtidos os dados sobre o \textit{socket} (porto, endereço e protocolo), para serem adicionados ao repositório.
+Na execução deste \textit{handler}, é obtido o identicador do processo que efectuou a chamada ao sistema e comparado com os identificadores, \textit{pid}, \textit{ppid} e \textit{tgid} internos ao \textit{MRoP}, caso um destes seja igual, é obtido o canal através dos parâmetros passados à chamada ao sistema e obtidos os dados sobre o \textit{socket} (porto, endereço e protocolo), para serem adicionados ao repositório.
 Deste modo quando o \textit{LSF} executar o novo sistema de filtragem irá verificar se os dados do pacote, recebido ou enviado, existe no repositório \textit{Estado do processo} e, caso exista, retorna à função de filtragem do \textit{LSF} que é para o capturar, sendo posteriormente passado para o monitor em nível utilizador.
 
 
@@ -34,7 +33,7 @@ Deste modo quando o \textit{LSF} executar o novo sistema de filtragem irá verif
 
 %------- apresentar as diversas seccoes ao leitor ----------------
 
-Nas subsecções seguintes irão ser apresentados os quatro componentes do \textit{MRoP} como se constanta na figura \ref{fig:general_architecture}.
+Nas subsecções seguintes irão apresentar-se os quatro componentes do \textit{MRoP} como se constata na figura \ref{fig:general_architecture}.
 
 \begin{figure}[!htbp]
 \centering
@@ -77,11 +76,11 @@ Nas subsecções seguintes irão ser apresentados os quatro componentes do \text
 %----------------------------------------------------------------------------------------------------------
 
 A metodologia aplicada à resolução do problema de desempenho, baseia-se no desenvolvimento de uma componente para efectuar uma análise aos canais de comunicação de rede, utilizados por um processo, que insira a informação necessária no repositório.
-Assim que um pacote chega ao sistema de monitorização, o \textit{LSF} tira partido do repositório para decidir a captura dos pacotes.
+Assim que um pacote chega ao sistema de monitorização, o \textit{LSF} tira partido do repositório para decidir a captura do pacote.
 
 
 De entre os sistemas analisados, o \textit{KProbes} foi aquele que permitiu obter menor sobrecarga, apesar do seu carácter dinâmico.
-Os restantes sistemas contêm componentes de \textit{logging} que, para a realização deste estudo, apresentam uma sobrecarga desnecessária, afectando negativamente o desempenho.
+Os restantes sistemas contêm componentes de registo que, para a realização deste mecanismo, apresentam uma sobrecarga desnecessária, afectando negativamente o desempenho.
 
 Para além do sistema de instrumentação utilizado foi igualmente considerado o número de funções a instrumentar.
 A sobrecarga total exercida pela instrumentação de funções do núcleo, tem em conta não só o número de funções que são instrumentadas, como o número de vezes que estas são executadas.
@@ -90,14 +89,16 @@ O conhecimento adquirido com a análise efectuada no capítulo \ref{cap:Estrutur
 
 O \textit{MRoP}, foi desenvolvido para monitorizar a utilização de canais da familia \textit{INET}, tendo como particularidade, a utilização de canais baseados nos protocolos \textit{TCP} e \textit{UDP}, e instrumentar um número reduzido de funções do núcleo, pertencentes ao subsistema de rede.
 
-O \textit{TCP} e o \textit{UDP} apresentam algumas funções em comum com protocolos de outras famílias, principalmente quando são executadas chamadas ao sistema, onde o nível de abstracção sobre estes protocolos é elevado.
+O \textit{TCP} e o \textit{UDP} apresentam algumas funções em comum com protocolos de outras famílias, principalmente quando são executadas as chamadas ao sistema, onde o nível de abstracção sobre estes protocolos é elevado.
 Com o objectivo de diminuir o número de funções a instrumentar, optou-se pelas chamadas ao sistema, obtendo assim um maior nível de abstração e um controlo directo dos processos de nível utilizador.
 
-As chamadas ao sistema instrumentadas correspondem: \textit{sendto}, \textit{recvfrom}, \textit{connect}, \textit{bind}, \textit{accept} e \textit{close}.
+As chamadas ao sistema instrumentadas correspondem a: \textit{sendto}, \textit{recvfrom}, \textit{connect}, \textit{bind}, \textit{accept} e \textit{close}.
 As análises inicialmente efectuadas demonstraram que apenas a chamada ao sistema \textit{close}, era demasiadas vezes executada, penalizando o desempenho global do sistema.
 Esta situação radica no facto da chamada ao sistema \textit{close}, ser utilizada extensivamente para fechar canais, independentemente destes serem ficheiros, \textit{sockets}, \textit{pipes}, etc.
 Para contornar esta dificuldade, foi necessário encontrar uma função que lidasse exclusivamente com o fecho de \textit{sockets}, de modo a reduzir a sobrecarga imposta pela instrumentação.
 
+
+% Falta explicar o pq do recvfrom e do sendto entre outros ...
 
 \subsection{Filtro de processos}
 
@@ -117,7 +118,7 @@ Para contornar esta dificuldade, foi necessário encontrar uma função que lida
 %-----------------------------------------------------------------------------------------------------
 
 O \textit{KProbes}, é um sistema de instrumentação do núcleo que não distingue entre que funções, não \textit{inline}, está a efectuar a instrumentação.
-Não existindo suporte no \textit{KProbes} para filtrar o processo, que efectuou a chamada ao sistema, foi necessário desenvolver uma metodologia que permitisse reduzir a sobrecarga, quando a monitorização é realizada sobre um processo, que não o desejado.
+Não existindo suporte no \textit{KProbes} para filtrar o processo, que efectuou a chamada ao sistema, foi necessário desenvolver um modo que permitisse reduzir a sobrecarga, quando a monitorização é realizada sobre um processo, que não o desejado.
 
 %-------------------------
 
@@ -131,11 +132,8 @@ Este repositório teria de conter a estrutura genealógica do processo a monitor
 A actualização desta estrutura poderia ser efectuada através da instrumentação da chamada ao sistema \textit{fork} ou \textit{clone}.
 Sempre que fossem invocadas as funções já referidas, seria efectuada uma consulta ao repositório e, a partir da informação obtida, este seria ou não, actualizado.
 Esta possibilidade, ao contemplar a remoção de dados do repositório, necessitaria também de instrumentar a função de término de processos.
-
 Considerando que a actualização dinâmica deste repositório, sem aplicar alterações no código do núcleo, afectaria negativamente o desempenho do sistema na sua totalidade.
 Assim, optou-se por excluir esta alternativa em virtude da criação e destruição de processos que podessem apresentar custos elevados.
-
-
 Face a esta situação, optou-se por efectuar uma análise aos campos da estrutura (\textit{task\_struct}), o que permitiu compreender o modo como os identificadores dos processos se relacionam com os identificadores dos membros da árvore genealógica do processo.
 Desta análise concluí-se que, os identificadores \textit{pid}, \textit{tid} e \textit{ppid} permitem, na grande maioria das aplicações, identificar toda a árvore genealógica.
 
@@ -159,8 +157,8 @@ Assim, as estruturas de dados com suporte no núcleo, que permitem a criação d
 \item[BitMap - ]
 %\subsubsection{Bitmap}
 
-O recurso a um mapa de \textit{bits}, permite, de um modo bastante rápido e com uma reduzida utilização de memória, conhecer se um determinado porto está em utilização, por um determinado processo.
 O núcleo do sistema possui suporte para o tratamento de mapas de \textit{bits}, permitindo representar cada porto usado pela aplicação por um \textit{bit}.
+O recurso a um mapa de \textit{bits}, permite, de um modo bastante rápido e com uma reduzida utilização de memória, determinar se um porto está em utilização.
 Embora este processo seja extremamente rápido, carece de modularidade, na medida em que apenas controla os portos, não dispondo de suporte para protocolos ou múltiplos endereços de rede.
 
  
