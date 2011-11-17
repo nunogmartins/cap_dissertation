@@ -78,7 +78,7 @@ Foi efectuada a monitorização de rede na máquina que executou o \textit{iperf
 O resultado da monitorização pelo \textit{tcpdump} foi guardado num ficheiro, que indicou que o total de \textit{bytes} correctamente recebidos pelo \textit{iperf} em modo servidor, foram também obtidos pela monitorização.
 Neste ficheiro não existiam mais fluxos de dados que não os respeitantes à utilização do \textit{iperf}.
 
-Como anteriormente referido, aquando dos testes existiram outros fluxos de rede, nomeadamente tráfego \textit{web}, de aplicações de conversação instantânea, entre outros, de modo a comprovar a eficácia de filtragem por processo.
+Como anteriormente referido, aquando dos testes existiram outros fluxos de rede, nomeadamente de tráfego \textit{web}, de aplicações de conversação instantânea, entre outros, de modo a comprovar a eficácia do \textit{MRoP}.
 
 \section{Avaliação do desempenho}
 \label{sec:eval_performance}
@@ -96,27 +96,21 @@ Na execução destes testes, foram efectuadas dez iterações, isto é, cada tes
 Os testes efectuados, em particular os primeiros, ilustram situações em que não há grande vantagem em ter o sistema o \textit{MRoP} activo, com vista a medir a sobrecarga do \textit{MRoP}.
 Os resultados obtidos constam nas tabelas \ref{tab:desempenho} e \ref{tab:overhead}:
 
-\begin{figure}[!ht]
+Os primeiros quatro testes foram efectuados utilizando apenas uma conexão ao servidor, enquanto o 5º e o 6º testes utilizaram mais uma comunicação, de modo a aumentar o peso sobre o processador e o número de pacotes a circular entre as máquinas.
+Desta forma, foi possível identificar a sobrecarga exercida enquando o \textit{tcpdump} executava e capturava todos os pacotes ou apenas um subconjunto destes, ou seja, os pacotes relativos aos processos alvo no novo sistema.
+
+Na tabela \ref{tab:desempenho}, a coluna "Original" corresponde aos valores resultantes dos tempos médios das execuções das transferências na ausência de monitorização.
+Na mesma tabela e na coluna "Com \textit{TcpDump}", é apresenta a média dos tempos de transferência com a captura total do tráfego utilizando a \textit{LibPCap}/\textit{LSF} original, enquanto que a coluna identificada com "Com \textit{TcpDump} e \textit{MRoP}" regista a média dos tempos para a transferência com captura pelo tcpdump e o módulo \textit{MRoP} desenvolvido no núcleo, de forma a capturar, apenas, o tráfego da transferência do processo alvo.
+Nos primeiros quatro testes é possível verificar que a utilização do \textit{MRoP}, aumentou de forma insignificativa o tempo de execução (figura \ref{fig:tests_graphics}).
+
+\begin{figure}[!htbp]
 \centering
 \includegraphics[scale=0.6]{testes.jpg}
 \caption{Testes de desempenho efectuados ao MRoP}
 \label{fig:tests_graphics}
 \end{figure}
 
-\begin{figure}[!ht]
-\centering
-\includegraphics[scale=0.7]{overhead.jpg}
-\caption{Sobrecarga nos testes 5 e 6 }
-\label{fig:tests_overhead}
-\end{figure}
-
-Os primeiros quatro testes foram efectuados utilizando apenas uma conexão ao servidor, enquanto o 5º e o 6º testes utilizaram mais uma comunicação, de modo a aumentar o peso sobre o processador e o número de pacotes a circular entre as máquinas.
-Desta forma, foi possível identificar a sobrecarga exercida enquando o \textit{tcpdump} executava e capturava todos os pacotes ou apenas um subconjunto destes, ou seja, os pacotes relativos aos processos alvo no novo sistema.
-A coluna "Original" corresponde aos valores resultantes dos tempos médios das execuções das transferências na ausência de monitorização.
-A coluna "Com \textit{TcpDump}" apresenta a média dos tempos de transferência com a captura total do tráfego utilizando a \textit{LibPCap}/\textit{LSF} original, enquanto que a coluna identificada com "Com \textit{TcpDump} e \textit{MRoP}" regista a média dos tempos para a transferência com captura pelo tcpdump e o módulo \textit{MRoP} desenvolvido no núcleo, de forma a capturar, apenas, o tráfego da transferência do processo alvo.
-Nos primeiros quatro testes é possível verificar que a utilização do \textit{MRoP}, aumentou de forma insignificativa o tempo de execução (figura \ref{fig:tests_graphics}).
 É igualmente possível observar que no 1º e 3º testes, aquando da utilização do \textit{tcpdump}, a execução sem o \textit{MRoP}, mostrou-se ligeiramente mais rápida, como se pode verificar na tabela \ref{tab:desempenho} e \ref{tab:overhead}.
-
 \begin{table}[!htb]
 \begin{center}
 \caption{Tempos médios em segundos (s)}
@@ -137,6 +131,23 @@ IPerf - 1GB UDP 2 conexões$^{6}$ & 179.4930 & 179.6280 & 179.6369 \\
 \label{tab:desempenho}
 \end{center}
 \end{table}
+Esta situação deve-se ao facto de, quando a máquina se encontra em sobrecarga, leva ao aumento do tamanho médio dos pacotes, reduzindo o seu número e o volume de dados transferidos, em virtude da diminuição dos seus cabeçalhos.
+Este comportamento já tinha sido detectado numa dissertação anterior~\cite{Farruca:2009}.
+
+Nos testes 5º e 6º testes, como o tráfego na interface é duplicado e o \textit{tcpdump} tem que capturar todos os pacotes, é possível evidenciar a sobrecarga exercida por estas cópias de dados e consequentes transferências (para nível utilizador) face ao novo sistema onde apenas captura um fluxo de dados.
+
+
+
+Na tabela \ref{tab:overhead} e na figura \ref{fig:tests_overhead} é possível observar que, para o teste 5, a sobrecarga do \textit{tcpdump} atinge os 3.6\% face ao original, enquanto que a sobrecarga do \textit{tcpdump} com o \textit{MRoP}, permitiu uma ligeira melhoria face ao original (-0.0775\%).
+Conclui-se, portanto, que quando o fluxo de dados que não pretendemos capturar aumenta consideravelmente, torna-se mais vantajoso utilizar o \textit{MRoP}, do que capturar todos os pacotes, na medida em que minimiza-se a sobrecarga, capturando apenas os dados relevantes, evitando-se assim a identificação e filtragem dos pacotes pertencentes ao processo alvo em nível utilizador (o que ainda acarretaria uma sobrecarga adicional).
+
+\begin{figure}[!ht]
+\centering
+\includegraphics[scale=0.7]{overhead.jpg}
+\caption{Sobrecarga nos testes 5 e 6 }
+\label{fig:tests_overhead}
+\end{figure}
+
 
 \begin{table}[!htb]
 \begin{center}
@@ -160,19 +171,12 @@ IPerf - 1GB UDP 2 conexões$^{6}$ & 0.0752 & 0.0802   \\
 \end{center}
 \end{table}
 
+Os resultados da sobrecarga do \textit{tcpdump} com o \textit{MRoP}, em todos os casos analisados, foram sempre inferiores a 0.15\%, chegando mesmo a ser de 0.0309\%.
+Se compararmos estes resultados com os obtidos em \cite{Farruca:2009}, podemos verificar que estão substancialmente melhores.
+Efectuando a comparação com o resultado obtido no 2º teste, da transferência por \textit{HTTP}, não por ser o melhor resultado obtido, mas por o teste ser identico, pode-se verificar que existiu uma melhoria no desempenho de 64 vezes.
 
-Esta situação deve-se ao facto de, quando a máquina se encontra em sobrecarga, leva ao aumento do tamanho médio dos pacotes, reduzindo o seu número e o volume de dados transferidos, em virtude da diminuição dos seus cabeçalhos.
-Este comportamento já tinha sido detectado numa dissertação anterior~\cite{Farruca:2009}.
-
-Nos testes 5º e 6º testes, como o tráfego na interface é duplicado e o \textit{tcpdump} tem que capturar todos os pacotes, é possível evidenciar a sobrecarga exercida por estas cópias de dados e consequentes transferências (para nível utilizador) face ao novo sistema onde apenas captura um fluxo de dados.
-Na tabela \ref{tab:overhead} e na figura \ref{fig:tests_overhead} é possível observar que, para o teste 5, a sobrecarga do \textit{tcpdump} atinge os 3.6\% face ao original, enquanto que a sobrecarga do \textit{tcpdump} com o \textit{MRoP}, permitiu uma ligeira melhoria face ao original (-0.0775\%).
-Conclui-se, portanto, que quando o fluxo de dados que não pretendemos capturar aumenta consideravelmente, torna-se mais vantajoso utilizar o \textit{MRoP}, do que capturar todos os pacotes, na medida em que minimiza-se a sobrecarga, capturando apenas os dados relevantes, evitando-se assim a identificação e filtragem dos pacotes pertencentes ao processo alvo em nível utilizador (o que acarretaria uma sobrecarga adicional).
-
----------------------------
-
-Comentar em relação ao efectuado por farruca 2009 \cite{Farruca:2009} onde o overhead era cerca de 2\% 
-
-----------------------------
+Como anteriormente foi referido, os testes realizados apenas com o \textit{tcpdump} capturam todo o tráfego e, como não existia a monitorização do processo alvo, não era efectuada a filtragem dos pacotes.
+Desta forma os valores apresentados para o \textit{tcpdump} são meramente indicativos relativamente ao \textit{tcpdump} com o \textit{MRoP} activo, uma vez que lhe falta a componente de filtragem dos dados, aumentando assim o seu tempo de execução e a sua sobrecarga.
 
 \subsection{Desempenho da estrutura de dados}
 
@@ -180,23 +184,14 @@ Para além das avaliações anteriormente descritas, tornou-se essencial analisa
 Assim para esta análise, foi elaborado um teste para determinar o desempenho da estrutura de dados, em relação às inserções e remoções.
 Este teste utiliza o sistema de alta resolução de temporizadores (\textit{HRTimer})\cite{hrtimerKernel}, presente no núcleo do sistema de operação.
 
-O teste consistiu em obter o tempo anterior e posterior à inserção dos 1024 elementos, representando outros tantos portos/endereços, afim de determinar o tempo decorrido.
+Para decidir qual o número de elementos a ser utilizado para este teste, foi verificado qual o valor máximo de descritores de canais que um processo pode ter.
+O valor foi obtido através da função \textit{getrlimits}, que indicou que o valor máximo de descritores de canais abertos, para um processo, é de 1024 canais.
+Dado que este valor (1024) é o máximo de canais por processo, considerou-se um optimo valor para verificar o comportamento da estrutura de dados no pior caso, no cenário em que todos os descritores de canais são \textit{sockets} e estão activos.
+Os valores obtidos através deste teste demonstrarão os valores máximo espectáveis, em que se assume que o processo alvo está a utilizar o número máximo de canais de rede.
+
+Assim o teste consistiu em obter o tempo anterior e posterior à inserção dos 1024 elementos, representando outros tantos portos/endereços, afim de determinar o tempo decorrido.
 De igual modo, foi calculado o tempo de remoção dos referidos elementos.
 Os resultados obtidos estão reproduzidos na tabela \ref{tab:tree_info}.
-
-
-----------------------------------------------------------------------------------------------------------
-
-A análise de desempenho da estrutura de dados
-
-O número de elementos foi 1024, pois este valor foi obtido através da chamada ao sistema ------ que indica qual o máximo de canais que podem estar a ser utilizados por um processo.
-Como os canais podem ser ficheiros, \textit{pipes}, \textit{sockets}, etc, o valor de uma utilização real deverá ser inferior a este, por isso considerou-se o valor de 1024 como um bom indicador do número de elementos que estrutura de dados, poderá conter num dado momento, permitindo assim verificar o desempenho desta com elevada carga.
-
-A inserção de dados no repositório, não é efectuada com um desempenho constante, dado que quando é necessário efectuar um rebalanceamento da árvore, o processo de inserção é mais demorado devido à necessidade de efectuar rotações na árvore.
-
-Os testes foram efectuados de modo a obtermos valores nos piores casos.
-
-----------------------------------------------------------------------------------------------------------
  
 \begin{table}[!htb]
 \begin{center}
@@ -218,11 +213,15 @@ Remoção de 1024 elementos & 675 086 & 659.2637\\
 \end{table}
 
 Como se pode verificar, pela tabela \ref{tab:tree_info}, a inserção de um elemento na árvore é inferior a 1 microsegundo, demonstrando que a estrutura utilizada não introduz uma elevada sobrecarga.
+A inserção de dados no repositório, não é efectuada com um desempenho constante, dado que quando é necessário efectuar um rebalanceamento da árvore, o processo de inserção é mais demorado devido à necessidade de efectuar rotações na árvore.
 Para além de estabelecer um bom compromisso de desempenho e utilização de memória, a sua disponibilidade de utilização no núcleo do sistema, possibilitou ter um elevado grau de confiança na sua utilização.
+
 O tempo médio despendido na procura do elemento com o menor valor de chave, nos 1024 elementos adicionados, foi de 1327 nanosegundos.
 Com este valor é possível verificar que para efectuar 10 iterações de procura na árvore, incorre-se numa penalização de 1.3 microsegundos.
-Verifica-se assim, que o tempo médio de procura de elementos na estrutura, é menor ou igual a 1.3 microsegundos.
+Verifica-se assim, que o tempo médio de procura de elementos na estrutura, é sempre menor ou igual a 1.3 microsegundos.
 Considerando que a maioria das aplicações não utiliza tantos portos em simultâneo, são expectáveis tempos inferiores em aplicações reais.
+
+O teste de desempenho realizado demonstra que, mesmo nas piores condições, ou seja nas condições mais extremas, consegue-se obter um desempenho aceitável, tendo em conta que se utilizou uma estrutura de dados dinâmica, em que se tem flexibilidade para modificar os seus dados.
 
 
 \subsection{Desempenho do Sistema de instrumentação}
