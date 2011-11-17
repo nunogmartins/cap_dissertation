@@ -219,7 +219,7 @@ Outra estrutura de dados passível de ser considerada foi a tabela de dispersão
 %\subsubsection{Tabela de dispersão}
 \item[Tabela de Dispersão]
 No núcleo existe uma implementação de tabelas de dispersão que efectuam a dispersão e o controlo sobre as suas chaves.
-O controlo sobre as chaves e a forma de dispersão é efectuada pela implementação, ou seja, não existe controlo do programador sobre as chaves nem sobre a forma de dispersar estas.
+O controlo sobre as chaves e a forma de dispersão é efectuada pela implementação, ou seja, não existe controlo do programador sobre as chaves nem sobre a forma de dispersa-las.
 
 No núcleo existem subsistemas que implementaram tabelas de dispersão com base em \textit{arrays} e listas, permitindo assim utilizar as vantagens desta estrutura de dados.
 Estas implementações tiram partido do conhecimento do dominio do problema que resolvem, assim, os \textit{arrays} são criados com dimensões fixas, dado que não necessitarão de efectuar redispersão dos elementos nela contidos.
@@ -237,7 +237,6 @@ O ciclo de desenvolvimento do \textit{MRoP}, foi efectuado mais rapidamente, ten
 \label{sub:repo_structure}
 
 Os elementos do repositório criado, através de uma árvore \textit{Red and Black}, têm uma estrutura bem definida, contendo obrigatoriamente um \textit{rb\_node}, para possibilitar a manipulação da árvore e um outro elemento, de carácter comparativo, utilizado como chave.
-
 Além dos referidos, esta estrutura contempla outros elementos que seguidamente se descrevem:
 
 \begin{figure}[ht]
@@ -271,7 +270,6 @@ Os elementos do repositório, correspondem a instâncias da estrutura \textit{Po
 
 Com o objectivo de efectuar inserções, consultas e remoções dos dados do repositório, foi desenvolvida uma \textit{API} interna ao \textit{MRoP}, que permite validar os parâmetros passados às funções do repositório de dados.
 Através desta \textit{API} foi possível realizar a separação das componentes do \textit{MRoP} beneficiando, deste modo, a modularidade do código.
-
 Esta \textit{API} permite aos \textit{handlers} das funções instrumentadas, efectuar as operações de inserção e remoção sobre a componente \textit{Estado dos Sockets}.
 Relativamente à operação de consulta, esta é particularmente importante, na medida em que executa a filtragem de pacotes das interfaces de rede.
 
@@ -317,7 +315,6 @@ Esta função será invocada quando o filtro estático for avaliado para captura
 \end{figure}
 
 Assim, além da definição de um \textit{hook} para activação e desactivação deste novo sistema, foi efectuada uma alteração ao código do \textit{Linux} na função \textit{sk\_run\_filter}, que se traduziu no retorno da decisão conjunta do filtro estático com o dinâmico, ambas realizadas no ficheiro \textit{filter.c}.
-
 Esta alteração permitiu adicionar uma nova funcionalidade, não obstante se assistir a uma ligeira sobrecarga no sistema de monitorização, independentemente da mesma estar ou não activa.
 
 %Para se poder definir uma nova instrução no \textit{Instruction Set}, é necessário alterar o ficheiro \textit{grammar.y}, na entrada correspondente à posição que deverá ocupar na \textit{AST (Abstract Sintax Tree)}, e modificar as funções de criação do novo filtro, quer em modo utilizador quer dentro do núcleo de sistema.
