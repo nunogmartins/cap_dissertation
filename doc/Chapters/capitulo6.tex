@@ -17,7 +17,7 @@ Por último, serão apresentadas algumas conclusões sobre as análises efectuad
 \label{sec:eval_functional}
 
 A análise funcional ao \textit{MRoP} teve várias vertentes, uma vez que este mecanismo recebe dados de diferentes fontes.
-Assim os testes visaram a verificação dos dados indicados pelo administrador, pelo processo alvo, e os das estruturas do núcleo.
+Assim os testes visaram a verificação dos dados indicados pelo administrador, pelo processo alvo e os das estruturas do núcleo.
 Foi necessário garantir que não existiam falhas nos mecanismo de entrada de dados ao \textit{MRoP}, porque como este está a executar no núcleo tem acesso a todo o sistema, assim qualquer problema na validação de dados poderá comprometer o sistema tanto a nível de segurança como a nível de disponibilidade.
 
 
@@ -61,9 +61,9 @@ Quando o processo alvo já se encontra em execução e se inicia a monitorizaç�
 \subsection{Avaliação de monitorização de rede}
 
 Foi efectuada uma verificação da correcção dos dados transferidos entre dois processos, um cliente e outro servidor.
-Estes testes foram apenas efectuados para protocolos assentes sobre \textit{tcp}, pois nestes temos a certeza que devido ao sistema de controlo de comunicação não existem falhas, permitindo assim analisar a transferência desde o seu início até ao seu término.
+Estes testes foram apenas efectuados para protocolos assentes sobre \textit{tcp}, pois nestes existe a certeza que, devido ao sistema de controlo de comunicação não existem falhas, o que permite analisar a transferência desde o seu início até ao seu término.
 
-Assim a execução do teste consistiu na transferência de um ficheiro entre duas máquinas, ligadas por um \textit{switch} com portas a 100 \textit{Mbit/s}, através do protocolo aplicacional \textit{ftp}, enquanto existiam outros fluxos de rede de outros processos.
+A execução do teste consistiu na transferência de um ficheiro entre duas máquinas, ligadas por um \textit{switch} com portas a 100 \textit{Mbit/s}, através do protocolo aplicacional \textit{ftp}, enquanto existiam outros fluxos de rede de outros processos.
 Foi escolhido este protocolo pois, apesar de ser necessário conhecer \textit{à priori} a porta de comunicação com o servidor, a transmissão de dados é efectuada noutra porta negociada dinamicamente, permitindo demonstrar também o potêncial do \textit{MRoP}.
 Todas as comunicações remotas referentes a esta transferência foram monitorizadas através do programa \textit{tcpdump}, com o módulo do núcleo \textit{MRoP} activo e com a indicação do processo a monitorizar.
 Esta monitorização foi guardada através do \textit{tcpdump} num ficheiro para posterior análise através do \textit{Wireshark}.
@@ -72,7 +72,7 @@ Após esta verificação, foi efectuada a recuperação do ficheiro transmitido 
 Esta recuperação foi guardada num ficheiro temporário, de modo a poderem ser aplicadas funções de sintese (\textit{md5} e \textit{sha1}), com o objectivo de verificar que o conteúdo dos pacotes recuperado era exactamente igual ao ficheiro original, e à sua transferência.
 Esta verificação foi confirmada através do mesmo valor retornado para os três ficheiros, para cada uma das funções de síntese utilizadas.
 
-Como também era necessário verificar a correcção de transferências sobre o protocolo \textit{udp}, realizou-se um teste utilizado o programa \textit{iperf} com recurso a \textit{sockets} \textit{udp}.
+Foi também necessário verificar a correcção de transferências sobre o protocolo \textit{udp}, por isso realizou-se um teste utilizado o programa \textit{iperf} com recurso a \textit{sockets} \textit{udp}.
 Para a realização deste teste foi utilizada a mesma infra-estrutura de rede, em que numa das máquinas foi executado o \textit{iperf} em modo servidor utilizando \textit{sockets udp}, e na outra máquina foi executado o modo cliente utilizando \textit{sockets} \textit{udp}.
 Foi efectuada a monitorização de rede na máquina que executou o \textit{iperf} em modo cliente, através do programa \textit{tcpdump} com o módulo do núcleo activo e com a indicação do identificador do processo \textit{iperf}, enquanto existiam outros fluxos de rede de outros processos.
 O resultado da monitorização pelo \textit{tcpdump} foi guardado num ficheiro, que indicou que o total de \textit{bytes} correctamente recebidos pelo \textit{iperf} em modo servidor, foram também obtidos pela monitorização.
@@ -94,10 +94,10 @@ A versão do sistema de operação utilizado, em ambas as máquinas, corresponde
 
 Na execução destes testes, foram efectuadas dez iterações, isto é, cada teste foi executado dez vezes, para cada experiência considerada, de modo a obter um valor médio e um desvio padrão considerado aceitável.
 Os testes efectuados, em particular os primeiros, ilustram situações em que não há grande vantagem em ter o sistema o \textit{MRoP} activo, com vista a medir a sobrecarga do \textit{MRoP}.
-Os resultados obtidos constam nas tabelas \ref{tab:desempenho} e \ref{tab:overhead}:
+Os resultados obtidos constam nas tabelas \ref{tab:desempenho} e \ref{tab:overhead}.
 
 Os primeiros quatro testes foram efectuados utilizando apenas uma conexão ao servidor, enquanto o 5º e o 6º testes utilizaram mais uma comunicação, de modo a aumentar o peso sobre o processador e o número de pacotes a circular entre as máquinas.
-Desta forma, foi possível identificar a sobrecarga exercida enquando o \textit{tcpdump} executava e capturava todos os pacotes ou apenas um subconjunto destes, ou seja, os pacotes relativos aos processos alvo no novo sistema.
+Desta forma, foi possível identificar a sobrecarga exercida enquanto o \textit{tcpdump} executava e capturava todos os pacotes ou apenas um subconjunto destes, ou seja, os pacotes relativos aos processos alvo no novo sistema.
 
 Na tabela \ref{tab:desempenho}, a coluna "Original" corresponde aos valores resultantes dos tempos médios das execuções das transferências na ausência de monitorização.
 Na mesma tabela e na coluna "Com \textit{TcpDump}", é apresenta a média dos tempos de transferência com a captura total do tráfego utilizando a \textit{LibPCap}/\textit{LSF} original, enquanto que a coluna identificada com "Com \textit{TcpDump} e \textit{MRoP}" regista a média dos tempos para a transferência com captura pelo tcpdump e o módulo \textit{MRoP} desenvolvido no núcleo, de forma a capturar, apenas, o tráfego da transferência do processo alvo.
@@ -134,12 +134,12 @@ IPerf - 1GB UDP 2 conexões$^{6}$ & 179.4930 & 179.6280 & 179.6369 \\
 Esta situação deve-se ao facto de, quando a máquina se encontra em sobrecarga, leva ao aumento do tamanho médio dos pacotes, reduzindo o seu número e o volume de dados transferidos, em virtude da diminuição dos seus cabeçalhos.
 Este comportamento já tinha sido detectado numa dissertação anterior~\cite{Farruca:2009}.
 
-Nos testes 5º e 6º testes, como o tráfego na interface é duplicado e o \textit{tcpdump} tem que capturar todos os pacotes, é possível evidenciar a sobrecarga exercida por estas cópias de dados e consequentes transferências (para nível utilizador) face ao novo sistema onde apenas captura um fluxo de dados.
+Nos 5º e 6º testes, como o tráfego na interface é duplicado e o \textit{tcpdump} tem que capturar todos os pacotes, é possível evidenciar a sobrecarga exercida por estas cópias de dados e consequentes transferências (para nível utilizador) face ao novo sistema onde apenas captura um fluxo de dados.
 
 
 
 Na tabela \ref{tab:overhead} e na figura \ref{fig:tests_overhead} é possível observar que, para o teste 5, a sobrecarga do \textit{tcpdump} atinge os 3.6\% face ao original, enquanto que a sobrecarga do \textit{tcpdump} com o \textit{MRoP}, permitiu uma ligeira melhoria face ao original (-0.0775\%).
-Conclui-se, portanto, que quando o fluxo de dados que não pretendemos capturar aumenta consideravelmente, torna-se mais vantajoso utilizar o \textit{MRoP}, do que capturar todos os pacotes, na medida em que minimiza-se a sobrecarga, capturando apenas os dados relevantes, evitando-se assim a identificação e filtragem dos pacotes pertencentes ao processo alvo em nível utilizador (o que ainda acarretaria uma sobrecarga adicional).
+Conclui-se, portanto, que quando o fluxo de dados que não pretendemos capturar aumenta consideravelmente, torna-se mais vantajoso utilizar o \textit{MRoP}, do que capturar todos os pacotes, na medida em que se minimiza a sobrecarga, capturando apenas os dados relevantes, evitando-se a identificação e filtragem dos pacotes pertencentes ao processo alvo em nível utilizador, tendo como consequência uma sobrecarga adicional.
 
 \begin{figure}[!ht]
 \centering
@@ -172,11 +172,11 @@ IPerf - 1GB UDP 2 conexões$^{6}$ & 0.0752 & 0.0802   \\
 \end{table}
 
 Os resultados da sobrecarga do \textit{tcpdump} com o \textit{MRoP}, em todos os casos analisados, foram sempre inferiores a 0.15\%, chegando mesmo a ser de 0.0309\%.
-Se compararmos estes resultados com os obtidos em \cite{Farruca:2009}, podemos verificar que estão substancialmente melhores.
-Efectuando a comparação com o resultado obtido no 2º teste, da transferência por \textit{HTTP}, não por ser o melhor resultado obtido, mas por o teste ser identico, pode-se verificar que existiu uma melhoria no desempenho de 64 vezes.
+Se estes resultados forem comparados com os obtidos em \cite{Farruca:2009}, pode verificar-se que são substancialmente melhores.
+Efectuando a comparação com o resultado obtido no 2º teste, da transferência por \textit{HTTP}, não por ser o melhor resultado obtido, mas por o teste ser identico, pode verificar-se a existência de uma melhoria no desempenho de 64 vezes.
 
-Como anteriormente foi referido, os testes realizados apenas com o \textit{tcpdump} capturam todo o tráfego e, como não existia a monitorização do processo alvo, não era efectuada a filtragem dos pacotes.
-Desta forma os valores apresentados para o \textit{tcpdump} são meramente indicativos relativamente ao \textit{tcpdump} com o \textit{MRoP} activo, uma vez que lhe falta a componente de filtragem dos dados, aumentando assim o seu tempo de execução e a sua sobrecarga.
+Como foi anteriormente referido, os testes realizados apenas com o \textit{tcpdump} capturam todo o tráfego e, como não existia a monitorização do processo alvo, não era efectuada a filtragem dos pacotes.
+Desta forma os valores apresentados para o \textit{tcpdump} são meramente indicativos relativamente ao \textit{tcpdump} com o \textit{MRoP} activo, uma vez que lhe falta a componente de filtragem dos dados, aumentando o tempo de execução e a sua sobrecarga.
 
 \subsection{Desempenho da estrutura de dados}
 
