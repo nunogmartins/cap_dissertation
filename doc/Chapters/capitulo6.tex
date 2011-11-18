@@ -212,13 +212,13 @@ Remoção de 1024 elementos & 675 086 & 659.2637\\
 \end{center}
 \end{table}
 
-Como se pode verificar, pela tabela \ref{tab:tree_info}, a inserção de um elemento na árvore é inferior a 1 microsegundo, demonstrando que a estrutura utilizada não introduz uma elevada sobrecarga.
+Pode verificar-se, pela tabela \ref{tab:tree_info}, que a inserção de um elemento na árvore é inferior a 1 microsegundo, demonstrando que a estrutura utilizada não introduz uma elevada sobrecarga.
 A inserção de dados no repositório, não é efectuada com um desempenho constante, dado que quando é necessário efectuar um rebalanceamento da árvore, o processo de inserção é mais demorado devido à necessidade de efectuar rotações na árvore.
 Para além de estabelecer um bom compromisso de desempenho e utilização de memória, a sua disponibilidade de utilização no núcleo do sistema, possibilitou ter um elevado grau de confiança na sua utilização.
 
 O tempo médio despendido na procura do elemento com o menor valor de chave, nos 1024 elementos adicionados, foi de 1327 nanosegundos.
 Com este valor é possível verificar que para efectuar 10 iterações de procura na árvore, incorre-se numa penalização de 1.3 microsegundos.
-Verifica-se assim, que o tempo médio de procura de elementos na estrutura, é sempre menor ou igual a 1.3 microsegundos.
+Verifica-se que o tempo médio de procura de elementos na estrutura, é sempre menor ou igual a 1.3 microsegundos.
 Considerando que a maioria das aplicações não utiliza tantos portos em simultâneo, são expectáveis tempos inferiores em aplicações reais.
 
 O teste de desempenho realizado demonstra que, mesmo nas piores condições, ou seja nas condições mais extremas, consegue-se obter um desempenho aceitável, tendo em conta que se utilizou uma estrutura de dados dinâmica, em que se tem flexibilidade para modificar os seus dados.
@@ -258,7 +258,7 @@ Note-se ainda que a instrumentação só é introduzida aquando do carregamento 
 
 Com os testes efectuados ao nível funcional e ao nível de desempenho ao \textit{MRoP} verificou-se que este mecanismo oferece um desempenho aceitável nas condições mais adversas, o que indica que para as condições das aplicações reais o seu desempenho será superior, enquanto que a sobrecarga introduzida no sistema poderá ser inferior ao constatado.
 
-Como se pode verificar em relação ao trabalho \cite{Farruca:2009}, a sobrecarga gerada pelo \textit{MRoP} foi muito inferior, o que demonstra que apesar da dificuldade de trabalhar no núcleo, criar um sistema de monitorização de rede orientado ao processo através de um mecanismo não intrusivo, que assim que possível rejeite a captura de pacotes, reduz consideravelmente a sobrecarga no sistema.
+Pode verificar-se em relação ao trabalho \cite{Farruca:2009}, que a sobrecarga gerada pelo \textit{MRoP} foi muito inferior, demonstrando que apesar da dificuldade de trabalhar no núcleo, criar um sistema de monitorização de rede orientado ao processo através de um mecanismo não intrusivo, que assim que possível rejeite a captura de pacotes, reduz consideravelmente a sobrecarga no sistema.
 
 Existe a possibilidade de reduzir a sobrecarga no sistema se ao invés de se instrumentar as chamadas ao sistema, forem instrumentadas as funções especificas relacionadas com a pilha de protocolos \textit{tcp/ip}.
 
