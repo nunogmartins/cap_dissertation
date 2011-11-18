@@ -241,7 +241,7 @@ O sistema proposto foi desenvolvido procurando cumprir os seguintes requisitos:
 \item a implementação deve envolver poucas alterações ao código do sistema, de modo a facilitar a sua manutenção e evolução aquando das novas versões do sistema \textit{Linux}.
 \end{itemize}
 
-Assim, o sistema criado está dividido em quatro componentes principais: filtragem dos pacotes de rede, instrumentação das chamadas ao sistema, repositório do estado das interacções via rede, e controlo e informação sobre o estado da monitorização (ver figura \ref{fig:arquitectura}).
+O mecanismo criado está dividido em quatro componentes principais: filtragem dos pacotes de rede, instrumentação das chamadas ao sistema, repositório do estado das interacções via rede, controlo e informação sobre o estado da monitorização (ver figura \ref{fig:arquitectura}).
 A função de filtragem, invocada por um \textit{hook} que estende o \textit{LSF}, permite que apenas o tráfego do processo alvo seja analisado pelo restante sistema de fitragem do \textit{LSF}.
 Por outro lado, relativamente à componente instrumentação das chamadas ao sistema (ou outras funções contidas no sistema de rede), esta actualiza a componente repositório de dados, onde é mantido o estado das interacções via rede do(s) processo(s) alvo, com as efectuadas pelo processo.
 Existe ainda um sistema para controlo/configuração, destinado a obter informação sobre o estado da monitorização.
@@ -277,7 +277,7 @@ O filtro de pacotes ao aceder ao repositório e ao decidir quais os pacotes a ca
 \label{sub:data_repository}
 
 O estado dos portos dos protocolos \textit{TCP} e \textit{UDP} em uso no processo alvo, é mantido num repositório de dados e permanentemente actualizado pelo componente anteriormente referido em \ref{sub:mon_syscalls}.
-A árvore \textit{Red and Black} já disponível no núcleo do sistema, foi a estrutura dados escolhida para produzir o repositório pretendido.
+A árvore \textit{Red and Black} já disponível no núcleo do sistema, foi a estrutura de dados escolhida para produzir o repositório pretendido.
 
 O conteúdo de cada folha da árvore é uma estrutura com duas listas de elementos, contendo cada uma endereços \textit{IP} utilizados pela aplicação, sendo a chave de indexação das folhas, o número do porto.
 Desta forma, a árvore poderá conter no máximo 65535 elementos, por ser este o número máximo de portos em utilização por um endereço \textit{IP}.
@@ -306,7 +306,7 @@ Esta interface que contém ficheiros, de modo a indicar ao \textit{MRoP} quais o
 
 Estes ficheiros, com permissões apenas acessíveis ao utilizador \textit{root}, impedem o acesso por parte dos restantes utilizadores da máquina ao sistema de monitorização.
 
-%section{Conclusão}
+\section{Conclusão}
 
-%Algumas ideias para concluir este capitulo ...
+Algumas ideias para concluir este capitulo ...
 
