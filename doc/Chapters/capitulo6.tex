@@ -249,6 +249,7 @@ Teste & Original & Com \textit{KRetProbe} & Sobrecarga por chamada\\
 \end{table}
 
 O valor de referência obtido pelos criadores do \textit{KProbes}, referentes ao \textit{KRetProbe} sem optimizações, é de 0.7 microsegundos\cite{KProbeKernel}, sendo que o valor médio obtido foi de 0.61 microsegundos, ou seja, ligeiramente inferior, visto que a máquina de referência apresenta uma frequência de \textit{cpu} inferior à máquina onde foram realizados estes testes.
+Esta sobrecarga é constante, o que indica que qualquer melhoria ao \textit{KProbes} afecte positivamente a sobrecarga do \textit{MRoP}.
 
 Consideram-se estes valores bastante aceitáveis e espera-se que tenham ainda reduzido impacto no desempenho normal do sistema.
 Note-se ainda que a instrumentação só é introduzida aquando do carregamento do \textit{MRoP}, de modo a executar a monitorização com esta nova funcionalidade.
