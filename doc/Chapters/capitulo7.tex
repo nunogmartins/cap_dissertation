@@ -1,7 +1,7 @@
 \chapter{Conclusões e Trabalho Futuro}
 \label{cap:conclusao}
 
-Esta dissertação teve como objectivo a criação de uma extensão ao actual \textit{PCap}/\textit{LSF}, utilizado no \textit{Linux}, de modo a restringir a captura dos pacotes referentes a uma determinada aplicação, contribuindo assim para uma nova funcionalidade e a redução da sobrecarga no sistema de monitorização e identificar os fluxos de rede de uma forma não intrusiva.
+Esta dissertação teve como objectivo a criação de uma extensão ao actual \textit{PCap}/\textit{LSF}, utilizado no \textit{Linux}, de modo a restringir a captura dos pacotes referentes a uma determinada aplicação, contribuindo deste modo para a redução da sobrecarga no sistema de monitorização com uma nova funcionalidade e identificar os fluxos de rede de uma forma não intrusiva.
 
 Para a realização da \textit{Monitorização de Rede orientada ao Processo} (\textit{MRoP}), foi necessário, para além de identificar os pontos e conhecer as razões que estiveram na génese do insucesso de anteriores trabalhos, criar alternativas permitissem ultrapassá-los.
 Para atingir tal objectivo, foram estudados os mecanismos de monitorização internos ao núcleo e os sistemas de comunicação entre o núcleo e as aplicações em nível utilizador.
@@ -15,8 +15,8 @@ Esta extensão foi analisada funcionalmente através de programas que criavam, c
 Na avaliação funcional, foram igualmente executados programas que efectuavam transferências utilizando os protocolos \textit{HTTP} e \textit{FTP}, enquanto decorriam outros fluxos na rede. 
 O \textit{MRoP} foi aplicado a estes programas, de modo a capturar todo o trafego respeitante às transferências destes dois protocolos, a compatibilidade está garantida, continuando a poder utilizar-se as ferramentas existentes como o \textit{tcpdump} e o \textit{Wireshark}.
 Foi possível constatar a correcção dos protocolos e verificar que apenas as interacções da aplicação alvo com o exterior, foram capturadas.
-Para além desta análise funcional, foi efectuada uma outra, onde foram comparados os desempenhos do \textit{PCap}, com e sem esta nova extensão, a fim de determinar qual a sobrecarga introduzida pelo \textit{MRoP} na monitorização já existente.
-Os resultados apurados evidenciam que a sobrecarga é praticamente inexistente nos piores casos, e que trará algumas vantagens perante vários fluxos de dados irrelevantes.
+Para além desta análise funcional, foi efectuada uma outra, onde se compararam os desempenhos do \textit{PCap}, com e sem esta nova extensão, a fim de determinar qual a sobrecarga introduzida pelo \textit{MRoP} na monitorização já existente.
+Os resultados apurados evidenciam que a sobrecarga é praticamente inexistente nos piores casos e, que trará algumas vantagens perante vários fluxos de dados irrelevantes.
 
 Nas secções seguintes são apresentados as principais conclusões da realização desta dissertação, assim como as possíveis evoluções e extensões ao \textit{MRoP}.
 
@@ -32,7 +32,7 @@ Se analisarmos a aplicação, do ponto de vista de segurança na rede, é possí
 Esta situação, não é possível de observar com o recurso ao normal funcionamento da \textit{LibPCap}, sem um conhecimento detalhado do seu funcionamente e protocolos, ou a uma monitorização da aplicação de forma intrusiva, o que pode originar comportamento errático e afectar negativamente o desempenho da aplicação e do sistema.
 O recurso à introdução desta funcionalidade não intrusiva, para a captura e análise do tráfego de um processo, constitui um avanço relativamente à monitorização de rede efectuada através da \textit{LibPCap}.
 
-O \textit{MRoP} ao oferecer a possibilidade de capturar exclusivamente os pacotes de um determinado processo ou de uma família de processos, facilita as análises a efectuar e reduz a sobrecarga neste tipo de sistemas, dispensando a \textit{LibPCap} de capturar o tráfego não pretendido, e de conhecer os protocolos e portos utilizados pela aplicação.
+O \textit{MRoP}, ao oferecer a possibilidade de capturar exclusivamente os pacotes de um determinado processo ou de uma família de processos, facilita as análises a efectuar e reduz a sobrecarga neste tipo de sistemas, dispensando a \textit{LibPCap} de capturar o tráfego não pretendido e, de conhecer os protocolos e portos utilizados pela aplicação.
 
 Esta funcionalidade, é transparente para todas as ferramentas desenvolvidas com base no \textit{PCap}, pelo que todas podem dela usufruir.
 

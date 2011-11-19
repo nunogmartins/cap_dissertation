@@ -10,7 +10,7 @@ O principal objectivo desta dissertação consiste no desenvolvimento de um mód
 O facto desta instrumentação ser efectuada no núcleo permite que qualquer aplicação possa ser monitorizada, sem que o seu código tenha de ser alterado.
 %Como se pode compreender, esta instrumentação é não intrusiva para as aplicações, havendo, deste modo a necessidade de criar uma método de verificação que identifique o processo que irá cada função instrumentada.
 Assim esta extensão ao \textit{LSF} irá conter um sistema externo, possibilitando a sua utilização sem a necessidade de modificar qualquer aplicação que tire partido da utilização do \textit{LSF}.
-As modificações necessárias às extensões das funcionalidades do \textit{LSF} no núcleo estão confinadas ao ficheiro \textit{filter.c}, presente no directório \textit{net/core} do código do \textit{Linux}.
+As modificações necessárias à extensão das funcionalidades do \textit{LSF} no núcleo estão confinadas ao ficheiro \textit{filter.c}, presente no directório \textit{net/core} do código do \textit{Linux}.
 
 \section{MRoP e a sua implementação}
 \label{sec:mrop_implementation}
@@ -26,7 +26,7 @@ O \textit{MRoP}, embora utilize o sistema de instrumentação do núcleo \textit
 Como apresentado na secção \ref{sub:network_cap}, o sistema de monitorização de rede é utilizado para cada pacote que passa pelo controlador de rede.
 Assim quando uma aplicação efectua uma chamada ao sistema (\textit{connect}, \textit{accept}, \textit{bind}, \textit{sendto}, \textit{recvfrom}), o \textit{handler} da função instrumentada é executado.
 Na execução deste \textit{handler}, é obtido o identicador do processo que efectuou a chamada ao sistema e comparado com os identificadores, \textit{pid}, \textit{ppid} e \textit{tgid} internos ao \textit{MRoP}, caso um destes seja igual, é obtido o canal através dos parâmetros passados à chamada ao sistema e obtidos os dados sobre o \textit{socket} (porto, endereço e protocolo), para serem adicionados ao repositório.
-Deste modo quando o \textit{LSF} executar o novo sistema de filtragem irá verificar se os dados do pacote, recebido ou enviado, existe no repositório \textit{Estado do processo} e, caso exista, retorna à função de filtragem do \textit{LSF} que é para o capturar, sendo posteriormente passado para o monitor em nível utilizador.
+Deste modo quando o \textit{LSF} executar o novo sistema de filtragem irá verificar se os metadados do pacote (endereço, porto, protocolo), recebido ou enviado, existem no repositório \textit{Estado do processo} e, caso existam, indica à função de filtragem do \textit{LSF} para o capturar, sendo posteriormente passado para o monitor em nível utilizador.
 
 
 %Por cada pacote ter de atravessar toda a arquitectura de rede incluida no \textit{vfs} seria demasiado pesado para o sistema.
@@ -82,15 +82,15 @@ Assim que um pacote chega ao sistema de monitorização, o \textit{LSF} tira par
 De entre os sistemas analisados, o \textit{KProbes} foi aquele que permitiu obter menor sobrecarga, apesar do seu carácter dinâmico.
 Os restantes sistemas contêm componentes de registo que, para a realização deste mecanismo, apresentam uma sobrecarga desnecessária, afectando negativamente o desempenho.
 
-Para além do sistema de instrumentação utilizado foi igualmente considerado o número de funções a instrumentar.
-A sobrecarga total exercida pela instrumentação de funções do núcleo, tem em conta não só o número de funções que são instrumentadas, como o número de vezes que estas são executadas.
+Para além do sistema de instrumentação utilizado, foi igualmente considerado o número de funções a instrumentar.
+A sobrecarga total exercida pela instrumentação de funções do núcleo, tem em consideração não só o número de funções que são instrumentadas, como também o número de vezes que estas são executadas.
 
 O conhecimento adquirido com a análise efectuada no capítulo \ref{cap:Estrutura}, sobre a \textit{Arquitectura de rede em Linux}, afectou positivamente a opção sobre as funções a instrumentar.
 
 O \textit{MRoP}, foi desenvolvido para monitorizar a utilização de canais da familia \textit{INET}, tendo como particularidade, a utilização de canais baseados nos protocolos \textit{TCP} e \textit{UDP}, e instrumentar um número reduzido de funções do núcleo, pertencentes ao subsistema de rede.
 
 O \textit{TCP} e o \textit{UDP} apresentam algumas funções em comum com protocolos de outras famílias, principalmente quando são executadas as chamadas ao sistema, onde o nível de abstracção sobre estes protocolos é elevado.
-Com o objectivo de diminuir o número de funções a instrumentar, optou-se pelas chamadas ao sistema, obtendo assim um maior nível de abstração e um controlo directo dos processos de nível utilizador.
+Com o objectivo de diminuir o número de funções a instrumentar, optou-se pelas chamadas ao sistema, obtendo-se um maior nível de abstração e um controlo directo dos processos de nível utilizador.
 
 As chamadas ao sistema instrumentadas correspondem a: \textit{sendto}, \textit{recvfrom}, \textit{connect}, \textit{bind}, \textit{accept} e \textit{close}.
 As análises inicialmente efectuadas demonstraram que apenas a chamada ao sistema \textit{close}, era demasiadas vezes executada, penalizando o desempenho global do sistema.
@@ -133,7 +133,7 @@ A actualização desta estrutura poderia ser efectuada através da instrumentaç
 Sempre que fossem invocadas as funções já referidas, seria efectuada uma consulta ao repositório e, a partir da informação obtida, este seria ou não, actualizado.
 Esta possibilidade, ao contemplar a remoção de dados do repositório, necessitaria também de instrumentar a função de término de processos.
 Considerando que a actualização dinâmica deste repositório, sem aplicar alterações no código do núcleo, afectaria negativamente o desempenho do sistema na sua totalidade.
-Assim, optou-se por excluir esta alternativa em virtude da criação e destruição de processos que podessem apresentar custos elevados.
+Optou-se então, por excluir esta alternativa em virtude da criação e destruição de processos que podessem apresentar custos elevados.
 Face a esta situação, optou-se por efectuar uma análise aos campos da estrutura (\textit{task\_struct}), o que permitiu compreender o modo como os identificadores dos processos se relacionam com os identificadores dos membros da árvore genealógica do processo.
 Desta análise concluí-se que, os identificadores \textit{pid}, \textit{tid} e \textit{ppid} permitem, na grande maioria das aplicações, identificar toda a árvore genealógica.
 
@@ -158,7 +158,7 @@ Assim, as estruturas de dados com suporte no núcleo, que permitem a criação d
 %\subsubsection{Bitmap}
 
 O núcleo do sistema possui suporte para o tratamento de mapas de \textit{bits}, permitindo representar cada porto usado pela aplicação por um \textit{bit}.
-O recurso a um mapa de \textit{bits}, permite, de um modo bastante rápido e com uma reduzida utilização de memória, determinar se um porto está em utilização.
+O recurso a um mapa de \textit{bits} permite, de um modo bastante rápido e com uma reduzida utilização de memória, determinar se um porto está em utilização.
 Embora este processo seja extremamente rápido, carece de modularidade, na medida em que apenas controla os portos, não dispondo de suporte para protocolos ou múltiplos endereços de rede.
 
  
@@ -221,7 +221,7 @@ Outra estrutura de dados passível de ser considerada foi a tabela de dispersão
 No núcleo existe uma implementação de tabelas de dispersão que efectuam a dispersão e o controlo sobre as suas chaves.
 O controlo sobre as chaves e a forma de dispersão é efectuada pela implementação, ou seja, não existe controlo do programador sobre as chaves nem sobre a forma de dispersa-las.
 
-No núcleo existem subsistemas que implementaram tabelas de dispersão com base em \textit{arrays} e listas, permitindo assim utilizar as vantagens desta estrutura de dados.
+No núcleo existem subsistemas que implementaram tabelas de dispersão com base em \textit{arrays} e listas, permitindo deste modo utilizar as vantagens desta estrutura de dados.
 Estas implementações tiram partido do conhecimento do dominio do problema que resolvem, assim, os \textit{arrays} são criados com dimensões fixas, dado que não necessitarão de efectuar redispersão dos elementos nela contidos.
 
 Como existe a necessidade de uma estrutura que se adapte ao comportamento dinâmico das interacções das aplicações com as interfaces de rede, seria necessário um estudo aprofundado sobre estatísticas do número de portos utilizados pelas aplicações e, caso este estudo fosse realizado seria necessário continuar a efectuar uma redispersão dos elementos, a não ser que, fosse utilizado um \textit{array} com 65535 posições, valor este que representa o valor máximo de portos possíveis através dos protocolos \textit{TCP} e \textit{UDP}, desperdiçando assim memória do sistema.
@@ -273,7 +273,7 @@ Através desta \textit{API} foi possível realizar a separação das componentes
 Esta \textit{API} permite aos \textit{handlers} das funções instrumentadas, efectuar as operações de inserção e remoção sobre a componente \textit{Estado dos Sockets}.
 Relativamente à operação de consulta, esta é particularmente importante, na medida em que executa a filtragem de pacotes das interfaces de rede.
 
-A \textit{API}, não obstante de, reduzir o desempenho, devido à necessidade de chamar os métodos específicos ao repositório, permite a substituição deste, sem que se verifique alterações do código.
+A \textit{API}, não obstante de reduzir o desempenho, devido à necessidade de chamar os métodos específicos ao repositório, permite a substituição deste, sem que se verifique alterações do código.
 
 \begin{figure}[!htbp]
 \centering
@@ -304,8 +304,8 @@ Assim, o facto de se tirar partido da utilização de um filtro, que identifique
 Face aos benefícios obtidos pela utilização do filtro, considera-se que o sistema de instrumentação do núcleo (\textit{KProbes}), poderia ser utilizado para invocar o novo sistema de filtragem criado e modificar o valor de retorno, caso se tornasse necessário.
 Todavia, face ao número de vezes que a função de filtragem é invocada (uma para cada pacote, recebido ou enviado), a sobrecarga da utilização do \textit{KProbes} é de todo desaconselhável.
 
-Assim, foi necessário modificar o código do \textit{Linux} de modo a inserir um \textit{hook}, ou seja, um apontador para uma função.
-Esta função será invocada quando o filtro estático for avaliado para captura, permitindo que a função de filtragem do \textit{MRoP} analize o pacote com base no estado do processo, possibilitando assim, efectuar uma conjunção entre o filtro estático definido pelo administrador e a filtragem dinâmica efectuada pelo \textit{MRoP}, como pode ser observado na figura \ref{fig:run_filter}.
+Foi necessário modificar o código do \textit{Linux} de modo a inserir um \textit{hook}, ou seja, um apontador para uma função.
+Esta função será invocada quando o filtro estático for avaliado para captura, permitindo que a função de filtragem do \textit{MRoP} analize o pacote com base no estado do processo, possibilitando efectuar uma conjunção entre o filtro estático definido pelo administrador e a filtragem dinâmica efectuada pelo \textit{MRoP}, como pode ser observado na figura \ref{fig:run_filter}.
 
 \begin{figure}[!ht]
 \centering
@@ -314,8 +314,8 @@ Esta função será invocada quando o filtro estático for avaliado para captura
 \label{fig:run_filter}
 \end{figure}
 
-Assim, além da definição de um \textit{hook} para activação e desactivação deste novo sistema, foi efectuada uma alteração ao código do \textit{Linux} na função \textit{sk\_run\_filter}, que se traduziu no retorno da decisão conjunta do filtro estático com o dinâmico, ambas realizadas no ficheiro \textit{filter.c}.
-Esta alteração permitiu adicionar uma nova funcionalidade, não obstante se assistir a uma ligeira sobrecarga no sistema de monitorização, independentemente da mesma estar ou não activa.
+Além da definição de um \textit{hook} para activação e desactivação deste novo sistema, foi efectuada uma alteração ao código do \textit{Linux} na função \textit{sk\_run\_filter}, que se traduziu no retorno da decisão conjunta do filtro estático com o dinâmico, ambas realizadas no ficheiro \textit{filter.c}.
+Esta alteração permitiu adicionar uma nova funcionalidade, não obstante de se assistir a uma ligeira sobrecarga no sistema de monitorização, independentemente da mesma estar ou não activa.
 
 %Para se poder definir uma nova instrução no \textit{Instruction Set}, é necessário alterar o ficheiro \textit{grammar.y}, na entrada correspondente à posição que deverá ocupar na \textit{AST (Abstract Sintax Tree)}, e modificar as funções de criação do novo filtro, quer em modo utilizador quer dentro do núcleo de sistema.
 %Este desenvolvimento tem de ser realizado par-a-par, pois a ser efectuado apenas de um lado, o outro tornar-se-á incompatível.
@@ -331,16 +331,17 @@ Assim, no que se refere à componente \textit{Informação de análise e control
 \subsection{Informação de controlo}
 
 Os ficheiros de controlo criados foram: \textit{pid}, \textit{ppid}, \textit{tgid} e \textit{option}.
-Estes ficheiros à excepção do último, são ficheiros que podem ser lidos e escritos pelo administrador, que caso já tenham sido escritos, contêm o identificador referente ao processo a monitorizar.
-Caso não tenham sido escritos o valor por omissão é 0.
-O ficheiro \textit{option}, tem apenas a permissão de escrita e, dependendo do valor escrito, pode activar a procura de portos no processo indicado em \textit{pid}, apagar todos os dados do repositório e activar ou desactivar o filtro dinâmico.
+Estes ficheiros, à excepção do último, podem ser lidos e escritos pelo administrador e, se já tiverem sofrido uma escrita, contêm o identificador referente ao processo a monitorizar.
+Caso não tenham sido alterados, o ficheiro conterá o valor por omissão, neste caso zero (0).
+O ficheiro \textit{option}, tem apenas a permissão de escrita e, dependendo do valor escrito, pode activar a procura de portos no processo indicado em \textit{pid}, apagar todos os dados do repositório e activar, ou desactivar, o filtro dinâmico.
 
 \subsection{Informação de análise}
-A informação de análise apenas é adicionada, caso o seu suporte seja activado na compilação, permitindo assim obter estatísticas sobre os diferentes componentes internos ao \textit{MRoP}.
+A informação de análise apenas é adicionada, caso o seu suporte seja activado na compilação.
+Caso esteja activa é possivel obter estatísticas sobre os diferentes componentes internos ao \textit{MRoP}.
 
-Os ficheiros de análise apenas estão apenas disponíveis para leitura, dado que quando lidos, devolvem os valores presentes nos contadores internos do \textit{MRoP}.
+Os ficheiros de análise apenas estão disponíveis para leitura, dado que quando lidos, devolvem os valores presentes nos contadores internos do \textit{MRoP}.
 Sobre os filtros estes contadores têm o número de pacotes que passaram no filtro dinâmico, bem como o número de pacotes que foram declarados para captura.
-No que se refere à monitorização do processo, existe também um ficheiro que devolve, em relação a cada uma das funções instrumentadas, o número de vezes que foi executado o \textit{handler} e quantas destas execuções pertenciam ao processo alvo.
+No que se refere à monitorização do processo, existe também um ficheiro que devolve, em relação a cada uma das funções instrumentadas, o número de execuções do \textit{handler} e, quantas destas pertenciam ao processo alvo.
 Relativamente ao repositório de dados, foi também criado um ficheiro com estatísticas, onde incidiram sobre o número de portos em utilização e, para cada porto, a indicação de estar estar em utilização, através do protocolo \textit{TCP}, \textit{UDP} ou em ambos, e por qual ou quais endereço(s) de rede.
 
 %\begin{figure}[ht]

@@ -2,19 +2,19 @@
 
 \section{Contexto}
 \label{sec:intro_context}
-A monitorização de uma aplicação destina-se normalmente à obtenção de informações relevantes acerca do seu comportamento durante a execução, mas pode igualmente servir para verificar a correcção, recursos atribuídos e usados, desempenho de execução, etc.
+A monitorização de uma aplicação destina-se, normalmente, à obtenção de informações relevantes acerca do seu comportamento durante a execução, mas pode igualmente servir para verificar a correcção, recursos atribuídos e usados, desempenho de execução, etc.
 
 A maioria dos sistemas de operação generalistas apresentam métodos de monitorização, devido à importância de que estes se revestem, quer no desenvolvimento das aplicações, quer na gestão destes sistemas.
 Se algumas ferramentas são específicas na monitorização de determinados recursos (como a biblioteca \textit{LibPCap}, que é específica nas interacções com o exterior utilizando interfaces de rede), outras são mais generalistas podendo monitorizar recursos diversos (como o \textit{LTT}, \textit{OProfile}, etc.).
 
-Esta dissertação foca-se na monitorização no núcleo das interacções das aplicações através de interfaces de rede.
+Esta dissertação foca-se na monitorização do núcleo, nas interacções das aplicações através de interfaces de rede.
 
 O dinamismo das aplicações pode dificultar bastante o processo de monitorização.
-Esta situação é particularmente sentida ao nível da monitorização dos dispositivos de \textit{IO}, e interfaces de rede.
+Esta situação é particularmente sentida ao nível da monitorização dos dispositivos de \textit{IO} e interfaces de rede.
 Nas aplicações onde as ligações e interacções são bastante dinâmicas e efectuadas em cada execução de um modo nem sempre previsível, a monitorização é particularmente difícil de ser realizada.
 
 A monitorização no núcleo pode gerar um elevado volume de dados que podem mostrar-se irrelevantes para as análises efectuadas.
-Se considerarmos que a transferência dos dados gerados pela monitorização, do núcleo para o nível utilizador, onde se localizam as ferramentas que procedem à análise dos mesmos, é necessário efectuar a cópia destes e proceder à sua filtragem, de modo a obtermos apenas os eventos pretendidos.
+Se considerarmos que a transferência dos dados gerados pela monitorização, do núcleo para o nível utilizador, onde se localizam as ferramentas que procedem à análise dos mesmos, é necessário efectuar a cópia destes dados e proceder à sua filtragem, de modo a obtermos apenas os eventos pretendidos.
 Se analisarmos atentamente este processo de monitorização, chegar-se-à à conclusão que este irá produzir uma sobrecarga sobre o sistema.
 Assim, de forma a capturar apenas dados relevantes e simultaneamente minimizar os efeitos da monitorização, são aplicados filtros logo que possível, no núcleo do sistema.
 Considerando que aplicações \textit{P2P} utilizam diversos portos de comunicação, revela-se difícil capturar os pacotes com base nos actuais filtros, sem que se assista a uma elevada degradação do desempenho.
