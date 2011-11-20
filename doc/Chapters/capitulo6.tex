@@ -1,10 +1,10 @@
 \chapter{Avaliação}
 \label{cap:avaliacao}
 
-Antes de se utilizar um novo sistema, é conveniente proceder-se a testes alargados de verificação, para que se tome conhecimento do seu correcto funcionamento e das sobrecargas introduzidas, para que deste modo possa ser utilizado como uma mais–valia.
-O mecanismo implementado (\textit{MRoP}) foi avaliado funcionalmente, através de diversos testes relativamente aos dados de entrada nos diversos componentes que o constituem.
-Como existem diversas fontes de dados para o \textit{MRoP} (dados de controlo, dados do processo alvo de monitorização, fluxos de rede, etc.), foram criados vários testes de modo a que todas estas fontes de dados sejam analisadas.
-Para além destas fontes directas de dados foi, também, verificada a correcção de que todos os fluxos de dados obtidos, através da monitorização de rede, são exclusivos ao processo alvo.
+Antes de se utilizar um novo sistema, é conveniente proceder-se a testes alargados de verificação, com o objectivo de tomar conhecimento do seu correcto funcionamento e das sobrecargas introduzidas, para que possa ser utilizado como uma mais–valia.
+O mecanismo implementado (\textit{MRoP}) foi avaliado funcionalmente, através de diversos testes aos dados de entrada nos diversos componentes que o constituem.
+Como existem diversas fontes de dados para o \textit{MRoP} (dados de controlo, dados do processo alvo de monitorização, fluxos de rede, etc.), foram criados vários testes de modo a que todas estas fontes de dados fossem analisadas.
+Para além destas fontes directas de dados foi, igualmente, verificada a correcção de que todos os fluxos de dados obtidos, através da monitorização de rede, são exclusivos do processo alvo.
 Assim todos estes testes e avaliações foram executados com sucesso e serão apresentados na secção \ref{sec:eval_functional}.
 
 Como um dos principais objectivos desta dissertação é criar um mecanismo com melhor desempenho que os anteriores, apresentados na secção \ref{sect:outras_abordagens}, foi assim necessário verificar se este tinha sido atingido.
@@ -17,20 +17,20 @@ Por último, serão apresentadas algumas conclusões sobre as análises efectuad
 \label{sec:eval_functional}
 
 A análise funcional ao \textit{MRoP} teve várias vertentes, uma vez que este mecanismo recebe dados de diferentes fontes.
-Assim os testes visaram a verificação dos dados indicados pelo administrador, pelo processo alvo e os das estruturas do núcleo.
-Foi necessário garantir que não existiam falhas nos mecanismo de entrada de dados ao \textit{MRoP}, porque como este está a executar no núcleo tem acesso a todo o sistema, assim qualquer problema na validação de dados poderá comprometer o sistema tanto a nível de segurança como a nível de disponibilidade.
+Assim os testes visaram a verificação dos dados inseridos pelo administrador, pelos dados monitorizados do processo alvo e os recolhidos das estruturas do núcleo.
+Foi necessário garantir a inexistência de falhas nos mecanismo de entrada de dados no \textit{MRoP}, porque como este está a executar no núcleo tem acesso a todo o sistema, logo qualquer problema na validação de dados poderá comprometer o sistema quer ao nível de segurança quer ao nível de disponibilidade.
 
 
 
 \subsection{Teste ao componente de controlo}
 
-Como o \textit{MRoP} foi desenvolvido para ser um módulo para o núcleo, é necessário que seja adicionado a este através do programa \textit{insmod} ou semelhante.
-Após a adição do \textit{MRoP} ao núcleo, para funcionar é necessário ser um utilizador com permissões de administrador (\textit{root}), e escrever em determinados ficheiros criados no \textit{DebugFs} para o controlo do \textit{MRoP}.
-Dado que o \textit{MRoP} é parte do núcleo, é necessário garantir que qualquer dado que lhe é passado não compromete a segurança nem a disponibildade do sistema, por isso as funções que recebem dados oriundos do sistema de controlo efectuam verificações antes de os passar para as restantes componentes do \textit{MRoP}.
-Como os dados de controlo são cadeias de caracteres, a função de verificação limita o tamanho máximo de caracteres, baseado no valor máximo expectável para a utilização do ficheiro.
-Assim cadeias de caracteres maiores que um determinado tamanho são truncadas, não existindo a possibilidade de explorar falhas de \textit{overflow}.
-O valor zero (\textit{0}) serviu como valor inicializador, sendo que valores superiores a este, indicadores de que existe uma opção activa no \textit{MRoP}.
-Para além destas análise, foram também verificadas que as permissões dos ficheiros estão de acordo com o estritamente necessário, e que apenas estão disponíveis ao utilizador \textit{root}.
+Como o \textit{MRoP} foi desenvolvido para ser um módulo para o núcleo, foi necessário adicioná-lo a este através do programa \textit{insmod}.
+Após a inclusão do \textit{MRoP} ao núcleo, para que este funcione é necessário que um utilizador com permissões de administrador (\textit{root}), escreva em determinados ficheiros criados no \textit{DebugFs} para o controlo do \textit{MRoP}.
+Dado que o \textit{MRoP} é parte do núcleo, é necessário garantir que a fiabilidade dos dados que lhe são transmitidos não comprometem a segurança nem a disponibildade do sistema, pelo que as funções que recebem dados oriundos do sistema de controlo efectuam verificações antes de os transmitirem às restantes componentes do \textit{MRoP}.
+Como os dados de controlo são cadeias de caracteres, a função de verificação limita o comprimento máximo destes, baseado no valor máximo expectável para a utilização do ficheiro.
+Assim cadeias de caracteres superiores a um determinado comprimento são truncadas, não existindo a possibilidade de explorar falhas de \textit{overflow}.
+O valor zero (\textit{0}) serviu como inicializador, sendo que valores superiores a este, são indicadores de que existe uma opção activa no \textit{MRoP}.
+Para além destas análise, foi também verificado que as permissões dos ficheiros são as estritamente necessárias e, se restringem a sua disponibildiade ao utilizador \textit{root}.
 
 \subsection{Obtenção do estado dos canais do processo alvo}
 
@@ -38,10 +38,10 @@ A análise funcional de detecção dos protocolos, portos e endereços locais, f
 Para o primeiro conjunto foi criado um servidor e um cliente, ambos utilizando o protocolo \textit{tcp}, em que o programa servidor esperava conexões numa porta e endereço pré-definidos.
 Como o \textit{MRoP} instrumenta as chamadas ao sistema \textit{connect}, \textit{accept}, \textit{bind}, \textit{recvfrom}, \textit{sendto} e a função \textit{sock\_close}, é possível capturar todas as operações relativamente às comunicações de rede utilizando os protocolos \textit{tcp} e \textit{udp}.
 Nas chamadas ao sistema \textit{bind} e \textit{connect}, um dos seus argumentos é uma estrutura \textit{sockaddr} que contém informações sobre o endereço e porto, sendo que na função \textit{connect} estes são relativos ao destino, e na função \textit{bind} são relativos à origem.
-Num \textit{socket} recentemente criado, as estruturas \textit{socket} e \textit{sock} que lhe pertencem, ainda não contêm os dados relativos aos portos e endereços.
+\todo{ligação com o anterior}Num \textit{socket} recentemente criado, as estruturas \textit{socket} e \textit{sock} que lhe pertencem, não contêm ainda os dados relativos aos portos e endereços.
 Assim os dados anteriormente mencionados, são de extrema utilidade para a construção do repositório do \textit{MRoP}, de modo a capturar apenas o tráfego respeitante ao processo alvo.
-Como os dados são provenientes do processo alvo, não é possível confiar que estão correctos, assim caso a função a executar retorne com um valor de erro, os valores adicionados são retirados do repositório, ficando novamente num estado consistente com a realidade.
-De modo a verificar que os dados que se encontram no repositório estão completos e correctos, é efectuada a leitura de todos os valores do repositório e apresentados através da função \textit{printk} para o terminal do núcleo, ou então são apresentados no ficheiro criado para o efeito no sistema de ficheiros virtual \textit{DebugFs}, verificando se são os mesmo que a aplicação \textit{netstat} declara para o processo alvo.
+Como os dados são provenientes do processo alvo, não é possível não é possível garantir a sua fiabilidade, assim caso a função a executar retorne com um valor de erro, os valores adicionados são retirados do repositório, ficando novamente num estado consistente com o processo alvo.
+De modo a verificar que os dados que se encontram no repositório estão completos e fiáveis, é efectuada a leitura de todos os valores do repositório e apresentados através da função \textit{printk} para o terminal do núcleo, ou são apresentados no ficheiro criado para o efeito no sistema de ficheiros virtual \textit{DebugFs}, verificando a sua exactidão com o que a aplicação \textit{netstat} declara para o processo alvo.
 
 Quando o processo alvo já se encontra em execução e se inicia a monitorização, caso os \textit{sockets} estejam em utilização contêm os dados relativos aos protocolos, portos e endereços dos \textit{sockets} e, por isso consideram-se correctos e válidos, sendo automaticamente adicionados ao repositório.
 
@@ -61,7 +61,7 @@ Quando o processo alvo já se encontra em execução e se inicia a monitorizaç�
 \subsection{Avaliação de monitorização de rede}
 
 Foi efectuada uma verificação da correcção dos dados transferidos entre dois processos, um cliente e outro servidor.
-Estes testes foram apenas efectuados para protocolos assentes sobre \textit{tcp}, pois nestes existe a certeza que, devido ao sistema de controlo de comunicação não existem falhas, o que permite analisar a transferência desde o seu início até ao seu término.
+Estes testes foram apenas efectuados para protocolos assentes sobre \textit{tcp}, pois nestes existe a certeza que, devido ao sistema de controlo de comunicação não existem falhas, o que permite analisar a transferência desde o início ao fim.
 
 A execução do teste consistiu na transferência de um ficheiro entre duas máquinas, ligadas por um \textit{switch} com portas a 100 \textit{Mbit/s}, através do protocolo aplicacional \textit{ftp}, enquanto existiam outros fluxos de rede de outros processos.
 Foi escolhido este protocolo pois, apesar de ser necessário conhecer \textit{à priori} a porta de comunicação com o servidor, a transmissão de dados é efectuada noutra porta negociada dinamicamente, permitindo demonstrar também o potêncial do \textit{MRoP}.
@@ -69,31 +69,31 @@ Todas as comunicações remotas referentes a esta transferência foram monitoriz
 Esta monitorização foi guardada através do \textit{tcpdump} num ficheiro para posterior análise através do \textit{Wireshark}.
 Utilizando o ficheiro capturado no \textit{Wireshark}, foi possível observar que apenas os fluxos de rede da transferência existiam no ficheiro.
 Após esta verificação, foi efectuada a recuperação do ficheiro transmitido através da agregação dos dados presentes nos pacotes, exceptuando os cabeçalhos.
-Esta recuperação foi guardada num ficheiro temporário, de modo a poderem ser aplicadas funções de sintese (\textit{md5} e \textit{sha1}), com o objectivo de verificar que o conteúdo dos pacotes recuperado era exactamente igual ao ficheiro original, e à sua transferência.
-Esta verificação foi confirmada através do mesmo valor retornado para os três ficheiros, para cada uma das funções de síntese utilizadas.
+Esta recuperação foi guardada num ficheiro temporário, de modo a poderem ser aplicadas funções de síntese (\textit{md5} e \textit{sha1}), com o objectivo de verificar se o conteúdo dos pacotes recuperado era exactamente igual ao do ficheiro original, e à sua transferência.
+Esta verificação foi confirmada através do retorno do mesmo valor para os três ficheiros, para cada uma das funções de síntese utilizadas.
 
-Foi também necessário verificar a correcção de transferências sobre o protocolo \textit{udp}, por isso realizou-se um teste utilizado o programa \textit{iperf} com recurso a \textit{sockets} \textit{udp}.
-Para a realização deste teste foi utilizada a mesma infra-estrutura de rede, em que numa das máquinas foi executado o \textit{iperf} em modo servidor utilizando \textit{sockets udp}, e na outra máquina foi executado o modo cliente utilizando \textit{sockets} \textit{udp}.
-Foi efectuada a monitorização de rede na máquina que executou o \textit{iperf} em modo cliente, através do programa \textit{tcpdump} com o módulo do núcleo activo e com a indicação do identificador do processo \textit{iperf}, enquanto existiam outros fluxos de rede de outros processos.
-O resultado da monitorização pelo \textit{tcpdump} foi guardado num ficheiro, que indicou que o total de \textit{bytes} correctamente recebidos pelo \textit{iperf} em modo servidor, foram também obtidos pela monitorização.
-Neste ficheiro não existiam mais fluxos de dados que não os respeitantes à utilização do \textit{iperf}.
+Foi também necessário verificar a correcção de transferências sobre o protocolo \textit{udp}, para o que se procedeu à realização de um teste utilizado o programa \textit{iperf}, com recurso a \textit{sockets} \textit{udp}.
+Para a realização do referido teste foi utilizada a mesma infra-estrutura de rede, em que numa das máquinas foi executado o \textit{iperf} em modo servidor utilizando \textit{sockets udp}, enquanto na outra foi executado o modo cliente utilizando \textit{sockets} \textit{udp}.
+Foi ainda efectuada a monitorização de rede na máquina que executou o \textit{iperf} em modo cliente, através do programa \textit{tcpdump} com o módulo do núcleo activo e com a indicação do identificador do processo \textit{iperf}, enquanto existiam outros fluxos de rede de outros processos.
+O resultado da monitorização pelo \textit{tcpdump} foi guardado num ficheiro, que indicou que o total de \textit{bytes} correctamente recebidos pelo \textit{iperf} em modo servidor, foram igualmente obtidos pela monitorização.
+Neste ficheiro não existiam outros fluxos de dados que não os respeitantes à utilização do \textit{iperf}.
 
-Como anteriormente referido, aquando dos testes existiram outros fluxos de rede, nomeadamente de tráfego \textit{web}, de aplicações de conversação instantânea, entre outros, de modo a comprovar a eficácia do \textit{MRoP}.
+Como o anteriormente referido, aquando da realização dos testes existiram outros fluxos de rede, nomeadamente de tráfego \textit{web}, e de aplicações de conversação instantânea, entre outros, de modo a comprovar a eficácia do \textit{MRoP}.
 
 \section{Avaliação do desempenho}
 \label{sec:eval_performance}
 
-Tendo presente a avaliação do desempenho, foram efectuados diversos testes com o objectivo de avaliar a sobrecarga gerada pela introdução do \textit{MRoP}.
+Tendo em vista a avaliação do desempenho, foram efectuados diversos testes com o objectivo de avaliar a sobrecarga gerada pela introdução do \textit{MRoP}.
 Estes testes basearam-se na recepção ou transmissão de \textit{1 GigaByte} de dados, utilizando diferentes programas e protocolos, entre duas máquinas ligadas directamente.
 Ambas as máquinas, que se optou por designar de máquina 1 e máquina 2, procederam à transmissão/recepção de dados, utilizando cada uma, apenas, um processador activo de 2 e de 2.6 Ghz, respectivamente.
-As máquinas anteriormente descritas encontravam-se conectadas directamente, por interfaces de rede a 100 MBit/s, ficando uma das máquinas responsável pela execução dos servidores \textit{ftp}, \textit{http} e \textit{iperf}, e a outra pelos respectivos clientes.
+As máquinas anteriormente referidas encontravam-se conectadas directamente, por interfaces de rede a 100 MBit/s, ficando uma responsável pela execução dos servidores \textit{ftp}, \textit{http} e \textit{iperf}, e a outra pelos respectivos clientes.
 A versão do sistema de operação utilizado, em ambas as máquinas, correspondeu ao 2.6.39, sendo que na máquina 1 foram introduzidas as modificações, para incluir o \textit{hook} do \textit{MRoP} e as suas funções auxiliares, enquanto na máquina 2 se executou o sistema original.
 
 \subsection{Desempenho do \textit{MRoP}}
 
 
 Na execução destes testes, foram efectuadas dez iterações, isto é, cada teste foi executado dez vezes, para cada experiência considerada, de modo a obter um valor médio e um desvio padrão considerado aceitável.
-Os testes efectuados, em particular os primeiros, ilustram situações em que não há grande vantagem em ter o sistema o \textit{MRoP} activo, com vista a medir a sobrecarga do \textit{MRoP}.
+Os testes efectuados, em particular os primeiros, não mostraram vantagem em ter o mecanismo \textit{MRoP} activo, com vista a medir a sobrecarga do \textit{MRoP}.
 Os resultados obtidos constam nas tabelas \ref{tab:desempenho} e \ref{tab:overhead}.
 
 Os primeiros quatro testes foram efectuados utilizando apenas uma conexão ao servidor, enquanto o 5º e o 6º testes utilizaram mais uma comunicação, de modo a aumentar o peso sobre o processador e o número de pacotes a circular entre as máquinas.
@@ -101,7 +101,7 @@ Desta forma, foi possível identificar a sobrecarga exercida enquanto o \textit{
 
 Na tabela \ref{tab:desempenho}, a coluna "Original" corresponde aos valores resultantes dos tempos médios das execuções das transferências na ausência de monitorização.
 Na mesma tabela e na coluna "Com \textit{TcpDump}", é apresenta a média dos tempos de transferência com a captura total do tráfego utilizando a \textit{LibPCap}/\textit{LSF} original, enquanto que a coluna identificada com "Com \textit{TcpDump} e \textit{MRoP}" regista a média dos tempos para a transferência com captura pelo tcpdump e o módulo \textit{MRoP} desenvolvido no núcleo, de forma a capturar, apenas, o tráfego da transferência do processo alvo.
-Nos primeiros quatro testes é possível verificar que a utilização do \textit{MRoP}, aumentou de forma insignificativa o tempo de execução (figura \ref{fig:tests_graphics}).
+Nos primeiros quatro testes é possível verificar que a utilização do \textit{MRoP}, aumentou de forma irrelevante o tempo de execução (figura \ref{fig:tests_graphics}).
 
 \begin{figure}[!htbp]
 \centering
@@ -173,16 +173,16 @@ IPerf - 1GB UDP 2 conexões$^{6}$ & 0.0752 & 0.0802   \\
 
 Os resultados da sobrecarga do \textit{tcpdump} com o \textit{MRoP}, em todos os casos analisados, foram sempre inferiores a 0.15\%, chegando mesmo a ser de 0.0309\%.
 Se estes resultados forem comparados com os obtidos em \cite{Farruca:2009}, pode verificar-se que são substancialmente melhores.
-Efectuando a comparação com o resultado obtido no 2º teste, da transferência por \textit{HTTP}, não por ser o melhor resultado obtido, mas por o teste ser identico, pode verificar-se a existência de uma melhoria no desempenho de 64 vezes.
+Efectuando a comparação com o resultado obtido no 2º teste, da transferência por \textit{HTTP}, não por ser o melhor resultado obtido, mas por o teste ser idêntico, pode verificar-se a existência de uma melhoria no desempenho de 64 vezes.
 
-Como foi anteriormente referido, os testes realizados apenas com o \textit{tcpdump} capturam todo o tráfego e, como não existia a monitorização do processo alvo, não era efectuada a filtragem dos pacotes.
+Como o anteriormente referido, os testes realizados apenas com o \textit{tcpdump} capturam todo o tráfego e, como não existia a monitorização do processo alvo, não era efectuada a filtragem dos pacotes.
 Desta forma os valores apresentados para o \textit{tcpdump} são meramente indicativos relativamente ao \textit{tcpdump} com o \textit{MRoP} activo, uma vez que lhe falta a componente de filtragem dos dados, aumentando o tempo de execução e a sua sobrecarga.
 
 \subsection{Desempenho da estrutura de dados}
 
 Para além das avaliações anteriormente descritas, tornou-se essencial analisar o comportamento da estrutura de dados utilizado no componente “estado do processo”, de modo a verificar o seu desempenho.
-Assim para esta análise, foi elaborado um teste para determinar o desempenho da estrutura de dados, em relação às inserções e remoções.
-Este teste utiliza o sistema de alta resolução de temporizadores (\textit{HRTimer})\cite{hrtimerKernel}, presente no núcleo do sistema de operação.
+Assim para esta análise, foi elaborado um teste para determinar o desempenho da estrutura de dados, relativamente às inserções e remoções.
+Este teste utilizou o sistema de alta resolução de temporizadores (\textit{HRTimer})\cite{hrtimerKernel}, presente no núcleo do sistema de operação.
 
 Para decidir qual o número de elementos a ser utilizado para este teste, foi verificado qual o valor máximo de descritores de canais que um processo pode ter.
 O valor foi obtido através da função \textit{getrlimits}, que indicou que o valor máximo de descritores de canais abertos, para um processo, é de 1024 canais.
@@ -214,7 +214,7 @@ Remoção de 1024 elementos & 675 086 & 659.2637\\
 
 Pode verificar-se, pela tabela \ref{tab:tree_info}, que a inserção de um elemento na árvore é inferior a 1 microsegundo, demonstrando que a estrutura utilizada não introduz uma elevada sobrecarga.
 A inserção de dados no repositório, não é efectuada com um desempenho constante, dado que quando é necessário efectuar um rebalanceamento da árvore, o processo de inserção é mais demorado devido à necessidade de efectuar rotações na árvore.
-Para além de estabelecer um bom compromisso de desempenho e utilização de memória, a sua disponibilidade de utilização no núcleo do sistema, possibilitou ter um elevado grau de confiança na sua utilização.
+Para além de estabelecer um bom compromisso de desempenho e utilização de memória, a sua disponibilidade de utilização no núcleo do sistema, possibilitou um elevado grau de confiança na sua utilização.
 
 O tempo médio despendido na procura do elemento com o menor valor de chave, nos 1024 elementos adicionados, foi de 1327 nanosegundos.
 Com este valor é possível verificar que para efectuar 10 iterações de procura na árvore, incorre-se numa penalização de 1.3 microsegundos.
@@ -225,10 +225,10 @@ O teste de desempenho realizado demonstra que, mesmo nas piores condições, ou 
 
 
 \subsection{Desempenho do Sistema de instrumentação}
-Sendo a instrumentação das chamadas ao sistema um dos pontos fundamentais na execução do \textit{MRoP}, a análise ao seu comportamento é bastante importante, na medida em que é necessário verificar se a introdução deste tipo de instrumentação irá produzir uma elevada penalização sobre o sistema de operação.
+Sendo a instrumentação das chamadas ao sistema um dos pontos fundamentais na execução do \textit{MRoP}, a análise ao seu comportamento é deveras importante, na medida em que é necessário verificar se a introdução deste tipo de instrumentação irá produzir uma elevada penalização sobre o sistema de operação.
 A titulo exemplificativo da sobrecarga introduzida pelo \textit{KRetProbe} em cada função instrumentada, foi adicionado \textit{KRetProbe} à chamada ao sistema \textit{getpid}.
-Esta chamada ao sistema foi escolhida, porque é uma função muito simples que apenas devolve o identificador do processo que a invocou.
-Este teste consistiu em avaliar o tempo decorrido entre o início e o fim do total das chamadas, com e sem o \textit{KRetProbe}, de forma a avaliar a sobrecarga e verificar se coincide com o indicado pelos criadores do sistema.
+Esta chamada ao sistema foi escolhida, devido à simplicidade da função que apenas devolve o identificador do processo que a invocou.
+Este teste consistiu em avaliar o tempo decorrido entre o início e o fim do total das chamadas, com e sem o \textit{KRetProbe}, de forma a avaliar a sobrecarga e verificar a sua coincidência com o indicado pelos criadores do sistema.
 
 
 \providecommand{\e}[1]{\ensuremath{\times 10^{#1}}}
@@ -249,7 +249,7 @@ Teste & Original & Com \textit{KRetProbe} & Sobrecarga por chamada\\
 \end{table}
 
 O valor de referência obtido pelos criadores do \textit{KProbes}, referentes ao \textit{KRetProbe} sem optimizações, é de 0.7 microsegundos\cite{KProbeKernel}, sendo que o valor médio obtido foi de 0.61 microsegundos, ou seja, ligeiramente inferior, visto que a máquina de referência apresenta uma frequência de \textit{cpu} inferior à máquina onde foram realizados estes testes.
-Esta sobrecarga é constante, o que indica que qualquer melhoria ao \textit{KProbes} afecte positivamente a sobrecarga do \textit{MRoP}.
+Esta sobrecarga é constante, o que indica que qualquer melhoria ao \textit{KProbes} afecta positivamente a sobrecarga do \textit{MRoP}.
 
 Consideram-se estes valores bastante aceitáveis e espera-se que tenham ainda reduzido impacto no desempenho normal do sistema.
 Note-se ainda que a instrumentação só é introduzida aquando do carregamento do \textit{MRoP}, de modo a executar a monitorização com esta nova funcionalidade.
@@ -257,9 +257,9 @@ Note-se ainda que a instrumentação só é introduzida aquando do carregamento 
 \section{Conclusão}
 \label{sec:five_chap_conclusion}
 
-Com os testes efectuados ao nível funcional e ao nível de desempenho ao \textit{MRoP} verificou-se que este mecanismo oferece um desempenho aceitável nas condições mais adversas, o que indica que para as condições das aplicações reais o seu desempenho será superior, enquanto que a sobrecarga introduzida no sistema poderá ser inferior ao constatado.
+Com os testes efectuados ao nível funcional e ao nível de desempenho ao \textit{MRoP} verificou-se que este mecanismo oferece um desempenho aceitável nas condições mais adversas, o que indicia que para as condições das aplicações reais o seu desempenho será superior, enquanto que a sobrecarga introduzida no sistema poderá ser inferior ao constatado.
 
-Pode verificar-se em relação ao trabalho \cite{Farruca:2009}, que a sobrecarga gerada pelo \textit{MRoP} foi muito inferior, demonstrando que apesar da dificuldade de trabalhar no núcleo, criar um sistema de monitorização de rede orientado ao processo através de um mecanismo não intrusivo, que assim que possível rejeite a captura de pacotes, reduz consideravelmente a sobrecarga no sistema.
+Pode verificar-se em relação ao trabalho \cite{Farruca:2009}, que a sobrecarga gerada pelo \textit{MRoP} foi muito inferior, demonstrando que apesar da dificuldade de operar no núcleo, criar um sistema de monitorização de rede orientado ao processo através de um mecanismo não intrusivo, que logo que possível rejeite a captura de pacotes, reduz consideravelmente a sobrecarga no sistema.
 
-Existe a possibilidade de reduzir a sobrecarga no sistema se ao invés de se instrumentar as chamadas ao sistema, forem instrumentadas as funções especificas relacionadas com a pilha de protocolos \textit{tcp/ip}.
+Existe ainda a possibilidade de reduzir a sobrecarga no sistema, se ao invés de se instrumentar as chamadas ao sistema, forem instrumentadas as funções especificas relacionadas com a pilha de protocolos \textit{tcp/ip}.
 

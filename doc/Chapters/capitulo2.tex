@@ -184,8 +184,7 @@ Daí que a biblioteca \textit{PCap} tenha uma linguagem própria para a especifi
 Se necessitar filtrar pacotes, especificará o filtro a utilizar, recorrendo às instruções presentes na \textit{LibPCap}, que através da função  \textit{pcap\_compile} o traduzirá e optimizará para o conjunto de instruções do \textit{BPF}, sendo posteriormente aplicado no núcleo através da função \textit{setfilter}.
 Se o filtro for demasiado complexo, não poderá ser aplicado no núcleo, sendo apenas possível aplicá-lo em nível utilizador, perdendo algum desempenho.
 Antes da introdução do novo filtro no canal, este tem de ser objecto de drenagem, para receber apenas os pacotes do novo filtro.
-Após esta inicialização, o programa poderá utilizar \textit{polling}\ref{}, de forma a obter os pacotes e analisá-los.
-Este sistema de captura, evita imediatamente a captura de pacotes irrelevantes para a captura e permite que aqueles que não são visíveis às aplicações, devido à \textit{firewall} do \textit{Linux}, possam ser capturados e analisados pelas ferramentas de monitorização de rede.
+Este modo de filtragem, evita imediatamente a captura de pacotes irrelevantes para a análise e permite que aqueles que não são visíveis às aplicações, devido à \textit{firewall} do \textit{Linux}, possam ser capturados e analisados pelas ferramentas de monitorização de rede.
 
 A arquitectura de rede do núcleo de sistema \textit{Linux}, utiliza \textit{socket buffers}, que contêm dados referentes às diferentes camadas da pilha de rede \textit{TCP/IP}.
 Esta estrutura que dispõe de toda a informação sobre o pacote, a receber pela aplicação, é igualmente utilizada nos sistemas de monitorização em nível utilizador.
