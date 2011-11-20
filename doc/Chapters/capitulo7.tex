@@ -3,7 +3,7 @@
 
 Esta dissertação teve como objectivo a criação de uma extensão ao actual \textit{PCap}/\textit{LSF}, utilizado no \textit{Linux}, de modo a restringir a captura dos pacotes referentes a uma determinada aplicação, contribuindo deste modo para a redução da sobrecarga no sistema de monitorização com uma nova funcionalidade e identificar os fluxos de rede de uma forma não intrusiva.
 
-Para a realização da \textit{Monitorização de Rede orientada ao Processo} (\textit{MRoP}), foi necessário, para além de identificar os pontos e conhecer as razões que estiveram na génese do insucesso de anteriores trabalhos, criar alternativas permitissem ultrapassá-los.
+Para a realização da \textit{Monitorização de Rede orientada ao Processo} (\textit{MRoP}), foi necessário, para além de identificar os pontos e conhecer as razões que estiveram na génese do insucesso de anteriores trabalhos, criar alternativas que permitissem ultrapassá-los.
 Para atingir tal objectivo, foram estudados os mecanismos de monitorização internos ao núcleo e os sistemas de comunicação entre o núcleo e as aplicações em nível utilizador.
 
 O estudo centrou-se, principalmente, nos mecanismos de monitorização ao nível do núcleo, pois estes permitem efectuar análises não intrusivas e, devido à sua localização, dispensam a permuta de dados entre o nível utilizador e o núcleo, o que a não acontecer contribuiria para o aumento da sobrecarga.
@@ -13,10 +13,10 @@ Os dados relevantes desta interacção, são adicionados a um repositório, de m
 
 Esta extensão foi analisada funcionalmente através de programas que criavam, comunicavam e destruiam canais de comunicação, onde todas estas interacções eram registadas e verificadas.
 Na avaliação funcional, foram igualmente executados programas que efectuavam transferências utilizando os protocolos \textit{HTTP} e \textit{FTP}, enquanto decorriam outros fluxos na rede. 
-O \textit{MRoP} foi aplicado a estes programas, de modo a capturar todo o trafego respeitante às transferências destes dois protocolos, a compatibilidade está garantida, continuando a poder utilizar-se as ferramentas existentes como o \textit{tcpdump} e o \textit{Wireshark}.
+O \textit{MRoP} foi aplicado a estes programas, de modo a capturar todo o trafego respeitante às transferências destes dois protocolos, garantindo a compatibilidade e a possibilidade de continuar a utilizar as ferramentas existentes como o \textit{tcpdump} e o \textit{Wireshark}.
 Foi possível constatar a correcção dos protocolos e verificar que apenas as interacções da aplicação alvo com o exterior, foram capturadas.
 Para além desta análise funcional, foi efectuada uma outra, onde se compararam os desempenhos do \textit{PCap}, com e sem esta nova extensão, a fim de determinar qual a sobrecarga introduzida pelo \textit{MRoP} na monitorização já existente.
-Os resultados apurados evidenciam que a sobrecarga é praticamente inexistente nos piores casos e, que trará algumas vantagens perante vários fluxos de dados irrelevantes.
+Os resultados apurados evidenciam que a sobrecarga é praticamente inexistente nos piores casos, trazendo vantagens na monitorização quando perante vários fluxos de dados irrelevantes para a análise.
 
 Nas secções seguintes são apresentados as principais conclusões da realização desta dissertação, assim como as possíveis evoluções e extensões ao \textit{MRoP}.
 
@@ -47,7 +47,7 @@ Acresce ainda a possibilidade de verificar problemas de concorrência na presen�
 
 Considerando que o sistema implementado se limita a monitorizar protocolos acentes em \textit{TCP} e \textit{UDP}, poderia ver a sua contribuição alargada se abrangesse outros protocolos como \textit{icmp, arp, stp}, etc.
 
-Outra possibilidade será procurar optimizar a instrumentação e evitar a instrumentação das funções \textit{sendto} e \textit{recvfrom}, restringindo a sua aplicação a funções internas especificas dos protocolos monitorizados.
+Outra possibilidade será procurar optimizar a instrumentação, evitando a instrumentação das funções \textit{sendto} e \textit{recvfrom}, restringindo a sua aplicação a funções internas específicas dos protocolos monitorizados.
 
-Pretende-se partilhar o uso destas funcionalidades submetendo este sistema a analise da comunidade utilizador do sistema \textit{Linux} com vista à sua implementação na versão principal do núcleo do \textit{Linux}.
+Pretende-se partilhar o uso destas funcionalidades submetendo este sistema a análise da comunidade utilizadora do sistema \textit{Linux} com vista à sua implementação na versão principal do núcleo do \textit{Linux}.
 Considera-se ainda a integração deste trabalho com o anterior \cite{duarte10,Farruca:2009}, com vista à obtenção de uma ferramenta de monitorização distribuída com baixa sobrecarga.

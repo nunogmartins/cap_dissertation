@@ -38,13 +38,13 @@ A análise funcional de detecção dos protocolos, portos e endereços locais, f
 Para o primeiro conjunto foi criado um servidor e um cliente, ambos utilizando o protocolo \textit{tcp}, em que o programa servidor esperava conexões numa porta e endereço pré-definidos.
 Como o \textit{MRoP} instrumenta as chamadas ao sistema \textit{connect}, \textit{accept}, \textit{bind}, \textit{recvfrom}, \textit{sendto} e a função \textit{sock\_close}, é possível capturar todas as operações relativamente às comunicações de rede utilizando os protocolos \textit{tcp} e \textit{udp}.
 Nas chamadas ao sistema \textit{bind} e \textit{connect}, um dos seus argumentos é uma estrutura \textit{sockaddr} que contém informações sobre o endereço e porto, sendo que na função \textit{connect} estes são relativos ao destino, e na função \textit{bind} são relativos à origem.
-\todo{ligação com o anterior}Num \textit{socket} recentemente criado, as estruturas \textit{socket} e \textit{sock} que lhe pertencem, não contêm ainda os dados relativos aos portos e endereços.
 Assim os dados anteriormente mencionados, são de extrema utilidade para a construção do repositório do \textit{MRoP}, de modo a capturar apenas o tráfego respeitante ao processo alvo.
-Como os dados são provenientes do processo alvo, não é possível não é possível garantir a sua fiabilidade, assim caso a função a executar retorne com um valor de erro, os valores adicionados são retirados do repositório, ficando novamente num estado consistente com o processo alvo.
-De modo a verificar que os dados que se encontram no repositório estão completos e fiáveis, é efectuada a leitura de todos os valores do repositório e apresentados através da função \textit{printk} para o terminal do núcleo, ou são apresentados no ficheiro criado para o efeito no sistema de ficheiros virtual \textit{DebugFs}, verificando a sua exactidão com o que a aplicação \textit{netstat} declara para o processo alvo.
+Como os dados são provenientes do processo alvo, não é possível garantir a sua fiabilidade, assim caso a função a instrumentada retorne com um valor de erro, os dados anteriormente adicionados (porto, endereço e protocolo) são retirados do repositório, ficando novamente num estado consistente com o processo alvo.
+De modo a verificar que os dados que se encontram no repositório são completos e fiáveis, é efectuada a leitura de todos os valores do repositório e apresentados através da função \textit{printk} para o terminal do núcleo, ou são apresentados no ficheiro criado para o efeito no sistema de ficheiros virtual \textit{DebugFs}, verificando a sua exactidão com o que a aplicação \textit{netstat} declara para o processo alvo.
 
 Quando o processo alvo já se encontra em execução e se inicia a monitorização, caso os \textit{sockets} estejam em utilização contêm os dados relativos aos protocolos, portos e endereços dos \textit{sockets} e, por isso consideram-se correctos e válidos, sendo automaticamente adicionados ao repositório.
 
+%Num \textit{socket} recentemente criado, as estruturas \textit{socket} e \textit{sock} que lhe pertencem, não contêm ainda os dados relativos aos portos e endereços.
 
 
 %\subsection{Avaliação das estruturas dos \textit{sockets} no núcleo}
