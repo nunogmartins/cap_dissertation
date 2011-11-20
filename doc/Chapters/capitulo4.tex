@@ -4,7 +4,7 @@
 De modo a conceber a arquitectura do mecanismo de Monitorização de Rede orientado ao Processo (\textit{MRoP}), foi necessário conhecer, como os processos em nível utilizador interagem com o exterior, via rede.
 Uma vez conhecida a arquitectura de rede do \textit{Linux}, tornou-se imprescindível compreender a forma, como se processa a comunicação e a monitorização de rede.
 
-Tendo em conta os factores anteriormente mencionados, este capítulo irá apresentar o funcionamento dos processos e a sua estruturação, bem como, a constituição do sistema de rede do \textit{Linux}, desde o momento do envio dos dados pelo processo até que estes cheguem à interface de rede, tendo em vista desenhar o sistema \textit{MRoP}.
+Tendo em conta os factores anteriormente mencionados, este capítulo irá apresentar o funcionamento dos processos e a sua estruturação, bem como, a constituição do sistema de rede do \textit{Linux}, desde o momento do envio dos dados pelo processo até estes atingirem a interface de rede, tendo em vista desenhar o sistema \textit{MRoP}.
 Considerando a abrangência desta visão, apenas serão focados os componentes essenciais da arquitectura, nomeadamente o descritor de processo, as familias de \textit{sockets}, a \textit{firewall}, o sistema de escalonamento de rede e a monitorização de rede.
 
 Após esta visão geral dos processos e do sistema de rede do \textit{Linux}, será apresentada a arquitectura proposta para o sistema de Monitorização de Rede orientado ao Processo (\textit{MRoP}).
@@ -17,33 +17,33 @@ Este consome recursos (físicos e lógicos), partilhados com outros processos nu
 O núcleo de sistema gere uma estrutura para cada processo (\textit{struct\_task}), onde estão identificados todos os recursos a este atribuídos.
 Esta estrutura contém apontadores para diversos recursos nomeadamente: zonas de memória requisitadas, canais abertos (ficheiros, \textit{sockets}, entre outros), contabilização de utilização de \textit{cpu}, apontadores para a sua árvore genealógica (pai, irmãos e filhos), etc~\cite{LKI, LKP}.
 
-A árvore genealógica, anteriormente indicada, contém o apontador para o processo pai (o processo que efectuou o \textit{fork}, o qual lhe deu origem), a lista de irmãos e dos descententes.
+A árvore genealógica, anteriormente referida, contém o apontador para o processo pai (o processo que efectuou o \textit{fork}, o qual lhe deu origem), a lista de irmãos e dos descententes.
 O processo pai, tal como cada um dos elementos presentes na lista, são estruturas do tipo \textit{task\_struct}, possibilitando, desta forma, a navegação ao longo da árvore genealógica do processo.
 
 Um dos recursos partilhados pelos diferentes processos é o acesso à rede, ou seja, o recurso que permite a comunicação com o exterior.
-De modo a que as comunicações tenham lugar, é necessário a alocação de canais de comunicação, cuja criação, utilização e destruição é efectuada pela \textit{API} definida no sistema de operação.
+Para que as comunicações tenham lugar, é necessária a alocação de canais de comunicação, cuja criação, utilização e destruição é efectuada pela \textit{API} definida no sistema de operação.
 Quando um processo cria um canal, o núcleo devolve-lhe um identificador, permitindo ao processo referenciar o canal dentro do núcleo e, deste modo, efectivar o seu controlo e realizar futuras comunicações.
 No núcleo, este identificador é gerido na estrutura que identifica os canais abertos, pelo processo.
 
-Para reconhecer qual o tipo do canal aberto, existem algumas funções específicas que o analisam e lhe permitem efectuar operações.
+Para reconhecer qual o tipo do canal aberto, existem funções específicas que o analisam e lhe permitem efectuar operações.
 Assim, ao manipular um ficheiro, existe a possibilidade de avançar e recuar, tendo como referência um determinado ponto.
 Todavia, esta situação deixa de fazer sentido, quando se pretende controlar um \textit{socket} ou um \textit{pipe}, na medida em que as comunicações nestes são destruídas quando consumidas (situação essa, que não se verifica aquando da manipulação de um ficheiro).
 
 Apesar destas informações estarem disponíveis no descritor de processo, não existe suporte neste descritor de modo a obter as interacções do processo com as interfaces de rede.
 Desta forma, apenas através da instrumentação das chamadas ao sistema, é possível obter as interacções anteriormente referidas.
-Deste modo quando um processo comunica com a rede, executa uma chamada ao sistema e por intermédio da instrumentação destas, é possível obter algumas informações relevantes que, combinadas com os dados do descritor do processo, permite que se obtenha as informações relativas aos portos, endereços e protocolos utilizados na comunicação com a rede.
+Assim, quando um processo comunica com a rede, executa uma chamada ao sistema e por intermédio da instrumentação destas, é possível obter algumas informações relevantes que, combinadas com os dados do descritor do processo, permitem que se obtenham as informações relativas aos portos, endereços e protocolos utilizados na comunicação com a rede.
 Com estes dados (protocolos, portos e endereços) é possível filtrar e capturar eficientemente os dados, através da extensão efectuada ao \textit{LSF}.
 
 \section{Arquitectura de rede em \textit{Linux}}
 \label{sub:network}
 
 Os processos necessitam de comunicar para obter dados, de modo a completar as suas execuções.
-Estas comunicações podem ser efectuadas tanto internamente, como externamente ao sistema.
+Estas comunicações podem ser efectuadas interna ou externamente ao sistema.
 Em geral, as comunicações externas processam-se através de uma interface de rede, sendo necessário, para tal, criar canais de comunicação.
-A(s) interface(s) de rede são recursos do sistema, as quais são partilhadas pelos diversos processos.
-Esta partilha é realizada pelo núcleo, pois apenas este é capaz de a efectuar correctamente.
+A(s) interface(s) de rede são recursos do sistema, que são partilhados pelos diversos processos.
+Esta partilha é realizada pelo núcleo, pois apenas tem a capacidade de a efectuar correctamente.
 
-A chamada ao sistema \textit{socket}, é efectuada para a criação de um canal de comunicação e este varia em função dos parâmetros: \textit{família}, t\textit{tipo} e \textit{protocolo}.
+A chamada ao sistema \textit{socket}, é efectuada para a criação de um canal de comunicação e este varia em função dos parâmetros: \textit{família}, \textit{tipo} e \textit{protocolo}.
 Existe um agrupamento em família de endereços (\textit{Address Family}), consoante se destina à comunicação remota ou local.
 Em termos gerais, as comunicações locais podem incidir na comunicação entre processos (\textit{AF\_UNIX}), ou entre estes e o núcleo (\textit{AF\_NETLINK}), enquanto as comunicações remotas podem ter lugar sobre protocolos da Internet, dispondo igualmente de uma família própria para o efeito (\textit{AF\_INET}).
 %As comunicações locais podem efectuar-se entre processos (\textit{AF\_UNIX}), ou entre estes e o núcleo (\textit{AF\_NETLINK}), enquanto as remotas podem ter lugar sobre a \textit{internet}, dispondo igualmente de uma família própria a \textit{AF\_INET}.
@@ -53,13 +53,13 @@ Estes canais possuem um conjunto de funções (\textit{API POSIX}) bem definidas
 %Para caracterizar o canal não é suficiente a especificação da família, é igualmente necessário especificar o tipo e o protocolo a utilizar, pois diferentes combinações de valores para estes parâmetros, traduzem-se em canais com diferentes funcionalidades.
 
 Hoje em dia, os administradores de sistemas necessitam filtrar o fluxo de informação que circula nas suas redes.
-Para tal, tem-se assistido ao desenvolvimento de sistemas de filtragem de comunicações, conhecidas por \textit{firewalls}.
+Para atingirem este objectivo, tem-se assistido ao desenvolvimento de sistemas de filtragem de comunicações, conhecidas por \textit{firewalls}.
 Sendo o \textit{Linux} um sistema de operação frequentemente utilizado em ambientes de servidores, tornou-se essencial a aplicação deste tipo controlo.
-A solução encontrada resultou do desenvolvido de uma \textit{firewall} (a qual foi denominada por \textit{NetFilter}) capaz de filtrar os fluxos de dados que circulam através da interface de rede.
+A solução encontrada resultou no desenvolvimento de uma \textit{firewall}, denominada de \textit{NetFilter}, capaz de filtrar os fluxos de dados que circulam através da interface de rede.
 
 Para além da existência da filtragem do fluxo de dados, o sistema de operação \textit{Linux} dispõe de um sistema de escalonamento do tráfego de rede, (\textit{Traffic Control}), que permite ao administrador indicar quais os fluxos de dados prioritários ou que necessitam de determinada largura de banda, possibilitando-lhe efectuar uma reserva antecipada da mesma.
  
-Adiante apresentar-se-ão diferentes constituintes da estrutura de rede do \textit{Linux}, iniciando-se pelas famílias de \textit{sockets} e terminando nos controladores de interfaces de rede.
+Adiante apresentar-se-ão diferentes constituintes da estrutura de rede do \textit{Linux}, desde as famílias de \textit{sockets} até aos controladores das interfaces de rede.
 
 Por último será apresentado o sistema de monitorização genérica de rede do \textit{Linux}.
 
@@ -86,15 +86,15 @@ No entanto desse conjunto destancam-se as famílias de endereços \textit{UNIX},
 \subsubsection{AF\_UNIX}
 
 A \textit{AF\_UNIX} consiste numa família de \textit{sockets} utilizada para efectuar a comunicação entre processos dentro da mesma máquina.
-É um dos sistemas de \textit{Inter Process Communication (IPC)}, utilizado em sistemas \textit{Unix}, ao qual permite utilizar um ficheiro, contido no sistema de ficheiros, como um canal de comunicações.
+É um dos sistemas de \textit{Inter Process Communication (IPC)}, utilizado em sistemas \textit{Unix}, que permite utilizar um ficheiro, contido no sistema de ficheiros, como um canal de comunicações.
 
 \subsubsection{AF\_NETLINK}
 
 A família \textit{NETLINK} é utilizada pelos processos, em nível utilizador, para comunicar com o núcleo.
-É possível efectuar comunicações ponto-a-ponto ou multi-ponto, isto é, é possível que um ou mais processos comuniquem com o núcleo, designadamente o \textit{netfilter}, como o sistema de encaminhamento de pacotes de rede, como o sistema de configuração de interfaces de rede, etc., através de um \textit{socket} nele criado.
+É possível efectuar comunicações ponto-a-ponto ou multi-ponto, isto é, é possível que um ou mais processos comuniquem com o núcleo, designadamente o \textit{netfilter}, o sistema de encaminhamento de pacotes de rede, ou ainda o sistema de configuração de interfaces de rede, etc., através de um \textit{socket} nele criado.
 Cabe aos processos, em nível utilizador, conectarem-se ao \textit{socket} definido no núcleo, o qual não é completamente passivo, na medida em que este pode iniciar comunicações assíncronas com os processos.
 
-Embora as interfaces de rede sejam configuradas através do programa \textit{ifconfig} em nível utilizador, o qual utiliza \textit{ioctls} para efectuar essa configuração, uma outra ferramenta foi desenvolvida (\textit{ethtool}), que tira partido de \textit{socket netlink} para efectuar estas configurações, dado que as \textit{ioctls} não permitem especificar correctamente os parâmetros (contrariamente ao que sucede nos \textit{socket netlink}).
+Embora as interfaces de rede sejam configuradas através do programa \textit{ifconfig} em nível utilizador, o qual utiliza \textit{ioctls} para efectuar essa configuração, uma outra ferramenta foi desenvolvida (\textit{ethtool}), que tira partido de \textit{socket netlink} para efectuar estas configurações, dado que as \textit{ioctls} não permitem especificar correctamente os parâmetros, contrariamente ao que sucede nos \textit{socket netlink}.
 
 \subsubsection{AF\_INET}
 \label{subsub:af_inet}
@@ -121,13 +121,13 @@ A criação de canais sobre o nível de transporte é efectuado utilizando a cha
 \end{minipage}
 \end{figure}
 
-O \textit{TCP} é utilizado para comunicações com controlo de fluxo de dados, que se adaptam ao canal existente, tolerando a perda momentânea de pacotes, e procedendo à sua retransmissão logo que possível.
+O \textit{TCP} é utilizado para comunicações com controlo de fluxo de dados, que se adaptam ao canal existente, tolerando a perda momentânea de pacotes e procedendo à sua retransmissão logo que possível.
 O controlo das retransmissões é efectuado através do envio de pacotes (\textit{acknowledges}), que informam o transmissor, dos que foram correctamente recebidos, permitindo-lhe reenviar os que se encontram em falta.
 
 O \textit{UDP} é um protocolo mais leve que o \textit{TCP}, pois não utiliza o controlo anteriormente referido.
-Para tal, este protocolo é habitualmente utilizado quando se está perante a possibilidade de perda de pacotes durante a transmissão ou quando o controlo da retransmissão destes, é efectuado em camadas superiores.
+É habitualmente utilizado quando se está perante a possibilidade de perda de pacotes durante a transmissão ou quando o controlo da retransmissão destes, é efectuado em camadas superiores.
 
-Para além dos protocolos anteriormente mencionados, existe ainda um protocolo denominado por \textit{SOCK\_RAW}.
+Para além dos protocolos anteriormente mencionados, existe ainda um denominado \textit{SOCK\_RAW}.
 Este protocolo permite o acesso directo ao nível rede, através da criação de um canal que comunica directamente com o nível rede da pilha de protocolos \textit{TCP/IP}, permitindo executar protocolos de comunicação em nível utilizador.
 Para utilizar \textit{sockets} através do modo \textit{RAW}, é necessário que o utilizador tenha permissões de \textit{super user}, uma vez que neste modo, é permitido ao utilizador específicar parte dos cabeçalhos dos pacotes a enviar, sem que o núcleo os valide.
 Contudo, a não validação, pode proporcionar que pacotes maliciosos, isto é, com falhas deliberadas, possam ser introduzidos na rede.
@@ -137,15 +137,15 @@ Contudo, a não validação, pode proporcionar que pacotes maliciosos, isto é, 
 
 A família \textit{AF\_PACKET} comunica directamente com o controlador da interface de rede, possibilitando assim efectuar a monitorização de rede.
 A utilização destes \textit{sockets} requer uma autorização de \textit{CAP\_NET\_RAW}, apenas disponível ao \textit{super user}.
-Tal verificação previne que utilizadores não autorizados possam monitorizar ou injectar pacotes na rede, influenciando o seu comportamento.
-Dado que dispõe da possibilidade de enviar pacotes directamente para o controlador de rede, uma das suas utilizações é a implementação de protocolos de rede em nível utilizador.
+Este requisito previne que utilizadores não autorizados possam monitorizar ou injectar pacotes na rede, influenciando o seu comportamento.
+Por dispor da possibilidade de enviar pacotes directamente para o controlador de rede, uma das suas utilizações é a implementação de protocolos de rede em nível utilizador.
 Os canais da família \textit{AF\_PACKET} são frequentemente utilizados em sistemas de detecção de intrusos, uma vez que permitem analisar os pacotes e detectar falhas na sua formatação.
 
-Como a obtenção dos pacotes por estes canais, é efectuada antes da recepção destes pelos processos, existe a possibilidade do \textit{NetFilter} bloquear a recepção de alguns pacotes, impedindo as aplicações de os receberem, não obstante do canal já os ter obtido para análise.
+Como a obtenção dos pacotes por estes canais, é efectuada antes da recepção destes pelos processos, existe a possibilidade do \textit{NetFilter} bloquear a recepção de alguns pacotes, impedindo as aplicações de os receberem, não obstante o canal já os ter obtido para análise.
 
 Como todos os pacotes recebidos pela(s) interface(s) de rede são obtidos por este canal, é necessário efectuar uma cópia destes e fornecê-los à aplicação em nível utilizador.
 Esta monitorização implica um peso extra na computação, pelo que diversas técnicas (designadamente \textit{lazy cloning}, \textit{mmap}, etc.) têm sido desenvolvidas no sentido de minimizá-lo.
-A utilização de \textit{lazy cloning}, destina-se a apenas efectuar a cópia, caso esta seja absolutamente necessária, permitindo reduzir a perda de eficiência do sistema, aquando da monitorização dos pacotes de rede.
+A utilização de \textit{lazy cloning}, destina-se apenas a efectuar a cópia, caso esta seja absolutamente necessária, permitindo reduzir a perda de eficiência do sistema, aquando da monitorização dos pacotes de rede.
 
 
 %A cópia do pacote é efectuada caso a avaliação do filtro indique que este deve ser copiado, caso contrário é terminada a execução em relação a esse pacote.
@@ -153,17 +153,17 @@ A utilização de \textit{lazy cloning}, destina-se a apenas efectuar a cópia, 
 
 \subsection{NetFilter}
 
-Este sistema, está implementado no núcleo do sistema de operação do \textit{Linux}, o qual controla o fluxo de dados dos processos de e para as interfaces de rede.
-O \textit{NetFilter} está presente na pilha de protocolos \textit{TCP/IP} em apenas cinco pontos (\textit{PRE ROUTING}, \textit{LOCAL IN}, \textit{FORWARD} \textit{LOCAL OUT} e \textit{POST ROUTING}) onde, em cada um dos quais, existe uma lista de funções a ser executada sobre o pacote, que foi recebido ou transmitido.
-Após a finalização destas funções e dependendo do valor retornado, o pacote irá ou não, prosseguir para as restantes camadas, até atingir o \textit{Traffic Control}(apresentado na subseccção \ref{sub:traffic_control}) ou na aplicação, efectuando deste modo, o controlo sobre o fluxo de rede.
+Este sistema, está implementado no núcleo do sistema de operação do \textit{Linux}, que controla o fluxo de dados dos processos de e para as interfaces de rede.
+O \textit{NetFilter} está presente na pilha de protocolos \textit{TCP/IP} em apenas cinco pontos (\textit{PRE ROUTING}, \textit{LOCAL IN}, \textit{FORWARD} \textit{LOCAL OUT} e \textit{POST ROUTING}), em cada um dos quais, existe uma lista de funções a ser executada sobre o pacote, que foi recebido ou transmitido.
+Após a finalização destas funções e dependendo do valor retornado, o pacote irá ou não, prosseguir para as restantes camadas, até atingir o \textit{Traffic Control}(apresentado na subseccção \ref{sub:traffic_control}) ou a aplicação, efectuando deste modo, o controlo sobre o fluxo de rede.
 O \textit{NetFilter} pode ser controlado pelo \textit{iptables}, uma ferramenta em nível utilizador, que através de regras, controla o acesso dos dados das comunicações de rede.
 
-Um dos componentes do \textit{netfilter} designado por \textit{connection tracking}, cuja sua funcionalidade permite que se efectue o acompanhamento das ligações desde a sua iniciação até ao seu término.
-De modo a realizar este acompanhamento, este componente necessita de conhecer os diferentes protocolos utilizados.
-Do mesmo modo que o \textit{nefilter} pode ser controlado por um programa em nível utilizador, esta componente \textit{connection tracking}, pode igualmente ser controlada pelo administrador, através do \textit{conntrack}.
+Um dos componentes do \textit{netfilter} designado por \textit{connection tracking}, cuja funcionalidade permite que se efectue o acompanhamento das ligações desde o seu inicio até ao seu \textit{terminus}.
+Para realizar este acompanhamento, este componente necessita conhecer os diferentes protocolos utilizados.
+Tal como o \textit{nefilter} pode ser controlado por um programa em nível utilizador, este componente \textit{connection tracking}, pode igualmente ser controlado pelo administrador, através do \textit{conntrack}.
 
-Este componente, \textit{connection tracking}, permite efectuar uma gestão mais eficiente e inteligente das conexões, sendo geralmente referido como \textit{firewall} com estado.
-Por outro lado, é também utilizado para efectuar \textit{Network Address Translation} (\textit{NAT})sobre as interfaces de rede.
+O \textit{connection tracking}, permite efectuar uma gestão mais eficiente e inteligente das conexões, sendo geralmente referido como \textit{firewall} com estado.
+Por outro lado, é igualmente utilizado para efectuar \textit{Network Address Translation} (\textit{NAT})sobre as interfaces de rede.
 
 Na transmissão de dados, quando estes passam no \textit{netfilter}, existe a possibilidade de identificá-los de forma a serem reconhecidos pelo \textit{traffic control}, permitindo assim efectuar uma gestão conjunta e inteligente do tráfego.
 
@@ -185,27 +185,27 @@ O \textit{QDisk} é a estrutura de suporte à transmissão de dados efectuada pe
 \subsection{Interfaces de rede}
 
 A interface de rede é o dispositivo que efectua a transmissão e recepção de dados na rede.
-Do ponto de vista do \textit{cpu}, a interface de rede apenas efectua pedidos de interrupção, sendo que o restante trabalho é realizado pelo controlador de rede, o qual efectua a ponte entre as funcionalidades de rede do núcleo e a interface de rede.
+Do ponto de vista do \textit{cpu}, a interface de rede apenas efectua pedidos de interrupção, sendo que o restante trabalho é realizado pelo controlador de rede, que efectua a ponte entre as funcionalidades de rede do núcleo e a interface de rede.
 
 O núcleo mantém a informação sobre as interfaces de rede, inicializadas pelos seus controladores.
 Estas, independentemente de estarem ou não em utilização, constam de uma lista duplamente ligada de \textit{net\_devices}.
-Em cada posição desta lista existem informações referente a uma interface de rede (nomeadamente a informação sobre o seu endereço \textit{IP}, o seu endereço \textit{MAC}, etc.), bem como outras configurações.
+Em cada posição desta lista existem informações referentes a uma interface de rede, nomeadamente a informação sobre o seu endereço \textit{IP}, o seu endereço \textit{MAC}, etc., bem como outras configurações.
 
-No registo de um novo controlador de interface de rede definem-se as operações a executar em determinados eventos (tais como a recepção e/ou transmissão de frames, a remoção da interface, etc.).
+No registo de um novo controlador de interface de rede definem-se as operações a executar em determinados eventos, tais como a recepção e/ou transmissão de frames, a remoção da interface, etc.
 Estas operações são definidas através de uma interface comum (\textit{struct netdev\_ops}), que permite afectar a esta estrutura, funções presentes nos módulos dos controladores, de modo a serem efectuadas as acções necessárias à utilização da interface de rede.
 
 \subsubsection{Estrutura de um sk\_buff}
 \label{subsub:sk_buff}
 
 Os dados envolvidos no fluxo de comunicação e utilizados pelos controladores correspondem aos \textit{socket buffers}, estruturas do tipo \textit{sk\_buff}.
-Esta estrutura contém diversos elementos, destacando-se os apontadores para a estrutura de rede do controlador, apontadores para secções do pacote (os diversos cabeçalhos pertencentes ao nível de rede e transporte), bem como a dimensão dos espaços alocados para estes e outros apontadores.
+Esta estrutura contém diversos elementos, merecendo especial relevância os apontadores para a estrutura de rede do controlador, os apontadores para secções do pacote, os diversos cabeçalhos pertencentes ao nível de rede e transporte, bem como a dimensão dos espaços alocados para estes e outros apontadores.
 
 \subsection{Captura dos fluxos de dados das interfaces de rede}
 \label{sub:network_cap}
 O sistema de monitorização de rede, opera de forma transparente à normal utilização da rede, por parte das aplicações.
 Desta forma, quando um pacote chega à interface de rede, esta envia ao \textit{cpu} um pedido de interrupção da computação.
 Neste ponto, é desligada a atenção do processador a novas interrupções, passando a computação para o controlador da interface de rede.
-Com a atenção do processador a novas interrupções desligada, a computação deve ser breve e restabelecer-se, logo de imediato, a atenção do processador a novas interrupções, de modo a que o normal funcionamento seja retomado.
+Com a atenção do processador a novas interrupções desligada, a computação deve ser breve e restabelecer-se de imediato, de modo a que o normal funcionamento seja retomado.
 Apenas a computação crítica é efectuada, diferindo a restante execução através da invocação de um \textit{softirq}, para que seja terminado o tratamento dos pacotes que chegaram à interface.
 O escalonamento do \textit{softirq} potencia o aproveitamento dos recursos ao equilibrar a execução de interrupções com as restantes tarefas.
 
@@ -213,7 +213,7 @@ Os pacotes recebidos são entregues aos \textit{sniffers} registados no sistema,
 A monitorização de rede é efectuada pelos \textit{sniffers}, sendo os pacotes entregues a cada um deles, para que possam proceder à sua análise.
 Cada \textit{sniffer} tem um filtro associado escrito em linguagem \textit{bpf}, a ser executado na máquina virtual, implementada para o efeito.
 
-Ao modificar a função que executa o filtro, de modo a incluir a chamada de um novo sistema de filtragem, permitirá a extensão do \textit{LSF}, sem que contudo, se assista a um elevado aumento da sobrecarga quando esse sistema de filtragem não esteja activo.
+A modificação da função que executa o filtro, de modo a incluir a chamada de um novo sistema de filtragem, permite a extensão do \textit{LSF}, sem que contudo, se assista a um elevado aumento da sobrecarga quando esse sistema de filtragem não esteja activo.
 
 %\subsubsection{Transmissão de dados}
 
@@ -242,8 +242,9 @@ O sistema proposto foi desenvolvido procurando cumprir os seguintes requisitos:
 \end{itemize}
 
 O mecanismo criado está dividido em quatro componentes principais: filtragem dos pacotes de rede, instrumentação das chamadas ao sistema, repositório do estado das interacções via rede, controlo e informação sobre o estado da monitorização (ver figura \ref{fig:arquitectura}).
+
 A função de filtragem, invocada por um \textit{hook} que estende o \textit{LSF}, permite que apenas o tráfego do processo alvo seja analisado pelo restante sistema de fitragem do \textit{LSF}.
-Por outro lado, relativamente à componente instrumentação das chamadas ao sistema (ou outras funções contidas no sistema de rede), esta actualiza a componente repositório de dados, onde é mantido o estado das interacções via rede do(s) processo(s) alvo, com as efectuadas pelo processo.
+Relativamente à componente instrumentação das chamadas ao sistema (ou outras funções contidas no sistema de rede), esta actualiza a componente repositório de dados, onde é mantido o estado das interacções via rede do(s) processo(s) alvo, com as efectuadas pelo processo.
 Existe ainda um sistema para controlo/configuração, destinado a obter informação sobre o estado da monitorização.
 
 \begin{figure}[htbp]
@@ -267,7 +268,7 @@ Este módulo do núcleo foi desenvolvido em quatro componentes, que em seguida s
 
 A principal relevância deste sistema, assenta no pressuposto de que todas as interacções desencadeadas por um processo com o exterior são detectadas.
 Para atingir esse objectivo, foi necessário recorrer à monitorização das chamadas ao sistema de rede ao nível do núcleo, para obter as interacções dos processos, de modo não intrusivo, com as interfaces de rede, possibilitando assim reduzir as cópias de dados e as trocas de contexto.
-Fazendo uso do sistema de monitorização \textit{KProbes}, foi possível realizar a monitorização sob um limitado conjunto de chamadas ao sistema, nomeadamente: \textit{sendto}, \textit{recvfrom}, \textit{bind}, \textit{accept}, \textit{connect} e \textit{close}.
+Fazendo uso do sistema de monitorização \textit{KProbes}, foi possível realizar a monitorização a um limitado conjunto de chamadas ao sistema, nomeadamente: \textit{sendto}, \textit{recvfrom}, \textit{bind}, \textit{accept}, \textit{connect} e \textit{close}.
 Ao efectuar esta monitorização é possível obter os portos, endereços e protocolos utilizados, de modo a detectar todas as modificações ao estado dos \textit{sockets} do processo.
 Com os dados relevantes obtidos da monitorização, afectados ao repositório, este mantem-se permanentemente actualizado relativamente aos portos, endereços e protocolos, utilizados pela aplicação.
 O filtro de pacotes ao aceder ao repositório e ao decidir quais os pacotes a capturar, origina a filtragem dinâmica orientada ao processo.
@@ -277,7 +278,7 @@ O filtro de pacotes ao aceder ao repositório e ao decidir quais os pacotes a ca
 \label{sub:data_repository}
 
 O estado dos portos dos protocolos \textit{TCP} e \textit{UDP} em uso no processo alvo, é mantido num repositório de dados e permanentemente actualizado pelo componente anteriormente referido em \ref{sub:mon_syscalls}.
-A árvore \textit{Red and Black} já disponível no núcleo do sistema, foi a estrutura de dados escolhida para produzir o repositório pretendido.
+A árvore \textit{Red and Black} já disponível no núcleo do sistema, foi a estrutura de dados escolhida para criar o repositório pretendido.
 
 O conteúdo de cada folha da árvore é uma estrutura com duas listas de elementos, contendo cada uma endereços \textit{IP} utilizados pela aplicação, sendo a chave de indexação das folhas, o número do porto.
 Desta forma, a árvore poderá conter no máximo 65535 elementos, por ser este o número máximo de portos em utilização por um endereço \textit{IP}.
@@ -290,7 +291,7 @@ O uso deste tipo de estrutura, permite obter um bom compromisso entre o tempo de
 
 A função de filtragem implementada neste sistema assenta no estado do processo alvo, mantido pelos módulos anteriormente descritos.
 Através da extensão do \textit{LSF} com um \textit{hook}, este quando ligado, invoca esta filtragem que devolve uma resposta ao \textit{LSF}, informando-o se deve ou não capturar o pacote em causa.
-Caso seja capturado indica que este pertence ao processo alvo, caso contrário irá ser sujeito a um processo de avaliação, baseado nas restantes regras de filtragem definidas.
+Caso seja capturado indica que este pertence ao processo alvo, caso contrário irá ser sujeito a um processo de avaliação, baseado nas restantes regras de filtragem.
 Mantêm-se assim, a compatibilidade e os benefícios da utilização do \textit{Linux Socket Filter}.
 Quando não existe uma ligação (\textit{hook}) activa, assiste-se a um ligeiro decréscimo no desempenho na utilização da filtragem estática.
 Tal facto deve-se apenas à necessidade de constatar se a ligação (\textit{hook}) está ou não activa.

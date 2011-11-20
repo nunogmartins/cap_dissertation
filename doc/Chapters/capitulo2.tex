@@ -1,8 +1,8 @@
 \chapter{Monitorização de processos}
 \label{cap:trabrelacionado}
-O recurso à monitorização do comportamento das aplicações, permite-nos obter dados relevantes sobre os recursos realmente utilizados, de modo a proporcionar-nos um conhecimento mais profundo do seu comportamento em execuções mas permitem também analisar o plano de execução, os métodos mais executados, e detectar situações de eventos interessantes.
-As informações recolhidas podem servir para analisarmos o desempenho ou correcção da aplicação sequencial ou distribuida, porquanto ao conseguir-se obter dados da utilização do \textit{cpu}, da memória, dos dispositivos de \textit{IO}, interacções, etc, é possível compreender o comportamento dinâmico das aplicações.
-Daí ser comum a utilização da monitorização como auxiliar na avaliação e depuração de programas conseguindo um bom compromisso entre a qualidade dos dados recolhidos e a perturbação das aplicações ~\cite{DuartePhd05}.
+O recurso à monitorização do comportamento das aplicações, permite-nos obter dados relevantes sobre os recursos realmente utilizados, de modo a proporcionar-nos um conhecimento mais profundo do seu comportamento em execuções reais, permite também analisar o plano de execução, os métodos mais executados e detectar situações de eventos interessantes.
+As informações recolhidas permitem analisar o desempenho ou correcção da aplicação, sequencial ou distribuida, porquanto ao conseguir-se obter dados da utilização do \textit{cpu}, da memória, dos dispositivos de \textit{IO}, interacções, etc, é possível compreender o comportamento dinâmico das aplicações.
+Daí ser comum a utilização da monitorização como auxiliar na avaliação e depuração de programas, conseguindo um bom compromisso entre a qualidade dos dados recolhidos e a perturbação das aplicações ~\cite{DuartePhd05}.
  
 Na secção \ref{} ... será apresentada a forma de monitorização de rede no \textit{Linux}.
 Na seccção \ref{} ... são apresentadas ferramentas e mecanismos do núcleo para efectuar a monitorização deste e dos processos em nível utilizador.
@@ -45,8 +45,8 @@ Por iniciativa explícita do utilizador, é possível inquirir o sistema de moni
 Este método, por vezes descrito como \textit{computacional steering}, é a forma com maior interactividade, uma vez que permite ir analisando e modificando os parâmetros da monitorização ou mesma da aplicação.
 
 \subparagraph*{Passiva - }
-Esta forma de monitorização é especialmente utilizada em ambientes onde é relevante a obtenção da totalidade dos dados e apenas no final nos debruçarmos sobre a sua análise.
-Esta forma é designada de passiva, por o utilizador não ter intervenção na forma como os dados estão a ser obtidos, o que reduz a perturbação do sistema.
+Esta forma de monitorização é especialmente utilizada em ambientes onde é relevante a obtenção da totalidade dos dados e, apenas no final, nos debruçarmos sobre a sua análise.
+Esta forma é designada de passiva, pois o utilizador não tem intervenção na forma como os dados estão a ser obtidos, o que reduz a perturbação no sistema.
 Quanto muito a sua acção acontece antes da execução, para configuração da informação a recolher.
 
 \paragraph*{}
@@ -69,20 +69,20 @@ Tal pode ser efectuado no início ou durante a sua execução, criando, alterand
 \subparagraph*{
 %Recolha de dados
 }
-A recolha de dados provenientes da monitorização, é uma das componentes mais sensíveis relativamente ao grau de perturbação da monitorização.
+A recolha de dados provenientes da monitorização, é uma das componentes mais sensíveis, relativamente ao grau de perturbação da monitorização.
 Em geral as informações recolhidas da monitorização são armazenados em memória central sendo posteriormente armazenados em memória persistente.
-Esta transferência de memória central para disco, em geral deve-se a uma acção explicita do utilizador, ou então, a algum evento que indica que é necessário guardar os dados, de forma a que novos dados possam ser armazenados em memória, uma vez que os \textit{buffers} em memória geralmente têm dimensão fixa.
+Esta transferência de memória central para disco em geral deve-se a uma acção explicita do utilizador, ou então, a algum evento indicador da necessidade de guardar os dados, de forma a que novos dados possam ser armazenados em memória, uma vez que os \textit{buffers} em memória geralmente têm dimensão fixa.
 %Caso exista algum evento que indique que o \textit{buffer} se encontra cheio ou por acção explícita do utilizador, tal é transferido para a interface com o utilizador ou armazena em memória persistente, para posterior análise.
 
 \subparagraph*{
 %Grau de perturbação
 }
-Existe, claro a preocupação de que o sistema a ser monitorizado tenha um baixo grau de perturbação, pois pode levar à alteração dos resultados obtidos e mesmo a comportamentos erráticos da aplicação (especialmente perante execuções concorrentes).
-Daí que, diversas abordagens foram criadas, para reduzirem o impacto da monitorização num sistema em produção.
-Uma destas abordagens traduz-se na utilização de instruções especializadas, de que alguns processadores dispõem para \textit{debug}, de modo a utilizar os recursos que mais se adequem à monitorização.
+Existe claro a preocupação de que o sistema a ser monitorizado, tenha um baixo grau de perturbação, pois esta perturbação pode levar à alteração dos resultados obtidos e mesmo a comportamentos erráticos da aplicação (especialmente perante execuções concorrentes).
+Daí que, diversas abordagens foram criadas, para reduzir o impacto da monitorização num sistema em produção.
+Uma destas abordagens traduz-se na utilização de instruções especializadas, as quais alguns processadores dispõem para \textit{debug}, de modo a utilizar os recursos que mais se adequem à monitorização.
 Estes métodos, nem sempre são utilizados, devido à sua dependência da arquitectura, o que dificulta a sua portabilidade.
-Com vista a minimizar a perturbação, alguns sistemas de monitorização utilizam uma técnica de amostragem, que permite obter indicações sobre os estado da computação a cada intervalo de tempo.
-Esta técnica, em oposição à criação de um traço de execução, permite obter dados sobre os recursos apenas por amostra, limitando à partida a perturbação, enquanto que na criação de um traço de execução, é possível obter a totalidade dos eventos de forma a criar uma história completa, mas pode levar a uma grande sobrecarga do sistema perante uma elevada taxa de eventos.
+Com vista a minimizar a perturbação, alguns sistemas de monitorização utilizam uma técnica de amostragem, o que permite obter indicações sobre os estado da computação a cada intervalo de tempo.
+Esta técnica, em oposição à criação de um traço de execução, permite obter dados sobre os recursos apenas por amostra, limitando à partida a perturbação, enquanto que na criação de um traço de execução, é possível obter a totalidade dos eventos de forma a criar uma história completa, conduzindo a uma grande sobrecarga do sistema perante uma elevada taxa de eventos.
 
 \paragraph*{
 }
@@ -91,23 +91,23 @@ No entanto estas análises não serão o foco deste trabalho.
 
 \section{Monitorização de Rede}\label{sub:network_monitoring}
 
-Em geral, as ferramentas de monitorização de rede, são baseadas na captura de pacotes de forma passiva.
+As ferramentas de monitorização de rede são em geral, baseadas na captura de pacotes de forma passiva.
 Estas capturam os pacotes que fluem através da interface de rede, para posterior análise ao tráfego, que pode incidir sobre a largura de banda utilizada, principais protocolos, eventuais problemas de segurança, etc.
 
 A monitorização das interacções dos processos com o exterior, pode ser efectuada de diferentes formas, duas destas serão apresentadas.
-A primeira é utilizando bibliotecas instrumentadas que obtêm os pacotes de dados quando estes chegam à aplicação, sendo a segunda forma recorrer a mecanismos genéricos do núcleo para a monitorização de rede.
+A primeira utiliza bibliotecas instrumentadas que obtêm os pacotes de dados quando estes chegam à aplicação, sendo que a segunda forma recorre a mecanismos genéricos do núcleo, para a monitorização de rede.
 Relativamente à primeira, é necessário conhecer o código da aplicação e instrumentá-lo, obtendo-se apenas os dados que chegam à aplicação.
 Este processo é específico a cada aplicação e pode ver o seu uso limitado por questões de segurança do sistema.
 No que à segunda forma se refere, a monitorização é efectuada de forma genérica, não sendo intrusiva para as aplicações, necessitando apenas de efectuar a monitorização do processo e da rede, separadamente. 
 
 \subparagraph*{Dinamismo das aplicações - }
 As aplicações são dinâmicas quanto às interacções via rede (por exemplo criando e destruindo canais de comunicação).
-A este dinamismo se devem algumas dificuldades com que nos deparamos, ao monitorizar as interacções dos vários fluxos de execução dos processos.
+A este dinamismo devem-se algumas dificuldades com que nos deparamos, ao monitorizar as interacções dos vários fluxos de execução dos processos.
 
 Relativamente à monitorização das interacções com o exterior, utilizando os mecanismos do sistema de operação, este dinamismo é um factor chave, pois existem dificuldades na forma de identificar os fluxos pertencentes a um processo face aos restantes, irrelevantes na nossa análise.
 
 \subparagraph*{Formas de reduzir o volume de dados utilizando filtros - }
-A utilização de filtros na captura do tráfego que circula na rede, é uma forma eficiente de apenas se obterem os dados relevantes, com vista à satisfação dos nossos objectivos e são particularmente importantes, quando o volume de dados que circula na rede é extremamente elevado.
+A utilização de filtros na captura do tráfego que circula na rede, é uma forma eficiente de apenas se obter os dados relevantes, com vista à satisfação dos nossos objectivos e, são particularmente importantes, quando o volume de dados que circula na rede é extremamente elevado.
 Tendo em vista a eficiência, estes filtros são implementados no núcleo do sistema de operação, baseando-se em regras simples, que podem ser combinadas para contemplar situações mais complexas.
 
 \subparagraph*{Dificuldade de criação e alteração de filtros - }
@@ -123,7 +123,7 @@ Quando os filtros são demasiado complexos, os módulos do núcleo têm de passa
 Diferentes técnicas têm vindo a ser desenvolvidas para aumentar o desempenho da monitorização das interfaces de rede.
 Como já referido, o aumento da sobrecarga é muito penalizante, daí que esta deva ser mantida bastante reduzida, o que contribuirá para aumentar o desempenho da captura.
 
-Hoje em dia a utilização de máquinas equipadas com processadores \textit{multi-core} é uma realidade, daí que a sua utilização permita ultrapassar algumas dificuldades sentidas na captura de pacotes.
+Actualmente a utilização de máquinas equipadas com processadores \textit{multi-core} é uma realidade, deste modo a sua utilização permite ultrapassar algumas dificuldades sentidas na captura de pacotes.
 Se os processadores \textit{multi-core} atenderem em paralelo as diversas interrupções, originadas pelo envio ou recepção de pacotes, o desempenho da rede é passível de ser aumentado.
 No entanto, revela-se díficil atingir este paralelismo para todas as interfaces de rede, pois nem todas estão preparadas para beneficiar de arquitecturas com múltiplos \textit{cores}.
 
@@ -133,8 +133,8 @@ A monitorização de rede existente em muitos dos sistemas tipo \textit{Unix} e 
 Assim a biblioteca \textit{PCap}\cite{LibPcap} permite às ferramentas de monitorização de rede fazerem uso deste mecanismo.
 Uma das principais características desta biblioteca, é a sua \textit{API} de alto nível para a captura de pacotes, que é igual em todas as plataformas.
 
-A monitorização de rede realizada pelas ferramentas que utilizam a biblioteca \textit{PCap}, efectuam uma monitorização passiva da rede, adequando as suas análises aos pacotes recebidos de modo \textit{online} ou \textit{offline}.
-Esta monitorização é não intrusiva para o código das aplicações e dependendo da forma como é efectuada pode ter algum impacto no desempenho destas ou do sistema de operação na sua globalidade.
+A monitorização de rede realizada pelas ferramentas que utilizam a biblioteca \textit{PCap}, efectuam uma monitorização passiva da rede, adequando as suas análises aos pacotes recebidos, de modo \textit{online} ou \textit{offline}.
+Esta monitorização é não intrusiva para o código das aplicações e dependendo do modo como é efectuada, pode ter algum impacto no desempenho destas ou do sistema na sua globalidade.
 
 Para filtrar os pacotes indesejados a biblioteca \textit{PCap} utiliza filtros baseados no \textit{BPF (Berkeley Packet Filtering)}, normalmente implementados no núcleo de sistema, de modo a que a monitorização se torne mais eficiente e menos intrusiva.
 
@@ -143,7 +143,7 @@ Em seguida é apresentada a arquitectura da biblioteca \textit{PCap} e o seu sup
 \subsection {Arquitectura}
 \label{sect:architecture_libpcap}
 A arquitectura do \textit{Packet Capture} (\textit{PCap}) divide-se em duas partes: a biblioteca a nível utilizador, e a implementação do \textit{Linux Socket Filtering} no núcleo de sistema.
-Como anteriormente referido a bibilioteca em nível utilizador é constituida por uma \textit{API} homogénea, que oferece às ferramentas de monitorização de rede uma forma de efectuar as suas análises ao tráfego.
+Como anteriormente referido a bibilioteca em nível utilizador é constituida por uma \textit{API} homogénea, que oferece às ferramentas de monitorização de rede um mecanismo para efectuar as suas análises ao tráfego.
 As funções auxiliares da biblioteca efectuam chamadas ao sistema de modo a interagirem com o mecanismo de monitorização de rede do \textit{Linux}, \textit{Linux Socket Filtering}, presente no núcleo.
 
 \begin{figure}[htbp]
@@ -156,16 +156,24 @@ As funções auxiliares da biblioteca efectuam chamadas ao sistema de modo a int
 
 \subsection{Biblioteca}
 
-A biblioteca em nível utilizador ao ter uma \textit{API} homogénea entre plataformas, permite aos programadores desenvolver mais facilmente ferramentas de monitorização de rede multiplataforma, sendo utilizada pela generalidade das ferramentas de monitorização de rede, tais como o \textit{TcpDump}, o \textit{Wireshark}, o \textit{Snort}, etc.
+A biblioteca em nível utilizador ao ter uma \textit{API} homogénea entre plataformas, permite aos programadores desenvolverem mais rapidamente ferramentas de monitorização de rede multiplataforma, sendo utilizada pela generalidade das ferramentas de monitorização de rede, tais como o \textit{TcpDump}, o \textit{Wireshark}, o \textit{Snort}, etc.
 Esta biblioteca como é multi-plataforma, permite ao programador utilizá-la nos principais sistemas de operação, dado que a \textit{API} da biblioteca \textit{PCap} é transparante relativamente à implementação, esta sim, específica a cada plataforma.
 
-Para cada utilização da biblioteca \textit{LibPCap} é criado um \textit{socket} da família \textit{AF\_PACKET}, através deste é efectuada a captura dos pacotes que atravessam a interface de rede, bem como a activação e desactivação de propriedades pertencentes às interfaces de rede, dado que este tipo de \textit{socket} comunica directamente com a interface de rede.
-Uma das funcionalidades que é possível activar e desactivar é o modo promiscuo da interface, neste modo é possível capturar pacotes que não são dirigidos à máquina em questão.
+No \textit{Linux} para cada utilização da biblioteca \textit{PCap} é criado um \textit{socket} da família \textit{AF\_PACKET}.
+Como este tipo de \textit{socket} comunica directamente com a interface de rede permite que sejam activadas e, desactivadas propriedades das mesmas, tais como o modo promiscuo geralmente utilizado para efectuar a captura de pacotes que não pertencem às comunicações da máquina que efectua a monitorização.
 Apesar desta funcionalidade ser amplamente utilizada para análisar a rede, para o ambito desta dissertação é totalmente desnecessária, dado que os pacotes a serem recolhidos para análise são os pretencentes a processos da máquina.
+Para além disso é através deste \textit{socket} que é efectuada a monitorização e captura dos pacotes que atravessam a interface de rede.
+Um dos parâmetros para a monitorização é a interface sobre a qual irá ser efectuada, ou um modo especial que permite que todas as interfaces possam ser monitorizadas.
+
+A fim de minimizar e capturar apenas os pacotes relevantes para as análises, pode ser necessário filtrar os pacotes não relevantes.
+Deste modo a biblioteca permite efectuar diversas formas de filtragem, quer em nível utilizador, para filtros mais complexos, quer no núcleo com filtros apenas baseados nos metadados dos pacotes.
+Se a filtragem for efectuada exclusivamente em nível utilizador, o filtro a ser aplicado indica que todos os pacotes devem ser capturados, senão a ferramenta que utiliza a biblioteca deve especificar um filtro utilizando para isso as instruções pertencentes à biblioteca \textit{PCap} que as irá traduzir e optimizar para uma outra linguagem (\textit{BPF}
+ 
+
+
 Caso exista a necessidade de filtrar os dados a capturar é necessário aplicá-lo ao \textit{socket} criado através de \textit{ioctl}, passando em argumentos o canal e o filtro a ser executado a cada pacote.
 É possível obter estatisticas relacionadas com a captura e filtragem de pacotes, estas estatisticas são também obtidas através de \textit{ioctls} efectuados sobre o canal de recepção da monitorização.
-Estas funcionalidades estão agregadas à biblioteca, para que o programador não tenha de se preocupar com os \textit{internals} relativos à manipulação da monitorização de rede no núcleo.
-
+Estas funcionalidades estão agregadas à biblioteca, para que o programador não tenha de se preocupar com os mecanismos internos relativos à manipulação da monitorização de rede no núcleo.
 
 Para se efectuar a captura de pacotes, é necessário especificar qual a interface de rede a monitorizar.
 
