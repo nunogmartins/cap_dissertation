@@ -223,11 +223,15 @@ Quanto mais eficiente for a filtragem, menor o número de pacotes transferidos p
 \paragraph{Captura de pacotes com \textit{TimeStamp}}
 % como etiquetar os pacotes 
 Um dos pontos que pode influenciar negativamente o desempenho da obtenção de pacotes, é a necessidade de colocar nestes, uma estampilha temporal, com o tempo da sua chegada ao sistema.
-A \textit{LibPCap} pode obter a estampilha de duas formas distintas, assim se a interface de rede fornecer a estampilha temporal associada ao pacote, a \textit{LibPCap} pode utilizar este valor, caso contrário será necessário obter a estampilha temporal da chegada do pacote ao sistema.
+A biblioteca \textit{PCap} pode obter a estampilha de duas formas distintas, assim se a interface de rede fornecer a estampilha temporal associada ao pacote, a biblioteca pode utilizar este valor, caso contrário será necessário obter a estampilha temporal da chegada do pacote ao sistema.
 A forma de obtenção da estampilha pela \textit{LibPCap}, processa-se através da função \textit{gettimeofday}, o que incorre numa maior sobrecarga do sistema face à solução anterior.
 
 \paragraph{Captura com dns activo}
 
+Como já referido a biblioteca \textit{PCap} é utilizada por diversas ferramentas de análise do trafego de rede, que dela tiram partido.
+Uma destas ferramentas é o \textit{TcpDump}, este utiliza a biblioteca \textit{PCap} para efectuar 
+
+A biblioteca \textit{PCap}
 tcpdump com parametro n de dns para obter os nomes de dominios sempre que possivel
 
 \paragraph{Captura especificando tamanho máximo de 65535 para pacotes}
@@ -323,18 +327,15 @@ Como os eventos detectados através destas ferramentas geram um mapa de execuç�
 % O RelayFs é um sistema de ficheiros para comunicação entre o código dentro e fora do núcleo de operação.
 %A utilização desta ferramenta em sistemas de tempo real é um bom indicador da sua performance.
 
-O \textit{Linux Trace ToolKit} (\textit{LTT}é uma ferramenta que permite efectuar um traço de execução do núcleo \textit{Linux}.
+O \textit{Linux Trace ToolKit} (\textit{LTT}) é uma das ferramentas mais utilizadas efectuar um traços de execução do núcleo \textit{Linux}.
 Esta ferramenta foi criada no final da década de 1990, sendo posteriormente subsituido em 2005 pelo \textit{Linux Trace ToolKit new generation}, (\textit{LTTng}) projecto derivado do \textit{LTT}.
-O \textit{LTT} e o \textit{LTTng} são ferramentas de monitorização dinâmica que efectuam um traço de execução.
-Estas ferramentas tiram partido dos mecanismos de instrumentação do núcleo de modo a obter dados que permitam efectuar o traço de execução.
-
 O \textit{LTT} é constituído por quatro componentes: o \textit{Kernel Patch}, o \textit{Kernel Module} o \textit{Trace Daemon} e o \textit{Data Decoder} tal como é visivel na figura \ref{fig:ltt_arch}.
 É através do \textit{Trace Daemon} que o utilizador pode comunicar com o sistema de monitorização.
 Os dados recolhidos têm diversos valores tais como o nome da função, o tempo, e o identificador do processador, pelo menos estes atributos de modo a conseguir construir os traço de execução.
-
+O \textit{LTT} e o \textit{LTTng} são ferramentas de monitorização dinâmica que efectuam um traço de execução.
+Estas ferramentas tiram partido dos mecanismos de instrumentação do núcleo de modo a obter dados que permitam efectuar o traço de execução.
 
 Para além do \textit{daemon} em nível utilizador existem outras ferramentas pertencentes ao \textit{LTT} para efectuar análises aos dados recolhidos durante a monitorização.
-
 
 Os dados provenientes da monitorização são recolhidos através do sistema de ficheiros virtual \textit{RelayFs}.
 
@@ -356,7 +357,7 @@ O \textit{Linux Trace Toolkit Viewer (LTTV)} é um projecto desenvolvido em para
 Esta ferramenta possibilita igualmente realizar um traço de execução, uma vez que os dados recolhidos contêm uma estampilha temporal, do momento em que foram obtidos.
  
 \subsubsection{OProfile}\label{cap:Oprofile_overview}
-As ferramentas anteriormente referidas utilizam mecanismos para obter um traço de execução.
+O \textit{OProfile} é outra das ferramentas de monitorização do núcleo, esta efectua um perfil de execução das funções do núcleo através de amostragem. 
 Com o \textit{OProfile}, em vez de a cada evento utilizar uma função para obter os dados, apenas a utiliza decorridos um certo número de eventos.
 O recurso a este critério permite ao \textit{OProfile} ser menos perturbador, uma vez que nem sempre é necessário o universo dos eventos que as ferramentas de monitorização capturam, mas tão somente uma amostra \ref{fig:oprofile_arch}.
 Deste modo ao utilizar a amostragem, o \textit{OProfile}, beneficia de um menor grau de perturbação no sistema\cite{Will:TuninProgrOProf}.
@@ -386,14 +387,24 @@ De modo a reduzir a sobrecarga / contenção utiliza buffers por cpu ...
 
 \subsection{Suporte à monitorização}
 
-Como suporte à monitorização destacam o mecanismo \textit{KProbes} e a ferramenta \textit{Linux Kernel Stace Tracer}.
+Nas secções anteriores foram apresentadas ferramentas de monitorização e os seus mecanismos para lidar com a monitorização.
+As ferramentas são importantes quando existe a necessidade de efectuar análises aos dados obtidos.
+Nas ferramentas os diversos componentes que as constituem estão muito interligados dificultando, por vezes, a sua integração com outros componentes.
+
+Por seu lado os mecanismos devem ser genéricos tirando partido das arquitecturas para que possam ser desenvolvidas ferramentas que as possam utilizar.
+
+
+Como suporte à monitorização destaca-se o mecanismo \textit{KProbes} que é um mecanismo de instrumentação dinâmica do \textit{Linux}.
+
+
+e a ferramenta \textit{Linux Kernel Stace Tracer}.
 
 Em \todo{} ambos é possível definir novos pontos, funções ou eventos a serem monitorizados, as funcionalidades já existentes nestas ferramentas.
 
 \subsubsection{KProbes}\label{sect:KProbes_overview}
 
 O \textit{KProbes} é um mecanismo de instrumentação dinâmica do núcleo do \textit{Linux}.
-A \textit{API} permite que aplicações, como o \textit{DProbes} ou o \textit{SystemTap} possam aceder às suas funcionalidades.
+A \textit{API} permite ferramentas, como o \textit{DProbes} ou o \textit{SystemTap} possam aceder às suas funcionalidades.
 Esta encontra-se na versão principal do núcleo do sistema \textit{Linux} desde a versão 2.6.9, o que indica tratar-se de uma ferramenta bastante estável\cite{kernel_debug_printk_on_fly,KProbesSite}.
 
 Utilizando o \textit{KProbes} existem três tipos de instrumentação que podem ser efectuados: o \textit{KProbe}, o \textit{JProbe} e o \textit{KRetProbe}.
@@ -716,7 +727,7 @@ Com este novo \textit{instruction set}, e sem necessidade de verificação, foi 
 
 \section{Conclusão}
 
-Como se pode observar neste capítulo, existe a possíbildiade de melhorar a monitorização de rede do \textit{Linux}.
+Como se pode observar neste capítulo, existe a possibilidade de melhorar a monitorização de rede do \textit{Linux}.
 O mecanismo de instrumentação genérico do \textit{Linux}, \textit{KProbes}, permite que se efectuem análises no núcleo de modo generalista, o que para obter as interacções dos processos com as interfaces de rede sem que se assista à instrumentação do código dos processos e com baixa sobrecarga será um sistema de instrumentação dinâmico a ter em conta para o desenvolvimento de um mecanismo de monitorização genérico de rede de um processo.
 
 Sistema de \textit{logging}, são por vezes um peso demasiado elevado e por isso utilizam mecanismos para fazer face a este problema de transporte da informação dos dados do núcleo para o nível utilizador o mais eficiente possível.
