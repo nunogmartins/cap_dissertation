@@ -15,15 +15,15 @@ Nas aplicações onde as ligações e interacções são bastante dinâmicas e e
 
 A monitorização no núcleo pode gerar um elevado volume de dados que podem mostrar-se irrelevantes para as análises efectuadas.
 Se considerarmos que a transferência dos dados gerados pela monitorização, do núcleo para o nível utilizador, onde se localizam as ferramentas que procedem à análise dos mesmos, é necessário efectuar a cópia destes dados e proceder à sua filtragem, de modo a obtermos apenas os eventos pretendidos.
-Se analisarmos atentamente este processo de monitorização, chegar-se-à à conclusão que este irá produzir uma sobrecarga sobre o sistema.
+Se analisarmos atentamente este processo de monitorização, concluiremos que este irá produzir uma sobrecarga sobre o sistema.
 Assim, de forma a capturar apenas dados relevantes e simultaneamente minimizar os efeitos da monitorização, são aplicados filtros logo que possível, no núcleo do sistema.
 Considerando que aplicações \textit{P2P} utilizam diversos portos de comunicação, revela-se difícil capturar os pacotes com base nos actuais filtros, sem que se assista a uma elevada degradação do desempenho.
 Não sendo exclusiva das aplicações \textit{P2P}, a utilização de um elevado número de portos, também se verifica em sistemas \textit{Voice over IP}.
 Estas aplicações, nas suas diversas comunicações, não utilizam sempre portas conhecidas \textit{à priori}, pois por vezes fazem uso de protocolos em que no início da sessão negoceiam portos, o que dificulta substancialmente a utilização de filtros, por se revelar necessário conhecer todos os protocolos específicos das aplicações.
 Para além desta dificuldade, existem aplicações que são executadas pelo administrador que não podem ser monitorizadas em nível utilizador, designadamente no caso da utilização do carregamento dinâmico de bibliotecas instrumentadas, para efectuar a monitorização de aplicações.
 
-No contexto de uma dissertação anterior~\cite{Farruca:2009}, utilizou-se a biblioteca \textit{LibPCap} para a captura do tráfego de rede com vista à monitorização das interacções entre processos distribuídos, sendo que um dos principais desafios solucionados consistiu no isolamento de pacotes pertencentes a um processo.
-Porém, a solução encontrada, não se revela de fácil integração em qualquer outra ferramenta, e acarreta elevada sobrecarga.
+No contexto de uma dissertação anterior~\cite{Farruca:2009}, utilizou-se a biblioteca \textit{LibPCap} para a captura do tráfego de rede com vista à monitorização das interacções entre processos distribuídos, sendo que, um dos principais desafios solucionados consistiu no isolamento de pacotes pertencentes a um processo.
+Porém, a solução encontrada, não se revela de fácil integração em qualquer outra ferramenta e acarreta elevada sobrecarga.
 
 Nos actuais sistemas de monitorização de rede não existe suporte para a monitorização das interacções de rede dos processos.
 Para levar a cabo esta tarefa de monitorização é imprescindível que métodos alternativos de monitorização de processos sejam combinados com a monitorização genérica de rede.
@@ -47,7 +47,7 @@ Merece igualmente referência, a possibilidade de análise dos fluxos do process
 À possibilidade anteriormente referida acresce a de monitorizar o fluxo de diferentes máquinas virtuais dentro de um sistema, sempre que estas sejam implementadas utilizando processos, permitindo individualizar e capturar o tráfego de cada uma.
 Esta funcionalidade pode ser particularmente interessante em centros de dados, visto ser possível efectuar a análise ao tráfego, sem necessidade de proceder à paragem da máquina.
 
-Foi submetido e aceite um artigo para o \textit{Inforum - 2011 Simpósio de Informática}\footnote{http://inforum.org.pt/INForum2011}, contendo uma descrição sucinta do trabalho do trabalho realizado nesta dissertação, bem como os resultados obtidos através das validações.\cite{inforum}
+Foi submetido e aceite um artigo para o \textit{Inforum - 2011 Simpósio de Informática}\footnote{http://inforum.org.pt/INForum2011}, contendo uma descrição sucinta do trabalho realizado nesta dissertação, bem como os resultados obtidos através das validações.\cite{inforum}
 
 \bigskip 
 

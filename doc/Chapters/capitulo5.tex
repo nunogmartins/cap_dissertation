@@ -17,7 +17,7 @@ As modificações necessárias à extensão das funcionalidades do \textit{LSF} 
 
 A implementação do \textit{MRoP} teve em consideração o desenvolvimento de um código minimalista, que implicasse ligeiras alterações ao código do núcleo e, simultaneamente, tirasse partido de \textit{APIs} internas.
 Por outro lado, é transparente à implementação da biblioteca \textit{PCap}, podendo ser integrado na mesma.
-A implementação está contida num módulo do núcleo, de modo a ser carregada e libertada, do mesmo, pelo administrador.
+A implementação está contida num módulo do núcleo, de modo a ser carregada e libertada do mesmo, pelo administrador.
 A modularização das diversas componentes, permite um desenvolvimento autónomo de cada subcomponente.
 
 No capítulo \ref{cap:trabrelacionado} apresentaram-se, a título exemplificativo (secção \ref{sect:instrumentacao_casos_linux}), alguns sistemas que permitem efectuar monitorização ou filtragem de pacotes, com a indicação de um processo.
@@ -132,9 +132,9 @@ Este repositório teria de conter a estrutura genealógica do processo a monitor
 A actualização desta estrutura poderia ser efectuada através da instrumentação da chamada ao sistema \textit{fork} ou \textit{clone}.
 Sempre que fossem invocadas as funções já referidas, seria efectuada uma consulta ao repositório e, a partir da informação obtida, este seria ou não, actualizado.
 Esta possibilidade, ao contemplar a remoção de dados do repositório, necessitaria também de instrumentar a função de término de processos.
-Considerando que a actualização dinâmica deste repositório, sem aplicar alterações no código do núcleo, afectaria negativamente o desempenho do sistema na sua totalidade, por isso optou-se por excluir esta alternativa.
+Considerando que a actualização dinâmica deste repositório, sem aplicar alterações no código do núcleo, afectaria negativamente o desempenho do sistema na sua totalidade, optou-se por excluir esta alternativa.
 Face a esta situação, decidiu-se efectuar uma análise aos campos da estrutura (\textit{task\_struct}), o que permitiu compreender o modo como os identificadores dos processos se relacionam com os identificadores dos membros da árvore genealógica do processo.
-Desta análise concluí-se que, os identificadores \textit{pid}, \textit{tid} e \textit{ppid} permitem, na grande maioria das aplicações, identificar toda a árvore genealógica.
+Desta análise conclui-se que, os identificadores \textit{pid}, \textit{tid} e \textit{ppid} permitem, na grande maioria das aplicações, identificar toda a árvore genealógica.
 
 
 
@@ -144,7 +144,7 @@ Desta análise concluí-se que, os identificadores \textit{pid}, \textit{tid} e 
 
 De modo a manter a informação relativa aos endereços e portos em utilização por uma aplicação, sem requerer a consulta sobre os canais de rede, foi necessário criar um repositório de dados, que contivesse informações relevantes para as decisões do filtro de captura.
 Neste repositório, existe a necessidade de ter funções de inserção, remoção e consulta, sendo que qualquer uma destas, deverá ser efectuada com celeridade, procurando estruturas que tenham uma complexidade temporal \textit{BigO}, \textit{O(1)} ou \textit{O(log n)}.
-A estrutura de dados necessária para suportar o \textit{Estado dos sockets do processo}, será uma estrutura que tenha, no máximo, uma complexidade temporal de \textit{O(log n)} sobre as pesquisas, dado que as estas serão muito superiores às inserções e remoções.
+A estrutura de dados necessária para suportar o \textit{Estado dos sockets do processo}, será uma estrutura que tenha, no máximo, uma complexidade temporal de \textit{O(log n)} sobre as pesquisas, dado que estas serão muito superiores às inserções e remoções.
 
 Assim, as estruturas de dados com suporte no núcleo, que permitem a criação de um repositório de dados, como o requerido, são:
 
@@ -190,8 +190,8 @@ No núcleo existe uma implementação parcial de uma árvore \textit{Red-black} 
 A árvore \textit{Red-black} é semi-balanceada, isto é, a diferença de alturas entre o ramo mais profundo e o mais curto é de apenas de 1 nível.
 Esta propriedade é mantida através do rebalanceamento da árvore em inserções e remoções, o que provoca um custo na sua utilização.
 Contudo, no caso esperado, existe maior número de consultas do que inserções e remoções, fazendo com que o custo associado ao rebalanciamento da árvore seja amortizado.
-De modo a tirar partido da utilização desta estrutura de dados é necessário definir três funções da manipulação da árvore (inserção, remoção e consulta).
-O suporte disponibilizado pelo núcleo apenas permite manusear a árvore, sendo necessário definir as funções que utilizam a chave de acesso para aceder ao conteúdo dos dados, que devido à sua especificidade, não foram incluídas no suporte.
+De modo a tirar partido da utilização desta estrutura de dados, é necessário definir três funções da manipulação da árvore (inserção, remoção e consulta).
+O suporte disponibilizado pelo núcleo, apenas permite manusear a árvore, sendo necessário definir as funções que utilizam a chave de acesso para aceder ao conteúdo dos dados, que devido à sua especificidade, não foram incluídas no suporte.
 
 De referir igualmente que, para o objecto deste estudo, o número do porto dos protocolos (\textit{TCP} e \textit{UDP}), é considerado a chave mais adequada.
 Tendo em conta o número máximo de portos possíveis nos protocolos (\textit{TCP} e \textit{UDP}), a árvore terá de conter 65535 elementos, com uma altura máxima de 16, ou seja, para pesquisar um dos elementos nos extremos (máximo ou mínimo) é necessário efectuar sobre ela, 16 iterações.
@@ -280,8 +280,8 @@ A \textit{API}, não obstante reduzir o desempenho, devido à necessidade de cha
 \label{fig:api_connect}
 \end{figure}
 
-\todo{nao esta no sitio} Apesar dos processos monitorizados apresentarem elevado dinamismo nas interacções das comunicações, a maior percentagem de operações sobre o repositório concentra-se ao nível da consulta.
-As restantes operações (inserção e remoção) repartem entre si igual percentagem.
+\todo{nao esta no sitio} Apesar dos processos monitorizados apresentarem elevado dinamismo nas interacções das comunicações, o maior número de operações sobre o repositório concentra-se ao nível da consulta.
+As restantes operações (inserção e remoção) repartem entre si igual número.
 Assim, é esperado que para cada inserção exista uma remoção.
 No final da monitorização de um processo, a componente \textit{Estado dos Sockets} deverá apresentar um número de elementos idêntico ao que antecedeu a monitorização.
 
@@ -340,7 +340,7 @@ A informação de análise apenas é adicionada, caso o seu suporte seja activad
 Caso esteja activa é possivel obter estatísticas sobre os diferentes componentes internos ao \textit{MRoP}.
 
 Os ficheiros de análise apenas estão disponíveis para leitura, dado que quando lidos, devolvem os valores presentes nos contadores internos do \textit{MRoP}.
-Sobre os filtros estes contadores têm o número de pacotes que passaram no filtro dinâmico, bem como o número de pacotes que foram declarados para captura.
+Relativamente à componente de filtragem dinâmica, os contadores declarados contêm o número de pacotes que foram analisados para captura, bem como quantos destes foram transferidos para o monitor em nível utilizador.
 No que se refere à monitorização do processo, existe também um ficheiro que devolve, em relação a cada uma das funções instrumentadas, o número de execuções do \textit{handler} e, quantas destas pertenciam ao processo alvo.
 Relativamente ao repositório de dados, foi também criado um ficheiro com estatísticas, que incidiram sobre o número de portos em utilização e, para cada porto, a indicação de estar em utilização, através do protocolo \textit{TCP}, \textit{UDP} ou em ambos, e por qual ou quais endereço(s) de rede.
 
