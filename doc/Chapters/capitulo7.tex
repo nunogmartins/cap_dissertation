@@ -8,7 +8,7 @@ Para atingir tal objectivo, foram estudados os mecanismos de monitorização int
 
 O estudo centrou-se, principalmente, nos mecanismos de monitorização ao nível do núcleo, pois estes permitem efectuar análises não intrusivas e, devido à sua localização, dispensam a permuta de dados entre o nível utilizador e o núcleo, o que a não acontecer contribuiria para o aumento da sobrecarga.
 
-Para executar a extensão ao \textit{LibPCap}, foi arquitectada uma solução utilizando o sistema de instrumentação dinâmica do núcleo (\textit{KProbes}), para a análise das interacções do processo alvo com o exterior.
+Para executar a extensão ao \textit{PCap}, foi arquitectada uma solução utilizando o sistema de instrumentação dinâmica do núcleo (\textit{KProbes}), para a análise das interacções do processo alvo com o exterior.
 Os dados relevantes desta interacção, são adicionados a um repositório, de modo a que o sistema \textit{LSF} os possa consultar e decidir quais os pacotes a capturar, com base nestas informações.
 
 Esta extensão foi analisada funcionalmente através de programas que criavam, comunicavam e destruiam canais de comunicação, onde todas estas interacções eram registadas e verificadas.
