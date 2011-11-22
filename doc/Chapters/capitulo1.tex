@@ -5,7 +5,7 @@
 A monitorização de uma aplicação destina-se, normalmente, à obtenção de informações relevantes acerca do seu comportamento durante a execução, mas pode igualmente servir para verificar a correcção, recursos atribuídos e usados, desempenho de execução, etc.
 
 A maioria dos sistemas de operação generalistas apresentam métodos de monitorização, devido à importância de que estes se revestem, quer no desenvolvimento das aplicações, quer na gestão destes sistemas.
-Se algumas ferramentas são específicas na monitorização de determinados recursos (como a biblioteca \textit{LibPCap}, que é específica nas interacções com o exterior utilizando interfaces de rede), outras são mais generalistas podendo monitorizar recursos diversos (como o \textit{LTT}, \textit{OProfile}, etc.).
+Se algumas ferramentas são específicas na monitorização de determinados recursos (como a biblioteca \textit{PCap}, que é específica nas interacções com o exterior utilizando interfaces de rede), outras são mais generalistas podendo monitorizar recursos diversos (como o \textit{LTT}, \textit{OProfile}, etc.).
 
 Esta dissertação foca-se na monitorização do núcleo, nas interacções das aplicações através de interfaces de rede.
 
@@ -22,7 +22,7 @@ Não sendo exclusiva das aplicações \textit{P2P}, a utilização de um elevado
 Estas aplicações, nas suas diversas comunicações, não utilizam sempre portas conhecidas \textit{à priori}, pois por vezes fazem uso de protocolos em que no início da sessão negoceiam portos, o que dificulta substancialmente a utilização de filtros, por se revelar necessário conhecer todos os protocolos específicos das aplicações.
 Para além desta dificuldade, existem aplicações que são executadas pelo administrador que não podem ser monitorizadas em nível utilizador, designadamente no caso da utilização do carregamento dinâmico de bibliotecas instrumentadas, para efectuar a monitorização de aplicações.
 
-No contexto de uma dissertação anterior~\cite{Farruca:2009}, utilizou-se a biblioteca \textit{LibPCap} para a captura do tráfego de rede com vista à monitorização das interacções entre processos distribuídos, sendo que, um dos principais desafios solucionados consistiu no isolamento de pacotes pertencentes a um processo.
+No contexto de uma dissertação anterior~\cite{Farruca:2009}, utilizou-se a biblioteca \textit{PCap} para a captura do tráfego de rede com vista à monitorização das interacções entre processos distribuídos, sendo que, um dos principais desafios solucionados consistiu no isolamento de pacotes pertencentes a um processo.
 Porém, a solução encontrada, não se revela de fácil integração em qualquer outra ferramenta e acarreta elevada sobrecarga.
 
 Nos actuais sistemas de monitorização de rede não existe suporte para a monitorização das interacções de rede dos processos.
