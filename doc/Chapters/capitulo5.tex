@@ -224,11 +224,11 @@ Como existe a necessidade de uma estrutura que se adapte ao comportamento dinâm
 
 Após terem sido verificadas quais as estruturas de dados com suporte no núcleo, foi necessário escolher qual a melhor escolha para a necessidade do \textit{MRoP}.
 O \textit{BitMap} apesar de ser uma estrutura de dados em que os acessos são bastante rápidos e com uma utilização de memória reduzida, carece de modularidade para a utilização com multiplos endereços e protocolos.
-Apesar de, na pior situação estarem em utilização apenas 1024 portos, seria necessário manter em memória todo o mapa referente aos 65535.
+Apesar de, na pior situação estarem em utilização apenas 1024 portos, seria necessário manter em memória todo o mapa referente aos 65 535.
 Relativamente à estrutura \textit{lista}, a análise dos portos no pior caso, aquele em que o pacote em análise não pertence ao processo alvo, é bastante prejudicial, pois é necessário verificar que não se encontra na lista, o que obriga a percorrer todos os elementos da lista.
 Esta situação pode ser minimizada se a lista tiver os elementos ordenados pelo número do porto, o que obriga a inserções ordenadas.
 A \textit{tabela de dispersão} seria a melhor escolha se existisse o controlo das chaves, por parte do programador, assim como tal não é possível e, como a opção de implementação de uma tabela de dispersão, necessitaria de uma verificação de correcção e desempenho, tal opção foi rejeitada.  
-Deste modo a árvore balanceada \textit{Red-black}, é a melhor opção entre as disponíveis no núcleo, pois a procura no pior caso é melhor que a \textit{lista}, uma vez tem os elementos ordenados e permite uma utilização de memória reduzida e com possibilidade de extensão dos seus elementos.
+Deste modo a árvore balanceada \textit{Red-black}, é a melhor opção entre as disponíveis no núcleo, pois a procura no pior caso é melhor que na \textit{lista}, uma vez que tem os elementos ordenados e permite uma utilização de memória reduzida e com possibilidade de extensão dos seus elementos.
 
 
 Assim o ciclo de desenvolvimento do \textit{MRoP}, foi efectuado mais rapidamente, tendo em consideração a confiança que merece a validação da estrutura de dados \textit{Red-black tree}, em utilização no núcleo do sistema \textit{Linux} e sujeita a uma análise extensiva ao longo dos anos.
