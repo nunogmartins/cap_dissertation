@@ -174,9 +174,9 @@ A gestão é efectuada através de regras definidas em função da largura de ba
 O tráfego baseado nas regras anteriormente referidas, é agrupado em classes, que podem ter diferentes níveis de prioridade.
 Para além desta classificação, é ainda possível definir os algoritmos de escalonamento a utilizar, de modo a definir diversas políticas de qualidade de serviço.
 
-Quando se verifica a iminência do envio de um pacote pela função \textit{ip\_output}, este é transmitido para o \textit{Traffic Control}, onde o pacote é marcado com a \textit{tag} da respectiva classe.
-Posteriormente, esse pacote irá ser adicionado ao \textit{QDisk} correspondente.
-O \textit{QDisk} é a estrutura de suporte à transmissão de dados efectuada pelo \textit{Traffic Control}, onde cada elemento desta estrutura é um \textit{sk\_buff} (que será abordado em \ref{subsub:sk_buff}).
+Quando se verifica a iminência do envio de um pacote pela função \textit{ip\_output}, este é transmitido para o \textit{Traffic Control}, onde o pacote é marcado com a \textit{tag} da respectiva classe e ao \textit{QDisk} correspondente.
+Apartir deste momento, o modo e o ritmo de envio dos pacotes, para a interface de rede, é efectuado segundo as regras definidas no \textit{QDisk} a que estes pertencem.
+%O \textit{QDisk} é a estrutura de suporte à transmissão de dados efectuada pelo \textit{Traffic Control}, onde cada elemento desta estrutura é um \textit{sk\_buff} (que será abordado em \ref{subsub:sk_buff}).
 
 %Na transmissão de dados, quando estes passam no \textit{netfilter}, existe a possibilidade de identificá-los de forma a serem reconhecidos pelo \textit{traffic control}, permitindo assim efectuar uma gestão conjunta e inteligente do tráfego.
 
@@ -189,7 +189,7 @@ O núcleo mantém a informação sobre as interfaces de rede, inicializadas pelo
 Estas, independentemente de estarem ou não em utilização, constam de uma lista duplamente ligada de \textit{net\_devices}.
 Em cada posição desta lista existem informações referentes a uma interface de rede, nomeadamente a informação sobre o seu endereço \textit{IP}, o seu endereço \textit{MAC}, etc., bem como outras configurações.
 
-No registo de um novo controlador de interface de rede definem-se as operações a executar em determinados eventos, tais como a recepção e/ou transmissão de \textit{frames}, a remoção da interface, etc.
+No registo de um novo controlador de interface de rede definem-se as operações a executar em determinados eventos, tais como a recepção e transmissão de \textit{frames}, activação e remoção da interface, etc.
 Estas operações são definidas através de uma interface comum (\textit{struct netdev\_ops}), que permite afectar a esta estrutura, funções presentes nos módulos dos controladores, de modo a serem efectuadas as acções necessárias à utilização da interface de rede.
 
 \subsubsection{Estrutura de um sk\_buff}
