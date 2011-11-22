@@ -14,7 +14,7 @@
 
 The monitorization of the applications allow us to understand and analyse their behaviour, during real executions, their computation resources, namely the cpu, memory, IO devices (which includes the network devices), etc.
 
-Network monitoring tools, in general, use the libpcap library, in order to capture the flows of network interfaces.
+Network monitoring tools, in general, use the PCap library, in order to capture the flows of network interfaces.
 Since this is a generic library, it allows to abstract the way the operating system deals with captured and filtering network packets flows.
 In Linux, this support is guaranteed by Linux Socket Filter.
 Overall, the traffic’s amount obtained by monitoring is high, being necessary to filter it, so that only relevant data streams can be transmitted to the monitor, at user level.
@@ -29,5 +29,5 @@ Besides this evaluation, performance was also assessed, which depended on the nu
 
 % Palavras-chave do resumo em Inglês
 \begin{keywords}
-Monitoring, network, application, LibPcap, packet capture, kernel instrumentation, filter, filtering
+Monitoring, network, application, libpcap, packet capture, kernel instrumentation, filter, filtering
 \end{keywords} 
