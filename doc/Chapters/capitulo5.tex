@@ -227,7 +227,10 @@ O \textit{BitMap} apesar de ser uma estrutura de dados em que os acessos são ba
 Apesar de, na pior situação estarem em utilização apenas 1024 portos, seria necessário manter em memória todo o mapa referente aos 65 535.
 Relativamente à estrutura \textit{lista}, a análise dos portos no pior caso, aquele em que o pacote em análise não pertence ao processo alvo, é bastante prejudicial, pois é necessário verificar que não se encontra na lista, o que obriga a percorrer todos os elementos da lista.
 Esta situação pode ser minimizada se a lista tiver os elementos ordenados pelo número do porto, o que obriga a inserções ordenadas.
-A \textit{tabela de dispersão} seria a melhor escolha se existisse o controlo das chaves, por parte do programador, assim como tal não é possível e, como a opção de implementação de uma tabela de dispersão, necessitaria de uma verificação de correcção e desempenho, tal opção foi rejeitada.  
+A \textit{tabela de dispersão} seria a melhor escolha se existisse o controlo das chaves, por parte do programador, assim como tal não é possível e, como a opção de implementação de uma tabela de dispersão, necessitaria de uma verificação de correcção e desempenho, tal opção foi rejeitada.  \todo{nao esta no sitio} Apesar dos processos monitorizados apresentarem elevado dinamismo nas interacções das comunicações, o maior número de operações sobre o repositório concentra-se ao nível da consulta.
+As restantes operações (inserção e remoção) repartem entre si igual número.
+Assim, é esperado que para cada inserção exista uma remoção.
+No final da monitorização de um processo, a componente \textit{Estado dos Sockets} deverá apresentar um número de elementos idêntico ao que antecedeu a monitorização.
 Deste modo a árvore balanceada \textit{Red-black}, é a melhor opção entre as disponíveis no núcleo, pois a procura no pior caso é melhor que na \textit{lista}, uma vez que tem os elementos ordenados e permite uma utilização de memória reduzida e com possibilidade de extensão dos seus elementos.
 
 
@@ -265,6 +268,13 @@ Os elementos do repositório, correspondem a instâncias da estrutura \textit{Po
 \label{fig:repo_example}
 \end{figure}
 
+\paragraph*{}
+Apesar dos processos monitorizados apresentarem elevado dinamismo nas interacções das comunicações, o maior número de operações sobre o repositório concentra-se ao nível da consulta.
+As restantes operações (inserção e remoção) repartem entre si igual número.
+Assim, é esperado que para cada inserção exista uma remoção.
+No final da monitorização de um processo, a componente \textit{Estado dos Sockets} deverá apresentar um número de elementos idêntico ao que antecedeu a monitorização.
+
+
 \subsection{\textit{API} de comunicação interna do MRoP}
 \label{sub:repo_api}
 
@@ -281,11 +291,6 @@ A \textit{API}, não obstante reduzir o desempenho, devido à necessidade de cha
 \caption{API interna do MRoP}
 \label{fig:api_connect}
 \end{figure}
-
-\todo{nao esta no sitio} Apesar dos processos monitorizados apresentarem elevado dinamismo nas interacções das comunicações, o maior número de operações sobre o repositório concentra-se ao nível da consulta.
-As restantes operações (inserção e remoção) repartem entre si igual número.
-Assim, é esperado que para cada inserção exista uma remoção.
-No final da monitorização de um processo, a componente \textit{Estado dos Sockets} deverá apresentar um número de elementos idêntico ao que antecedeu a monitorização.
 
 \todo{falar sobre imagem}
 
