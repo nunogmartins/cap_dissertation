@@ -190,13 +190,12 @@ Estas, independentemente de estarem ou não em utilização, constam de uma list
 Em cada posição desta lista existem informações referentes a uma interface de rede, nomeadamente a informação sobre o seu endereço \textit{IP}, o seu endereço \textit{MAC}, etc., bem como outras configurações.
 
 No registo de um novo controlador de interface de rede definem-se as operações a executar em determinados eventos, tais como a recepção e transmissão de \textit{frames}, activação e remoção da interface, etc.
-Estas operações são definidas através de uma interface comum (\textit{struct netdev\_ops}), que permite afectar a esta estrutura, funções presentes nos módulos dos controladores, de modo a serem efectuadas as acções necessárias à utilização da interface de rede.
+Estas operações são definidas numa interface comum (\textit{netdev\_ops}), através de apontadores de funções, de modo a serem efectuadas as acções necessárias à utilização da interface de rede.
+As ferramentas em nível utilizador quando necessitam configurar ou consultar as interfaces de rede, utilizam \textit{ioctl's} ou \textit{sockets netlink} de modo a obter ou alterar as configurações.
 
-\subsubsection{Estrutura de um sk\_buff}
-\label{subsub:sk_buff}
-\todo{ligacao com o anterior}
-Os dados envolvidos no fluxo de comunicação e utilizados pelos controladores correspondem aos \textit{socket buffers}, estruturas do tipo \textit{sk\_buff}.
+Os dados envolvidos no fluxo de comunicação e utilizados pelos controladores são \textit{socket buffers}, estruturas do tipo \textit{sk\_buff}.
 Esta estrutura contém diversos elementos, merecendo especial relevância os apontadores para a estrutura de rede do controlador, os apontadores para secções do pacote, os diversos cabeçalhos pertencentes ao nível de rede e transporte, bem como a dimensão dos espaços alocados para estes e outros apontadores.
+
 
 \subsection{Captura dos fluxos de dados das interfaces de rede}
 \label{sub:network_cap}

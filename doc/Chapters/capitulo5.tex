@@ -10,12 +10,12 @@ O principal objectivo desta dissertação consiste no desenvolvimento de um mód
 O facto desta instrumentação ser efectuada no núcleo permite que qualquer aplicação possa ser monitorizada, sem que o seu código tenha de ser alterado.
 %Como se pode compreender, esta instrumentação é não intrusiva para as aplicações, havendo, deste modo a necessidade de criar uma método de verificação que identifique o processo que irá cada função instrumentada.
 Esta extensão ao \textit{LSF} também pode ser utilizada por qualquer ferramenta de monitorização baseada no \textit{LSF}.
-As modificações necessárias à extensão das funcionalidades do \textit{LSF} no núcleo estão confinadas ao ficheiro \textit{filter.c}, presente no directório \textit{net/core} do código do \textit{Linux}.
+As modificações ao código do original do núcleo do sistema, necessárias à extensão das funcionalidades do \textit{LSF} no núcleo estão confinadas ao ficheiro \textit{filter.c}, presente no directório \textit{net/core} do código do \textit{Linux}.
 
 \section{MRoP e a sua implementação}
 \label{sec:mrop_implementation}
 
-A implementação do \textit{MRoP} teve em consideração o desenvolvimento de código que implicasse ligeiras alterações ao código do núcleo e, simultaneamente, tirasse partido de \textit{APIs} internas.
+A implementação do \textit{MRoP} teve em consideração o desenvolvimento de código que implicasse o mínimo alterações ao código do núcleo e, simultaneamente, tirasse partido de \textit{APIs} internas.
 Por outro lado, é transparente à implementação da biblioteca \textit{PCap}, podendo ser integrado na mesma.
 A implementação está contida num módulo do núcleo, de modo a ser carregada e libertada do mesmo, pelo administrador.
 A modularização das diversas componentes, permite um desenvolvimento autónomo de cada subcomponente.
