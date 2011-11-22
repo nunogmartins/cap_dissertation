@@ -29,14 +29,14 @@ O \textit{MRoP} é um módulo do núcleo que permite monitorizar as interacçõe
 Esta monitorização é inócua para a aplicação, porquanto esta desconhece que está a ser monitorizada, possibilitando ao administrador monitorizar aplicações sem acesso ao código fonte.
 
 Se analisarmos a aplicação, do ponto de vista de segurança na rede, é possível verificar se está, ou não, a enviar indevidamente informação para o exterior.
-Esta situação, não é possível de observar com o recurso ao normal funcionamento da \textit{LibPCap}, sem um conhecimento detalhado do seu funcionamente e protocolos, ou a uma monitorização da aplicação de forma intrusiva, o que pode originar comportamento errático e afectar negativamente o desempenho da aplicação e do sistema.
-O recurso à introdução desta funcionalidade não intrusiva, para a captura e análise do tráfego de um processo, constitui um avanço relativamente à monitorização de rede efectuada através da \textit{LibPCap}.
+Esta situação, não é possível de observar com o recurso ao normal funcionamento da biblioteca \textit{PCap}, sem um conhecimento detalhado do seu funcionamente e protocolos, ou a uma monitorização da aplicação de forma intrusiva, o que pode originar comportamento errático e afectar negativamente o desempenho da aplicação e do sistema.
+O recurso à introdução desta funcionalidade não intrusiva, para a captura e análise do tráfego de um processo, constitui um avanço relativamente à monitorização de rede efectuada através da biblioteca \textit{PCap}.
 
-O \textit{MRoP}, ao oferecer a possibilidade de capturar exclusivamente os pacotes de um determinado processo ou de uma família de processos, facilita as análises a efectuar e reduz a sobrecarga neste tipo de sistemas, dispensando a \textit{LibPCap} de capturar o tráfego não pretendido e, de conhecer os protocolos e portos utilizados pela aplicação.
+O \textit{MRoP}, ao oferecer a possibilidade de capturar exclusivamente os pacotes de um determinado processo ou de uma família de processos, facilita as análises a efectuar e reduz a sobrecarga neste tipo de sistemas, dispensando a biblioteca \textit{PCap} de capturar o tráfego não pretendido e, de conhecer os protocolos e portos utilizados pela aplicação.
 
 Esta funcionalidade, é transparente para todas as ferramentas desenvolvidas com base no \textit{PCap}, pelo que todas podem dela usufruir.
 
-Relativamente à sobrecarga introduzida, tendo como referência a monitorização de rede já existente, esta revelou-se insignificante mesmo nos piores casos, melhorando substancialmente aqueles em que incide sobre o tráfego de um único processo, reduzindo igualmente o trabalho realizado pelo \textit{LSF} e pela \textit{LibPCap}.
+Relativamente à sobrecarga introduzida, tendo como referência a monitorização de rede já existente, esta revelou-se insignificante mesmo nos piores casos, melhorando substancialmente aqueles em que incide sobre o tráfego de um único processo, reduzindo igualmente o trabalho realizado pelo \textit{LSF} e pela biblioteca \textit{PCap}.
 
 As vantagens do sistema criado assumem maior notoriedade, quando a máquina se encontra perante uma carga mais elevada de trabalho, ou um grande volume de tráfego de rede e/ou muitos fluxos irrelevantes, dado manter o uso dos recursos na proporção aproximada apenas do tráfego do processo alvo.
 

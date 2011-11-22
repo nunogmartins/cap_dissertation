@@ -256,7 +256,7 @@ Existe ainda um sistema para controlo/configuração, destinado a configurar est
 O \textit{MRoP} (Monitorização de Rede orientada ao Processo), captura os pacotes de rede de um processo, sem que o utilizador necessite exista um conhecimento prévio sobre o(s) protocolo(s) ou portas utilizadas.
 A utilização de um sistema de instrumentação do núcleo foi necessária apenas para monitorizar as chamadas envolvendo \textit{sockets}, e identificar o processo responsável, permitindo desta forma obter e manter, permanentemente actualizada, a informação relativa ao estado do processo alvo.
 De modo a minimizar a redução de desempenho, todo o sistema foi desenvolvido no núcleo do \textit{Linux}, sem alterações nas interfaces já existentes.
-Assim, ferramentas que façam uso da biblioteca \textit{LibPCap}, como o programa \textit{tcpdump} ou as suas variantes, podem beneficiar desta extensão sem qualquer alteração e sem impacto relevante no seu desempenho.
+Assim, ferramentas que façam uso da biblioteca \textit{PCap}, como o programa \textit{tcpdump} ou as suas variantes, podem beneficiar desta extensão sem qualquer alteração e sem impacto relevante no seu desempenho.
 
 Este módulo do núcleo foi desenvolvido com base nos quatro componentes que em seguida serão apresentados:
 
