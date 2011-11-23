@@ -21,13 +21,17 @@ Considerando que muitas aplicações aplicações (como \textit{P2P}) utilizam d
 Não sendo exclusiva das aplicações \textit{P2P}, a utilização de um elevado número de portos, também se verifica em sistemas \textit{Voice over IP}.
 Estas aplicações, nas suas diversas comunicações, não utilizam sempre portas conhecidas \textit{à priori}, pois por vezes fazem uso de protocolos em que no início da sessão negoceiam portos, o que dificulta substancialmente a utilização dos filtros existentes, por se revelar necessário conhecer todos os protocolos específicos das aplicações.
 
-\todo{ver}Para além desta dificuldade, existem aplicações que são executadas pelo administrador que não podem ser monitorizadas em nível utilizador, designadamente no caso da utilização do carregamento dinâmico de bibliotecas instrumentadas, para efectuar a monitorização de aplicações.
+%\todo{ver}Para além desta dificuldade, existem aplicações que são executadas pelo administrador que não podem ser monitorizadas em nível utilizador, designadamente no caso da utilização do carregamento dinâmico de bibliotecas instrumentadas, para efectuar a monitorização de aplicações.
+
+\todo{ver} Para além desta dificuldade, a monitorização de processos em nível utilizador nem sempre é possível de ser realizada, dado que para efectuar a instrumentação é necessário ter acesso ou conhecimento do código da aplicação.
+Quando a monitorização é efectuada recorrendo a mecanismos do núcleo, tal como o \textit{ptrace}, a sobrecarga gerada é significativa, o que pode por em causa o comportamento da aplicação.
+
 
 No contexto de uma dissertação anterior~\cite{Farruca:2009}, utilizou-se a biblioteca \textit{PCap} para a captura do tráfego de rede com vista à monitorização das interacções entre processos distribuídos, sendo que, um dos principais desafios solucionados consistiu no isolamento de pacotes pertencentes a um processo.
 Porém, a solução encontrada baseada em análise em nível utilizador, não se revela de fácil integração em qualquer outra ferramenta e acarreta elevada sobrecarga.
 
-Nos actuais sistemas de monitorização de rede não existe suporte para a monitorização das interacções de rede dos processos.
-Para levar a cabo esta tarefa de monitorização é imprescindível que métodos alternativos de monitorização de processos sejam combinados com a monitorização genérica de rede.
+Nos actuais sistemas de monitorização de rede, não existe suporte para a monitorização das interacções de rede dos processos.
+Para levar a cabo esta monitorização, é imprescindível que métodos alternativos de monitorização de processos sejam combinados com a monitorização genérica de rede.
 Esta combinação, quando possível, manifesta fraco desempenho e implica uma elevada especificidade na monitorização dos programas.
 
 
@@ -48,7 +52,7 @@ Merece igualmente referência, a possibilidade de análise dos fluxos do process
 À possibilidade anteriormente referida acresce a de ao monitorizar o fluxo de diferentes máquinas virtuais, implementadas utilizando processos dentro de um sistema, permitirá individualizar e capturar o tráfego de cada uma.
 Esta funcionalidade pode ser particularmente interessante em centros de dados, visto ser possível efectuar a análise deste tráfego, sem necessidade de recorrer a mecanismos mais complexos de análise.
 
-Foi submetido e aceite um artigo para o \textit{Inforum - 2011 Simpósio de Informática}\footnote{http://inforum.org.pt/INForum2011}, contendo uma descrição sucinta do trabalho realizado nesta dissertação, bem como os resultados obtidos através das validações.\cite{inforum}
+Foi submetido e aceite um artigo para o \textit{Inforum - 2011 Simpósio de Informática}\footnote{http://inforum.org.pt/INForum2011}, contendo uma descrição sucinta do trabalho realizado nesta dissertação, bem como os resultados obtidos através das validações~\cite{inforum}.
 
 \bigskip 
 
