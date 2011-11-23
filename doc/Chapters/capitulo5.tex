@@ -312,7 +312,7 @@ Face aos benefícios obtidos pela utilização do filtro, considera-se que o sis
 Todavia, face ao número de vezes que a função de filtragem é invocada (uma para cada pacote, recebido ou enviado), a sobrecarga da utilização do \textit{KProbes} é de todo desaconselhável.
 
 Foi necessário modificar o código do \textit{Linux} de modo a inserir um \textit{hook}, ou seja, um apontador para uma função.
-Esta função será invocada quando o filtro estático for avaliado para captura, permitindo que a função de filtragem do \textit{MRoP} analize o pacote com base no estado do processo, possibilitando efectuar uma conjunção entre o filtro estático definido pelo utilizador do \textit{LSF/PCAP} e a filtragem dinâmica efectuada pelo \textit{MRoP}, como pode ser observado na figura \ref{fig:run_filter}.
+Esta função será invocada quando o filtro estático for avaliado para captura, permitindo que a função de filtragem do \textit{MRoP} analise o pacote com base no estado do processo, possibilitando efectuar uma conjunção entre o filtro estático definido pelo utilizador do \textit{LSF/PCAP} e a filtragem dinâmica efectuada pelo \textit{MRoP}, como pode ser observado na figura \ref{fig:run_filter}.
 
 \begin{figure}[!ht]
 \centering
