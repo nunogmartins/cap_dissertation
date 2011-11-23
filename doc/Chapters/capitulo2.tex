@@ -1,12 +1,22 @@
 \chapter{Monitorização de processos}
 \label{cap:trabrelacionado}
 O recurso à monitorização do comportamento das aplicações, permite-nos obter dados relevantes sobre os recursos realmente utilizados, de modo a proporcionar-nos um conhecimento mais profundo do seu comportamento em execuções reais, permite também analisar o plano de execução, os métodos mais executados e detectar situações de eventos interessantes.
-As informações recolhidas permitem analisar o desempenho ou correcção da aplicação, sequencial ou distribuida, porquanto ao conseguir-se obter dados da utilização do \textit{cpu}, da memória, dos dispositivos de \textit{IO}, interacções, etc, é possível compreender o comportamento dinâmico das aplicações.
+As informações recolhidas permitem analisar o desempenho ou correcção da aplicação, sequencial ou distribuida, porquanto ao conseguir obter-se dados da utilização do \textit{cpu}, da memória, dos dispositivos de \textit{IO}, interacções, etc, é possível compreender o comportamento dinâmico das aplicações.
 Daí ser comum a utilização da monitorização como auxiliar na avaliação e depuração de programas, conseguindo um bom compromisso entre a qualidade dos dados recolhidos e a perturbação das aplicações ~\cite{DuartePhd05}.
  
-Na secção \ref{} ... será apresentada a forma de monitorização de rede no \textit{Linux}.
-Na seccção \ref{} ... são apresentadas ferramentas e mecanismos do núcleo para efectuar a monitorização deste e dos processos em nível utilizador.
-Como a obtenção de dados provenientes do núcleo é um dos problemas de desempenho da monitorização, são apresentados na seccção \ref{} ... algumas das interfaces e mecanismos de transferência de dados do núcleo para os processos em nível utilizador.
+Na secção \ref{sect:instrumentation_overview} é apresentada a forma de efectuar a monitorização, distinguindo entre os diferentes modos de obtenção da informação.
+Na secção \ref{sub:network_monitoring} é apresentada a monitorização de rede como um caso especifico da monitorização, são discutidos alguns dos problemas inerentes a esta monitorização, bem como algumas formas de as mitigar.
+É igualmente apresentado o \textit{Packet Capture} (\textit{PCap}), a sua arquitectura e partes relevantes da sua implementação, bem como alguns modos que permitem melhorias no desempenho da rede e da monitorização.
+
+Como a monitorização não é apenas exclusiva da rede, na secção \ref{sect:instrumentacao_casos_linux} são apresentadas ferramentas e mecanismos de monitorização do núcleo.
+Estas ferramentas permitem não só instrumentar o código do núcleo, mas também analisar o código de aplicações em nível utilizador.
+
+Como um dos problemas da monitorização é a obtenção da informação relevante, na secção \ref{sect:kernel_user_comm} são apresentados mecanismos de transferência de dados e, sistemas de comunicação entre o núcleo e o nível utilizador, para compreender se existem mecanismos alternativos que possam melhorar o desempenho da monitorização de rede.
+
+Na secção \ref{sect:outras_abordagens} são apresentados exemplos de ferramentas de monitorização de rede com base em informação de processos de nível utilizador.
+
+Por último, na secção \ref{sec:segundo:conclusion} apresenta-se uma conclusão referente aos mecanismos de monitorização e obtenção de informação.
+
 
  
 %\section{Visão geral} \label{sect:descricao}
@@ -23,7 +33,7 @@ Algumas são desenvolvidas para objectivos específicos.
 Tendo em vista o conhecimento geral das capacidades de cada uma, podemos analisar estes sistemas de variados pontos de vista.
 
 \paragraph*{}
-Se considerarmos por exemplo quanto à análise e visualização face ao instante da execução da aplicação alvo, podemos dividir os sistemas em:
+Se considerarmos, por exemplo, quanto à análise e visualização face ao instante da execução da aplicação alvo, podemos dividir os sistemas em:
  
 \subparagraph*{Online -}
 Enquanto decorre a monitorização da aplicação é possível observar os dados que são recolhidos pelo monitor.
@@ -31,7 +41,7 @@ Como os eventos estão a ser recolhidos e visualizados em simultâneo, apenas po
 
 \subparagraph*{Offline ou \textit{Post-Mortem} - }
 
-A história do programa é analisada após este se ter completado, daí a designação \textit{Post-Mortem}.
+A história do programa é analisada após este se ter completado, portanto a designação \textit{Post-Mortem}.
 Este método permite-nos analisar integralmente a sua história e correlacioná-la.
 Permite análises mais completas e computacionalmente mais exigentes.
 
@@ -157,7 +167,7 @@ As funções auxiliares da biblioteca efectuam chamadas ao sistema de modo a int
 \subsection{Biblioteca}
 
 A biblioteca em nível utilizador ao ter uma \textit{API} homogénea entre plataformas, permite aos programadores desenvolverem mais rapidamente ferramentas de monitorização de rede multiplataforma, sendo utilizada pela generalidade das ferramentas de monitorização de rede, tais como o \textit{TcpDump}, o \textit{Wireshark}, o \textit{Snort}, etc.
-Esta biblioteca como é multi-plataforma, permite ao programador utilizá-la nos principais sistemas de operação, dado que a \textit{API} da biblioteca \textit{PCap} é transparante relativamente à implementação, esta sim, específica a cada plataforma.
+Esta biblioteca como é multiplataforma, permite ao programador utilizá-la nos principais sistemas de operação, dado que a \textit{API} da biblioteca \textit{PCap} é transparante relativamente à implementação, esta sim, específica a cada plataforma.
 
 No \textit{Linux} para cada utilização da biblioteca \textit{PCap} é criado um \textit{socket} da família \textit{AF\_PACKET}.
 Como este tipo de \textit{socket} comunica directamente com a interface de rede permite que sejam activadas e, desactivadas propriedades das mesmas, tais como o modo promiscuo geralmente utilizado para efectuar a captura de pacotes que não pertencem às comunicações da máquina que efectua a monitorização.
@@ -274,16 +284,16 @@ Relativamente ao \textit{software}, são conhecidos esforços na utilização da
 Igualmente no \textit{hardware}, tem-se assistido a uma evolução no sentido de reduzir as interrupções efectuadas ao \textit{cpu}, adicionando nas interfaces de rede processadores dedicados às funcionalidades presentes no núcleo, de modo a libertá-lo da execução destas tarefas.
 
 
-\section{Optimizações}
+\subsection{Optimizações na Estrutura de Rede}
 
-\paragraph*{NAPI - New API - }
+Com a utilização de redes de 100 ou 1000 \textit{Mbps} o número de interrupções que são efectuadas a cada pacote que chega a interface de rede é muito elevado, levando a que para cada pacote a ser transferido entre o \textit{buffer} da interface de rede e a memória central seja necessário uma interrupção ao \textit{cpu}.
+Quando a utilização de rede é baixa, este modo de atendimento não comporta uma elevada sobrecarga no sistema, mas a partir de um certo valor, o número de atendimentos de interrupções é tão alto que não é possível realizar mais trabalho.
 
-Foi criada uma nova \textit{API} (\textit{Application Program Interface}) de atendimento de interrupções do processador, oriundos das interfaces de rede, com o objectivo de aumentar o desempenho da utilização de rede de elevado débito.
+Assim, foi criada uma nova \textit{API} (\textit{Application Program Interface}) de atendimento de interrupções do processador, oriundos das interfaces de rede, com o objectivo de aumentar o desempenho da utilização de rede de elevado débito.
 Esta nova \textit{API}, permite desligar a atenção do processador a novas interrupções, oriundas da interface de rede, durante um certo período de tempo.
-
 Este tempo foi definido, de forma a que não se verifiquem situações de elevada latência na chegada dos pacotes às aplicações.
-A forma anterior de recepção de pacotes, era efectuada de modo a atender uma interrupção por cada pacote que chegava à interface de rede, gerando assim demasiada sobrecarga no sistema.
-Actualmente a arquitectura de rede, está balanceada de forma a mudar o modo de atendimento de interrupções para NAPI, caso existam demasiadas interrupções por unidade de tempo~\cite{administrator:napi}.
+
+Actualmente a arquitectura de rede, está balanceada de forma a mudar o modo de atendimento de interrupções para \textit{NAPI}, caso existam demasiadas interrupções por unidade de tempo~\cite{administrator:napi}.
 
 Utilizando esta nova \textit{API}, é possível explorar um escalonamento mais eficiente das interrupções, em situações de intensa actividade da interface de rede e do processador.
 O \textit{NAPI} apenas pode ser aplicado nos caso em que os controladores das interfaces de rede estejam preparados para utilizar alguma forma de mitigação da interrupção, caso contrário esta \textit{API} não é aplicada, resultando em interrupções por cada pacote, enviado ou recebido.
@@ -291,11 +301,10 @@ O \textit{NAPI} apenas pode ser aplicado nos caso em que os controladores das in
 A utilização desta nova \textit{API} permite diminuir o número de trocas de contexto entre o controlador da interface e o núcleo de sistema.
 Sempre que o \textit{cpu} atende uma interrupção de rede, obtem um número maior de dados, que combinado com um sistema de memória partilhada aumenta substancialmente o desempenho.
 
-
 \paragraph*{Sistemas \textit{multi-core} e multi-processador}
 
 Com o aparecimento de sistemas \textit{multi-core} e \textit{multi-processador} a que a generalidade do público tem acesso, a paralelização de código ou a forma de tirar partido destas arquitecturas, que permitem um melhor aproveitamento dos recursos, assumem uma particular importância.
-De forma a tirar partido das arquitecturas \textit{multi-core}, é necessário que o controlador e interfaces de rede, os \textit{buffers}, e os controladores de \textit{DMA} (\textit{Direct Memory Access}), sejam modificados de forma a conhecerem esta estrutura.
+De modo a tirar partido das arquitecturas \textit{multi-core}, é necessário que o controlador e interfaces de rede, os \textit{buffers}, e os controladores de \textit{DMA} (\textit{Direct Memory Access}), sejam modificados de forma a conhecerem esta estrutura.
 É pois, determinante um esforço conjunto envolvendo todas estas componentes, com vista à obtenção do máximo rendimento destas arquitecturas\cite{Deri:2010}.
 
 
@@ -726,7 +735,7 @@ Com este novo \textit{instruction set}, e sem necessidade de verificação, foi 
 %Falta falar do ipt\_owner do iptables entre outros ....
 
 \section{Conclusão}
-
+\label{sec:segundo:conclusion}
 Como se pode observar neste capítulo, existe a possibilidade de melhorar a monitorização de rede do \textit{Linux}.
 O mecanismo de instrumentação genérico do \textit{Linux}, \textit{KProbes}, permite que se efectuem análises no núcleo de modo generalista, o que para obter as interacções dos processos com as interfaces de rede sem que se assista à instrumentação do código dos processos e com baixa sobrecarga será um sistema de instrumentação dinâmico a ter em conta para o desenvolvimento de um mecanismo de monitorização genérico de rede de um processo.
 
