@@ -200,23 +200,22 @@ As ferramentas que utilizam esta biblioteca, não necessitam de conhecer estes m
 
 O \textit{Linux Socket Filtering} (\textit{LSF}), pertence à arquitectura de rede do núcleo do \textit{Linux}.
 Este componente permite que sejam efectuadas monitorizações ao tráfego que circula nas interfaces de rede, de modo não intrusivo.
-Como o referido anteriormente, o \textit{LSF} utiliza um \textit{socket} da família \textit{AF\_PACKET} que comunica directa com o controlador da interface de rede, possibilitando a captura dos diversos pacotes ainda antes destes poderem ser filtrados pela \textit{firewall}, presente no núcleo de sistema.
+Como o anteriormente referido, o \textit{LSF} utiliza um \textit{socket} da família \textit{AF\_PACKET} que comunica directa com o controlador da interface de rede, possibilitando a captura dos diversos pacotes ainda antes destes poderem ser filtrados pela \textit{firewall}, presente no núcleo de sistema.
 
 Podem ser aplicados filtros aos \textit{sockets} de modo a aumentar a eficiência na captura dos pacotes, excluindo aqueles que são irrelevantes para a monitorização.
 O \textit{LSF} é derivado do \textit{Berkeley Packet Filtering} (\textit{BPF}) que é o \textit{standard} de \textit{de facto} para a criação de filtros para a captura de pacotes de rede, no núcleo de sistema.
-Este sistema de captura e filtragem permite aos administradores, definir e afectar filtros ao \textit{socket} da familia \textit{PACKET}.
+Este sistema de captura e filtragem permite aos administradores, definir e afectar filtros ao \textit{socket} da familia \textit{AF\_PACKET}.
 Os filtros definidos são descritos numa linguagem simples, de forma a efectuarem com celeridade a selecção dos pacotes a capturar, rejeitando todos os outros.
 A linguagem utilizada para a criação dos filtros é traduzida para o \textit{Instruction Set}, definido no \textit{BPF}.
-Este \textit{Instruction Set} utiliza operadores lógicos de forma a combinar as regras definidas nos filtros, criando-se apenas um filtro a ser aplicado aos pacotes.~\cite{Mccanne92thebsd}.
+Este \textit{Instruction Set} utiliza operadores lógicos de forma a combinar as regras definidas nos filtros, criando-se apenas um filtro a ser aplicado aos pacotes~\cite{Mccanne92thebsd}.
+Este filtro é como um programa que irá ser executado, passo a passo, sobre o pacote, recebido ou enviado, através de uma máquina virtual desenhada para o efeito.
+No retorno da execução deste programa / filtro, é decidido se o pacote deve, ou não ser capturado, continuando o seu percurso pelo sistema de monitorização, até ao monitor em nível utilizador, que em geral é uma ferramenta que utiliza a biblioteca \textit{PCap}.
 
-Na versão actual do núcleo de sistema do \textit{Linux} (2.6.39), o \textit{socket} \textit{AF\_PACKET} pode utilizar um sistema de partilha de \textit{buffer} (\textit{MMAP}), com o espaço de utilizador.
-Neste caso, cabe ao utilizador definir explicitamente a forma como pretende utilizar o \textit{socket}. 
-Para atingir este objectivo o utilizador tem de pedir ao núcleo, uma região de memória, sendo esta, posteriormente indicada como argumento de configuração do \textit{socket}.
+Na versão actual do núcleo \textit{Linux} (2.6.39), o \textit{socket} \textit{AF\_PACKET} pode utilizar um sistema de partilha de \textit{buffer} (\textit{MMAP}), com o espaço de utilizador.
+Neste caso, cabe à ferramenta monitora definir explicitamente que deseja utilizar este modo de captura e, de modo a atingir este objectivo tem de pedir ao núcleo, uma região de memória, sendo esta, posteriormente indicada como argumento de configuração do \textit{socket}.
 
 
 %O módulo \textit{AF\_PACKET} permite activar o modo promiscuo da interface a monitorizar, ou seja, permite a captura de pacotes que não são destinados à máquina utilizada.
-
-
 
 \subsection{Limitações e optimizações}
 Apesar da \textit{API} da biblioteca \textit{PCap} ser homogénea em diferentes plataformas (\textit{Windows}, \textit{Linux}, \textit{FreeBSD}, etc), o desempenho desta pode variar.
