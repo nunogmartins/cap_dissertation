@@ -1,11 +1,11 @@
 \chapter{Monitorização de processos}
 \label{cap:trabrelacionado}
-O recurso à monitorização do comportamento das aplicações, permite-nos obter dados relevantes sobre os recursos realmente utilizados, de modo a proporcionar-nos um conhecimento mais profundo do seu comportamento em execuções reais, permite também analisar o plano de execução, os métodos mais executados e detectar situações de eventos interessantes.
-As informações recolhidas permitem analisar o desempenho ou correcção da aplicação, sequencial ou distribuida, porquanto ao conseguir obter-se dados da utilização do \textit{cpu}, da memória, dos dispositivos de \textit{IO}, interacções, etc, é possível compreender o comportamento dinâmico das aplicações.
+O recurso à monitorização do comportamento das aplicações, permite-nos obter dados relevantes sobre os recursos realmente utilizados, de modo a proporcionar-nos um conhecimento mais profundo do seu comportamento em execuções reais e permite igualmente analisar o plano de execução, os métodos mais executados e detectar situações de eventos interessantes.
+As informações recolhidas permitem analisar o desempenho ou correcção da aplicação, sequencial ou distribuída, porquanto ao conseguir obter-se dados da utilização do \textit{cpu}, da memória, dos dispositivos de \textit{IO}, interacções, etc, é possível compreender o comportamento dinâmico das aplicações.
 Daí ser comum a utilização da monitorização como auxiliar na avaliação e depuração de programas, conseguindo um bom compromisso entre a qualidade dos dados recolhidos e a perturbação das aplicações ~\cite{DuartePhd05}.
  
 Na secção \ref{sect:instrumentation_overview} é apresentada a forma de efectuar a monitorização, distinguindo entre os diferentes modos de obtenção da informação.
-Na secção \ref{sub:network_monitoring} é apresentada a monitorização de rede como um caso especifico da monitorização, são discutidos alguns dos problemas inerentes a esta monitorização, bem como algumas formas de as mitigar.
+Na secção \ref{sub:network_monitoring} é apresentada a monitorização de rede, onde se centra o foco deste trabalho, como um caso especifico da monitorização, são discutidos alguns dos problemas inerentes a esta monitorização, bem como algumas formas de os mitigar.
 É igualmente apresentado o \textit{Packet Capture} (\textit{PCap}), a sua arquitectura e partes relevantes da sua implementação, bem como alguns modos que permitem melhorias no desempenho da rede e da monitorização.
 
 Como a monitorização não é apenas exclusiva da rede, na secção \ref{sect:instrumentacao_casos_linux} são apresentadas ferramentas e mecanismos de monitorização do núcleo.
@@ -25,7 +25,7 @@ Por último, na secção \ref{sec:segundo:conclusion} apresenta-se uma conclusã
 %Daí ser comum a utilização da monitorização como auxiliar na avaliação e depuração de programas conseguindo um bom compromisso entre a qualidade dos dados recolhidos e a perturbação das aplicações~\cite{DuartePhd05}.
 
 
-\section{Obtenção de informação}\label{sect:instrumentation_overview}
+\section{Formas de monitorização}\label{sect:instrumentation_overview}
 
 Os dados relativos ao comportamento das aplicações, obtidos de diferentes fontes, são normalmente coligidos e posteriormente analisados por ferramentas especializadas.
 Existem diferentes formas de coligir, visualizar e até interactuar com os monitores, cada uma com as suas especificidades e capacidades próprias.
@@ -41,7 +41,7 @@ Como os eventos estão a ser recolhidos e visualizados em simultâneo, apenas po
 
 \subparagraph*{Offline ou \textit{Post-Mortem} - }
 
-A história do programa é analisada após este se ter completado, portanto a designação \textit{Post-Mortem}.
+A história do programa é analisada após este se ter completado, daí a designação \textit{Post-Mortem}.
 Este método permite-nos analisar integralmente a sua história e correlacioná-la.
 Permite análises mais completas e computacionalmente mais exigentes.
 
@@ -52,10 +52,10 @@ Se a monitorização necessitar de interactividade do utilizador, é possível d
 \subparagraph*{Activa - }
 
 Por iniciativa explícita do utilizador, é possível inquirir o sistema de monitorização sobre o estado da computação, ou mesmo alterá-la.
-Este método, por vezes descrito como \textit{computacional steering}, é a forma com maior interactividade, uma vez que permite ir analisando e modificando os parâmetros da monitorização ou mesma da aplicação.
+Este método, por vezes descrito como \textit{computacional steering}, é a forma com maior interactividade, uma vez que permite ir analisando e modificando os parâmetros da monitorização ou mesmo da aplicação.
 
 \subparagraph*{Passiva - }
-Esta forma de monitorização é especialmente utilizada em ambientes onde é relevante a obtenção da totalidade dos dados e, apenas no final, nos debruçarmos sobre a sua análise.
+Esta forma de monitorização é especialmente utilizada em ambientes onde é relevante a obtenção de um conjunto fixo de dados e, apenas no final, nos debruçarmos sobre a sua análise.
 Esta forma é designada por passiva, pois o utilizador não tem intervenção na forma como os dados estão a ser obtidos, o que reduz a perturbação no sistema.
 Quanto muito a sua acção acontece antes da execução, para configuração da informação a recolher.
 
@@ -64,7 +64,7 @@ A própria instrumentação da aplicação pode ser de dois tipos: a estática e
 
 \subparagraph*{Estática - }
 
-Na instrumentação estática o código instrumentado é definido em tempo de compilação ou utilizando bibliotecas próprias para o efeito, como a utilização da função \textit{assert}, que define os pontos a serem monitorizados.
+Na instrumentação estática o código de instrumentação é definido em tempo de compilação ou utilizando bibliotecas próprias para o efeito, como a utilização da função \textit{assert}, que define os pontos a serem monitorizados.
 Durante a execução não podem ser adicionados ou removidos pontos de análise.
 
 \subparagraph*{Dinâmica - }
@@ -80,18 +80,18 @@ Tal pode ser efectuado no início ou durante a sua execução, criando, alterand
 %Recolha de dados
 }
 A recolha de dados provenientes da monitorização é uma das componentes mais sensíveis, relativamente ao grau de perturbação da monitorização.
-Em geral as informações recolhidas da monitorização são armazenados em memória central sendo posteriormente armazenados em memória persistente.
-Esta transferência de memória central para disco em geral deve-se a uma acção explicita do utilizador, ou então, a algum evento indicador da necessidade de guardar os dados, de forma a que novos dados possam ser armazenados em memória, uma vez que os \textit{buffers}, em memória, geralmente têm dimensão fixa.
+Em geral as informações recolhidas da monitorização são inicialmente armazenados em memória central e posteriormente em memória persistente.
+Esta transferência de memória central para disco em geral deve-se a uma acção explícita do utilizador, ou então, a algum evento indicador da necessidade de guardar os dados, de forma a que novos dados possam ser armazenados em memória, uma vez que os \textit{buffers}, em memória, geralmente têm dimensão fixa.
 %Caso exista algum evento que indique que o \textit{buffer} se encontra cheio ou por acção explícita do utilizador, tal é transferido para a interface com o utilizador ou armazena em memória persistente, para posterior análise.
 
 \subparagraph*{
 %Grau de perturbação
 }
-Existe claro a preocupação de que o sistema a ser monitorizado, tenha um baixo grau de perturbação, pois esta perturbação pode levar à alteração dos resultados obtidos e mesmo a comportamentos erráticos da aplicação (especialmente perante execuções concorrentes).
+Existe claro a preocupação de que o sistema a ser monitorizado, tenha um baixo grau de perturbação, pois esta pode levar à alteração dos resultados obtidos e mesmo a comportamentos erráticos da aplicação (especialmente perante execuções concorrentes).
 Por este motivo, diversas abordagens foram criadas, para reduzir o impacto da monitorização num sistema em produção.
-Uma destas abordagens traduz-se na utilização de instruções especializadas, as quais alguns processadores dispõem para \textit{debug}, de modo a utilizar os recursos que mais se adequem à monitorização.
+Uma destas abordagens traduz-se na utilização de instruções especializadas, de que alguns processadores dispõem para \textit{debug}, de modo a utilizar os recursos que mais se adequem à monitorização.
 Estes métodos, nem sempre são utilizados, devido à sua dependência da arquitectura, o que dificulta a sua portabilidade.
-Com vista a minimizar a perturbação, alguns sistemas de monitorização utilizam uma técnica de amostragem, o que permite obter indicações sobre os estado da computação a cada intervalo de tempo.
+Com vista a minimizar a perturbação, alguns sistemas de monitorização utilizam uma técnica de amostragem, que permite obter indicações sobre os estado da computação a cada intervalo de tempo.
 Esta técnica, em oposição à criação de um traço de execução, permite obter dados sobre os recursos apenas por amostra, limitando à partida a perturbação, enquanto que na criação de um traço de execução, é possível obter a totalidade dos eventos de forma a criar uma história completa, conduzindo a uma grande sobrecarga do sistema perante uma elevada taxa de eventos.
 
 \paragraph*{
@@ -104,28 +104,27 @@ No entanto estas análises não serão o foco deste trabalho.
 As ferramentas de monitorização de rede são, em geral, baseadas na captura de pacotes de forma passiva.
 Estas capturam os pacotes que fluem através da interface de rede, para posterior análise ao tráfego, que pode incidir sobre a largura de banda utilizada, principais protocolos, eventuais problemas de segurança, etc.
 
-A monitorização das interacções dos processos com o exterior, pode ser efectuada de diferentes formas, duas destas serão apresentadas.
-A primeira utiliza bibliotecas instrumentadas que obtêm os pacotes de dados quando estes chegam à aplicação, sendo que a segunda forma recorre a mecanismos genéricos do núcleo, para a monitorização de rede.
-Relativamente à primeira, é necessário conhecer o código da aplicação e instrumentá-lo, obtendo-se apenas os dados que chegam à aplicação.
-Este processo é específico a cada aplicação e pode ver o seu uso limitado por questões de segurança do sistema.
-No que à segunda forma se refere, a monitorização é efectuada de forma genérica, não sendo intrusiva para as aplicações, necessitando apenas de efectuar a monitorização do processo e da rede, separadamente. 
+A monitorização das interacções dos processos com o exterior, pode ser efectuada de diferentes formas, de que se apresentam duas:
+A primeira utiliza bibliotecas instrumentadas que obtêm os dados quando estes chegam (ou saem) da aplicação, sendo que a segunda forma recorre a mecanismos genéricos do núcleo, para a monitorização de rede.
+Relativamente à primeira, é necessário conhecer o código da aplicação, ou das suas bibliotecas e instrumentá-lo, obtendo-se apenas os dados referentes à aplicação.
+Este processo é específico de cada aplicação e pode ver o seu uso limitado por questões de segurança do sistema.
+No que à segunda forma se refere, a monitorização é efectuada de forma genérica, não sendo intrusiva para as aplicações, necessitando apenas de efectuar separadamente a monitorização do processo e da rede.
 
 \subparagraph*{Dinamismo das aplicações - }
 As aplicações são dinâmicas quanto às interacções via rede (por exemplo criando e destruindo canais de comunicação).
-A este dinamismo devem-se algumas dificuldades com que nos deparamos, ao monitorizar as interacções dos vários fluxos de execução dos processos.
+Este dinamismo acarreta algumas dificuldades, ao monitorizar as interacções dos vários fluxos de execução dos processos.
 
 \subparagraph*{Formas de reduzir o volume de dados utilizando filtros - }
-A utilização de filtros na captura do tráfego de rede é uma forma eficiente de, apenas, se obter os dados relevantes, com vista à satisfação dos nossos objectivos e, são particularmente importantes, quando o volume de dados que circula na rede é extremamente elevado.
+A utilização de filtros na captura do tráfego de rede é uma forma eficiente de apenas se obterem os dados relevantes, com vista à satisfação dos nossos objectivos e, são particularmente importantes, quando o volume de dados que circula na rede é extremamente elevado.
 Tendo em vista a eficiência, estes filtros são implementados no núcleo do sistema de operação, baseando-se em regras simples, que podem ser combinadas para contemplar situações mais complexas.
 
 \subparagraph*{Dificuldade de criação e alteração de filtros - }
-Os filtros actualmente suportados para capturar pacotes no \textit{Linux}, são definidos \textit{a priori}, não existindo forma eficiente de os alterar dinamicamente, uma vez que a captura tem de ser interrompida a fim de ser criado um novo filtro, posteriormente aplicado, procedendo-se em seguida à retoma da captura dos pacotes, de acordo com as novas regras.
+Os filtros actualmente suportados para capturar pacotes no \textit{Linux}, são definidos \textit{a priori}, não existindo forma eficiente de os alterar dinamicamente, uma vez que a captura tem de ser interrompida a fim de ser criado um novo filtro e posteriormente aplicado, procedendo-se em seguida à retoma da captura dos pacotes, de acordo com as novas regras.
 
 \subparagraph*{Filtros complexos - }
-Para aumentar o desempenho da captura de pacotes, os filtros são aplicados o mais cedo possível, ou seja, logo que chegam à interface de rede.
+Para aumentar o desempenho da captura de pacotes, os filtros são aplicados o mais cedo possível, ou seja, logo na interface de rede.
 Face a esta situação, o tipo de filtros que se podem aplicar têm de ser simples, baseados apenas nos metadados do pacote.
-Quando os filtros são demasiado complexos, a componente de filtragem do núcleo tem de transferir o pacote para o monitor em nível utilizador, de modo a poder ser aplicar o filtro.
-Estes fitros analisam um nível mais abstracto da informação, presente no \textit{payload} dos pacotes, ou a relacionam com outra informação, para obterem apenas os dados relevantes.
+Quando os filtros são demasiado complexos, a componente de filtragem do núcleo tem de transferir o pacote para o monitor em nível utilizador, de modo a poder aplicar o filtro.
 
 \subparagraph*{Técnicas para o aumento de desempenho}
 
@@ -148,13 +147,13 @@ Esta monitorização é não intrusiva para o código das aplicações e, depend
 Para filtrar os pacotes indesejados a biblioteca \textit{PCap} utiliza filtros baseados no \textit{Berkeley Packet Filtering} (\textit{BPF}), normalmente implementados no núcleo de sistema, de modo a que a monitorização se torne mais eficiente e menos intrusiva.
 Assim, a interactividade apresentada é, em geral, ao nível da alteração dos filtros para a captura.
 
-Em seguida é apresentada a arquitectura da biblioteca \textit{PCap} e o seu suporte no \textit{Linux}, \textit{Linux Socket Filtering}.
+Em seguida é apresentada a arquitectura da biblioteca \textit{PCap} e o seu suporte no \textit{Linux}, cuja implementação de filtros toma o nome de \textit{Linux Socket Filtering}.
 
 \subsection {Arquitectura}
 \label{sect:architecture_libpcap}
 A arquitectura do \textit{Packet Capture} (\textit{PCap}) divide-se em duas partes: a biblioteca em nível utilizador, e a implementação do \textit{Linux Socket Filtering} no núcleo de sistema, como é visível na figura \ref{fig:pcap_architecture}.
-Como anteriormente referido, a bibilioteca em nível utilizador é constituida por uma \textit{API} homogénea, que oferece às ferramentas de monitorização de rede um mecanismo para efectuar as suas análises ao tráfego.
-As funções auxiliares da biblioteca efectuam chamadas ao sistema de modo a interagirem com o mecanismo de monitorização de rede do \textit{Linux}, \textit{Linux Socket Filtering}, presente no núcleo.
+Como o anteriormente referido, a bibilioteca em nível utilizador é constituída por uma \textit{API} homogénea, que oferece às ferramentas de monitorização de rede um mecanismo para efectuar as suas análises ao tráfego.
+As funções auxiliares da biblioteca efectuam chamadas ao sistema de modo a interagirem com o mecanismo de monitorização de rede do \textit{Linux}, \textit{Linux Socket Filtering}.
 
 \begin{figure}[htbp]
        \centering
@@ -168,62 +167,64 @@ As funções auxiliares da biblioteca efectuam chamadas ao sistema de modo a int
 
 A biblioteca em nível utilizador, ao ter uma \textit{API} homogénea entre plataformas, permite aos programadores desenvolverem mais rapidamente ferramentas de monitorização de rede multiplataforma, sendo utilizada pela generalidade das ferramentas de monitorização de rede, tais como o \textit{TcpDump}, o \textit{Wireshark}, o \textit{Snort}, etc.
 Esta biblioteca como é multiplataforma, permite ao programador utilizá-la nos principais sistemas de operação, dado que a \textit{API} da biblioteca \textit{PCap} é transparante relativamente à implementação, esta sim, específica a cada plataforma.
+Existem implementações da biblioteca \textit{PCap} para \textit{Linux}, \textit{MS-Windows}, \textit{FreeBSD}, etc.
 
 No \textit{Linux} para cada utilização da biblioteca \textit{PCap} é criado um \textit{socket} da família \textit{AF\_PACKET}.
-Como este \textit{socket} comunica, directamente, com a interface de rede permite que sejam capturados logo os pacotes que nela circulam, efectuando assim a monitorização dos pacotes de rede.
+Este tipo de \textit{socket} permite comunicar directamente com a interface de rede e possibilita a captura dos pacotes que nela circulam, para uso do processo monitor.
 Para além da captura, devido à comunicação directa com as interfaces, permite a activação e desactivação de propriedades destas.
 Uma destas propriedades é o modo promiscuo, geralmente utilizado para efectuar a captura de pacotes, que não pertencem às comunicações da máquina que efectua a monitorização.
 Apesar desta funcionalidade ser amplamente utilizada para a monitorização da rede, para o âmbito desta dissertação é totalmente desnecessária, dado que os pacotes a serem recolhidos para análise, são os pertencentes a processos da máquina.
 
-Um dos parâmetros necessários à monitorização, é a interface sobre a qual irá ser efectuada, assim de modo a monitorizar todas as interfaces simultâneamente, foi criado um modo especial, o \textit{any}.
+Um dos parâmetros necessários à monitorização, é a interface sobre a qual irá ser efectuada.
+Existe um modo especial, o \textit{any}, de modo a monitorizar todas as interfaces simultâneamente.
 
-Como verificado anteriormente, quando o número de dados da monitorização é elevado, e nem todos os dados capturados são relevantes para as análises, estes são filtrados, de modo a apenas serem utilizados para análise os dados relevantes.
-Por isso, de modo a minimizar a sobrecarga e capturar apenas os pacotes relevantes para as análises, pode ser necessário filtrar os pacotes não relevantes.
-A biblioteca permite efectuar diversas formas de filtragem, quer em nível utilizador, para filtros mais complexos, quer no núcleo com filtros apenas baseados nos metadados dos pacotes.
-Se a filtragem for efectuada exclusivamente em nível utilizador, é necessário aplicar um filtro que indique que todos os pacotes devem ser capturados.
-Se a ferramenta que utiliza a biblioteca necessitar filtrar os pacotes com base nos metadados destes, deverá especificar um filtro utilizando para isso as instruções pertencentes à biblioteca \textit{PCap}.
-Se o filtro for demasiado complexo, não poderá ser aplicado no núcleo, sendo apenas possível aplicá-lo em nível utilizador, perdendo algum desempenho.
-Antes da introdução do novo filtro no canal, este tem de ser objecto de drenagem, para receber apenas os pacotes do novo filtro.
-Este modo de filtragem, evita imediatamente a captura de pacotes irrelevantes para a análise e permite que aqueles que não são visíveis às aplicações, devido à \textit{firewall} do \textit{Linux}, possam ser capturados e analisados pelas ferramentas de monitorização de rede.
-Através da função \textit{pcap\_compile} presente na biblioteca, irá traduzir e optimizar o filtro para o conjunto de instruções do \textit{BPF}, sendo posteriormente aplicado no núcleo através da função \textit{setfilter}.
-Esta função utiliza a chamada ao sistema \textit{setsockopt}, passando como argumentos o canal e o filtro a ser executado, para que este seja avaliado a cada pacote recebido ou enviado através da interface de rede.
+Como o atrás referido, quando o número de dados da monitorização é elevado e nem todos os dados capturados são relevantes para as análises, estes podem ser filtrados, o que permite minimizar a sobrecarga ao ignorar de imediato os pacotes não relevantes.
+A implementação da biblioteca permite efectuar diversas formas de filtragem, quer em nível utilizador, para filtros mais complexos, quer no núcleo com filtros apenas baseados nos metadados dos pacotes.
+Se a filtragem for efectuada exclusivamente em nível utilizador, é necessário pedir ao núcleo do sistema de operação, que todos os pacotes sejam capturados.
+
+A ferramenta que utiliza a biblioteca, especifica um filtro utilizando para tal as instruções pertencentes à biblioteca \textit{PCap}.
+Se o filtro for demasiado complexo e não possa ser aplicado no núcleo (como seja quando o \textit{SO} em causa não suporte a funcionalidade requerida), será automaticamente aplicado em nível utilizador, perdendo-se algum desempenho.
+Antes da introdução do novo filtro no canal de rede, este tem de ser objecto de drenagem\footnote{signfica garantir que todos os pacotes em trânsito no canal da pilha de rede no \textit{SO} são tratados e entregues, para que a nova captura possa entrar em funcionamento.}, para receber apenas os pacotes de acordo com o novo filtro.
+Esta filtragem, evita a captura de pacotes irrelevantes para a análise e permite que aqueles que não são visíveis às aplicações, devido à \textit{firewall} do \textit{Linux}, possam também ser capturados e analisados pelas ferramentas de monitorização de rede.
+A função \textit{pcap\_compile}, presente na biblioteca, irá traduzir e optimizar o filtro para o conjunto de instruções do \textit{LSF} (ou o equivalente presente no \textit{SO}), sendo posteriormente aplicado no núcleo através da função \textit{setfilter}.
+Esta função utiliza a chamada ao sistema \textit{setsockopt}, passando como argumentos o canal e o filtro a ser executado, para que este passe a ser avaliado para cada pacote recebido ou enviado através da interface de rede.
 Caso o número de \textit{bytes} dos pacotes sejam superiores ao indicado no filtro, o pacote é cortado até ao tamanho indicado neste.
-É possível obter estatisticas, relacionadas com a captura e filtragem de pacotes, estas são também obtidas através de \textit{ioctls} efectuadas sobre o canal de recepção da monitorização.
+É possível obter estatísticas, relacionadas com a captura e filtragem de pacotes, através de \textit{ioctls} efectuadas sobre o canal de recepção da monitorização.
 
 A arquitectura de rede do núcleo de sistema \textit{Linux}, utiliza \textit{socket buffers}, que contêm os dados referentes às diferentes camadas da pilha de rede \textit{TCP/IP}.
-Esta estrutura dispõe de toda a informação sobre o pacote, não só o \textit{payload} recebido pelas aplicações, como também os metadados, por isso é utilizada nos sistemas de monitorização.
+Esta estrutura dispõe de toda a informação sobre o pacote, não só o \textit{payload} recebido pelas aplicações, como também os metadados, sendo utilizada na implementação dos filtros no \textit{LSF}.
 
-As ferramentas que utilizam esta biblioteca, não necessitam de conhecer estes mecanismos internos, sendo-lhes facultado uma \textit{API} que lhes permite abstrair das especificidades da arquitectura onde estão a executar.
+As ferramentas que utilizam esta biblioteca, não necessitam de conhecer estes mecanismos internos, sendo-lhes facultada a \textit{API} que lhes permite abstrair das especificidades da arquitectura onde estão a executar.
 
 
 \subsection{Linux Socket Filtering}
 
 O \textit{Linux Socket Filtering} (\textit{LSF}), pertence à arquitectura de rede do núcleo do \textit{Linux}.
 Este componente permite que sejam efectuadas monitorizações ao tráfego que circula nas interfaces de rede, de modo não intrusivo.
-Como o anteriormente referido, o \textit{LSF} utiliza um \textit{socket} da família \textit{AF\_PACKET} que comunica directa com o controlador da interface de rede, possibilitando a captura dos diversos pacotes ainda antes destes poderem ser filtrados pela \textit{firewall}, presente no núcleo de sistema.
+Como o anteriormente referido, o \textit{LSF} utiliza um \textit{socket} da família \textit{AF\_PACKET} que comunica directamente com o controlador da interface de rede, possibilitando a captura dos diversos pacotes ainda antes destes puderem ser filtrados pela \textit{firewall}, presente no núcleo de sistema.
 
-Podem ser aplicados filtros aos \textit{sockets} de modo a aumentar a eficiência na captura dos pacotes, excluindo aqueles que são irrelevantes para a monitorização.
-O \textit{LSF} é derivado do \textit{Berkeley Packet Filtering} (\textit{BPF}) que é o \textit{standard} de \textit{de facto} para a criação de filtros para a captura de pacotes de rede, no núcleo de sistema.
-Este sistema de captura e filtragem permite aos administradores, definir e afectar filtros ao \textit{socket} da familia \textit{AF\_PACKET}.
-Os filtros definidos são descritos numa linguagem simples, de forma a efectuarem com celeridade a selecção dos pacotes a capturar, rejeitando todos os outros.
-A linguagem utilizada para a criação dos filtros é traduzida para o \textit{Instruction Set}, definido no \textit{BPF}.
+O \textit{LSF} é derivado do \textit{Berkeley Packet Filtering} (\textit{BPF}) que é o \textit{standard} de \textit{de facto} para a criação de filtros destinados à captura de pacotes de rede, no núcleo de sistema.
+Este sistema de captura e filtragem permite aos administradores, definir e afectar filtros ao \textit{socket} da família \textit{AF\_PACKET}, afecto às interfaces onde a captura deve ser realizada.
+A linguagem simples utilizada para a criação dos filtros no \textit{PCap} é traduzida para o \textit{Instruction Set}, definido no \textit{BPF}.
 Este \textit{Instruction Set} utiliza operadores lógicos de forma a combinar as regras definidas nos filtros, criando-se apenas um filtro a ser aplicado aos pacotes~\cite{Mccanne92thebsd}.
-Este filtro é como um programa que irá ser executado, passo a passo, sobre o pacote, recebido ou enviado, através de uma máquina virtual desenhada para o efeito.
-No retorno da execução deste programa / filtro, é decidido se o pacote deve, ou não ser capturado, continuando o seu percurso pelo sistema de monitorização, até ao monitor em nível utilizador, que em geral é uma ferramenta que utiliza a biblioteca \textit{PCap}.
+Este filtro é como um programa que irá ser executado, passo a passo, sobre cada pacote, recebido ou enviado, através de uma máquina virtual desenhada para o efeito no \textit{LSF}.
+No retorno da execução deste programa / filtro, é indicado se o pacote deve, ou não ser capturado.
+Caso seja, é duplicado e, a cópia continua o seu percurso, pelo sistema de monitorização, até ao monitor em nível utilizador, que em geral é uma ferramenta que utiliza a biblioteca \textit{PCap}.
 
 Na versão actual do núcleo \textit{Linux} (2.6.39), o \textit{socket} \textit{AF\_PACKET} pode utilizar um sistema de partilha de \textit{buffer} (\textit{MMAP}), com o espaço de utilizador.
-Neste caso, cabe à ferramenta monitora definir explicitamente que deseja utilizar este modo de captura e, de modo a atingir este objectivo tem de pedir ao núcleo, uma região de memória, sendo esta, posteriormente indicada como argumento de configuração do \textit{socket}.
+Neste caso, cabe à ferramenta monitora definir explicitamente que deseja utilizar este modo de captura e, de modo a atingir este objectivo, solicita ao núcleo uma região de memória partilhada, sendo esta, posteriormente, indicada como argumento na configuração do \textit{socket}.
 
 
 %O módulo \textit{AF\_PACKET} permite activar o modo promiscuo da interface a monitorizar, ou seja, permite a captura de pacotes que não são destinados à máquina utilizada.
 
 \subsection{Limitações e optimizações}
-Apesar da \textit{API} da biblioteca \textit{PCap} ser homogénea em diferentes plataformas (\textit{Windows}, \textit{Linux}, \textit{FreeBSD}, etc), o desempenho desta pode variar.
+Apesar da \textit{API} da biblioteca \textit{PCap} existir em diferentes plataformas, o desempenho desta pode variar para cada caso.
 Quando existe pouco tráfego de rede as diferenças são pouco notórias, mas logo que este se intensifica, estas acentuam-se bastante, como demonstra o estudo~\cite{Deri2004}.
 
 Diversas razões podem levar à limitação de desempenho por parte da aplicação monitora, sendo que uma destas é a sobrecarga exercida pela necessidade de copiar dados e trocar de contexto entre nível utilizador e o núcleo.
-Dependendo das análises a serem efectuadas, pode ser interessante e vantajoso desligar o modo permiscuo da interface de rede a monitorizar.
-Assim, caso o este modo esteja desligado, um menor número de pacotes serão processados e transferidos para o monitor, o que reduzirá significativamente a sobrecarga exercida.
+Dependendo de cada implementação e das análises a serem efectuadas, pode ser interessante e vantajoso desligar o modo permiscuo da interface de rede a monitorizar.
+Assim, caso este modo esteja desligado, um menor número de pacotes serão processados e transferidos para o monitor, o que reduzirá significativamente a sobrecarga exercida.
+Outros mecanismos em especial para a implementação no \textit{Linux}, podem influenciar o desempenho deste sistema, como a seguir se discute.
  
 
 
@@ -242,15 +243,15 @@ Assim, caso o este modo esteja desligado, um menor número de pacotes serão pro
 
 \paragraph*{PACKET\_MMAP}
 
-Para diminuir o número de cópias de dados, entre o núcleo e o monitor da monitorização em nível utilizador, foi utilizada a técnica de partilha de um \textit{buffer}.
+Para diminuir o número de cópias de dados, entre o núcleo e o processo monitor em nível utilizador, foi utilizada a técnica de partilha de um espaço em memória.
 
 Com base nesta técnica de \textit{MMAP}, foi criado o \textit{PACKET\_MMAP}, disponível a partir da versão 1.0.0 da biblioteca \textit{PCap}.
 Este módulo permite algumas melhorias em termos de desempenho, face à anterior versão 0.9.8 da biblioteca \textit{PCap}, visto que o número de cópias de dados dos pacotes foi reduzida.
 
-Esta técnica consiste na utilização de um bloco de memória pertencente ao processo monitor, de modo a que quando seja necessário transferir um pacote do núcleo para a ferramenta, não se efectue a cópia de memória onde reside o pacote para a do processo.
-Este novo método tem de ser acompanhado por contadores/índices de acesso à memória, dado que, esta zona de memória é acedida de forma circular.
-Apesar de melhorar significativamente o número de cópias de dados, como os blocos de memória para a introdução dos pacotes é efectuada de modo estático, existem apenas um número fixo de pacotes que podem ser alocados.
-Deste modo, se o ritmo de escrita dos pacotes na zona de memória for superior ao ritmo de leitura, podem existir perdas de pacotes, devido à inexistência de espaço para alocar novos, enquanto os anteriores pacotes não forem consumidos.
+Esta técnica consiste na utilização de um bloco de memória pertencente ao processo monitor, de modo a que não seja necessário voltar a transferir cada pacote capturado do núcleo para a ferramenta.
+Este novo método tem de ser acompanhado por contadores/índices de acesso à memória, dado que, esta zona de memória é acedida como um \textit{buffer} circular.
+Apesar de melhorar significativamente o número de cópias de dados, como os blocos de memória para a introdução dos pacotes é efectuada de modo estático, existem apenas um número fixo de pacotes que podem ser mantidos.
+Deste modo, se o ritmo de escrita dos pacotes na zona de memória for superior ao ritmo de leitura pela ferramenta, podem existir perdas de pacotes, devido à inexistência de espaço para guardar os novos, enquanto os anteriores pacotes não forem consumidos.
 
 Para além destas modificações no \textit{PACKET\_MMAP}, o núcleo \textit{Linux} na sua versão 2.6, permite e aconselha a utilização da nova \textit{API} de rede (\textit{NAPI}), apresentada na secção \ref{sub:napi}.
 
@@ -262,7 +263,7 @@ Para além destas modificações no \textit{PACKET\_MMAP}, o núcleo \textit{Lin
 
 Este é um novo módulo para o núcleo \textit{Linux}, criado com base em duas técnicas \textit{mmap} e \textit{ring\_buffers}.
 
-Este módulo difere na abordagem utilizada no \textit{PACKET\_MMAP}, porquanto nesta a memória é mapeada entre a ferramenta e o controlador da interface, enquanto que no \textit{PACKET\_MMAP} a memória é mapeada entre a ferramenta e um \textit{buffer} externo ao controlador da interface, mas interno ao núcleo de sistema.
+Este módulo difere na abordagem utilizada no \textit{PACKET\_MMAP}, porquanto nesta a memória é mapeada entre a ferramenta e o controlador da interface, enquanto que no \textit{PACKET\_MMAP} a memória é mapeada entre a ferramenta e um \textit{buffer} interno ao núcleo do sistema, mas externo ao controlador da interface.
 Esta abordagem permite que os dados fiquem disponíveis para a aplicação directamente, verificando-se a inexistência de cópia dos dados do \textit{buffer} do controlador, para o \textit{buffer} partilhado entre a ferramenta e o núcleo\cite{PFRING}.
  
 \paragraph*{PF\_RING com DNA (Direct NIC Access)}
@@ -273,7 +274,7 @@ Para ser utilizada esta técnica, é necessário que a interface de rede, permit
 \paragraph*{}
 
 Diversos esforços no sentido de aumentar o desempenho da captura de pacotes têm sido efectuados.
-Relativamente ao \textit{software}, são conhecidos esforços na utilização de técnicas de partilha de \textit{buffers}, como o \textit{mmap}, de modo a reduzir o número de cópias de dados entre as aplicações e o núcleo de sistema.
+Relativamente ao \textit{software}, são conhecidos esforços na utilização de técnicas de partilha de \textit{buffers}, como o \textit{mmap}, de modo a reduzir o número de cópias de dados entre as aplicações e o núcleo de sistema como visto.
 Igualmente no \textit{hardware}, tem-se assistido a uma evolução, no sentido de reduzir as interrupções efectuadas ao \textit{cpu}, adicionando nas interfaces de rede processadores dedicados a certas funcionalidades presentes no núcleo, de modo a libertá-lo da execução destas tarefas.
 Estas tarefas podem ser de monitorização, colocação de estampilha temporal, reagrupar segmentos, filtragem de pacotes, etc.
 Não só têm sido adicionadas mais funcionalidades, como também tem sido adicionados multiplas filas de espera, para que estas possam tirar partido das arquitecturas de multiplos cores e das memórias \textit{cache} residentes nestes processadores.
@@ -295,26 +296,26 @@ Não só têm sido adicionadas mais funcionalidades, como também tem sido adici
 
 \subsection{Optimizações na Estrutura de Rede}
 \label{sub:napi}
-Com a utilização de redes a 100 ou 1000 \textit{Mbps} o número de interrupções que são efectuadas, a cada pacote que chega a interface de rede, é muito elevado.
+Com a utilização de redes a 100 ou 1000 \textit{Mbps} o número de interrupções, por unidade de tempo, que são efectuadas é muito elevado.
 Isto leva a que, para cada pacote a ser transferido entre o \textit{buffer} da interface de rede e a memória central, seja necessário uma interrupção ao \textit{cpu}.
 Quando a utilização de rede é baixa, este modo de atendimento não comporta uma elevada sobrecarga no sistema, mas a partir de um certo valor, o número de atendimentos de interrupções é tão alto que não é possível realizar mais trabalho.
 
-Foi criada uma nova \textit{API} de atendimento de interrupções do processador, oriundos das interfaces de rede, com o objectivo de aumentar o desempenho da utilização de rede de elevado débito.
-Esta nova \textit{API}, permite desligar a atenção do processador a novas interrupções, oriundas da interface de rede, durante um certo período de tempo.
-Este tempo foi definido, de forma a que não se verifiquem situações de elevada latência na chegada dos pacotes às aplicações.
+Foi criada uma nova \textit{API} (\textit{NAPI}) de atendimento de interrupções do processador, oriundos das interfaces de rede, com o objectivo de aumentar o desempenho da utilização de redes de elevado débito.
+Esta nova \textit{API}, permite desligar a atenção do processador a novas interrupções, oriundas da interface de rede, diferindo-as durante um certo período de tempo.
+Este tempo é definido, de forma a que não se verifiquem situações de elevada latência na chegada dos pacotes às aplicações.
 
-Actualmente, a arquitectura de rede, está balanceada de forma a mudar o modo de atendimento de interrupções para \textit{NAPI}, caso existam demasiadas interrupções por unidade de tempo~\cite{administrator:napi}.
+Actualmente, a arquitectura de rede está balanceada de forma a mudar o modo de atendimento de interrupções para \textit{NAPI}, caso existam demasiadas interrupções por unidade de tempo~\cite{administrator:napi}.
 
 Utilizando esta nova \textit{API}, é possível explorar um escalonamento mais eficiente das interrupções, em situações de intensa actividade da interface de rede e do processador.
-O \textit{NAPI} apenas pode ser aplicado nos caso em que os controladores das interfaces de rede estejam preparados para utilizar alguma forma de mitigação da interrupção, caso contrário esta \textit{API} não é aplicada, resultando em interrupções por cada pacote, enviado ou recebido.
+O \textit{NAPI}, apenas pode ser aplicado nos caso em que os controladores das interfaces de rede estejam preparados para utilizar alguma forma de mitigação da interrupção, caso contrário esta \textit{API} não pode ser utilizada.
 
 Através desta nova \textit{API}, é possível diminuir o número de trocas de contexto, entre o controlador da interface e o núcleo de sistema.
-Sempre que o \textit{cpu} atende uma interrupção de rede, obtém um número maior de dados, que combinado com um sistema de memória partilhada aumenta substancialmente o desempenho.
+Sempre que o \textit{cpu} atende uma sequência de interrupções de rede, obtém um maior número de dados, que combinado com um sistema de memória partilhada aumenta substancialmente o desempenho.
 
 \paragraph*{Sistemas \textit{multi-core} e multi-processador}
 
 Com o aparecimento de sistemas \textit{multi-core} e \textit{multi-processador} a que a generalidade do público tem acesso, a paralelização de código ou a forma de tirar partido destas arquitecturas, que permitem um melhor aproveitamento dos recursos, assumem uma particular importância.
-De modo a tirar partido das arquitecturas \textit{multi-core}, é necessário que o controlador e interfaces de rede, os \textit{buffers}, e os controladores de \textit{DMA}, sejam modificados de forma a conhecerem esta estrutura.
+De modo a tirar partido das arquitecturas \textit{multi-core} no próprio núcleo do sistema, é necessário que o controlador e interfaces de rede, os \textit{buffers}, e os controladores de \textit{DMA}, sejam modificados de forma a conhecerem esta arquitectura.
 É pois, determinante um esforço conjunto envolvendo todas estas componentes, com vista à obtenção do máximo rendimento destas arquitecturas\cite{Deri:2010}.
 
 
@@ -322,13 +323,13 @@ De modo a tirar partido das arquitecturas \textit{multi-core}, é necessário qu
 \section{Sistemas de monitorização no núcleo do \textit{Linux}}\label{sect:instrumentacao_casos_linux}
 
 A monitorização do núcleo é uma das melhores formas de conhecer não só, como os recursos da máquina são partilhados entre o núcleo e os processos, como também efectuar análises de desempenho e correcção dos diversos componentes do núcleo.
-Assim nesta secção são apresentados ferramentas e mecanismos de monitorização do núcleo.
+Assim nesta secção são apresentadas ferramentas e mecanismos de monitorização presentes no núcleo.
 
-A utilização de sistemas de monitorização ao nível do núcleo, permite efectuar a monitorização genérica dos processos, de forma não intrusiva para as aplicações.
-Ao efectuar a monitorização no núcleo, a sobrecarga imposta ao sistema é menor que em nível utilizador, por ser possível recolher apenas as informações relevantes, evitando filtrar os elementos não relevantes, para análise.
+A utilização dos sistemas de monitorização ao nível do núcleo, permitem também efectuar a monitorização genérica dos processos, de forma não intrusiva para as aplicações.
+Ao efectuar a monitorização no núcleo, a sobrecarga imposta ao sistema pode ser menor que em nível utilizador, por ser possível recolher apenas as informações presentes no próprio núcleo que sejam relevantes, evitando a recolha e posterior tratamento dos elementos não relevantes.
 
 Neste documento constam apenas mecanismos e ferramentas de monitorização dinâmicas, pois apenas estas são as desejadas para a criação de um mecanismo de monitorização de rede orientada ao processo.
-De entre os mecanismos e ferramentas de monitorização dinâmica analisadas é possível agrupá-las em duas categorias: eventos pré-definidos e instrumentação dinâmica.
+De entre os mecanismos e ferramentas de monitorização dinâmica analisadas é possível agrupá-las em duas categorias: com base em eventos pré-definidos e com base em instrumentação dinâmica.
 Na categoria instrumentação dinâmica existem dois mecanismos mais relevantes: o \textit{KProbes} e o \textit{Linux Kernel Stace Tracer}, enquanto que para os eventos pré-definidos foram verificados o \textit{Linux Trace Toolkit} e o \textit{OProfile}.
 Estas quatro ferramentas são apresentados em seguida considerando as suas categorias:
 
@@ -338,7 +339,7 @@ Nesta categoria encontram-se duas ferramentas o \textit{Linux Trace Toolkit} e o
 Em cada uma destas ferramentas a monitorização é efectuada sobre pontos previamente definidos, não permitindo a adição de novos pontos de monitorização.
 Cada um destas ferramentas analisa todo o sistema, sendo a filtragem extra dos eventos efectuada em nível utilizador.
 %\todo{ver}
-Como os eventos detectados através destas ferramentas geram um mapa de execução, a utilização de apenas alguns eventos pré-definidos não é limitativa de uma ferramenta.
+%Como os eventos detectados através destas ferramentas geram um mapa de execução, a utilização de apenas alguns eventos pré-definidos não é limitativa de uma ferramenta.
 
 \subsubsection{Linux Trace ToolKit}\label{cap:linux_trace_toolkit_overview}
 
@@ -348,17 +349,19 @@ Como os eventos detectados através destas ferramentas geram um mapa de execuç�
 % O RelayFs é um sistema de ficheiros para comunicação entre o código dentro e fora do núcleo de operação.
 %A utilização desta ferramenta em sistemas de tempo real é um bom indicador da sua performance.
 
-O \textit{Linux Trace ToolKit} (\textit{LTT}) é uma das ferramentas mais utilizadas efectuar um traços de execução do núcleo \textit{Linux}.
+O \textit{Linux Trace ToolKit} (\textit{LTT}) é uma das ferramentas mais utilizadas para efectuar traços de execução do núcleo \textit{Linux}.
 Esta ferramenta foi criada no final da década de 1990, sendo posteriormente subsituido em 2005 pelo \textit{Linux Trace ToolKit new generation}, (\textit{LTTng}), projecto derivado do \textit{LTT}.
 O \textit{LTT} é constituído por quatro componentes: o \textit{Kernel Patch}, o \textit{Kernel Module} o \textit{Trace Daemon} e o \textit{Data Decoder} tal como é visivel na figura \ref{fig:ltt_arch}.
 É através do \textit{Trace Daemon} que o utilizador pode comunicar com o sistema de monitorização.
-Os dados recolhidos têm diversos valores tais como o nome da função, o tempo, e o identificador do processador, pelo menos estes atributos de modo a conseguir construir os traço de execução.
+%Os dados recolhidos têm diversos valores tais como o nome da função, o tempo, e o identificador do processador, pelo menos estes atributos de modo a conseguir construir os traço de execução.
 O \textit{LTT} e o \textit{LTTng} são ferramentas de monitorização dinâmica que efectuam um traço de execução.
-Estas ferramentas tiram partido dos mecanismos de instrumentação do núcleo de modo a obter dados que permitam efectuar o traço de execução.
+O \textit{Linux Trace Toolkit New Generation}, utiliza os mecanismos \textit{Tracepoints}\cite{Mathieu2009} e \textit{Linux Kernel Markers}\cite{Mathieu2009} para efectuar as suas monitorizações.
+O \textit{Tracepoints} e o \textit{Linux Kernel Markers} fazem parte da instrumentação estática do núcleo \textit{Linux}.
+Estes mecanismos apesar de fazerem parte da instrumentação estática do núcleo, são activados e desactivados dinamicamente através das ferramentas em nível utilizador.
+Estas ferramentas tiram partido dos mecanismos de instrumentação estática e dinâmica do núcleo, de modo a obter os dados relativos às funções para efectuar o traço de execução.
+Os dados provenientes da monitorização, no \textit{LTTng} são recolhidos através do sistema de ficheiros virtual \textit{RelayFs}, enquanto que para o \textit{Ltt} poderiam ser recolhidos através do \textit{daemon} \textit{KLogd}.
 
-Para além do \textit{daemon} em nível utilizador existem outras ferramentas pertencentes ao \textit{LTT} para efectuar análises aos dados recolhidos durante a monitorização.
-
-Os dados provenientes da monitorização são recolhidos através do sistema de ficheiros virtual \textit{RelayFs}.
+Para além do \textit{daemon} em nível utilizador, existem outras ferramentas pertencentes ao \textit{LTT} e \textit{LTTng}, que permitem efectuar análises aos dados recolhidos durante a monitorização.
 
 \begin{figure}[!htb]
        \centering
@@ -367,26 +370,18 @@ Os dados provenientes da monitorização são recolhidos através do sistema de 
 	\label{fig:ltt_arch}
 \end{figure}
 
-\cite{Yaghmour:2000:MCS:1267724.1267726}
-foi substituída pelo \textit{Linux Trace Toolkit New Generation}.
-O \textit{Linux Trace Toolkit New Generation}, e permite utilizar mecanismos como o \textit{KProbes}, o \textit{Tracepoints}\cite{Mathieu2009} e \textit{Linux Kernel Markers}\cite{Mathieu2009} para efectuar as suas monitorizações.
-Os \textit{Tracepoints} e Linux \textit{Kernel Markers} fazem parte da instrumentação estática pertencente ao núcleo de sistema do \textit{Linux}.
-A transferência dos dados do núcleo de sistema para a aplicação, é efectuada utilizando o sistema de ficheiros virtual \textit{RelayFs}.
-
 %\subparagraph{Linux Trace Toolkit Viewer - }\label{cap:lttv_overview}
 O \textit{Linux Trace Toolkit Viewer (LTTV)} é um projecto desenvolvido em paralelo com o \textit{LTT} e \textit{LTTng}, de modo a criar uma análise visual dos dados recolhidos por estas aplicações.
-Esta ferramenta possibilita igualmente realizar um traço de execução, uma vez que os dados recolhidos contêm uma estampilha temporal, do momento em que foram obtidos.
- 
+Esta ferramenta possibilita igualmente visualizar o traço de execução, uma vez que os dados recolhidos contêm uma estampilha temporal, do momento em que foram obtidos.
+
 \subsubsection{OProfile}\label{cap:Oprofile_overview}
-O \textit{OProfile} é outra das ferramentas de monitorização do núcleo, esta efectua um perfil de execução das funções do núcleo, através de amostragem. 
-Com o \textit{OProfile}, em vez de a cada evento utilizar uma função para obter os dados, apenas a utiliza decorridos um certo número de eventos.
-O recurso a este critério permite ao \textit{OProfile} ser menos perturbador, uma vez que nem sempre é necessário o universo dos eventos que as ferramentas de monitorização capturam, mas tão somente uma amostra \ref{fig:oprofile_arch}.
+O \textit{OProfile} é uma ferramenta de monitorização, que efectua um perfil de utilização dos recursos da máquina, utilizando para o efeito a técnica de amostragem.
+Assim, o \textit{OProfile}, em vez de a cada evento utilizar uma função para obter os dados, apenas a utiliza decorridos um certo número de eventos.
+O recurso a este critério permite ao \textit{OProfile} ser menos perturbador, uma vez que nem sempre é necessário o universo dos eventos que as ferramentas de monitorização capturam, mas tão somente uma amostra.
 Deste modo ao utilizar a amostragem, o \textit{OProfile}, beneficia de um menor grau de perturbação no sistema\cite{Will:TuninProgrOProf}.
 % ser menos perturbador do sistema.
 % it uses data sampling ... the others don't
 
-\paragraph*{}
-O \textit{OProfile} é uma ferramenta que efectua um perfil de utilização dos recursos da máquina, utilizando para o efeito a técnica de amostragem.
 Esta ferramenta é composta por três componentes principais, o módulo no núcleo (\textit{oprofile driver}), o \textit{daemon}/processo em nível utilizador que recolhe os dados obtidos da monitorização pelo módulo do núcleo (\textit{opcontrol}) e o \textit{opreport} e \textit{opannotate} que permitem criar relatórios, tal como se pode constatar na figura \ref{fig:oprofile_arch}.
 
 \begin{figure}[!htb]
@@ -396,31 +391,23 @@ Esta ferramenta é composta por três componentes principais, o módulo no núcl
 	\label{fig:oprofile_arch}
 \end{figure}
 
-O \textit{OProfile} não efectua apenas o perfil de utilização do núcleo \textit{Linux}, pois também cria o perfil de utilização dos processos que estão em execução na máquina.
-Este perfil é criado com o auxilio do sistema de ficheiros virtual \textit{ProcFs}, que indica quais os processos em execução e respectivas zonas de memória utilizadas por estes.
+O \textit{OProfile} não permite apenas efectuar o perfil de utilização do núcleo \textit{Linux}, pode igualmente criar o perfil de utilização dos processos de nível utilizador, que estão em execução na máquina.
+Este perfil é criado com o auxilio do sistema de ficheiros virtual \textit{ProcFs}, que indica quais os processos em execução e, respectivas zonas de memória utilizadas por estes.
+O \textit{OProfile} regista os valores do \textit{program counter} (registo do processador que contém a próxima instrução a executar) e o instante em que este foi actualizado, assim com estes dados e conhecendo as zonas de memória consegue efectuar o perfil de execução.
 
-O \textit{OProfile} regista os valores do \textit{program counter} (registo do processador que contém a proxima instrução a executar) e o tempo quando quando foi  ------ é triplo com estes dados e as zonas de memória e qual o processo corrente consegue efectuar o perfil de utilização do processo.
-
-De modo a reduzir a sobrecarga / contenção utiliza buffers por cpu ... 
-
+Para além de utilizar a técnica de amostragem, utiliza também \textit{buffers} especificos aos processadores, de modo a reduzir a sobrecarga exercida no sistema.
 
 % outra abordagem 
 
 \subsection{Suporte à monitorização}
 
-Nas secções anteriores foram apresentadas ferramentas de monitorização e os seus mecanismos para lidar com a monitorização.
+Nas subsecções anteriores foram apresentadas ferramentas de monitorização e os seus mecanismos para lidar com a monitorização.
 As ferramentas são importantes quando existe a necessidade de efectuar análises aos dados obtidos.
-Nas ferramentas os diversos componentes que as constituem estão muito interligados dificultando, por vezes, a sua integração com outros componentes.
-
+Nas ferramentas, os diversos componentes que as constituem estão muito interligados, dificultando por vezes, a sua integração com outros componentes.
 Por seu lado os mecanismos devem ser genéricos, tirando partido das arquitecturas, para que possam ser desenvolvidas ferramentas que os possam utilizar.
 
-
-Como suporte à monitorização destaca-se o mecanismo \textit{KProbes} que é um mecanismo de instrumentação dinâmica do \textit{Linux}.
-
-
-e a ferramenta \textit{Linux Kernel Stace Tracer}.
-
-Em \todo{} ambos é possível definir novos pontos, funções ou eventos a serem monitorizados, as funcionalidades já existentes nestas ferramentas.
+Como suporte à monitorização destacam-se o mecanismo \textit{KProbes} e a ferramenta \textit{Linux Kernel Stace Tracer}.
+Em ambos é possível definir novos pontos, funções ou eventos a serem monitorizados, as funcionalidades já existentes nestas ferramentas.
 
 \subsubsection{KProbes}\label{sect:KProbes_overview}
 
@@ -432,14 +419,14 @@ Utilizando o \textit{KProbes} existem três tipos de instrumentação que podem 
 Cada um destes três tipos é especifico de uma determinada funcionalidade.
 
 \begin{itemize}
- \item \textbf{KProbe - } Utilizando o \textit{KProbe} pode analisar-se uma instrução e, para isso tem de ser indicada a distância da instrução relativamente ao inicio da função instrumentada.
+ \item \textbf{KProbe - } Utilizando o \textit{KProbe} pode analisar-se uma instrução e, para isso tem de ser indicada a distância desta ao inicio da função instrumentada.
 A indicação da função a instrumentar, pode ser definida recorrendo ao seu nome, ou ao seu endereço de memória.
 
 \item \textbf{JProbe - } Um \textit{JProbe} destina-se a analisar os parâmetros, da função a instrumentar.
 Quando é declarado um \textit{JProbe} a função de \textit{handler} tem de conter os mesmos tipos de argumentos que a função que se destina a ser instrumentada, de forma a serem monitorizadas.
  
  \item \textbf{KRetProbe - } Este tipo de análise tem como objectivo obter o valor de retorno da função que se pretende analisar.
-Para efectuar esta operação é utilizada a técnica do trampolim~\cite{Hollingsworth94dynamicprogram}, uma vez que uma função pode terminar em pontos diversos.
+Para efectuar esta operação é utilizada a técnica do trampolim~\cite{Hollingsworth94dynamicprogram}, uma vez que uma função pode terminar em diversos pontos.
 
 \end{itemize}
 
@@ -492,8 +479,8 @@ O \textit{SystemTap} é uma ferramenta que possibilita o desenvolvimento de mód
 Uma vez que os dados gerados estão no espaço de endereçamento de memória do núcleo, e o programa que os analisará se situa no espaço de endereçamento do utilizador, é necessário efectuar uma transferência de dados de um para outro espaço.
 O \textit{SystemTap} efectua esta transferência, recorrendo à utilização do sistema de ficheiros \textit{ReplayFs}, onde é possível escrever de forma rápida, sem comprometer a segurança do sistema\cite{Donovan2007,Jones2009}.
 
-Apesar de, no pacote de aplicações desta ferramenta, existir um visualizador gráfico de dados recolhidos pelo \textit{SystemTap}, este só consegue analisar os \textit{TapSets} pré-definidos no \textit{SystemTap}.
-Para ultrapassar esta limitação, novas ferramentas estão a ser desenvolvidas.
+Apesar de no conjunto de aplicações desta ferramenta, existir um visualizador gráfico de dados recolhidos pelo \textit{SystemTap}, este só consegue analisar os \textit{TapSets} pré-definidos no \textit{SystemTap}.
+Para ultrapassar esta limitação, novas ferramentas foram a ser desenvolvidas.
 Uma destas ferramentas designada por \textit{bootlimn}, está actualmente a ser desenvolvida no \textit{Google Summer of Code}, com o objectivo de utilizar o \textit{SystemTap} para recolher informações sobre o arranque do sistema, agregando estes dados no formato \textit{XML}.
 Os dados recolhidos, permitem visualizações gráficas do processo de inicialização do sistema, bem como da utilização de disco e \textit{CPU}.
 Outro projecto conhecido como \textit{Systemtap GUI}, que engloba o \textit{System Tap Editor Plug-in} para a ferramenta Eclipse, é um ambiente onde podem ser analisados e visualizados os dados recolhidos pelo \textit{SystemTap}.
