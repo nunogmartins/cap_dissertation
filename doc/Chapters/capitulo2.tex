@@ -221,6 +221,12 @@ Neste caso, cabe à ferramenta monitora definir explicitamente que deseja utiliz
 Apesar da \textit{API} da biblioteca \textit{PCap} ser homogénea em diferentes plataformas (\textit{Windows}, \textit{Linux}, \textit{FreeBSD}, etc), o desempenho desta pode variar.
 Quando existe pouco tráfego de rede as diferenças são pouco notórias, mas logo que este se intensifica, estas acentuam-se bastante, como demonstra o estudo~\cite{Deri2004}.
 
+Diversas razões podem levar à limitação de desempenho por parte da aplicação monitora, sendo que uma destas é a sobrecarga exercida pela necessidade de copiar dados e trocar de contexto entre nível utilizador e o núcleo.
+Dependendo das análises a serem efectuadas, pode ser interessante e vantajoso desligar o modo permiscuo da interface de rede a monitorizar.
+Desta forma, caso tenha sido aplicado um filtro no canal, menos pacotes têm de ser processados e passados para o monitor, o que pode reduzir significativamente a sobrecarga exercida.
+ 
+
+
 %De modo geral, para a avaliar o desempenho da monitorização de rede, é frequente utilizar-se uma métrica, que nos permita determinar a percentagem de pacotes que é possível capturar, sem que se verifiquem perdas.
 %Esta métrica é calculada sabendo o número de pacotes que atravessam uma determinada porta de um \textit{router ou switch}, e compará-lo com o número de pacotes capturados na interface.
 %Uma variante desta medida de desempenho é combiná-la com o máximo número de regras que é possível aplicar, sem que se assista à perda de pacotes.
@@ -236,8 +242,9 @@ Quando existe pouco tráfego de rede as diferenças são pouco notórias, mas lo
 
 \paragraph{Captura com \textit{dns} activo}
 
-Como já referido a biblioteca \textit{PCap} é utilizada por diversas ferramentas de análise do trafego de rede, que dela tiram partido.
-Uma destas ferramentas é o \textit{TcpDump}, este utiliza a biblioteca \textit{PCap} para efectuar 
+Como já referido, a biblioteca \textit{PCap} é utilizada por diversas ferramentas de análise ao trafego de rede.
+Uma destas ferramentas é o \textit{TcpDump}, tem sido desenvolvida a par com a biblioteca \textit{PCap} .
+
 
 A biblioteca \textit{PCap}
 \textit{TcpDump} com parametro n de \textit{dns} para obter os nomes de dominios sempre que possivel
