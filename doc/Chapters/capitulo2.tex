@@ -114,8 +114,6 @@ No que à segunda forma se refere, a monitorização é efectuada de forma gené
 As aplicações são dinâmicas quanto às interacções via rede (por exemplo criando e destruindo canais de comunicação).
 A este dinamismo devem-se algumas dificuldades com que nos deparamos, ao monitorizar as interacções dos vários fluxos de execução dos processos.
 
-Relativamente à monitorização das interacções com o exterior, utilizando os mecanismos do sistema de operação, este dinamismo é um factor chave, pois existem dificuldades na forma de identificar os fluxos pertencentes a um processo face aos restantes, irrelevantes na nossa análise.
-
 \subparagraph*{Formas de reduzir o volume de dados utilizando filtros - }
 A utilização de filtros na captura do tráfego de rede é uma forma eficiente de, apenas, se obter os dados relevantes, com vista à satisfação dos nossos objectivos e, são particularmente importantes, quando o volume de dados que circula na rede é extremamente elevado.
 Tendo em vista a eficiência, estes filtros são implementados no núcleo do sistema de operação, baseando-se em regras simples, que podem ser combinadas para contemplar situações mais complexas.
@@ -125,8 +123,9 @@ Os filtros actualmente suportados para capturar pacotes no \textit{Linux}, são 
 
 \subparagraph*{Filtros complexos - }
 Para aumentar o desempenho da captura de pacotes, os filtros são aplicados o mais cedo possível, ou seja, logo que chegam à interface de rede.
-Face a esta situação, o tipo de filtros que se podem aplicar têm de ser simples, baseados apenas no conteúdo do pacote.
-Quando os filtros são demasiado complexos, os módulos do núcleo têm de passar grande parte da informação para as camadas superiores, de forma a puderem ser aplicados filtros mais elaborados, que analisam um nível mais abstracto da informação, presente no \textit{payload} dos pacotes, ou a relacionam com outra informação, para obterem apenas os dados relevantes.
+Face a esta situação, o tipo de filtros que se podem aplicar têm de ser simples, baseados apenas nos metadados do pacote.
+Quando os filtros são demasiado complexos, a componente de filtragem do núcleo tem de transferir o pacote para o monitor em nível utilizador, de modo a poder ser aplicar o filtro.
+Estes fitros analisam um nível mais abstracto da informação, presente no \textit{payload} dos pacotes, ou a relacionam com outra informação, para obterem apenas os dados relevantes.
 
 \subparagraph*{Técnicas para o aumento de desempenho}
 
@@ -143,16 +142,17 @@ A monitorização de rede existente em muitos dos sistemas tipo \textit{Unix} e 
 Assim, a biblioteca \textit{PCap}\cite{LibPcap} permite às ferramentas de monitorização de rede fazerem uso deste mecanismo.
 Uma das principais características desta biblioteca, é a sua \textit{API} de alto nível para a captura de pacotes, que é igual em todas as plataformas.
 
-A monitorização de rede realizada pelas ferramentas que utilizam a biblioteca \textit{PCap}, efectuam uma monitorização passiva da rede, adequando as suas análises aos pacotes recebidos, de modo \textit{online} ou \textit{offline}.
-Esta monitorização é não intrusiva para o código das aplicações e, dependendo do modo como é efectuada, pode ter algum impacto no desempenho destas ou do sistema na sua globalidade.
+A monitorização de rede realizada pelas ferramentas que utilizam a biblioteca \textit{PCap}, é efectuada de modo passivo, adequando as suas análises aos pacotes capturados, de modo \textit{online} ou \textit{offline}.
+Esta monitorização é não intrusiva para o código das aplicações e, dependendo do modo como é efectuada, pode ter algum impacto no desempenho destas ou no do sistema.
 
 Para filtrar os pacotes indesejados a biblioteca \textit{PCap} utiliza filtros baseados no \textit{Berkeley Packet Filtering} (\textit{BPF}), normalmente implementados no núcleo de sistema, de modo a que a monitorização se torne mais eficiente e menos intrusiva.
+Assim, a interactividade apresentada é em geral ao nível da alteração dos filtros para a captura.
 
 Em seguida é apresentada a arquitectura da biblioteca \textit{PCap} e o seu suporte no \textit{Linux}, \textit{Linux Socket Filtering}.
 
 \subsection {Arquitectura}
 \label{sect:architecture_libpcap}
-A arquitectura do \textit{Packet Capture} (\textit{PCap}) divide-se em duas partes: a biblioteca a nível utilizador, e a implementação do \textit{Linux Socket Filtering} no núcleo de sistema.
+A arquitectura do \textit{Packet Capture} (\textit{PCap}) divide-se em duas partes: a biblioteca em nível utilizador, e a implementação do \textit{Linux Socket Filtering} no núcleo de sistema.
 Como anteriormente referido, a bibilioteca em nível utilizador é constituida por uma \textit{API} homogénea, que oferece às ferramentas de monitorização de rede um mecanismo para efectuar as suas análises ao tráfego.
 As funções auxiliares da biblioteca efectuam chamadas ao sistema de modo a interagirem com o mecanismo de monitorização de rede do \textit{Linux}, \textit{Linux Socket Filtering}, presente no núcleo.
 
@@ -170,39 +170,36 @@ A biblioteca em nível utilizador, ao ter uma \textit{API} homogénea entre plat
 Esta biblioteca como é multiplataforma, permite ao programador utilizá-la nos principais sistemas de operação, dado que a \textit{API} da biblioteca \textit{PCap} é transparante relativamente à implementação, esta sim, específica a cada plataforma.
 
 No \textit{Linux} para cada utilização da biblioteca \textit{PCap} é criado um \textit{socket} da família \textit{AF\_PACKET}.
-Como este \textit{socket} comunica, directamente, com a interface de rede permite que sejam activadas e, desactivadas propriedades das mesmas.
-Uma destas propriedades é o modo promiscuo, geralmente utilizado para efectuar a captura de pacotes que não pertencem às comunicações da máquina que efectua a monitorização.
-Apesar desta funcionalidade ser amplamente utilizada para análisar a rede, para o âmbito desta dissertação é totalmente desnecessária, dado que os pacotes, a serem recolhidos para análise, são os pretencentes a processos da máquina.
-É através deste \textit{socket} que é efectuada a captura dos pacotes que atravessam a interface de rede.
-Um dos parâmetros para a monitorização é a interface sobre a qual irá ser efectuada, ou um modo especial que permite que todas as interfaces possam ser monitorizadas.
+Como este \textit{socket} comunica, directamente, com a interface de rede permite que sejam capturados logo os pacotes que nela circulam, efectuando assim a monitorização dos pacotes de rede.
+Para além da captura, devido à comunicação directa com as interfaces, permite a activação e desactivação de propriedades destas.
+Uma destas propriedades é o modo promiscuo, geralmente utilizado para efectuar a captura de pacotes, que não pertencem às comunicações da máquina que efectua a monitorização.
+Apesar desta funcionalidade ser amplamente utilizada para a monitorização da rede, para o âmbito desta dissertação é totalmente desnecessária, dado que os pacotes a serem recolhidos para análise, são os pertencentes a processos da máquina.
 
-A fim de minimizar e capturar apenas os pacotes relevantes para as análises, pode ser necessário filtrar os pacotes não relevantes.
-Deste modo a biblioteca permite efectuar diversas formas de filtragem, quer em nível utilizador, para filtros mais complexos, quer no núcleo com filtros apenas baseados nos metadados dos pacotes.
-Se a filtragem for efectuada exclusivamente em nível utilizador, o filtro a ser aplicado indica que todos os pacotes devem ser capturados, senão a ferramenta que utiliza a biblioteca deve especificar um filtro utilizando para isso as instruções pertencentes à biblioteca \textit{PCap} que as irá traduzir e optimizar para uma outra linguagem (\textit{BPF}
- 
+Um dos parâmetros necessários à monitorização, é a interface sobre a qual irá ser efectuada, assim de modo a monitorizar todas as interfaces simultâneamente, foi criado um modo especial, o \textit{any}.
 
-
-Caso exista a necessidade de filtrar os dados a capturar é necessário aplicá-lo ao \textit{socket} criado através da chamada ao sistema \textit{setsockopt}, passando em argumentos o canal e o filtro a ser executado a cada pacote.
-É possível obter estatisticas, relacionadas com a captura e filtragem de pacotes, estas são também obtidas através de \textit{ioctls} efectuados sobre o canal de recepção da monitorização.
-Estas funcionalidades estão agregadas à biblioteca, para que o programador não tenha de se preocupar com os mecanismos internos relativos à manipulação da monitorização de rede no núcleo.
-
-Para se efectuar a captura de pacotes, é necessário especificar qual a interface de rede a monitorizar.
-
-Como o número de pacotes que atravessa a interface de rede é elevado, existe a possibilidade de capturar segundo critérios baseados nos dados dos pacotes.
 Como verificado anteriormente, quando o número de dados da monitorização é elevado, e nem todos os dados capturados são relevantes para as análises, estes são filtrados, de modo a apenas serem utilizados para análise os dados relevantes.
-Daí que a biblioteca \textit{PCap} tenha uma linguagem própria para a especificação de filtros, sendo posteriormente traduzidos para a linguagem \textit{BPF} para serem aplicados ao canal, obtendo assim apenas os pacotes relevantes para as análise a efectuar.
+Por isso, de modo a minimizar a sobrecarga e capturar apenas os pacotes relevantes para as análises, pode ser necessário filtrar os pacotes não relevantes.
+A biblioteca permite efectuar diversas formas de filtragem, quer em nível utilizador, para filtros mais complexos, quer no núcleo com filtros apenas baseados nos metadados dos pacotes.
+Se a filtragem for efectuada exclusivamente em nível utilizador, é necessário aplicar um filtro que indique que todos os pacotes devem ser capturados.
+Se a ferramenta que utiliza a biblioteca necessitar filtrar os pacotes com base nos metadados destes, deve especificar um filtro utilizando para isso as instruções pertencentes à biblioteca \textit{PCap} que as irá traduzir e optimizar para a linguagem (\textit{BPF}) de modo a ser aplicada no núcleo.
+ O filtro é aplicado ao canal de monitorização criado, através da chamada ao sistema \textit{setsockopt}, passando em argumentos o canal e o filtro a ser executado a cada pacote.
+Caso o número de \textit{bytes} dos pacotes sejam superiores ao indicado no filtro, o pacote é cortado até ao tamanho indicado neste.
+
+É possível obter estatisticas, relacionadas com a captura e filtragem de pacotes, estas são também obtidas através de \textit{ioctls} efectuadas sobre o canal de recepção da monitorização.
+
+As ferramentas que utilizam esta biblioteca, não necessitam de conhecer estes mecanismos internos, sendo-lhes facultado uma \textit{API} que lhes permite abstrair das especificidades da arquitectura onde estão a operar.
+
+
+
+
 
 Se for necessitario filtrar pacotes, é necessário especificar o filtro a utilizar, recorrendo às instruções presentes na biblioteca \textit{PCap}, que através da função  \textit{pcap\_compile} o traduzirá e optimizará para o conjunto de instruções do \textit{BPF}, sendo posteriormente aplicado no núcleo através da função \textit{setfilter}.
 Se o filtro for demasiado complexo, não poderá ser aplicado no núcleo, sendo apenas possível aplicá-lo em nível utilizador, perdendo algum desempenho.
 Antes da introdução do novo filtro no canal, este tem de ser objecto de drenagem, para receber apenas os pacotes do novo filtro.
 Este modo de filtragem, evita imediatamente a captura de pacotes irrelevantes para a análise e permite que aqueles que não são visíveis às aplicações, devido à \textit{firewall} do \textit{Linux}, possam ser capturados e analisados pelas ferramentas de monitorização de rede.
 
-A arquitectura de rede do núcleo de sistema \textit{Linux}, utiliza \textit{socket buffers}, que contêm dados referentes às diferentes camadas da pilha de rede \textit{TCP/IP}.
-Esta estrutura que dispõe de toda a informação sobre o pacote, a receber pela aplicação, é igualmente utilizada nos sistemas de monitorização em nível utilizador.
-A monitorização da rede é efectuada directamente no controlador da interface de rede, utilizando para isso um \textit{socket} \textit{AF\_PACKET}.
-
-Enquanto que as aplicações apenas recebem os dados (\textit{payload} final), este \textit{socket} recebe a totalidade do pacote.
-Caso o número de \textit{bytes} dos pacotes sejam superiores ao indicado no filtro, o pacote é cortado até ao tamanho indicado neste.
+A arquitectura de rede do núcleo de sistema \textit{Linux}, utiliza \textit{socket buffers}, que contêm os dados referentes às diferentes camadas da pilha de rede \textit{TCP/IP}.
+Esta estrutura dispõe de toda a informação sobre o pacote, não só o \textit{payload} recebido pelas aplicações, como também os metadados, por isso é utilizada nos sistemas de monitorização.
 
 \subsection{Linux Socket Filtering}
 
