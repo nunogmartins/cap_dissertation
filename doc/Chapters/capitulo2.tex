@@ -73,7 +73,7 @@ Em contraste com a instrumentação estática está a dinâmica.
 É mais complexa que a estática e permite a inserção e remoção dos pontos a serem monitorizados.
 Caracteriza-se pela ausência do ciclo $introduzir ponto\rightarrow compilar programa\rightarrow executar\rightarrow remover ponto$ de instrumentação.
 A utilização de pontos de instrumentação dinâmica, pode ajudar a reduzir o grau de perturbação, uma vez que apenas são definidos os que se desejam observar.
-Tal pode ser efectuado no início ou durante a sua execução, criando, alterando, destruindo os pontos de observação sobre os recursos monitorizados.
+Tal pode ser efectuado no início ou durante a sua execução, criando, alterando e destruindo os pontos de observação sobre os recursos monitorizados.
 
 
 \subparagraph*{
@@ -146,7 +146,7 @@ A monitorização de rede realizada pelas ferramentas que utilizam a biblioteca 
 Esta monitorização é não intrusiva para o código das aplicações e, dependendo do modo como é efectuada, pode ter algum impacto no desempenho destas ou no do sistema.
 
 Para filtrar os pacotes indesejados a biblioteca \textit{PCap} utiliza filtros baseados no \textit{Berkeley Packet Filtering} (\textit{BPF}), normalmente implementados no núcleo de sistema, de modo a que a monitorização se torne mais eficiente e menos intrusiva.
-Assim, a interactividade apresentada é em geral ao nível da alteração dos filtros para a captura.
+Assim, a interactividade apresentada é, em geral, ao nível da alteração dos filtros para a captura.
 
 Em seguida é apresentada a arquitectura da biblioteca \textit{PCap} e o seu suporte no \textit{Linux}, \textit{Linux Socket Filtering}.
 
@@ -185,7 +185,7 @@ Se a ferramenta que utiliza a biblioteca necessitar filtrar os pacotes com base 
 Se o filtro for demasiado complexo, não poderá ser aplicado no núcleo, sendo apenas possível aplicá-lo em nível utilizador, perdendo algum desempenho.
 Antes da introdução do novo filtro no canal, este tem de ser objecto de drenagem, para receber apenas os pacotes do novo filtro.
 Este modo de filtragem, evita imediatamente a captura de pacotes irrelevantes para a análise e permite que aqueles que não são visíveis às aplicações, devido à \textit{firewall} do \textit{Linux}, possam ser capturados e analisados pelas ferramentas de monitorização de rede.
-Através da função \textit{pcap\_compile} presente na biblioteca, irá traduzir o filtro e o optimizará para o conjunto de instruções do \textit{BPF}, sendo posteriormente aplicado no núcleo através da função \textit{setfilter}.
+Através da função \textit{pcap\_compile} presente na biblioteca, irá traduzir e optimizar o filtro para o conjunto de instruções do \textit{BPF}, sendo posteriormente aplicado no núcleo através da função \textit{setfilter}.
 Esta função utiliza a chamada ao sistema \textit{setsockopt}, passando como argumentos o canal e o filtro a ser executado, para que este seja avaliado a cada pacote recebido ou enviado através da interface de rede.
 Caso o número de \textit{bytes} dos pacotes sejam superiores ao indicado no filtro, o pacote é cortado até ao tamanho indicado neste.
 É possível obter estatisticas, relacionadas com a captura e filtragem de pacotes, estas são também obtidas através de \textit{ioctls} efectuadas sobre o canal de recepção da monitorização.
@@ -223,7 +223,7 @@ Quando existe pouco tráfego de rede as diferenças são pouco notórias, mas lo
 
 Diversas razões podem levar à limitação de desempenho por parte da aplicação monitora, sendo que uma destas é a sobrecarga exercida pela necessidade de copiar dados e trocar de contexto entre nível utilizador e o núcleo.
 Dependendo das análises a serem efectuadas, pode ser interessante e vantajoso desligar o modo permiscuo da interface de rede a monitorizar.
-Desta forma, caso tenha sido aplicado um filtro no canal, menos pacotes têm de ser processados e passados para o monitor, o que pode reduzir significativamente a sobrecarga exercida.
+Assim, caso o este modo esteja desligado, um menor número de pacotes serão processados e transferidos para o monitor, o que reduzirá significativamente a sobrecarga exercida.
  
 
 
@@ -240,53 +240,57 @@ Desta forma, caso tenha sido aplicado um filtro no canal, menos pacotes têm de 
 %Assim, se a interface de rede fornecer a estampilha temporal associada ao pacote, a biblioteca pode utilizar este valor, caso contrário, será necessário obter a estampilha temporal da chegada do pacote ao sistema.
 %A forma de obtenção da estampilha pela biblioteca \textit{PCap}, processa-se através da função \textit{gettimeofday}, o que incorre numa maior sobrecarga do sistema face à solução anterior.
 
-\paragraph{Captura com \textit{dns} activo}
-
-Como já referido, a biblioteca \textit{PCap} é utilizada por diversas ferramentas de análise ao trafego de rede.
-Uma destas ferramentas é o \textit{TcpDump}, tem sido desenvolvida a par com a biblioteca \textit{PCap} .
-
-
-A biblioteca \textit{PCap}
-\textit{TcpDump} com parametro n de \textit{dns} para obter os nomes de dominios sempre que possivel
-
-\paragraph{Captura especificando tamanho máximo de 65535 para pacotes}
-
-MTU de 1500 ethernet
-
 \paragraph*{PACKET\_MMAP}
 
-Com base na técnica \textit{MMAP}, foi criado o \textit{PACKET\_MMAP}, disponível a partir da versão 1.0.0 da biblioteca \textit{PCap}.
-Este módulo permite algumas melhorias em termos de desempenho, visto que foi reduzido o número de cópias efectuadas, face à anterior versão 0.9.8 da biblioteca \textit{PCap}.
-Esta técnica consiste na utilização de um bloco de memória pertencente ao processo que irá utilizar o \textit{socket}, de modo a que quando seja necessário passar um pacote do núcleo para a ferramenta, não seja necessário efectuar uma cópia da memória onde reside o pacote.
+Para diminuir o número de cópias de dados, entre o núcleo e o monitor da monitorização em nível utilizador, foi utilizada a técnica de partilha de um \textit{buffer}.
+
+Com base nesta técnica de \textit{MMAP}, foi criado o \textit{PACKET\_MMAP}, disponível a partir da versão 1.0.0 da biblioteca \textit{PCap}.
+Este módulo permite algumas melhorias em termos de desempenho, face à anterior versão 0.9.8 da biblioteca \textit{PCap}, visto que o número de cópias de dados dos pacotes foi reduzida.
+
+Esta técnica consiste na utilização de um bloco de memória pertencente ao processo monitor, de modo a que quando seja necessário transferir um pacote do núcleo para a ferramenta, não se efectue a cópia de memória onde reside o pacote para a do processo.
 Este novo método tem de ser acompanhado por contadores/índices de acesso à memória, dado que, esta zona de memória é acedida de forma circular.
-Apesar de melhorar significativamente o número de cópias de dados, como os blocos de memória para a introdução de pacotes é efectuada de modo estático, existem apenas um número fixo que podem ser alocados.
-Assim, se o ritmo de escrita dos pacotes na zona de memória for superior ao ritmo de leitura, podem existir perdas de pacotes, dado que não existe espaço suficiente para alocar os novos, enquanto os anteriores não forem consumidos.
+Apesar de melhorar significativamente o número de cópias de dados, como os blocos de memória para a introdução dos pacotes é efectuada de modo estático, existem apenas um número fixo de pacotes que podem ser alocados.
+Deste modo, se o ritmo de escrita dos pacotes na zona de memória for superior ao ritmo de leitura, podem existir perdas de pacotes, devido à inexistência de espaço para alocar novos, enquanto os anteriores pacotes não forem consumidos.
 
-----------------------------------------------------------------------------------------------------------
+Para além destas modificações no \textit{PACKET\_MMAP}, o núcleo \textit{Linux} na sua versão 2.6, permite e aconselha a utilização da nova \textit{API} de rede (\textit{NAPI}), apresentada na secção \ref{sub:napi}.
 
-Para além destas modificações no \textit{PACKET\_MMAP}, o núcleo de sistema de operação \textit{Linux} na sua versão 2.6, passou a contar com a nova \textit{API} de rede (\textit{NAPI}), apresentada na secção \ref{sub:napi}.
 
-Se as interfaces de rede suportarem um mecanismo de mitigação de interrupções, é possível obter melhores resultados, conforme \cite{Deri2004}.
+%Se as interfaces de rede suportarem um mecanismo de mitigação de interrupções, é possível obter melhores resultados, conforme \cite{Deri2004}.
 
-----------------------------------------------------------------------------------------------------------
 
 \paragraph*{PF\_RING}
 
-Este é um novo módulo para o núcleo de sistema, criado com base em duas técnicas \textit{mmap} e \textit{ring\_buffers} anteriormente descritas.
+Este é um novo módulo para o núcleo \textit{Linux}, criado com base em duas técnicas \textit{mmap} e \textit{ring\_buffers}.
 
 Este módulo difere na abordagem utilizada no \textit{PACKET\_MMAP}, porquanto nesta a memória é mapeada entre a ferramenta e o controlador da interface, enquanto que no \textit{PACKET\_MMAP} a memória é mapeada entre a ferramenta e um \textit{buffer} externo ao controlador da interface, mas interno ao núcleo de sistema.
 Esta abordagem permite que os dados fiquem disponíveis para a aplicação directamente, verificando-se a inexistência de cópia dos dados do \textit{buffer} do controlador, para o \textit{buffer} partilhado entre a ferramenta e o núcleo\cite{PFRING}.
  
 \paragraph*{PF\_RING com DNA (Direct NIC Access)}
-Baseando-se na técnica anteriormente descrita de utilizar um \textit{buffer} partilhado entre a ferramenta de monitorização e o controlador, assiste-se a uma evolução desta técnica, ao permitir que a interface de rede partilhe um \textit{buffer} com a ferramenta de monitorização, possibilitando que os pacotes passem directamente para esta\cite{IntroPF_RIDNADirecNICAcces}.
-Esta partilha é efectuada utilizando \textit{mmap}, \textit{ring\_buffers} e \textit{DMA}.
+Baseando-se na técnica anteriormente descrita, de utilizar um \textit{buffer} partilhado entre a ferramenta de monitorização e o controlador, assiste-se a uma evolução desta técnica, ao permitir que a interface de rede partilhe um \textit{buffer} com a ferramenta de monitorização, possibilitando que os pacotes passem directamente para esta~\cite{IntroPF_RIDNADirecNICAcces}.
+Esta partilha é efectuada utilizando \textit{mmap}, \textit{ring\_buffers} e \textit{DMA} (\textit{Direct Memory Access}).
 Para ser utilizada esta técnica, é necessário que a interface de rede, permita a utilização de memória partilhada e \textit{DMA}.
 
 \paragraph*{}
 
 Diversos esforços no sentido de aumentar o desempenho da captura de pacotes têm sido efectuados.
-Relativamente ao \textit{software}, são conhecidos esforços na utilização da técnica de \textit{mmap}, por forma a reduzir o número de cópias de dados entre as aplicações e o núcleo de sistema.
-Igualmente no \textit{hardware}, tem-se assistido a uma evolução, no sentido de reduzir as interrupções efectuadas ao \textit{cpu}, adicionando nas interfaces de rede processadores dedicados às funcionalidades presentes no núcleo, de modo a libertá-lo da execução destas tarefas.
+Relativamente ao \textit{software}, são conhecidos esforços na utilização de técnicas de partilha de \textit{buffers}, como o \textit{mmap}, de modo a reduzir o número de cópias de dados entre as aplicações e o núcleo de sistema.
+Igualmente no \textit{hardware}, tem-se assistido a uma evolução, no sentido de reduzir as interrupções efectuadas ao \textit{cpu}, adicionando nas interfaces de rede processadores dedicados a certas funcionalidades presentes no núcleo, de modo a libertá-lo da execução destas tarefas.
+Estas tarefas podem ser de monitorização, colocação de estampilha temporal, reagrupar segmentos, filtragem de pacotes, etc.
+Não só têm sido adicionadas mais funcionalidades, como também tem sido adicionados multiplas filas de espera, para que estas possam tirar partido das arquitecturas de multiplos cores e das memórias \textit{cache} residentes nestes processadores.
+
+
+%\paragraph{Captura com \textit{dns} activo}
+%
+%Como já referido, a biblioteca \textit{PCap} é utilizada por diversas ferramentas de análise ao trafego de rede.
+%Uma destas ferramentas é o \textit{TcpDump}, tem sido desenvolvida a par com a biblioteca \textit{PCap} .
+%
+%
+%A biblioteca \textit{PCap}
+%\textit{TcpDump} com parametro n de \textit{dns} para obter os nomes de dominios sempre que possivel
+%
+%\paragraph{Captura especificando tamanho máximo de 65535 para pacotes}
+%
+%MTU de 1500 ethernet
 
 
 \subsection{Optimizações na Estrutura de Rede}
@@ -310,25 +314,27 @@ Sempre que o \textit{cpu} atende uma interrupção de rede, obtém um número ma
 \paragraph*{Sistemas \textit{multi-core} e multi-processador}
 
 Com o aparecimento de sistemas \textit{multi-core} e \textit{multi-processador} a que a generalidade do público tem acesso, a paralelização de código ou a forma de tirar partido destas arquitecturas, que permitem um melhor aproveitamento dos recursos, assumem uma particular importância.
-De modo a tirar partido das arquitecturas \textit{multi-core}, é necessário que o controlador e interfaces de rede, os \textit{buffers}, e os controladores de \textit{Direct Memory Access} (\textit{DMA}), sejam modificados de forma a conhecerem esta estrutura.
+De modo a tirar partido das arquitecturas \textit{multi-core}, é necessário que o controlador e interfaces de rede, os \textit{buffers}, e os controladores de \textit{DMA}, sejam modificados de forma a conhecerem esta estrutura.
 É pois, determinante um esforço conjunto envolvendo todas estas componentes, com vista à obtenção do máximo rendimento destas arquitecturas\cite{Deri:2010}.
 
 
 
 \section{Sistemas de monitorização no núcleo do \textit{Linux}}\label{sect:instrumentacao_casos_linux}
 
-A monitorização do núcleo é uma das melhores formas de conhecer como os recursos da máquina são partilhados entre o núcleo e os processos, assim nesta secção são apresentados ferramentas e mecanismos de monitorização do núcleo.
-A utilização dos sistemas de monitorização ao nível do núcleo, permitem efectuar a monitorização genérica dos processos, de forma não intrusiva para as aplicações.
-Ao efectuar a monitorização no núcleo, a sobrecarga imposta ao sistema é menor que em nível utilizador, por ser possível recolher apenas as informações relevantes, evitando filtrar os elementos não relevantes, para análise.\todo{duvida se pode ser assim}
+A monitorização do núcleo é uma das melhores formas de conhecer não só, como os recursos da máquina são partilhados entre o núcleo e os processos, como também efectuar análises de desempenho e correcção dos diversos componentes do núcleo.
+Assim nesta secção são apresentados ferramentas e mecanismos de monitorização do núcleo.
 
-Neste documento constam apenas mecanismos e ferramentas de monitorização dinâmicas, pois apenas estas são as desejadas para a criação de uma componente de monitorização de rede orientada ao processo.
-De entre as ferramentas de monitorização dinâmica analisadas é possível agrupá-las em duas categorias: eventos pré-definidos e instrumentação dinâmica.
-Na categoria instrumentação dinâmica existem dois sistemas mais relevantes: o \textit{KProbes} e o \textit{Linux Kernel Stace Tracer}, enquanto que para os eventos pré-definidos foram verificados o \textit{Linux Trace Toolkit} e o \textit{OProfile}.
-Estes quatro sistemas são apresentados em seguida considerando as suas categorias:
+A utilização de sistemas de monitorização ao nível do núcleo, permite efectuar a monitorização genérica dos processos, de forma não intrusiva para as aplicações.
+Ao efectuar a monitorização no núcleo, a sobrecarga imposta ao sistema é menor que em nível utilizador, por ser possível recolher apenas as informações relevantes, evitando filtrar os elementos não relevantes, para análise.
+
+Neste documento constam apenas mecanismos e ferramentas de monitorização dinâmicas, pois apenas estas são as desejadas para a criação de um mecanismo de monitorização de rede orientada ao processo.
+De entre os mecanismos e ferramentas de monitorização dinâmica analisadas é possível agrupá-las em duas categorias: eventos pré-definidos e instrumentação dinâmica.
+Na categoria instrumentação dinâmica existem dois mecanismos mais relevantes: o \textit{KProbes} e o \textit{Linux Kernel Stace Tracer}, enquanto que para os eventos pré-definidos foram verificados o \textit{Linux Trace Toolkit} e o \textit{OProfile}.
+Estas quatro ferramentas são apresentados em seguida considerando as suas categorias:
 
 \subsection{Eventos pré-definidos}
 
-Nesta categoria encaixam-se duas ferramentas o \textit{Linux Trace ToolKit} e o \textit{OProfile}.
+Nesta categoria encontram-se duas ferramentas o \textit{Linux Trace Toolkit} e o \textit{OProfile}.
 Em cada uma destas ferramentas a monitorização é efectuada sobre pontos previamente definidos, não permitindo a adição de novos pontos de monitorização.
 Cada um destas ferramentas analisa todo o sistema, sendo a filtragem extra dos eventos efectuada em nível utilizador.
 %\todo{ver}
@@ -396,29 +402,6 @@ Este perfil é criado com o auxilio do sistema de ficheiros virtual \textit{Proc
 O \textit{OProfile} regista os valores do \textit{program counter} (registo do processador que contém a proxima instrução a executar) e o tempo quando quando foi  ------ é triplo com estes dados e as zonas de memória e qual o processo corrente consegue efectuar o perfil de utilização do processo.
 
 De modo a reduzir a sobrecarga / contenção utiliza buffers por cpu ... 
-
-\subsubsection{DProbes}
-O \textit{DProbes} utiliza o \textit{KProbes} como suporte para efectuar a instrumentação dinâmica do núcleo de sistema.
-Como a criação de pontos de análise é escrito em linguagem C ou \textit{assembly}, foi desenvolvida uma linguagem de mais alto nível de forma a simplificar a utilização desta aplicação.
-
-Após se obterem os dados, estes podem ser transferidos para um ficheiro, para o \textit{daemon de logging} do núcleo de sistema, ou para uma porta série.
-Existe, igualmente, a opção de interoperabilidade com o \textit{Linux Trace Toolkit}\cite{DProbes}.
-
-%\subsubsection{SystemTap}\label{cap:Systemtap_overview}
-\subsubsection{SystemTap}
-O \textit{SystemTap} é uma ferramenta que possibilita o desenvolvimento de módulos para o \textit{KProbes}, utilizando uma linguagem específica, de forma a ser segura e fácil de trabalhar.
-Uma vez que os dados gerados estão no espaço de endereçamento de memória do núcleo, e o programa que os analisará se situa no espaço de endereçamento do utilizador, é necessário efectuar uma transferência de dados de um para outro espaço.
-O \textit{SystemTap} efectua esta transferência, recorrendo à utilização do sistema de ficheiros \textit{ReplayFs}, onde é possível escrever de forma rápida, sem comprometer a segurança do sistema\cite{Donovan2007,Jones2009}.
-
-Apesar de, no pacote de aplicações desta ferramenta, existir um visualizador gráfico de dados recolhidos pelo \textit{SystemTap}, este só consegue analisar os \textit{TapSets} pré-definidos no \textit{SystemTap}.
-Para ultrapassar esta limitação, novas ferramentas estão a ser desenvolvidas.
-Uma destas ferramentas designada por \textit{bootlimn}, está actualmente a ser desenvolvida no \textit{Google Summer of Code}, com o objectivo de utilizar o \textit{SystemTap} para recolher informações sobre o arranque do sistema, agregando estes dados no formato \textit{XML}.
-Os dados recolhidos, permitem visualizações gráficas do processo de inicialização do sistema, bem como da utilização de disco e \textit{CPU}.
-Outro projecto conhecido como \textit{Systemtap GUI}, que engloba o \textit{System Tap Editor Plug-in} para a ferramenta Eclipse, é um ambiente onde podem ser analisados e visualizados os dados recolhidos pelo \textit{SystemTap}.
-
-%O \textit{SystemTap} actualmente está a ser desenvolvido por empresas de reconhecido mérito internacional, nomeadamente a \textit{Red Hat}, a \textit{IBM}, a \textit{Hitachi} e a \textit{Oracle}.
-
-
 
 
 % outra abordagem 
@@ -495,6 +478,30 @@ Não existe a possibilidade de instrumentar recursivamente uma função, ou seja
 
 Como anteriormente referido, este mecanismo de instrumentação do núcleo é utilizado por diversas ferramentas, de modo a instrumentar dinamicamente código pertencente ao núcleo.
 Duas das ferramentas que tiram partido deste mecanismo são: \textit{DProbes} e o \textit{SystemTap}.
+
+\subsubsection{DProbes}
+O \textit{DProbes} utiliza o \textit{KProbes} como suporte para efectuar a instrumentação dinâmica do núcleo de sistema.
+Como a criação de pontos de análise é escrito em linguagem C ou \textit{assembly}, foi desenvolvida uma linguagem de mais alto nível de forma a simplificar a utilização desta aplicação.
+
+Após se obterem os dados, estes podem ser transferidos para um ficheiro, para o \textit{daemon de logging} do núcleo de sistema, ou para uma porta série.
+Existe, igualmente, a opção de interoperabilidade com o \textit{Linux Trace Toolkit}\cite{DProbes}.
+
+%\subsubsection{SystemTap}\label{cap:Systemtap_overview}
+\subsubsection{SystemTap}
+O \textit{SystemTap} é uma ferramenta que possibilita o desenvolvimento de módulos para o \textit{KProbes}, utilizando uma linguagem específica, de forma a ser segura e fácil de trabalhar.
+Uma vez que os dados gerados estão no espaço de endereçamento de memória do núcleo, e o programa que os analisará se situa no espaço de endereçamento do utilizador, é necessário efectuar uma transferência de dados de um para outro espaço.
+O \textit{SystemTap} efectua esta transferência, recorrendo à utilização do sistema de ficheiros \textit{ReplayFs}, onde é possível escrever de forma rápida, sem comprometer a segurança do sistema\cite{Donovan2007,Jones2009}.
+
+Apesar de, no pacote de aplicações desta ferramenta, existir um visualizador gráfico de dados recolhidos pelo \textit{SystemTap}, este só consegue analisar os \textit{TapSets} pré-definidos no \textit{SystemTap}.
+Para ultrapassar esta limitação, novas ferramentas estão a ser desenvolvidas.
+Uma destas ferramentas designada por \textit{bootlimn}, está actualmente a ser desenvolvida no \textit{Google Summer of Code}, com o objectivo de utilizar o \textit{SystemTap} para recolher informações sobre o arranque do sistema, agregando estes dados no formato \textit{XML}.
+Os dados recolhidos, permitem visualizações gráficas do processo de inicialização do sistema, bem como da utilização de disco e \textit{CPU}.
+Outro projecto conhecido como \textit{Systemtap GUI}, que engloba o \textit{System Tap Editor Plug-in} para a ferramenta Eclipse, é um ambiente onde podem ser analisados e visualizados os dados recolhidos pelo \textit{SystemTap}.
+
+%O \textit{SystemTap} actualmente está a ser desenvolvido por empresas de reconhecido mérito internacional, nomeadamente a \textit{Red Hat}, a \textit{IBM}, a \textit{Hitachi} e a \textit{Oracle}.
+
+
+
 
 %\subsubsection{DProbes}\label{cap:Dprobe_overview}
 
