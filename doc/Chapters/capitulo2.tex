@@ -412,8 +412,7 @@ O \textit{KProbes} é um mecanismo de instrumentação dinâmica do núcleo do \
 A \textit{API} permite que ferramentas, como o \textit{DProbes} ou o \textit{SystemTap} possam aceder às suas funcionalidades.
 Esta encontra-se na versão principal do núcleo do sistema \textit{Linux}, desde a versão 2.6.9, o que indica tratar-se de um mecanismo bastante estável~\cite{kernel_debug_printk_on_fly,KProbesSite}.
 
-\todo{falta escrever sobre tecnica do trampolim e dos handlers}
-Para efectuar esta operação é utilizada a técnica do trampolim~\cite{Hollingsworth94dynamicprogram}, uma vez que uma função pode terminar em diversos pontos. e falar sobre o handler ...
+O \textit{KProbes} utiliza a técnica do trampolim~\cite{Hollingsworth94dynamicprogram}, combinada com funções de \textit{handler} que efectuam as análises definidas pelo administrador.
 
 Utilizando o \textit{KProbes} são possíveis três tipos de instrumentação: o \textit{KProbe}, o \textit{JProbe} e o \textit{KRetProbe}.
 Cada um destes três tipos é específico de uma determinada funcionalidade.
@@ -432,14 +431,14 @@ Quando é declarado um \textit{JProbe}, a função de \textit{handler} dessa cha
 \begin{figure}[!htb]
        \centering
        \includegraphics[scale=0.75]{KProbesArchitecture.jpg}
-       \caption{Arquitectura do \textit{Kprobes} }
+       \caption{Arquitectura do \textit{Kprobes} \cite{KProbesLwn}}
 	\label{fig:kprobes_arch}
 \end{figure}
 
 \begin{figure}[!htb]
        \centering
        \includegraphics[scale=1.0]{KProbeExecution.png}
-       \caption{Execução de um \textit{KProbe} }
+       \caption{Execução de um \textit{KProbe} \cite{KProbesLwn}}
 	\label{fig:kprobe_execution}
 \end{figure}
 
@@ -598,10 +597,10 @@ Apesar de novos sistemas como o \textit{SysFs} terem sido criados, continua a se
 Esta é uma das \textit{API's} de comunicação, entre o núcleo e as aplicações, mais utilizadas, não obstante ter crescido de forma desorganizada.
 
 \paragraph*{SysFs - }\label{cap:SysFs_overview}
-\todo{normalização de estruturas}
+
 Este sistema de ficheiros virtual foi desenvolvido para colmatar algumas deficiências encontradas no \textit{ProcFs}.
 Estes problemas situam-se basicamente na forma desorganizada como a quantidade de informação disponibilizada está distribuída sobre o \textit{ProcFs}.
-Este novo sistema de ficheiros virtual, evidencia restrições na disponibilização das informações, uma vez que apenas é possível visualizar e modificar um \textit{KObject} por ficheiro.
+Este novo sistema de ficheiros virtual, evidencia restrições na disponibilização das informações, uma vez que apenas é possível visualizar e modificar um \textit{KObject} por ficheiro, assim é possível efectuar uma normalização da apresentação das estruturas do núcleo.
 Esta limitação conduziu a que outros sistemas de ficheiros virtuais, nomeadamente o \textit{DebugFs} e o \textit{RelayFs}, fizessem a sua aparição com vista a colmatar esta situação.
 
 \paragraph*{DebugFs - }\label{cap:DebugFs_overview}
@@ -658,7 +657,7 @@ NetLink & Sem & Elevado \\
 \section{Captura de tráfego de um processo específico}
 \label{sect:outras_abordagens}
 
-A captura do tráfego, respeitante a um processo genérico, foi alvo de estudo em \cite{1688981} e em \cite{Farruca:2009}, esta última, uma dissertação de mestrado.
+A captura do tráfego, respeitante a um processo genérico, foi alvo de estudo em \cite{1688981} e em \cite{duarte10,Farruca:2009}, esta última, uma dissertação de mestrado.
 
 No primeiro trabalho, foi desenvolvido um sistema de captura de pacotes de um determinado processo, utilizando um módulo no núcleo de sistema que intercepta e captura os pacotes do processo.
 
