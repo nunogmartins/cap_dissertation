@@ -54,7 +54,6 @@ int main(int argc, char **argv)
 			*/
 		}
 		i--;
-
 		for(i;i >= 0; --i)
 		{
 			if(sockfds[i] > 0)

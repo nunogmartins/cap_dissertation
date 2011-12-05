@@ -66,6 +66,23 @@ static int socket_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 
 
 /*
+ * monitor function inet_release
+ * static int inet_release(struct socket *sock)
+ *
+ */
+
+static int release_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
+{
+	return 0;
+}
+
+static int release_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
+{
+	int retval = regs_return_value(regs);
+	return 0;
+}
+
+/*
  * function called on module init to initialize kretprobes common to tcp and udp
  */
 
@@ -88,6 +105,8 @@ int init_kretprobes_common(int *initial)
 	index +=1;
 	if(ret < 0)
 		return -1;
+
+	ret = instanciationKRETProbe((kreprobes+index),"inet_release",release_ret_handler,release_entry_handler,0);
 
 	*initial = index;
 	return 0;

@@ -10,7 +10,7 @@ obj-m	:=monitoring_syscalls.o
 
 #my_module-y	:=monitor.o common_monitor_func.o tcp_monitor_func.o udp_monitor_func.o debugfs_support.o ports_table.o
 
-monitoring_syscalls-y	:=monitor.o syscalls_monitor.o debugfs_support.o table_port.o filter.o tools.o portsDB.o unit_tests.o
+monitoring_syscalls-y	:=monitor.o syscalls_monitor.o debugfs_support.o filter.o table_port.o tools.o portsDB.o unit_tests.o
 
 #monitoring_calls-y	:=monitor.o common_monitor_func.o tcp_monitor_func.o udp_monitor_func.o debugfs_support.o ports_table.o
 

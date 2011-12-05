@@ -1,75 +1,73 @@
 
 #include "config.h"
 
-#ifdef UNIT_TESTING
+//#ifdef UNIT_TESTING
 
 #include <linux/slab.h>
+#include <linux/ktime.h>
+#include <linux/limits.h>
 
 #include "table_port.h"
 
-#define INITIAL_PORT 2010
-#define FINAL_PORT 2050
+#define INITIAL_PORT 1
+#define FINAL_PORT 1024
 
-#define MAX_DATA 5
+#define MAX_DATA 1024
 
 static struct packetInfo *ports;
 
 int populate(void)
 {
-	int i=0, j=0;
+	int i=0;
 	int iteration = 0;
-	struct packetInfo pi;
+	s64 delta;
+	ktime_t initial, end;
+	struct packetInfo *sentinel = NULL;
 
 	ports = kmalloc(MAX_DATA*sizeof(*ports),GFP_KERNEL);
-	pr_emerg("Populate\n");
-	for(i=INITIAL_PORT,iteration=0;i < FINAL_PORT; i+=10,iteration++)
+	pr_info("Populate\n");
+
+	//initial = ktime_get();	
+	for(i=INITIAL_PORT,iteration=0;i < FINAL_PORT ; i++,iteration++)
 	{
-		struct packetInfo *sentinel = (ports)+iteration;
+		sentinel = (ports)+iteration;
 		sentinel->port = (u16)i;
 		sentinel->address = 0x7f000001;
 		sentinel->protocol = 0x06;
 		insertPort(sentinel);
 	}
+	/*end = ktime_get();
+	delta = ktime_to_ns(ktime_sub(end,initial));
+	pr_info("%lld ns to execute a insert\n",(long long)delta);
 
-	for(j=0; j < 10 ; j++ )
-	{
-		pi = *ports;
-		pi.address = pi.address + j;
-		insertPort(&pi);
-	}
+	initial = ktime_get();
+	searchPort(sentinel);
+	end = ktime_get();
+	delta = ktime_to_ns(ktime_sub(end,initial));
+	pr_info("%lld ns to execute one search\n",(long long)delta);
+*/
+    printTree();
 
-
-	{
-		pi = *ports;
-		pi.protocol = 0x11;
-		insertPort(&pi);
-	}
-
-	//(ports)->address = (ports->address);
-
-	printTree();
-	return 0;	
+	return 0;
 }
 
 int depopulate(void)
 {
 	int i = INITIAL_PORT;
 	int iteration = 0;
-	//do for all ports my_erase
-	pr_emerg("DePopulate\n");
-	for(i=INITIAL_PORT;i < FINAL_PORT; i+=10,iteration++)
+	s64 delta;
+	ktime_t initial, end;
+
+	pr_info("DePopulate\n");
+//	initial = ktime_get();
+	for(i=INITIAL_PORT, iteration=0;i < FINAL_PORT; i++,iteration++)
 	{
 		deletePort((ports+iteration));
-
 	}
-
-	deletePort((ports+0));
-	{
-		struct packetInfo pi;
-		pi = *(ports);
-		pi.protocol = 0x11;
-		deletePort(&pi);
-	}
+/*	end = ktime_get();
+	delta = ktime_to_ns(ktime_sub(end,initial));
+	pr_info("%lld ns to execute a remove\n",(long long)delta);
+*/	
 	printTree();
 
 	kfree(ports);
@@ -77,4 +75,4 @@ int depopulate(void)
 	return 0;
 }
 
-#endif
+//#endif

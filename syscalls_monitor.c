@@ -24,43 +24,178 @@
 #include <linux/slab.h>
 #include <linux/types.h>
 #include <linux/sched.h>
+#include <linux/list.h>
 
 
 #include "table_port.h"
 #include "pcap_monitoring.h"
-
-#ifdef MY_DEBUG
-#include "info_acquire.h"
 #include "debugfs_support.h"
 
+#ifdef TIMMING
+#include <linux/ktime.h>
+#endif
+
+#ifdef MY_DEBUG
+#include <linux/debugfs.h>
+#include <linux/seq_file.h>
+#include "info_acquire.h"
+
 struct syscall_info_acquire syscall_info;
+
+
+static void *monitor_seq_start(struct seq_file *p, loff_t *pos)
+{
+	//int i = 0;
+	if(*pos > 0)
+		return NULL;
+	
+		/*my_print_debug("on start return 0x%p\n",&syscall_info.info[0]);
+
+		for(i = 0 ; i <= 5 ; i++)
+		my_print_debug("position %d entry %d success %d unsucess %d\n",
+				i,syscall_info.info[i].entry,syscall_info.info[i].success, syscall_info.info[i].unsuccess);
+		my_print_debug("\n");
+		*/
+		return &syscall_info.info[0];
+	
+}
+
+static void *monitor_seq_next(struct seq_file *p, void *v, loff_t *pos)
+{
+	//struct syscall_info_acquire *info = &syscall_info;
+	int ipos = 0 ;
+	struct counters *c = v;
+	*(pos)= *(pos)+1;
+	ipos = *pos;
+	c++;
+	//my_print_debug("on next %d\n",ipos);
+	if(ipos <= 5)
+	{
+		/*my_print_debug("position %d entry %d success %d unsucess %d\n",
+				ipos,c->entry,c->success, c->unsuccess);	
+		
+		my_print_debug("on next 0x%p\n",v);
+		*/
+		return c; 
+	}
+	else
+		return NULL;
+	
+}
+
+static void monitor_seq_stop(struct seq_file *p, void *v)
+{
+	//kfree(v);
+}
+
+static int monitor_seq_show(struct seq_file *m, void *v)
+{
+	struct counters *c = NULL;
+
+	//my_print_debug("on show 0x%p \n",v);
+	if(v != NULL){
+		c = v;
+		seq_printf(m,"entry %d success %d unsucess %d\n",c->entry,c->success, c->unsuccess);
+	}
+	else{
+		seq_printf(m,"v é nulo \n");
+	}
+	return 0;
+}
+
+static const struct seq_operations monitor_seq_ops = {
+        .start  = monitor_seq_start,
+        .next   = monitor_seq_next,
+        .stop   = monitor_seq_stop,
+        .show   = monitor_seq_show,
+};
+
+static int monitor_open(struct inode *inode, struct file *file)
+{
+	return seq_open(file,&monitor_seq_ops);
+}
+/*
+static int monitor_release(struct inode *inode, struct file *file)
+{
+	return 0;
+}
+*/
+static const struct file_operations monitor_fops = {
+        .open           = monitor_open,
+        .read           = seq_read,
+        .llseek         = seq_lseek,
+        //.release        = monitor_release,
+        .release = seq_release,
+        .owner          = THIS_MODULE,
+ };
+
+
+
 #endif
 
 pid_t monitor_pid;
-
+u64 pid = -1, ppid = -1, tgid = -1;
+extern struct dentry *my_debug_dir;
 #ifdef MY_KPROBES
 int kprobes_index;
+
+static inline short isSon(pid_t pid, pid_t newpid)
+{
+	return pid == newpid ? 1 : 0;
+}
+
+static inline short itsMe(pid_t pid, pid_t newpid)
+{
+	return pid == newpid ? 1: 0;
+}
+
+static inline short isGroup(pid_t pid, pid_t newpid)
+{
+	return pid == newpid ? 1 : 0;
+}
+
+#define TO_MONITOR(t) \
+	if(itsMe(pid,t->pid) || isSon(ppid,t->parent->pid) || isGroup(tgid,t->tgid)){ \
+		goto monitor; \
+	}else {\
+		my_data->fd = -1; \
+		return 0; \
+		}
+	
 
 #define NR_PROBES 7
 
 struct kretprobe *kretprobes = NULL;
 
-void print_regs(const char *function, struct pt_regs *regs)
-{
-#ifdef CONFIG_X86_64
-	pr_emerg( "%s ax=%p bx=%p cx=%p dx=%p di=%p si=%p r8=%p r9=%p",function, (void *)regs->ax,(void *)regs->bx,(void *)regs->cx,(void *)regs->dx,(void*)regs->di,(void *) regs->si,(void *)regs->r8,(void *)regs->r9);
+struct cell{
+#ifdef TIMMING
+	ktime_t init_time;
 #endif
-}
+	int fd;
+};
 
-extern struct kretprobe *kretprobes;
-
-extern char *application_name;
-extern void print_regs(const char *function, struct pt_regs *regs);
+struct closeInfo {
+#ifdef TIMMING
+	ktime_t init_time;
+#endif
+	int fd;
+	struct packetInfo pi;
+};
 
 struct connect_extern_info {
+#ifdef TIMMING
+	ktime_t init_time;
+#endif
 	struct packetInfo external;
 	int fd;
 };
+
+void print_regs(const char *function, struct pt_regs *regs)
+{
+#ifdef CONFIG_X86_64
+	my_print_debug( "%s ax=%p bx=%p cx=%p dx=%p di=%p si=%p r8=%p r9=%p",function, (void *)regs->ax,(void *)regs->bx,(void *)regs->cx,(void *)regs->dx,(void*)regs->di,(void *) regs->si,(void *)regs->r8,(void *)regs->r9);
+#endif
+}
 
 #ifdef UDP_PROBES
 #ifdef SENDPROBE
@@ -75,10 +210,13 @@ static int sendto_entry_handler(struct kretprobe_instance *ri, struct pt_regs *r
 #endif
 	struct cell *my_data = (struct cell *)ri->data;
 
-	CHECK_MONITOR_PID;
-
-	my_data->fd = fd;
+	//CHECK_MONITOR_PID;
+	syscall_info.info[0].entry++;
+	TO_MONITOR(task)
 	
+monitor:
+	my_data->fd = fd;
+	syscall_info.info[0].success++;
 	return 0;
 }
 static int sendto_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
@@ -88,15 +226,21 @@ static int sendto_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 	struct cell *my_data = (struct cell *)ri->data;
 	struct packetInfo pi;
 	int fd = my_data->fd;
-	int err;
-	
-	if(retval >= 0 || retval == -11)
+	int err = 0;
+
+	if(my_data->fd == -1){
+		syscall_info.info[0].unsuccess++;
+		return 0;
+	}
+
+
+	if(retval >= 0 || retval == -11 || retval == -111)
 	{
 		getLocalPacketInfoFromFd(fd,&pi,&err);
 		if(err == 0)
 			insertPort(&pi);
 	}else
-		pr_info("sendto retval < 0 which is %d ",retval);
+		my_print_debug("sendto retval < 0 which is %d ",retval);
 
 	return 0;
 }
@@ -114,11 +258,12 @@ static int recvfrom_entry_handler(struct kretprobe_instance *ri, struct pt_regs 
 #else
 	int fd = regs->di;
 #endif
-
-	CHECK_MONITOR_PID;
-
+	syscall_info.info[1].entry++;
+	TO_MONITOR(task)
+	
+monitor:
 	my_data->fd = fd;
-
+	syscall_info.info[1].success++;
 	return 0;
 }
 static int recvfrom_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
@@ -127,7 +272,13 @@ static int recvfrom_ret_handler(struct kretprobe_instance *ri, struct pt_regs *r
 	struct cell *my_data = (struct cell*)ri->data;
 	struct packetInfo pi;
 	int fd = my_data->fd;
-	int err;
+	int err = 0;
+	
+	if(my_data->fd == -1){
+		syscall_info.info[1].unsuccess++;
+		return 0;
+	}
+
 
 	if(retval >= 0 || retval == -11)
 	{
@@ -136,7 +287,7 @@ static int recvfrom_ret_handler(struct kretprobe_instance *ri, struct pt_regs *r
 			insertPort(&pi);
 	}else{
 #ifdef MY_DEBUG_INFO
-	pr_info("recvfrom retval < 0 which is %d", retval);
+	my_print_debug("recvfrom retval < 0 which is %d", retval);
 #endif
 	}	
 
@@ -152,17 +303,25 @@ static int recvfrom_ret_handler(struct kretprobe_instance *ri, struct pt_regs *r
 static int accept_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	struct task_struct *task = ri->task;
-
-	CHECK_MONITOR_PID;
-
-	return 0;
+	struct cell *my_data = (struct cell *)ri->data;
+	syscall_info.info[2].entry++;
+	TO_MONITOR(task)
+	
+monitor:
+	syscall_info.info[2].success++;
+return 0;
 }
 static int accept_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	int retval = regs_return_value(regs);
+	struct cell *my_data = (struct cell *)ri->data;
 	struct packetInfo pi;
 	int err;
-
+	
+	if(my_data->fd == -1){
+		syscall_info.info[2].unsuccess++;
+		return 0;
+	}
 	if(retval > 0)
 	{
 		getLocalPacketInfoFromFd(retval,&pi,&err);
@@ -181,31 +340,36 @@ static int accept_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	struct task_struct *task = ri->task;
-	struct packetInfo *my_data = (struct packetInfo *)ri->data;
+	struct closeInfo *my_data = (struct closeInfo *)ri->data;
 	//void *stack = (void *)regs->bp;
 	//struct socket *socket = stack+8;
 
 #ifdef CONFIG_X86_32
 	struct file *filp = (struct file *)regs->bx;
-	struct inode *inode = (struct inode *)regs->ax;
+	//struct inode *inode = (struct inode *)regs->ax;
 #else
 	struct file *filp = (struct file *)regs->si;
-	struct inode *inode = (struct inode *)regs->di;
+	//struct inode *inode = (struct inode *)regs->di;
 #endif
 
 	int err = -1;
+	syscall_info.info[3].entry++;
+	TO_MONITOR(task)
+	
+monitor:
 
-	CHECK_MONITOR_PID;
-
-	getLocalPacketInfoFromFile(filp,my_data,&err);
+	getLocalPacketInfoFromFile(filp,&(my_data->pi),&err);
 	if(err >= 0){
 #ifdef MY_DEBUG_INFO
-		pr_emerg( "close_sock entry %s",task->comm);
-		pr_emerg( "port %hu address %d.%d.%d.%d protocol %hu",my_data->port,NIPQUAD(my_data->address),my_data->protocol);
-#endif	
+		//my_print_debug( "close_sock entry %s",task->comm);
+		//my_print_debug( "port %hu address %d.%d.%d.%d protocol %hu",my_data->pi.port,NIPQUAD(my_data->pi.address),my_data->pi.protocol);
+#endif
+		syscall_info.info[3].success++;
+		my_data->fd = -2;
 	}
-	else
-		return 1;
+	else {
+		my_data->fd = -1;
+	}
 
 	return 0;
 }
@@ -213,12 +377,17 @@ static int close_entry_handler(struct kretprobe_instance *ri, struct pt_regs *re
 static int close_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	int retval = regs_return_value(regs);
-	struct packetInfo *pi = (struct packetInfo *)ri->data;
+	struct closeInfo *cI = (struct closeInfo *)ri->data;
 	
-
+	if(cI->fd == -1){
+		syscall_info.info[3].unsuccess++;
+		return 0;
+	}
 	if(retval == 0){
-		pr_emerg( "close_ret: port %hu address %d.%d.%d.%d protocol %hu",pi->port,NIPQUAD(pi->address),pi->protocol);
-		deletePort(pi);
+#ifdef MY_DEBUG_INFO
+		//my_print_debug( "close_ret: port %hu address %d.%d.%d.%d protocol %hu",cI->pi.port,NIPQUAD(cI->pi.address),cI->pi.protocol);
+#endif
+		deletePort(&(cI->pi));
 	}
 	return 0;
 }
@@ -235,11 +404,12 @@ static int bind_entry_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 	int fd = regs->di;
 #endif
 	struct cell *my_data = (struct cell *)ri->data;
-
-	CHECK_MONITOR_PID;
-
+	syscall_info.info[4].entry++;
+	TO_MONITOR(task)
+	
+monitor:
 	my_data->fd = fd;
-
+	syscall_info.info[4].success++;
 	return 0;
 }
 
@@ -249,10 +419,15 @@ static int bind_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 	struct cell *my_data = (struct cell *)ri->data;
 	struct packetInfo pi;
 	int err;
-	
+	int fd = my_data->fd;	
+
+	if(my_data->fd == -1){
+		syscall_info.info[4].unsuccess++;
+		return 0;
+	}
 	if(retval == 0)
 	{
-		getLocalPacketInfoFromFd(my_data->fd, &pi,&err);
+		getLocalPacketInfoFromFd(fd, &pi,&err);
 		if(err == 0)
 			insertPort(&pi);
 	}
@@ -275,20 +450,27 @@ static int connect_entry_handler(struct kretprobe_instance *ri, struct pt_regs *
 	int fd = regs->di;
 	struct sockaddr_in *in = (struct sockaddr_in *)regs->si;
 #endif
-
-	CHECK_MONITOR_PID;
-
-	pr_emerg("\n");
+#ifdef TIMMING
+	//my_data->init_time = ktime_get();
+#endif
+	syscall_info.info[5].entry++;
+	TO_MONITOR(task)
+	
+monitor:
+	my_data->fd = fd;
 
 	getLocalPacketInfoFromFd(fd,&(my_data->external),&err);
 	if(err == 0){
 		my_data->external.address = ntohl(in->sin_addr.s_addr);
 		my_data->external.port = ntohs(in->sin_port);
 		insertPort(&(my_data->external));
-		pr_emerg("before local: port %hu address %d.%d.%d.%d and protocol %hu",my_data->external.port, NIPQUAD(my_data->external.address), my_data->external.protocol);
+#ifdef MY_DEBUG_INFO
+		//my_print_debug("before local: port %hu address %d.%d.%d.%d and protocol %hu\n",my_data->external.port, NIPQUAD(my_data->external.address), my_data->external.protocol);
+#endif
+		syscall_info.info[5].success++;
+	}else {
+		my_data->fd = -1;
 	}
-
-	my_data->fd = fd;
 
 	return 0;
 }
@@ -300,9 +482,18 @@ static int connect_ret_handler(struct kretprobe_instance *ri, struct pt_regs *re
 	int fd = my_data->fd;
 	struct packetInfo pi;
 	int err;
-	
+#ifdef TIMMING
+	ktime_t end;
+	s64 delta;
+#endif
 
-	pr_emerg("sys connect ret %d from %s with pid %d",retval,ri->task->comm, ri->task->pid);
+	if(fd == -1){
+		syscall_info.info[5].unsuccess++;
+#ifdef TIMMING
+		//goto timming;
+#endif
+		return 0;
+	}
 
 	if(retval == 0 || retval == -115)
 	{
@@ -310,11 +501,20 @@ static int connect_ret_handler(struct kretprobe_instance *ri, struct pt_regs *re
 		getLocalPacketInfoFromFd(fd,&pi,&err);
 		if(err == 0){
 			insertPort(&pi);
-			pr_emerg("local: port %hu address %d.%d.%d.%d and protocol %hu",pi.port, NIPQUAD(pi.address), pi.protocol);
+#ifdef MY_DEBUG_INFO
+			//my_print_debug("local: port %hu address %d.%d.%d.%d and protocol %hu",pi.port, NIPQUAD(pi.address), pi.protocol);
+#endif
 		}
 		
 	}
-	
+#ifdef TIMMING
+timming:
+/*
+	end = ktime_get();
+	delta = ktime_to_ns(ktime_sub(end,my_data->init_time));
+	my_print_debug("connect %s total time %lld ",fd != -1 ? "success":"unsuccess",(long long)delta);
+*/
+#endif		
 	return 0;
 }
 #endif //CONNECTPROBE
@@ -358,11 +558,12 @@ static int socket_ret_handler(struct kretprobe_instance *ri, struct pt_regs *reg
 #endif //COMMON_TCP_UDP
 
 
+
 static int instantiationKRETProbe(struct kretprobe *kret,
-								const char *function_name,
-								kretprobe_handler_t func_handler,
-								kretprobe_handler_t func_entry_handler,
-								ssize_t data_size)
+				const char *function_name,
+				kretprobe_handler_t func_handler,
+				kretprobe_handler_t func_entry_handler,
+				ssize_t data_size)
 {
 	int ret = -1;
 
@@ -374,28 +575,92 @@ static int instantiationKRETProbe(struct kretprobe *kret,
 	kret->handler = func_handler;
 	kret->entry_handler = func_entry_handler;
 	kret->data_size		= data_size;
-	kret->maxactive		= 20;
+	kret->maxactive		= 8;
 
 	ret = register_kretprobe(kret);
     if (ret < 0) {
-		pr_info( "register_kretprobe failed, returned %d\n", ret);
+		my_print_debug( "register_kretprobe failed, returned %d\n", ret);
 		return -1;
 	}
 
-	pr_info( "Planted kretprobe at %p, handler addr %p\n",
+	my_print_debug( "Planted kretprobe at %p, handler addr %p\n",
 	       kret->kp.symbol_name, kret->kp.addr);
 
 	return ret;
 }
 
-static void initializeTreeWithTaskInfo(pid_t new_pid)
+
+static void initTree(struct task_struct *task)
+{
+
+	struct fdtable *fdt;	
+	struct task_struct *aux;
+	struct list_head *pos;
+
+	if(task == NULL)
+		return;
+
+	task_lock(task);
+
+	fdt = task->files->fdt;
+
+	while(fdt != NULL){
+		int fd;
+		struct file **fds;
+		int max_fds;
+
+ 		fds = fdt->fd;
+		max_fds = fdt->max_fds;
+
+		for(fd=0; fd < max_fds ; fd++)
+		{
+			struct file *file;
+
+			if((file=fds[fd]) != NULL){
+				struct packetInfo p;
+				int err;
+				getLocalPacketInfoFromFile(file,&p,&err);
+				if(err == 0)
+				{
+					if(insertPort(&p) > 0){
+						my_print_debug("insertion was ok");
+					}
+					else{
+						my_print_debug("something was wrong with the insertion");
+					}
+				}
+			}	
+		}
+
+		fdt = fdt->next;
+	}
+
+	list_for_each(pos,&(task->sibling)){
+			aux = list_entry(pos,struct task_struct,sibling);  // sibling
+			printk(KERN_INFO "sibling pid: %d ",aux->tgid);
+		
+	} 
+
+	list_for_each(pos,&(task->children)){	//siblings
+			aux = list_entry(pos,struct task_struct,children);
+			printk(KERN_INFO "children pid: %d",aux->tgid);
+	}
+	task_unlock(task);
+}
+
+
+static void initializeTreeWithTaskInfo(void)
 {
 	struct task_struct *t;
-	monitor_pid = new_pid;
 
 	for_each_process(t){
-		if (t->pid == monitor_pid || t->real_parent->pid == monitor_pid)
+		if (t->tgid == pid || t->parent->tgid == pid)
 		{
+
+			initTree(t);
+/*
+
+
 			//ToDo: change all structures according to pid
 			//ToDo: get all ports from the task that has new_pid
 
@@ -406,7 +671,7 @@ static void initializeTreeWithTaskInfo(pid_t new_pid)
 			files = t->files;
 			fdt = files->fdt;
 
-			pr_info( "application %s with pid %lu", t->comm,(unsigned long)t->pid);
+			my_print_debug( "application %s with pid %lu", t->comm,(unsigned long)t->pid);
 
 			while(fdt != NULL)
 			{
@@ -424,10 +689,10 @@ static void initializeTreeWithTaskInfo(pid_t new_pid)
 						if(err == 0)
 						{
 							if(insertPort(&p) > 0){
-								pr_info("insertion was ok");
+								my_print_debug("insertion was ok");
 							}
 							else{
-								pr_info("something was wrong with the insertion");
+								my_print_debug("something was wrong with the insertion");
 
 							}
 						}
@@ -437,21 +702,27 @@ static void initializeTreeWithTaskInfo(pid_t new_pid)
 				//end of for or while more internal ...
 				fdt = fdt->next; //verifica se existem mais fdtable
 			}  //end of while / no more fdtables in files_struct
-
+*/
 		}
+
 	}
 }
 
-static ssize_t pid_write(struct file *file, const char __user *user_buf,size_t size, loff_t *ppos)
+static ssize_t options(struct file *file, const char __user *user_buf,size_t size, loff_t *ppos)
 {
-	unsigned long pid;
-	char *buf;
+	unsigned long option;
+	char buf[11];
 	char *endp;
 
-	pr_info( "pid_write function called");
-	buf = kmalloc(size,GFP_KERNEL);
+	my_print_debug( "pid_write function called");
 
-	copy_from_user(buf,user_buf,size);
+	memset(buf,0,11);	
+
+	if(size <= 10)
+		copy_from_user(buf,user_buf,size);
+	else
+		copy_from_user(buf,user_buf,10);
+	
 	/*
 	 * ToDo: actualizar todas as estruturas necessárias ao funcionamento da monitorização inclusivé
 	 * o pid
@@ -460,24 +731,28 @@ static ssize_t pid_write(struct file *file, const char __user *user_buf,size_t s
 	 * monitorização
 	 *
 	 */
-	pid = simple_strtoul(buf,&endp,10);
+	option = simple_strtoul(buf,&endp,10);
 	if(endp == buf)
 	{
-		pr_info( "could not convert value into long");
+		my_print_debug( "could not convert value into long");
 		return size;
 	}
-	kfree(buf);
-	pr_info( "pid = %lu",pid);
+	my_print_debug( "option = %lu",option);
 
-	if(pid > 1)
-		initializeTreeWithTaskInfo((size_t) pid);
-	else{
-		if(pid == 0)
-		{
-			printTree();
-		}else if(pid == 1){
-			clearInfo();
-		}
+	switch(option)
+	{
+	case 0:
+		printTree();		
+		break;
+	case 1:
+		initializeTreeWithTaskInfo();
+		break;
+	case 2:
+		clearInfo();
+		break;
+	default:
+		my_print_debug("OPTION NOT DEFINED \n");
+		break;
 	}
 
 	return size;
@@ -486,9 +761,26 @@ static ssize_t pid_write(struct file *file, const char __user *user_buf,size_t s
 
 static const struct file_operations pid_fops = {
 		.owner = THIS_MODULE,
-		.write = pid_write,
+		.write = options,
 };
 
+void createMonitoringSystem(void)
+{
+
+	struct dentry *parent = NULL;
+	memset(&syscall_info,0,sizeof(syscall_info));
+	register_debugfs_file("option", &pid_fops);
+
+#ifdef MY_DEBUG
+
+	parent = createMonitorStatDir();
+	debugfs_create_file("stats",S_IRUSR,parent,NULL,&monitor_fops);
+
+#endif
+	register_monitor_id("pid",&pid);
+	register_monitor_id("ppid",&ppid);
+	register_monitor_id("tgid",&tgid);
+}
 /*
  * function called on module init to initialize kretprobes common to tcp and udp
  */
@@ -497,12 +789,15 @@ int init_kretprobes_syscalls(void)
 {
 	int ret = 0;
 
-	register_debugfs_file("pid_monitor", &pid_fops);
+	monitor_pid = -1;
+
+	createMonitoringSystem();
+
 
 	kretprobes = kmalloc(sizeof(*kretprobes)*NR_PROBES,GFP_KERNEL);
 
 	if(!kretprobes){
-		pr_info( "problem allocating memory");
+		my_print_debug( "problem allocating memory");
 		return -1;
 	}
 
@@ -564,9 +859,9 @@ int init_kretprobes_syscalls(void)
 static void removeKprobe(int index)
 {
 	if((kretprobes+index)!=NULL){
-		pr_info( "in index %d missed %d probes" , index,(kretprobes+index)->nmissed);
+		my_print_debug( "in index %d missed %d probes" , index,(kretprobes+index)->nmissed);
 		unregister_kretprobe((kretprobes+index));
-		pr_info( "kretprobe at %p named %s unregistered\n", (kretprobes+index)->kp.addr, (kretprobes+index)->kp.symbol_name);
+		my_print_debug( "kretprobe at %p named %s unregistered\n", (kretprobes+index)->kp.addr, (kretprobes+index)->kp.symbol_name);
 	}
 }
 

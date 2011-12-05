@@ -25,96 +25,31 @@
 
 #include "pcap_monitoring.h"
 
-struct inode *getInodeFromFd(unsigned int fd)
+void debugFunc(struct packetInfo *lpi)
 {
-	struct inode *d_inode = NULL;
-	struct file *f = NULL;
-
-	f = fget(fd);
-
-	if(f!=NULL)
-	{
-		struct dentry *dentry = NULL;
-
-		fput(f);
-		dentry = f->f_dentry;
-		if(dentry!=NULL)
-		{
-			d_inode = dentry->d_inode;
-		}
-	}
-
-	return d_inode;
-}
-
-
-u16 getPortFromInode(struct file *f,struct inode *inode)
-{
-	struct socket *socket = NULL;
-	if(inode)
-	{
-		if(S_ISSOCK(inode->i_mode))
-		{
-			socket = f->private_data;
-			return ntohs(inet_sk(socket->sk)->inet_num) ;
-		}
-	}
-	else
-		return 0;
-
-	return 0;
-}
-
-/*
- * unsigned int fd
- * int direction
- */
-
-u16 getPort(unsigned int fd,int direction)
-{
-	struct file *f = NULL;
-	//int fput_needed;
-	struct socket *socket = NULL;
-	/*struct sock *sock = NULL;
-struct inet_sock *i_sock = NULL;
-	 */
-	f = fget(fd);
-
-	if(f!=NULL)
-	{
-		struct dentry *dentry;
-		struct inode *d_inode;
-		fput(f);
-		dentry = f->f_dentry;
-		if(dentry !=NULL)
-		{
-			d_inode = dentry->d_inode;
-			if(S_ISSOCK(d_inode->i_mode))
-			{
-				socket = f->private_data;
-			}
-		}
-	}
-
-	if(socket == NULL)
-		return 0;
-
-	return inet_sk(socket->sk)->inet_num;
-	//return direction == 0 ? ntohs(inet_sk(socket->sk)->sport) : ntohs(inet_sk(socket->sk)->dport);
+	pr_info("insert port");
+	pr_info("port %hu",lpi->port);
+	pr_info("protocol %hu",lpi->protocol);
+	pr_info("address %d.%d.%d.%d",NIPQUAD(lpi->address));
 }
 
 void getInetSockParameters(struct inet_sock *inetsock,struct packetInfo *ret)
 {
 	ret->port = inetsock->inet_num;
+	ret->protocol = ((struct sock *)inetsock)->sk_protocol;
+
 #ifdef MY_DEBUG_INFO
-	{
+/*	if(ret->protocol!=0){
 		int src_addr = ntohl(inetsock->inet_saddr);
 		int dst_addr = ntohl(inetsock->inet_daddr);
-	pr_emerg( "rcv is 0x%x",ntohl(inetsock->inet_rcv_saddr));
+		int rcv = ntohl(inetsock->inet_rcv_saddr);
+	pr_emerg( "rcv is %d.%d.%d.%d",NIPQUAD(rcv));
 	pr_emerg( "sport %hu dport %hu daddr %d.%d.%d.%d laddr %d.%d.%d.%d",
 			ntohs(inetsock->inet_sport),ntohs(inetsock->inet_dport), NIPQUAD(dst_addr),NIPQUAD(src_addr));
 	}
+*/
 #endif
+
 	if(ret->port == ntohs(inetsock->inet_sport))
 	{
 		if(!inetsock->inet_rcv_saddr){
@@ -128,7 +63,7 @@ void getInetSockParameters(struct inet_sock *inetsock,struct packetInfo *ret)
 		ret->address = inetsock->inet_daddr;
 	}
 	ret->address = ntohl(ret->address);
-	ret->protocol = ((struct sock *)inetsock)->sk_protocol;
+	//ret->protocol = ((struct sock *)inetsock)->sk_protocol;
 
 }
 
@@ -136,53 +71,24 @@ void getInetSockParameters(struct inet_sock *inetsock,struct packetInfo *ret)
 void getLocalPacketInfoFromFd(unsigned int fd, struct packetInfo *ret, int *err)
 {
 	struct file *f = NULL;
-	struct socket *socket = NULL;
-
 	*err = 0;
 	f = fget(fd);
 
-#ifdef MY_DEBUG_INFO
-	pr_info( "fd is %d f is null ? %s ", fd ,f == NULL ? "yes": "no");
-#endif
+
 	if(f!=NULL)
 	{
-		struct dentry *dentry;
-		struct inode *d_inode;
 		fput(f);
-		dentry = f->f_dentry;
-		if(dentry !=NULL)
-		{
-			d_inode = dentry->d_inode;
-			if(S_ISSOCK(d_inode->i_mode))
-			{
-				socket = f->private_data;
-				getInetSockParameters((struct inet_sock *)(socket->sk),ret);
-#ifdef MY_DEBUG_INFO
-				pr_emerg("local port %hu addr %d.%d.%d.%d proto %hu",ret->port, NIPQUAD(ret->address), ret->protocol);
-#endif
-			}else
-			{
-				*err = -1;
-			}
-		}else
-		{
-			*err = -2;
-		}
-	}
-#ifdef MY_DEBUG_INFO
-	else
-	{
-		pr_info( "f is null");
+		getLocalPacketInfoFromFile(f,ret,err);
+	}else{
 		*err = -3;
 	}
-#endif
-
 }
 
 void getLocalPacketInfoFromFile(struct file *f, struct packetInfo *ret, int *err)
 {
 	struct socket *socket = NULL;
-
+	short type;
+	unsigned short family;
 	*err = 0;
 
 	if(f!=NULL)
@@ -196,10 +102,17 @@ void getLocalPacketInfoFromFile(struct file *f, struct packetInfo *ret, int *err
 			if(S_ISSOCK(d_inode->i_mode))
 			{
 				socket = f->private_data;
+				type = socket->type;
+				family = socket->sk->__sk_common.skc_family;
+				if(family != AF_INET)
+				{
+					*err = -4;
+					return;
+				}
 				getInetSockParameters((struct inet_sock *)(socket->sk),ret);
 
 #ifdef MY_DEBUG_INFO
-				pr_info( "lport %hu addr %d.%d.%d.%d proto %hu",ret->port, NIPQUAD(ret->address), ret->protocol);
+		//		pr_info( "family %hu type %hu lport %hu addr %d.%d.%d.%d proto %hu",family,type,ret->port, NIPQUAD(ret->address), ret->protocol);
 #endif
 			}else
 			{
@@ -228,7 +141,7 @@ struct local_addresses_list* listAllDevicesAddress(void)
 
 	for_each_netdev(net,dev){
 #ifdef MY_DEBUG_INFO
-		pr_info( "device %s",dev->name);
+		pr_info( "device %s\n",dev->name);
 #endif
 		if(dev->ip_ptr)
 		{
@@ -238,13 +151,17 @@ struct local_addresses_list* listAllDevicesAddress(void)
 			{
 #ifdef MY_DEBUG_INFO
 				int aux_addr = ntohl(addr->ifa_address);
-				pr_info( "ip address %d.%d.%d.%d", NIPQUAD(aux_addr));
+				pr_info( "ip address %d.%d.%d.%d\n", NIPQUAD(aux_addr));
 #endif
 				tmp = kmalloc(sizeof(*tmp),GFP_KERNEL);
 				tmp->address = ntohl(addr->ifa_address);
 				list_add(&(tmp->list),&(list->list));
 			}
 		}
+
+#ifdef MY_DEBUG_INFO
+		pr_info( "end of device %s\n",dev->name);
+#endif
 	}
 
 	return list;
@@ -258,7 +175,7 @@ int remove_local_addresses_list(struct local_addresses_list *list)
 	{
 		tmp = list_entry(pos,local_addresses_list, list);//(pos,struct local_addresses_list,list);
 #ifdef MY_DEBUG_INFO
-		pr_info( "removing address %d.%d.%d.%d",NIPQUAD(tmp->address));
+		pr_info( "removing address %d.%d.%d.%d\n",NIPQUAD(tmp->address));
 #endif
 		list_del(pos);
 		kfree(tmp);
@@ -266,4 +183,3 @@ int remove_local_addresses_list(struct local_addresses_list *list)
 
 	return 0;
 }
-

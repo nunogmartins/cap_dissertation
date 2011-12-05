@@ -1,18 +1,33 @@
 \abstract 
 % The title ``Abstract'' font palatino. The text of the abstract should not exceed one page in 1.5 spacing as a reference.
-Monitoring applications is a way to understand and analyze their behavior.
-Is possible to monitor only some of the resources used by the application, such as cpu and memory utilization, IO devices (for example network interfaces), etc.
+%Monitoring applications is a way to understand and analyze their behavior.
+%Is possible to monitor only some of the resources used by the application, such as cpu and memory utilization, IO devices (for example network interfaces), etc.
 
-For a tool to monitor an applications network interactions uses a library, LibPcap, this library is specific to network capture with kernel support.
+%For a tool to monitor an applications network interactions uses a library, LibPcap, this library is specific to network capture with kernel support.
 % For monitoring the applications interactions with the network is usual to link the program with a specific library, LibPcap. This library is specific to monitor the network. 
-To capture only the data that we want, most of the time is necessary to use filters, this way we can separate the data that is relevant from that is not.
+%To capture only the data that we want, most of the time is necessary to use filters, this way we can separate the data that is relevant from that is not.
 
-The LibPcap library provides a specific environment to make network monitoring, but for monitoring in a generic way the traffic of an application this one has serious performance issues. This issues are mainly because of the applications dynamic and to the communication structure between the applications and the external devices.
+%The LibPcap library provides a specific environment to make network monitoring, but for monitoring in a generic way the traffic of an application this one has serious performance issues. This issues are mainly because of the applications dynamic and to the communication structure between the applications and the external devices.
 
-This dissertation aims to give a new filtering system to LibPcap based on the pid (process id) or the applications name, to capture only the packets that were sent or received by the monitored application.
-To minimize the performance and overhead associated to the activity, some part of the development will be made available inside the Linux kernel. 
+%This dissertation aims to give a new filtering system to LibPcap based on the pid (process id) or the applications name, to capture only the packets that were sent or received by the monitored application.
+%To minimize the performance and overhead associated to the activity, some part of the development will be made available inside the Linux kernel. 
+
+The monitorization of the applications allow us to understand and analyse their behaviour, during real executions, their computation resources, namely the cpu, memory, IO devices (which includes the network devices), etc.
+
+Network monitoring tools, in general, use the PCap library, in order to capture the flows of network interfaces.
+Since this is a generic library, it allows to abstract the way the operating system deals with captured and filtering network packets flows.
+In Linux, this support is guaranteed by Linux Socket Filter.
+Overall, the traffic’s amount obtained by monitoring is high, being necessary to filter it, so that only relevant data streams can be transmitted to the monitor, at user level.
+Either in libpcap, or on systems’ support, there is no capture support based on processes interactions.
+This is a very useful feature for users, and very advantageous in the system overhead and perfomance.
+ 
+The presented solution aims to solve this problematic through \textit{Monitorização de Rede orientado ao Processo} (Network Monitoring oriented Process), extending the Linux network monitoring system, through the inclusion of a kernel module, allowing to capture the applications’ interactions and filtering network flows of the target application.
+This solution was functionally assessed, checking that only the desired data streams could be captured.
+Besides this evaluation, performance was also assessed, which depended on the number of captured packets, regarding the target process. 
+
+
 
 % Palavras-chave do resumo em Inglês
 \begin{keywords}
-Monitoring, network, application, LibPcap, packet capture, kernel instrumentation, filter, filtering
+Monitoring, network, application, libpcap, packet capture, kernel instrumentation, filter, filtering
 \end{keywords} 

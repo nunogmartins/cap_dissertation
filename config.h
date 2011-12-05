@@ -51,3 +51,16 @@
 
 #define MY_DEBUG_INFO
 //#undef DEBUG_INFO
+
+#define MACHINE
+
+#ifdef VM
+#define my_print_debug(fmt, ...)\
+	printk(KERN_EMERG pr_fmt(fmt), ##__VA_ARGS__)
+#endif
+#ifdef MACHINE
+#define my_print_debug(fmt, ...)\
+	 printk(KERN_INFO pr_fmt(fmt), ##__VA_ARGS__)
+#endif
+
+#define TIMMING

@@ -10,7 +10,6 @@
 #include <linux/init.h>
 #include <linux/kernel.h>
 #include <linux/slab.h>
-
 #include "pcap_monitoring.h"
 #include "table_port.h"
 #include "filter.h"
@@ -23,20 +22,10 @@
 char *application_name = "server";
 struct local_addresses_list *local_list = NULL;
 
-
-static void monitor_exit(void);
-static int  monitor_init(void);
-
-module_init(monitor_init);
-module_exit(monitor_exit);
-MODULE_LICENSE("GPL");
-
-
-
-#ifdef UNIT_TESTING
+//#ifdef UNIT_TESTING
 extern int populate(void);
 extern int depopulate(void);
-#endif
+//#endif
 
 static int loadSubSystems(void)
 {
@@ -53,9 +42,11 @@ static int loadSubSystems(void)
 	init_DB();
 #endif
 
+//    populate();
+
 #ifdef SYSCALLS_SUPPORT
 #ifdef MY_KPROBES
-	pr_info("Loaded %d probes", init_kretprobes_syscalls());
+	my_print_debug("Loaded %d probes", init_kretprobes_syscalls());
 #endif
 #endif
 	return 0;
@@ -71,6 +62,8 @@ static int unloadSubSystems(void)
 	exit_Filter();
 #endif
 
+//    depopulate();
+
 #ifdef DB_SUPPORT
 	exit_DB();
 #endif
@@ -84,7 +77,7 @@ static int unloadSubSystems(void)
 	return 0;
 }
 
-static int monitor_init(void)
+static int __init monitor_init(void)
 {
 	loadSubSystems();
 
@@ -97,7 +90,7 @@ static int monitor_init(void)
 	return 0;
 }
 
-static void monitor_exit(void)
+static void __exit monitor_exit(void)
 {
 	int ret = -1;
 
@@ -112,3 +105,6 @@ static void monitor_exit(void)
 		kfree(local_list);
 }
 
+module_init(monitor_init);
+module_exit(monitor_exit);
+MODULE_LICENSE("GPL");

@@ -18,6 +18,10 @@
 #ifdef MY_DEBUG
 #include "info_acquire.h"
 struct db_info_acquire db_info;
+
+
+
+
 #endif
 
 extern struct local_addresses_list *local_list;
@@ -257,6 +261,7 @@ int my_insert(struct rb_root *root, struct packetInfo *lpi)
 
 #ifdef MY_DEBUG
 	db_info.how_many_inserts++;
+	db_info.how_many_ports++;
 #endif
 
 	return 1;
@@ -359,11 +364,12 @@ void my_erase(struct rb_root *root, struct packetInfo *pi)
 			kfree(data);
 #ifdef MY_DEBUG
 			db_info.how_many_removes++;
+			db_info.how_many_ports--;
 #endif
 		}
 	}
 }
-
+/*
 static void iterateList(struct local_addresses_list *tmp)
 {
 	struct list_head *pos = NULL;
@@ -372,37 +378,42 @@ static void iterateList(struct local_addresses_list *tmp)
 	list_for_each(pos,&(tmp->list))
 	{
 		address = list_entry(pos,local_addresses_list,list);
-		pr_emerg("address %d.%d.%d.%d and counter %d",NIPQUAD(address->address), address->counter);
+		my_print_debug("address %d.%d.%d.%d and counter %d",NIPQUAD(address->address), address->counter);
 	}
 }
-
+*/
 void printAll(struct rb_root *root)
 {
 	struct rb_node *node;
-	struct portInfo *p = NULL;
-	int i = 0;
+	//struct portInfo *p = NULL;
+	unsigned long i = 0;
 
 
 	for(node = rb_first(root); node ; node = rb_next(node))
 	{
+		/*
 		p = rb_entry(node,portInfo, node);
-		pr_emerg( "port = %hu ", p->port);
+		my_print_debug( "port = %hu ", p->port);
 
 		if(p->tcp){
-			pr_emerg( "tcp addresses 0x%p and counter %d",p->tcp,p->tcp_list_counter);
+			my_print_debug( "tcp addresses 0x%p and counter %d",p->tcp,p->tcp_list_counter);
 			iterateList(p->tcp);
 		}
 
 		if(p->udp){
-			pr_emerg( "udp addresses 0x%p and counter %d",p->udp,p->udp_list_counter);
+			my_print_debug( "udp addresses 0x%p and counter %d",p->udp,p->udp_list_counter);
 			iterateList(p->udp);
 		}
+		*/
 		i++;
 	}
 
 	if(i == 0)
 	{
-		pr_emerg("Arvore vazia");
+		my_print_debug("Empty Tree");
+	}else
+	{
+		my_print_debug("The tree has %lu elements",i);
 	}
 }
 
@@ -461,4 +472,70 @@ struct db_info_acquire * dbInfoPointer(void)
 {
 	return &db_info;
 }
+#endif
+
+#ifdef MY_DEBUG
+
+static void *db_seq_start(struct seq_file *p, loff_t *pos)
+{
+	if(*pos > 0)
+		return NULL;
+	else
+		return &db_info;
+}
+
+static void *db_seq_next(struct seq_file *p, void *v, loff_t *pos)
+{
+	return NULL;
+}
+
+static void db_seq_stop(struct seq_file *p, void *v)
+{
+
+}
+
+static int db_seq_show(struct seq_file *m, void *v)
+{
+	struct db_info_acquire *info = NULL;
+	if(v != NULL)
+	{
+		info = v;
+		seq_printf(m,"how many ports %ld inserts %ld removes %ld\n",
+				info->how_many_ports, info->how_many_inserts,info->how_many_removes);
+	}
+
+	return 0;
+
+}
+
+static const struct seq_operations db_seq_ops = {
+        .start  = db_seq_start,
+        .next   = db_seq_next,
+        .stop   = db_seq_stop,
+        .show   = db_seq_show,
+};
+
+static int db_open(struct inode *inode, struct file *file)
+{
+	return seq_open(file,&db_seq_ops);
+}
+
+static const struct file_operations db_fops = {
+        .open           = db_open,
+        .read           = seq_read,
+        .llseek         = seq_lseek,
+        .release 		= seq_release,
+        .owner          = THIS_MODULE,
+ };
+
+#include <linux/debugfs.h>
+#include "debugfs_support.h"
+int init_db_debug(void)
+{
+	struct dentry *parent = NULL;
+	parent = createDBStatDir();
+	debugfs_create_file("stats",S_IRUSR,parent,NULL,&db_fops);
+	return 0;
+}
+
 #endif

@@ -1,16 +1,31 @@
 \resumo 
 
-A monitorização de aplicações é uma forma de compreender e analisar o comportamento destas. 
-É possível monitorizar apenas parte dos recursos computacionais das aplicações tais como: utilização do cpu, da memória, dos dispositivos de \textit{IO} (em que nestes se enquadra a utilização dos dispositivos de rede), etc. 
+A monitorização de aplicações permite analisar e compreender o seu comportamento, sendo possível monitorizar durante execuções reais os seus recursos computacionais, nomeadamente a utilização do \textit{cpu}, da memória, dos dispositivos de \textit{IO} (incluindo os dispositivos de rede), etc. 
 
-De forma a monitorizar a utilização de rede de uma aplicação é habitual utilizar-se a biblioteca \textit{libPcap} especializada na monitorização de rede. Para capturar apenas os dados desejados em geral é necessário criar filtros de forma a separar os dados relevantes para a análise, daqueles que não o são. 
-
-A biblioteca \textit{libPcap} proporciona um ambiente especifico para fazer esta monitorização, mas a forma de capturar genericamente o tráfego realizado por uma aplicação tem grandes problemas a nível de performance. Estes problemas são devido à dinâmica que as aplicações apresentam e à estrutura de comunicação entre as aplicações e os dispositivos de \textit{IO}.
-
-Esta dissertação propõe-se a criar um sistema de filtragem para a biblioteca \textit{libpcap} com base no \textit{pid} (\textit{Process id}) ou no nome da aplicação, de forma a obter apenas os pacotes da aplicação especificada. Com vista a mitigar os problemas anteriormente indicados, parte do desenvolvimento irá ser efectuado dentro do núcleo de sistema de operação.
+As ferramentas de monitorização de rede, em geral, utilizam a biblioteca \textit{PCap}, de modo a capturar os fluxos das interfaces de rede.
+Como esta biblioteca é genérica, permite abstrair o modo como o sistema de operação lida com a captura dos fluxos, sendo que no \textit{Linux}, o suporte é garantido pelo sistema de captura e filtragem de pacotes de rede \textit{Linux Socket Filter}.
 
 
+De um modo geral, o volume de tráfego obtido pela monitorização é elevado, sendo necessário filtrá-lo, de forma a que apenas os fluxos de dados relevantes sejam transmitidos para o monitor, em nível utilizador.
+Quer na biblioteca \textit{PCap} quer no suporte dos sistemas não existe suporte para a captura baseada nas interacções dos processos.
+%Caso tivesse, muitos dos actuais filtros poderiam ser simplificados e o volume de dados transferidos para o monitor seria mais reduzido e relevante, melhorando o desempenho da monitorização.
+%Existem ferramentas que monitorizam as interacções das aplicações com a rede, sendo demasiado específicas e de fraco desempenho.
+Esta funcionalidade é bastante útil para os utilizadores e com vantagens na sobrecarga do sistema e desempenho.
 
+A solução proposta pretende resolver esta problemática, através da Monitorização de Rede Orientada ao Processo (\textit{MRoP}), estendendo o sistema de monitorização de rede do \textit{Linux}, por meio da introdução de um módulo no núcleo, permitindo capturar as interacções das aplicações e filtrando os fluxos de rede da aplicação alvo.
+Esta solução foi avaliada funcionalmente, verificando-se que apenas os fluxos de dados pretendidos existiam na captura.
+Para além desta avaliação, foi igualmente realizada uma outra de desempenho, que dependeu do conjunto de pacotes capturados, relativos ao processo alvo.
+
+
+
+
+%No caso em que se pretendia um subconjunto dos pacotes, os pertencentes ao processo alvo, o desempenho da captura foi melhorado substancialmente, resultado já expectável.
+
+%De forma a monitorizar a utilização de rede de uma aplicação é habitual utilizar-se a biblioteca \textit{LibPCap} especializada na monitorização de rede. Para capturar apenas os dados desejados em geral é necessário criar filtros de forma a separar os dados relevantes para a análise, daqueles que não o são. 
+
+%A biblioteca \textit{LibPCap} proporciona um ambiente especifico para fazer esta monitorização, mas a forma de capturar genericamente o tráfego realizado por uma aplicação tem grandes problemas a nível de performance. Estes problemas são devido à dinâmica que as aplicações apresentam e à estrutura de comunicação entre as aplicações e os dispositivos de \textit{IO}.
+
+%Esta dissertação propõe-se a criar um sistema de filtragem para a biblioteca \textit{libpcap} com base no \textit{pid} (\textit{Process id}) ou no nome da aplicação, de forma a obter apenas os pacotes da aplicação especificada. Com vista a mitigar os problemas anteriormente indicados, parte do desenvolvimento irá ser efectuado dentro do núcleo de sistema de operação.
 
 % O texto do Resumo deverá ser escrito em fonte Palatino e não deve exceder uma página, usando um espaçamento e meio.  Note-se que a natureza do resumo depende do tipo de documento a produzir. 
 % 
@@ -22,6 +37,6 @@ Esta dissertação propõe-se a criar um sistema de filtragem para a biblioteca 
 
 % Palavras-chave do resumo em Português
 \begin{keywords}
-Monitorização, rede, aplicação, libpcap, captura de pacotes, instrumentação do núcleo de sistema, filtro
+Monitorização, rede, aplicação, biblioteca PCap, captura de pacotes, instrumentação do núcleo de sistema, filtro
 \end{keywords}
 % to add an extra black line

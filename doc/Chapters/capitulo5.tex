@@ -1,0 +1,414 @@
+\chapter{Implementação do sistema proposto}
+\label{cap:Implementacao}
+
+% falta falar sobre filesystem vfs e como chegar ao socket file private\_data para alem da parte de interrupts, tasklets e bottomhalfs bem como sobre os contextos de execucao
+%Falta falar sobre os motivos e a estrutura desejada para esta implementação
+
+
+
+O principal objectivo desta dissertação consiste no desenvolvimento de um módulo do núcleo que consiga estender as funcionalidades do \textit{LSF}, de forma a introduzir a funcionalidade de monitorização do tráfego realizado por um processo, tirando partido da instrumentação de código do núcleo.
+O facto desta instrumentação ser efectuada no núcleo permite que qualquer aplicação possa ser monitorizada, sem que o seu código tenha de ser alterado.
+%Como se pode compreender, esta instrumentação é não intrusiva para as aplicações, havendo, deste modo a necessidade de criar uma método de verificação que identifique o processo que irá cada função instrumentada.
+Esta extensão ao \textit{LSF} também pode ser utilizada por qualquer ferramenta de monitorização baseada no \textit{LSF}.
+As modificações ao código original do núcleo do sistema, necessárias à extensão das funcionalidades do \textit{LSF} no núcleo estão confinadas ao ficheiro \textit{filter.c}, presente no directório \textit{net/core} do código do \textit{Linux}.
+
+\section{MRoP e a sua implementação}
+\label{sec:mrop_implementation}
+
+A implementação do \textit{MRoP} teve em consideração o desenvolvimento de um código que implicasse o mínimo de alterações ao código do núcleo e, simultaneamente, tirasse partido de \textit{APIs} internas.
+Por outro lado, é transparente à implementação da biblioteca \textit{PCap}, podendo ser integrado na mesma.
+A implementação está contida num módulo do núcleo, de modo a ser carregada e libertada do mesmo, pelo administrador.
+A modularização das diversas componentes, permite um desenvolvimento autónomo de cada subcomponente.
+
+No capítulo \ref{cap:trabrelacionado} apresentaram-se, a título exemplificativo (secção \ref{sect:instrumentacao_casos_linux}), alguns sistemas que permitem efectuar monitorização ou filtragem de pacotes, com a indicação de um processo.
+O \textit{MRoP}, embora utilize o sistema de instrumentação do núcleo \textit{KProbes}, apenas o aplica para instrumentar as interacções com o sistema de rede, diferenciando-se das soluções apresentadas na secção \ref{sect:outras_abordagens}, o que lhe permite encontrar-se totalmente implementado no núcleo, com reduzida utilização de memória e perturbação do sistema.
+
+Assim quando uma aplicação efectua uma chamada ao sistema (\textit{connect}, \textit{accept}, \textit{bind}, \textit{sendto}, \textit{recvfrom}), o \textit{handler} da função instrumentada é executado.
+Na execução deste \textit{handler}, é obtido o identicador do processo que efectuou a chamada ao sistema e comparado com os identificadores, \textit{pid}, \textit{ppid} e \textit{tgid} internos ao \textit{MRoP}, caso um destes seja igual, é obtido o canal (através dos parâmetros passados à chamada ao sistema) e adquiridos os dados sobre o \textit{socket} (porto, endereço e protocolo), para serem adicionados ao repositório.
+Deste modo quando executar o novo sistema de filtragem irá verificar se os metadados do pacote (endereço, porto, protocolo), recebido ou enviado, existem no repositório \textit{Estado do processo} e, caso existam, indica à função de filtragem do \textit{LSF} para avaliar os filtros normais e, eventualmente capturar o pacote, sendo posteriormente passado para o monitor em nível utilizador.
+
+No carregamento do módulo dinâmico \textit{MRoP} no núcleo são invocadas as rotinas de inicialização dos componentes (ver figura \ref{fig:general_architecture}), de modo a registá-los nos respectivos subsistemas, bem como inicializar o repositório \textit{Estado do processo} e efectuar a ligação ao \textit{hook}.
+
+Aquando da remoção do módulo \textit{MRoP} no núcleo, são invocadas rotinas de modo a repor os subsistemas no estado em que estavam antes da inclusão do \textit{MRoP} no núcleo.
+%Por cada pacote ter de atravessar toda a arquitectura de rede incluida no \textit{vfs} seria demasiado pesado para o sistema.
+
+%------- apresentar as diversas seccoes ao leitor ----------------
+
+Nas subsecções seguintes, irão apresentar-se os quatro componentes do \textit{MRoP} conforme figura \ref{fig:general_architecture}.
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[scale=0.6]{arquitectura.pdf}
+\caption{Arquitectura geral do MRoP}
+\label{fig:general_architecture}
+\end{figure}
+
+
+
+\section{Instrumentação de funções do núcleo}
+
+%----------------------------------------------------------------------------------------------------------
+
+%Como foi anteriormente descrito em \ref{subsection:network} sobre as chamadas aos sistema para utilizar as funcionalidades de rede
+
+%Foi necessário conhecer a \textit{ABI}\ref{ABI}\cite{ABI} referente às arquitecturas suportadas, \textit{x86} e \textit{x86\_64}, para a passagem de parâmetros das chamadas aos sistema.
+
+%O sistema de \textit{KProbes} permite consultar os registos do processador onde foi efectuada a chamada à função (neste caso a chamada ao sistema).
+% Por isso foram definidos 6 \textit{KRetProbes} referentes às chamadas \textit{connect}, \textit{bind}, \textit{accept}, \textit{sendto}, \textit{recvfrom} e
+%\textit{close}.
+% Para esta última \textit{close} devido à elevada utilização desta chamada ao sistema por diferentes aplicações no sistema, foi utilizada a função \textit{qqq coisa ...  ????}
+
+%Para efectuar a monitorização das interacções de rede de um processo foi necessário recorrer à instrumentação de funções do núcleo.
+
+%Através da instrumentação de funções do núcleo foi possível manter o contexto da execução do processo.
+
+%Como apresentado e concluído na secção \ref{}, o sistema de monitorização que melhor se adequa ao problema exposto é o \textit{KProbes}.
+% Deste sistema utilizou-se o \textit{KRetProbe}, de forma a instrumentar a entrada e retorno de funções.
+% Obter os parâmetros de entrada das funções, principalmente o \textit{file descriptor}, tornou-se essencial.
+% Para garantir que o repositório do estado do processo está coerente com o estado do núcleo, foi necessário obter o valor de retorno das funções.
+% Por estas razões e porque as chamadas ao sistema têm ciclos de modificação da bastante lentos, o que evidência elevada estabilidade e consistência do núcleo, e por ser ponto de entrada do processo no núcleo foram as funções instrumentadas.
+
+%As subsecções \ref{} .... \ref{} apresentam as funções do núcleo que foram instrumentadas.
+
+%
+% faltam as subsecoes ... 
+%
+
+%----------------------------------------------------------------------------------------------------------
+
+A metodologia aplicada à resolução do problema de desempenho, baseia-se no desenvolvimento de uma componente para efectuar uma análise aos canais de comunicação de rede, utilizados por um processo, que insira a informação necessária no repositório.
+Assim, logo que um pacote chega ao sistema de monitorização, o \textit{LSF} tira partido do repositório para decidir a captura do pacote.
+
+
+De entre os sistemas analisados, o \textit{KProbes} foi aquele que permitiu obter menor sobrecarga, apesar do seu carácter dinâmico.
+Os restantes sistemas contêm componentes de registo que, para a realização deste mecanismo, apresentam uma sobrecarga desnecessária, afectando negativamente o desempenho.
+
+Para além do sistema de instrumentação utilizado, foi igualmente considerado o número de funções a instrumentar.
+A sobrecarga total exercida pela instrumentação de funções do núcleo, tem em consideração não só o número de funções que são instrumentadas, como também o número de vezes que estas são executadas.
+
+O conhecimento adquirido com a análise efectuada, referida no capítulo \ref{cap:Estrutura}, sobre a \textit{Arquitectura de rede em Linux}, permitu identificar as funções a instrumentar.
+
+O \textit{MRoP}, foi desenvolvido para monitorizar a utilização de canais da familia \textit{INET}, tendo como particularidade, a utilização de canais baseados nos protocolos \textit{TCP} e \textit{UDP}, e instrumentar um número reduzido de funções do núcleo, pertencentes ao subsistema de rede.
+
+O \textit{TCP} e o \textit{UDP} apresentam algumas funções em comum com protocolos de outras famílias, principalmente ao nível das chamadas ao sistema, onde o nível de abstracção sobre estes protocolos é elevado.
+No entanto, com o objectivo de diminuir o número de funções a instrumentar, optou-se mesmo assim por instrumentar as chamadas ao sistema, independentemente destas nem sempre pertencerem à família \textit{INET}.
+
+As chamadas ao sistema instrumentadas correspondem a: \textit{sendto}, \textit{recvfrom}, \textit{connect}, \textit{bind}, \textit{accept} e \textit{close}.
+As análises inicialmente efectuadas demonstraram que apenas a chamada ao sistema \textit{close}, era demasiadas vezes executada, penalizando o desempenho global do sistema.
+Esta situação radica no facto da chamada ao sistema \textit{close}, ser utilizada extensivamente para fechar canais, independentemente destes serem ficheiros, \textit{sockets}, \textit{pipes}, etc.
+Para contornar esta dificuldade, foi necessário encontrar uma função que lidasse exclusivamente com o fecho de \textit{sockets}, de modo a reduzir a sobrecarga imposta pela instrumentação.
+
+
+% Falta explicar o pq do recvfrom e do sendto entre outros ...
+
+\subsection{Filtro de processos}
+
+%------------------------------------------------------------------------------------------------
+
+%A filtragem dos processos que efectuam as chamadas ao sistema de rede impôs um novo desafio.
+% Se apenas filtrar as chamadas de um processo/pid seria apenas verificar se o pid é igual ao que se pretende é trivial e com baixa sobrecarga.
+% Para um utilizador que queria analisar um processo, e não saiba qual dos fluxos do processo é responsável pela comunicação de rede, tornou-se complicado.
+
+%Com esta abordagem ainda existe a possibilidade de não se obter todas as \textit{task} do processo, caso este tenha um àrvore com mais de 3 níveis, mas a sobrecarga sobre o sistema é inferior à situação de monitorização da criação de processos no sistema.
+% Estes três identificadores foram escolhidos pois permitem identificar até 3 níveis da árvore de um processo.
+
+%Seria bom colocar uma imagem de uma àrvore de processo .... 
+
+%Os identificadores têm de ser escritos para os ficheiros respectivos no \textit{DebugFs}, que serão explicados na secção \ref{}.
+
+%-----------------------------------------------------------------------------------------------------
+
+O \textit{KProbes}, é um sistema de instrumentação do núcleo que não distingue entre que funções, não \textit{inline}, está a efectuar a instrumentação.
+Não existindo suporte no \textit{KProbes} para filtrar o processo, que efectuou a chamada ao sistema, foi necessário desenvolver um modo que permitisse reduzir a sobrecarga, quando a chamada é de um processo, que não o desejado.
+
+%-------------------------
+
+%Os objectivos referidos principais continuam a ser reduzida sobrecarga e actualização permanente do(s) processo(s) a monitorizar.
+%Tendo estas caracteristicas como base algumas possibilidades foram tidas em consideração, onde o principal desafio foi conseguir manter a informação actualizada.
+
+%--------------------------------------
+
+No intuito de ultrapassar esta dificuldade, poder-se-ia ter recorrido à criação de um repositório com a informação sobre os identificadores dos processos a monitorizar, sendo necessário, uma vez mais, uma estrutura de suporte a este repositório, bem como funcionalidades de adição, remoção, actualização e consulta.
+Este repositório teria de conter a estrutura genealógica do processo a monitorizar, assim como uma componente que actualizasse essa informação.
+A actualização desta estrutura poderia ser efectuada através da instrumentação da chamada ao sistema \textit{fork} ou \textit{clone}.
+Sempre que fossem invocadas as funções já referidas, seria efectuada uma consulta ao repositório e, a partir da informação obtida, este seria ou não, actualizado.
+Esta possibilidade, ao contemplar a remoção de dados do repositório, necessitaria também de instrumentar a função de término de processos.
+Considerando que a actualização dinâmica deste repositório, sem aplicar alterações no código do núcleo, afectaria negativamente o desempenho do sistema na sua totalidade, optou-se por excluir esta alternativa.
+Face a esta situação, decidiu-se efectuar uma análise aos campos da estrutura (\textit{task\_struct}), o que permitiu compreender o modo como os identificadores dos processos se relacionam com os identificadores dos membros da árvore genealógica do processo.
+Desta análise concluiu-se que, os identificadores \textit{pid}, \textit{tid} e \textit{ppid} permitem, na generalidade das aplicações, identificar toda a árvore genealógica.
+
+
+
+
+
+\section{Estado dos \textit{sockets} do processo}
+
+De modo a manter a informação relativa aos endereços e portos em utilização por uma aplicação, sem requerer a consulta sobre os canais de rede, foi necessário criar um repositório de dados, que contivesse informações relevantes para as decisões do filtro de captura.
+Neste repositório, existe a necessidade de ter funções de inserção, remoção e consulta, sendo que qualquer uma destas, deverá ser efectuada com celeridade.
+
+Apesar dos processos monitorizados apresentarem elevado dinamismo nas interacções das comunicações, o maior número de operações sobre o repositório situa-se ao nível da consulta.
+As restantes operações (inserção e remoção) repartem entre si igual número.
+Assim, é esperado que para cada inserção exista uma remoção.
+No final da monitorização de um processo, a componente \textit{Estado dos Sockets} deverá apresentar um número de elementos idêntico ao que antecedeu a monitorização.
+
+A estrutura de dados necessária para suportar o \textit{Estado dos sockets do processo}, será uma estrutura que terá, no máximo, uma complexidade temporal de \textit{O(log n)} sobre as pesquisas, dado que estas serão muito superiores às inserções e remoções.
+
+Assim, as estruturas de dados com suporte no núcleo, que permitem a criação de um repositório de dados, como o requerido, são:
+
+%\subsection{Com suporte no núcleo}
+%outro titulo alternativas disponíveis
+
+\begin{description}
+
+\item[BitMap - ]
+%\subsubsection{Bitmap}
+
+O núcleo do sistema possui suporte para o tratamento de mapas de \textit{bits}, permitindo representar cada porto usado pela aplicação por um \textit{bit}.
+O recurso a um mapa de \textit{bits} permite, de um modo bastante rápido e com uma reduzida utilização de memória, determinar se um porto está em utilização.
+Embora este processo seja extremamente rápido, carece de modularidade, na medida em que apenas controla os portos, não dispondo de suporte para protocolos ou múltiplos endereços de rede.
+
+ 
+%----------------------------------------------------------------------------------------------------------
+
+%Uma solução seria agrupar os diferentes mapas de bits sob a terminologia de um endereço, mas e se fosse udp ou tcp ?
+%E quando um processo efectua um bind sob todas as interfaces do sistema ? 
+%E quando é utilizada mais uma interface virtual sob uma real ? .....
+
+%----------------------------------------------------------------------------------------------------------
+
+\item[Listas - ]
+
+No núcleo existe uma implementação bastante eficiente da estrutura de dados \emph{lista} (\emph{list}), contendo apenas dois apontadores, destinando-se um ao elemento que o precede e outro ao que se lhe segue.
+
+Embora não seja necessário definir uma lista com o número máximo de portos, dado que estes podem ser adicionados dinamicamente, a complexidade temporal de pesquisa, no pior caso, é de \textit{O(n)} (traduzindo-se num mau indicador de desempenho para o estudo pretendido nesta dissertação).
+No entanto, quando o número de elementos não é elevado, a utilização de uma lista apresenta-se como uma possível solução.
+
+%\subsubsection{Listas duplamente ligadas}
+%\subsubsection{Árvores}
+
+%\item[Árvores Binária - ]
+%\todo{ver}
+%Apesar de não ser necessário percorrer os elementos ou obter os indíces de forma ordenada. 
+
+%\paragraph{Arvores Balanceadas}
+\item[Árvore Balanceada - ] \textit{Red-black Tree} 
+
+No núcleo existe uma implementação parcial de uma árvore \textit{Red-black} genérica, a fim de permitir o acesso aos dados através de chaves, ou seja, trata-se de uma estrutura associativa.
+A árvore \textit{Red-black} é semi-balanceada, isto é, a diferença de alturas entre o ramo mais profundo e o mais curto é de apenas de 1 nível.
+Esta propriedade é mantida através do rebalanceamento da árvore em inserções e remoções, o que provoca um custo na sua utilização.
+Contudo, no caso esperado, existe maior número de consultas do que inserções e remoções, fazendo com que o custo associado ao rebalanciamento da árvore seja amortizado.
+De modo a tirar partido da utilização desta estrutura de dados, é necessário definir três funções da manipulação da árvore (inserção, remoção e consulta).
+O suporte disponibilizado pelo núcleo, apenas permite manusear a árvore, sendo necessário definir as funções que utilizam a chave de acesso para aceder ao conteúdo dos dados, que devido à sua especificidade, não podem ser oferecidas.
+
+De referir igualmente que, para o objecto deste estudo, o número do porto dos protocolos (\textit{TCP} e \textit{UDP}), é considerado a chave mais adequada.
+Tendo em conta o número máximo de portos possíveis nos protocolos (\textit{TCP} e \textit{UDP}), a árvore poderá conter 65535 elementos, com uma altura máxima de 16, ou seja, para pesquisar um dos elementos nos extremos (máximo ou mínimo) é necessário efectuar sobre ela, 16 iterações.
+Embora não constitua um requisito, é possível obter de forma ordenada todas as chaves, bem como os valores que lhe estão associados.
+
+%-----------------------------------------------------------------------------------------------------------
+
+%Complexidade de inserção, pesquisa e remoção é O(log n), sendo n o número de elementos da árvore.
+
+%Pode existir uma penalização no desempenho, devido à necessidade de balancear a àrvore.
+%Os ganhos provenientes deste balanceamento, face às àrvores não balanceadas, permite manter a complexidade média de acesso aos dados em O(log(n)), ao invés de um possível decremento até O(n), ou seja a árvore degenerar numa lista.
+
+%-----------------------------------------------------------------------------------------------------------
+
+%\item[Radix Tree - ]
+%talvez falar sobre esta arvore ....
+
+%\subsubsection{Tabela de dispersão}
+\item[Tabela de Dispersão - ]
+No núcleo existe uma implementação de tabelas de dispersão, que efectuam a dispersão e o controlo sobre as suas chaves.
+O controlo sobre as chaves e a forma de dispersão é efectuada pela implementação, ou seja, não existe controlo do programador sobre as chaves nem sobre a forma de dispersa-las.
+
+No núcleo existem subsistemas que implementaram outras tabelas de dispersão, com base em \textit{arrays} e listas, permitindo deste modo utilizar as vantagens desta estrutura de dados.
+Estas implementações tiram partido do conhecimento do dominio do problema que resolvem, pelo que, os \textit{arrays} são criados com dimensões fixas, dado que não necessitam efectuar redispersão dos elementos nela contidos.
+
+Como existe a necessidade de uma estrutura que se adapte ao comportamento dinâmico das interacções das aplicações com as interfaces de rede, é necessário um estudo aprofundado sobre estatísticas do número de portos utilizados pelas aplicações e, caso este estudo seja realizado é necessário continuar a efectuar uma redispersão dos elementos, a não ser que, seja utilizado um \textit{array} com 65535 posições, valor este que representa o valor máximo de portos possíveis através dos protocolos \textit{TCP} e \textit{UDP}, desaproveitando assim memória do sistema.
+
+
+\end{description}
+\paragraph*{}
+
+Após terem sido verificadas as estruturas de dados com suporte no núcleo, foi necessário optar por aquela que melhor satisfizesse a necessidade do \textit{MRoP}.
+O \textit{BitMap} apesar de ser uma estrutura de dados em que os acessos são bastante rápidos e com uma reduzida utilização de memória, carece de modularidade para a utilização com múltiplos endereços e protocolos.
+Apesar de na pior situação, estarem em utilização apenas 1024 portos, seria necessário manter em memória a totalidade dos portos.
+Relativamente à estrutura \textit{lista}, a análise dos portos no pior caso, aquele em que o pacote em análise não pertence ao processo alvo, é bastante prejudicial, pois é necessário confirmar a sua inexistência, o que obriga a percorrer todos os elementos da lista.
+Esta situação pode ser minimizada se a lista tiver os elementos ordenados pelo número do porto, o que obriga a inserções ordenadas.
+A \textit{tabela de dispersão} apresentar-se-ia como a melhor escolha, se existisse o controlo das chaves por parte do programador.
+Verificando-se essa impossibilidade e, como a opção de implementação de uma tabela de dispersão, obrigaria a uma verificação da correcção e desempenho, esta opção foi rejeitada.  
+Deste modo a árvore balanceada \textit{Red-black}, mostra-se a melhor opção entre as disponíveis no núcleo pois, a procura no pior caso apresenta não só um custo inferior ao da \textit{lista} como também uma reduzida utilização de memória, dispondo ainda da possibilidade de extensão dos seus elementos.
+
+%\todo{nao esta no sitio} Apesar dos processos monitorizados apresentarem elevado dinamismo nas interacções das comunicações, o maior número de operações sobre o repositório concentra-se ao nível da consulta.
+%As restantes operações (inserção e remoção) repartem entre si igual número.
+%Assim, é esperado que para cada inserção exista uma remoção.
+%No final da monitorização de um processo, a componente \textit{Estado dos Sockets} deverá apresentar um número de elementos idêntico ao que antecedeu a monitorização.
+
+Assim, o ciclo de desenvolvimento do \textit{MRoP} foi efectuado mais rapidamente, tendo em consideração a confiança que merece a validação da estrutura de dados \textit{Red-black tree}, em utilização no núcleo do sistema \textit{Linux} e sujeita a uma análise extensiva ao longo dos anos.
+ 
+\subsection{Estrutura utilizada}
+\label{sub:repo_structure}
+
+Os elementos do repositório criado, através de uma árvore \textit{Red and Black}, têm uma estrutura bem definida, contendo obrigatoriamente um \textit{rb\_node}, para possibilitar a manipulação da árvore e um outro elemento, de carácter comparativo, utilizado como chave.
+Além dos referidos, esta estrutura contempla outros elementos que seguidamente se descrevem:
+
+\begin{figure}[ht]
+\begin{minipage}[b]{0.5\linewidth}
+\centering
+\includegraphics[scale=0.8]{portInfo_structure.pdf}
+\caption{Elemento da árvore}
+\label{fig:portInfo}
+\end{minipage}
+\hspace{0.5cm}
+\begin{minipage}[b]{0.5\linewidth}
+\centering
+\includegraphics[scale=0.8]{local_address_list}
+\caption{Lista de endereços}
+\label{fig:local_address_list}
+\end{minipage}
+\end{figure}
+
+A figura \ref{fig:portInfo} apresenta a disposição dos elementos da estrutura \textit{PortInfo}, sendo que as listas de endereços \textit{IP} das interfaces de rede, são adicionadas através da estrutura apresentada na figura \ref{fig:local_address_list}.
+Os elementos do repositório, correspondem a instâncias da estrutura \textit{PortInfo}, os quais são adicionados através dos \textit{handlers} das funções instrumentadas, conforme o esquema exemplificado na figura \ref{fig:repo_example}.
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[scale=0.7]{repositorio_exemplo.pdf}
+\caption{exemplo do repositório \textit{Estado do Processo}, com 4 \textit{sockets}}
+\label{fig:repo_example}
+\end{figure}
+
+
+\subsection{\textit{API} de comunicação interna do MRoP}
+\label{sub:repo_api}
+
+Com o objectivo de efectuar inserções, consultas e remoções dos dados do repositório, foi desenvolvida uma \textit{API} interna ao \textit{MRoP}, que permite validar os parâmetros passados às funções do repositório de dados.
+Através desta \textit{API} foi possível realizar a separação das componentes do \textit{MRoP} beneficiando, deste modo, a modularidade do código.
+Esta \textit{API} permite aos \textit{handlers} das funções instrumentadas, efectuar as operações de inserção e remoção sobre a componente \textit{Estado dos Sockets}.
+Relativamente à operação de consulta, esta é particularmente importante, na medida em que é usada na filtragem de pacotes das interfaces de rede.
+
+A \textit{API}, não obstante reduzir o desempenho, devido à necessidade de chamar os métodos específicos ao repositório, permite a substituição deste, sem que se verifique alterações do código.
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[scale=0.7]{API_connect_drawing.pdf}
+\caption{API interna do MRoP}
+\label{fig:api_connect}
+\end{figure}
+
+\todo{falar sobre imagem}
+
+
+%\subsubsection{Identificadores}
+
+%No núcleo do \textit{Linux} quando um processo é criado os identificadores, \textit{pid} e \textit{tgid} são iguais.
+
+\section{Filtro de pacotes, extensão ao \textit{LSF}}
+
+No sistema de monitorização de rede, um dos componentes corresponde a uma função que serve de máquina virtual às instruções do \textit{LSF}.
+Esta função itera sobre o filtro, executando instrução a instrução, sobre o pacote (recebido ou enviado), até ao momento em que identifica uma das instrução de retorno (\textit{BPF\_RET} ou \textit{BPF\_RET\_A}).
+Consoante o valor retornado nestas instruções, o pacote analisado é, ou não, capturado.
+Caso seja capturado, é efectuado um \textit{clone} do pacote e colocado num \textit{ring buffer}, partilhado com a aplicação monitora de rede em nível utilizador.
+Caso o valor retornado não corresponda a uma captura, a computação sobre esse pacote termina, reduzindo a sobrecarga da monitorização.
+Assim, o facto de se tirar partido da utilização de um filtro, que identifique de forma célere a rejeição de um pacote, diminui consideravelmente a sobrecarga imposta ao sistema por parte da monitorização.
+
+Face aos benefícios obtidos com a utilização do filtro, considera-se que o sistema de instrumentação do núcleo (\textit{KProbes}), poderia ser utilizado para invocar o novo sistema de filtragem criado e modificar o valor de retorno, caso fosse necessário.
+Todavia, face ao número de vezes que a função de filtragem é invocada (uma para cada pacote, recebido ou enviado), a sobrecarga da utilização do \textit{KProbes} é de todo desaconselhável.
+
+Foi necessário modificar o código do \textit{Linux} de modo a inserir um \textit{hook}, ou seja, um apontador para uma função.
+Esta função será invocada quando o filtro estático for avaliado para captura, permitindo que a função de filtragem do \textit{MRoP} analise o pacote com base no estado do processo, possibilitando efectuar uma conjunção entre o filtro estático definido pelo utilizador do \textit{LSF/PCAP} e a filtragem dinâmica efectuada pelo \textit{MRoP}, como pode ser observado na figura \ref{fig:run_filter}.
+
+\begin{figure}[!ht]
+\centering
+\includegraphics[scale=0.6]{run_filter.pdf}
+\caption{Execução da nova filtragem de pacotes pelo LSF}
+\label{fig:run_filter}
+\end{figure}
+
+Além da definição de um \textit{hook} para activação e desactivação deste novo sistema, foi efectuada uma alteração ao código do \textit{Linux} na função \textit{sk\_run\_filter}, que se traduziu no retorno da decisão conjunta do filtro estático com o dinâmico, ambas realizadas no ficheiro \textit{filter.c}.
+Esta alteração permitiu adicionar uma nova funcionalidade, com uma sobrecarga mínima no sistema de monitorização, independentemente da mesma estar ou não activa.
+
+%Para se poder definir uma nova instrução no \textit{Instruction Set}, é necessário alterar o ficheiro \textit{grammar.y}, na entrada correspondente à posição que deverá ocupar na \textit{AST (Abstract Sintax Tree)}, e modificar as funções de criação do novo filtro, quer em modo utilizador quer dentro do núcleo de sistema.
+%Este desenvolvimento tem de ser realizado par-a-par, pois a ser efectuado apenas de um lado, o outro tornar-se-á incompatível.
+
+
+\section{Informação de análise e controlo}
+
+O \textit{MRoP} foi desenhado e implementado de modo a ser relativamente autónomo, apenas necessitando da configuração de alguns parâmetros, essenciais ao seu funcionamento.
+
+Com o propósito de obter informações, sobre o estado da computação dos diversos componentes da ferramenta e de invocar a monitorização, procedeu-se à criação de alguns ficheiros no \textit{DebugFs}.
+Assim, no que se refere à componente \textit{Informação de análise e controlo}, esta fica responsável pelos diversos aspectos da instrumentação e do repositório.
+
+\subsection{Informação de controlo}
+
+Os ficheiros de controlo criados foram: \textit{pid}, \textit{ppid}, \textit{tgid} e \textit{option}.
+Estes ficheiros, à excepção do último, podem ser lidos e escritos pelo administrador.
+Porem se já tiverem sofrido uma escrita, contêm o identificador referente ao processo ou processos a monitorizar.
+Caso não tenham sido sujeitos a qualquer alteração, os ficheiro conterão os valores por omissão, neste caso zero (0).
+O ficheiro \textit{option}, tem apenas a permissão de escrita e, dependendo do valor escrito, pode activar a procura de portos no processo indicado em \textit{pid}, apagar todos os dados do repositório e activar, ou desactivar, o filtro dinâmico.
+
+\subsection{Informação de análise}
+A informação de análise apenas é adicionada, se o seu suporte for activado na compilação.
+Caso esteja activa é possivel obter estatísticas sobre os diferentes componentes internos ao \textit{MRoP}.
+
+Os ficheiros de análise apenas estão disponíveis para leitura, devolvendo os valores presentes nos contadores internos do \textit{MRoP}.
+Relativamente à componente de filtragem dinâmica, os contadores declarados contêm o número de pacotes que foram analisados para captura, bem como quantos destes foram transferidos para o monitor em nível utilizador.
+No que se refere à monitorização do processo, existe também um ficheiro que devolve, em relação a cada uma das funções instrumentadas, o número de execuções do \textit{handler} e, quantas destas pertenciam ao processo alvo.
+No que respeita ao repositório de dados, foi também criado um ficheiro com estatísticas, que incidiram sobre o número de portos em utilização e, para cada porto, a indicação de estar em utilização, através do protocolo \textit{TCP}, \textit{UDP} ou em ambos, e por qual ou quais endereço(s) de rede.
+
+Estes valores serviram para a depuração do sistema e para aferir que os pressupostos que levaram à implementação apresentada se verificavam.
+
+%\begin{figure}[ht]
+%\centering
+%\includegraphics{Ipv4_table.pdf}
+%\caption{Protocolo IPv4}
+%\label{fig:ipv4_proto}
+%\end{figure}
+
+
+%\begin{figure}[ht]
+%\centering
+%\includegraphics{tcp_table.pdf}
+%\caption{Protocolo TCP em IPv4}
+%\label{fig:ipv4_tcp_proto}
+%\end{figure}
+
+%\begin{figure}[ht]
+%\centering
+%\includegraphics{udp_table.pdf}
+%\caption{Protocolo UDP em IPv4}
+%\label{fig:ipv4_udp_proto}
+%\end{figure}
+
+
+%\begin{figure}[ht]
+%\centering
+%url = http://upload.wikimedia.org/wikipedia/commons/3/3b/UDP_encapsulation.svg
+%\includegraphics[scale=0.7]{UDP_encapsulation.pdf}
+%\caption{Execução de filtragem de pacotes}
+%\label{fig:run_filter}
+%\end{figure}
+
+%Quando o módulo da ferramenta é executado os indicadores de \textit{pid}, \textit{ppid} e \textit{tgid} são inicializados com o valor -1.
+
+%Esta ferramenta de monitorização só irá passar a analisar os dados das chamadas ao sistema quando estes valores estiverem definidos e identificarem o processo que efectuou a chamada.
+
+%\subsubsection{Sistema de Ficheiros}
+
+%Dentro do sistema de ficheiros onde os \textit{sockets} estão incorporados, como apenas estamos interessados em analisar os sockets construidos para a familia \textit{AF\_INET} todos os sockets que não pertencerem a esta familia e não forem do tipo \textit{TCP} ou \textit{UDP} não serão mais analisados.
+% Os \textit{sockets} que pertencem é então inicializado uma estrutura do tipo \textit{não me lembro ??? ver código} onde estão definidos o porto, o endereço e se são do tipo \textit{UDP} ou \textit{TCP}.
+
+%Dependendo da chamada ao sistema realizada entre a função definida na entrada e a definida no retorno do \textit{KRetProbe}, são passados parâmetros que irão ser utilizados na função de retorno.
+
+
+%\subsection{DebugFs}
+%Criação de alguns ficheiros no sistema virtual \textit{configFs} para poder observar o comportamento da monitorização e dos pacotes que chegaram ao sistema de filtragem.
+%A forte restrição de apenas um valor por ficheiro do \textit{SysFs} obriga a que para obter diferentes valores do sistema tenha de abrir diferentes ficheiros.
+% Como o sistema de ficheiros \textit{proc} se sitia principalmente para os processos seria um bom candidado para a colocação de informação sobre 
+
+
+%\section{Dificuldades}
+% As chamadas ao sistema para o protocolo \textit{UDP} podem ser dificeis de analisar pois apesar de para o \textit{sendto} poder user utilizada a mesma técnica que foi utilizada para o \textit{connect}, para o \textit{recvfrom} pode ser mais dificil pois pode receber pacotes de multiplas fontes
+
+%\section{Conclusão}
+%\label{sec:implement_conclusion}

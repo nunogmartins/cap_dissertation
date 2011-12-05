@@ -14,15 +14,6 @@
 struct rb_root db;
 extern struct local_addresses_list *local_list;
 
-void debugFunc(struct packetInfo *lpi)
-{
-	pr_emerg("insert port");
-	pr_emerg("port %hu",lpi->port);
-	pr_emerg("protocol %hu",lpi->protocol);	
-	pr_emerg("address %d.%d.%d.%d",NIPQUAD(lpi->address));
-}
-
-
 int insertPort(struct packetInfo *lpi)
 {
 	int ret=1;
@@ -32,13 +23,13 @@ int insertPort(struct packetInfo *lpi)
 		return 	-1;
 	}
 
-	debugFunc(lpi);
+	//debugFunc(lpi);
 #endif
 
 	if(lpi->port == 0 || lpi->protocol == 0)
 	{
 #ifdef MY_DEBUG_INFO
-		pr_emerg("some info is zero port %d address 0x%x and protocol %hu",lpi->port,lpi->address, lpi->protocol);
+		//my_print_debug("some info is zero port %d address %d.%d.%d.%d and protocol %hu",lpi->port,NIPQUAD(lpi->address), lpi->protocol);
 #endif
 		return -1;
 	}
@@ -51,7 +42,7 @@ int insertPort(struct packetInfo *lpi)
 int deletePort(struct packetInfo *pi)
 {
 #ifdef MY_DEBUG_INFO
-	pr_emerg( "deleting port %hu",pi->port);
+	//my_print_debug( "deleting port %hu",pi->port);
 #endif
 	my_erase(&db,pi);
 	return 0;
@@ -74,6 +65,9 @@ void printTree(void){
 
 int init_DB(void)
 {
+#ifdef MY_DEBUG
+	init_db_debug();
+#endif
 	return 0;
 }
 void exit_DB(void)
