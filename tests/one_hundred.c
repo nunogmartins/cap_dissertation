@@ -46,10 +46,12 @@ int main(int argc, char **argv)
 			sockfds[i] = socket(AF_INET, SOCK_STREAM, 0);
 			if(sockfds[i] < 0)
 				printf("create error on %d\t",i);
+			/*
 			else{
 			bind(sockfds[i], (struct sockaddr *)&serv_addr, sizeof(serv_addr));
 			listen(sockfds[i], 5);
 			}
+			*/
 		}
 		i--;
 
