@@ -15,7 +15,7 @@ As modificações ao código original do núcleo do sistema, necessárias à ext
 \section{MRoP e a sua implementação}
 \label{sec:mrop_implementation}
 
-A implementação do \textit{MRoP} teve em consideração o desenvolvimento de um código que implicasse o de mínimo alterações ao código do núcleo e, simultaneamente, tirasse partido de \textit{APIs} internas.
+A implementação do \textit{MRoP} teve em consideração o desenvolvimento de um código que implicasse o mínimo de alterações ao código do núcleo e, simultaneamente, tirasse partido de \textit{APIs} internas.
 Por outro lado, é transparente à implementação da biblioteca \textit{PCap}, podendo ser integrado na mesma.
 A implementação está contida num módulo do núcleo, de modo a ser carregada e libertada do mesmo, pelo administrador.
 A modularização das diversas componentes, permite um desenvolvimento autónomo de cada subcomponente.
@@ -27,7 +27,9 @@ Assim quando uma aplicação efectua uma chamada ao sistema (\textit{connect}, \
 Na execução deste \textit{handler}, é obtido o identicador do processo que efectuou a chamada ao sistema e comparado com os identificadores, \textit{pid}, \textit{ppid} e \textit{tgid} internos ao \textit{MRoP}, caso um destes seja igual, é obtido o canal (através dos parâmetros passados à chamada ao sistema) e adquiridos os dados sobre o \textit{socket} (porto, endereço e protocolo), para serem adicionados ao repositório.
 Deste modo quando executar o novo sistema de filtragem irá verificar se os metadados do pacote (endereço, porto, protocolo), recebido ou enviado, existem no repositório \textit{Estado do processo} e, caso existam, indica à função de filtragem do \textit{LSF} para avaliar os filtros normais e, eventualmente capturar o pacote, sendo posteriormente passado para o monitor em nível utilizador.
 
+No carregamento do módulo dinâmico \textit{MRoP} no núcleo são invocadas as rotinas de inicialização dos componentes (ver figura \ref{fig:general_architecture}), de modo a registá-los nos respectivos subsistemas, bem como inicializar o repositório \textit{Estado do processo} e efectuar a ligação ao \textit{hook}.
 
+Aquando da remoção do módulo \textit{MRoP} no núcleo, são invocadas rotinas de modo a repor os subsistemas no estado em que estavam antes da inclusão do \textit{MRoP} no núcleo.
 %Por cada pacote ter de atravessar toda a arquitectura de rede incluida no \textit{vfs} seria demasiado pesado para o sistema.
 
 %------- apresentar as diversas seccoes ao leitor ----------------
@@ -84,7 +86,7 @@ Os restantes sistemas contêm componentes de registo que, para a realização de
 Para além do sistema de instrumentação utilizado, foi igualmente considerado o número de funções a instrumentar.
 A sobrecarga total exercida pela instrumentação de funções do núcleo, tem em consideração não só o número de funções que são instrumentadas, como também o número de vezes que estas são executadas.
 
-O conhecimento adquirido com a análise efectuada referida no capítulo \ref{cap:Estrutura}, sobre a \textit{Arquitectura de rede em Linux}, permitu identificar as funções a instrumentar.
+O conhecimento adquirido com a análise efectuada, referida no capítulo \ref{cap:Estrutura}, sobre a \textit{Arquitectura de rede em Linux}, permitu identificar as funções a instrumentar.
 
 O \textit{MRoP}, foi desenvolvido para monitorizar a utilização de canais da familia \textit{INET}, tendo como particularidade, a utilização de canais baseados nos protocolos \textit{TCP} e \textit{UDP}, e instrumentar um número reduzido de funções do núcleo, pertencentes ao subsistema de rede.
 
