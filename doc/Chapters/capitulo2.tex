@@ -17,14 +17,6 @@ Na secção \ref{sect:outras_abordagens} são apresentados exemplos de ferrament
 
 Por último, na secção \ref{sec:segundo:conclusion} apresenta-se uma conclusão referente aos mecanismos de monitorização e obtenção de informação.
 
-
- 
-%\section{Visão geral} \label{sect:descricao}
-%O recurso à monitorização do comportamento das aplicações, permite-nos obter dados relevantes sobre os recursos realmente utilizados, de modo a proporcionar-nos um conhecimento mais profundo do seu comportamento em execuções mas permitem também analisar o plano de execução, os métodos mais executados, e detectar situações de eventos interessantes.
-%As informações recolhidas podem servir para analisarmos o desempenho ou correcção da aplicação sequencial ou distribuida, porquanto ao conseguir-se obter dados da utilização do \textit{cpu}, da memória, dos dispositivos de \textit{IO}, interacções, etc, é possível compreender o comportamento dinâmico das aplicações.
-%Daí ser comum a utilização da monitorização como auxiliar na avaliação e depuração de programas conseguindo um bom compromisso entre a qualidade dos dados recolhidos e a perturbação das aplicações~\cite{DuartePhd05}.
-
-
 \section{Formas de monitorização}\label{sect:instrumentation_overview}
 
 Os dados relativos ao comportamento das aplicações, obtidos de diferentes fontes, são normalmente coligidos e posteriormente analisados por ferramentas especializadas.
@@ -82,7 +74,6 @@ Tal pode ser efectuado no início ou durante a sua execução, criando, alterand
 A recolha de dados provenientes da monitorização é uma das componentes mais sensíveis, relativamente ao grau de perturbação da monitorização.
 Em geral as informações recolhidas da monitorização são inicialmente armazenados em memória central e posteriormente em memória persistente.
 Esta transferência de memória central para disco em geral deve-se a uma acção explícita do utilizador, ou então, a algum evento indicador da necessidade de guardar os dados, de forma a que novos dados possam ser armazenados em memória, uma vez que os \textit{buffers}, em memória, geralmente têm dimensão fixa.
-%Caso exista algum evento que indique que o \textit{buffer} se encontra cheio ou por acção explícita do utilizador, tal é transferido para a interface com o utilizador ou armazena em memória persistente, para posterior análise.
 
 \subparagraph*{
 %Grau de perturbação
@@ -91,7 +82,7 @@ Existe claro a preocupação de que o sistema a ser monitorizado, tenha um baixo
 Por este motivo, diversas abordagens foram criadas, para reduzir o impacto da monitorização num sistema em produção.
 Uma destas abordagens traduz-se na utilização de instruções especializadas, de que alguns processadores dispõem para \textit{debug}, de modo a utilizar os recursos que mais se adequem à monitorização.
 Estes métodos, nem sempre são utilizados, devido à sua dependência da arquitectura, o que dificulta a sua portabilidade.
-Com vista a minimizar a perturbação, alguns sistemas de monitorização utilizam uma técnica de amostragem, que permite obter indicações sobre os estado da computação a cada intervalo de tempo.
+Com vista a minimizar a perturbação, alguns sistemas de monitorização utilizam uma técnica de amostragem, que permite obter indicações sobre o estado da computação a cada intervalo de tempo.
 Esta técnica, em oposição à criação de um traço de execução, permite obter dados sobre os recursos apenas por amostra, limitando à partida a perturbação, enquanto que na criação de um traço de execução, é possível obter a totalidade dos eventos de forma a criar uma história completa, conduzindo a uma grande sobrecarga do sistema perante uma elevada taxa de eventos.
 
 \paragraph*{
