@@ -228,10 +228,6 @@ Deste modo, se o ritmo de escrita dos pacotes na zona de memória for superior a
 
 Para além destas modificações no \textit{PACKET\_MMAP}, o núcleo \textit{Linux} na sua versão 2.6, permite e aconselha a utilização da nova \textit{API} de rede (\textit{NAPI}), apresentada na secção \ref{sub:napi}.
 
-
-%Se as interfaces de rede suportarem um mecanismo de mitigação de interrupções, é possível obter melhores resultados, conforme \cite{Deri2004}.
-
-
 \paragraph*{PF\_RING}
 
 Este é um novo módulo para o núcleo \textit{Linux}, criado com base em duas técnicas \textit{mmap} e \textit{ring\_buffers}.
@@ -250,21 +246,6 @@ Diversos esforços no sentido de aumentar o desempenho da captura de pacotes tê
 Relativamente ao \textit{software}, são conhecidos esforços na utilização de técnicas de partilha de \textit{buffers}, como o \textit{mmap}, de modo a reduzir o número de cópias de dados entre as aplicações e o núcleo de sistema.
 Igualmente no \textit{hardware}, tem-se assistido a uma evolução, no sentido de reduzir as interrupções efectuadas ao \textit{cpu}, adicionando nas interfaces de rede processadores dedicados a certas funcionalidades presentes no núcleo, de modo a libertá-lo da execução de tarefas, designadamente de monitorização, de colocação de estampilha temporal, de reagrupar segmentos, filtragem de pacotes, etc.
 Além das funcionalidades já referidas, têm sido igualmente adicionadas multiplas filas de espera, para que estas possam tirar partido das arquitecturas de multiplos \textit{cores} e das memórias \textit{cache} residentes nestes processadores.
-
-
-%\paragraph{Captura com \textit{dns} activo}
-%
-%Como já referido, a biblioteca \textit{PCap} é utilizada por diversas ferramentas de análise ao trafego de rede.
-%Uma destas ferramentas é o \textit{TcpDump}, tem sido desenvolvida a par com a biblioteca \textit{PCap} .
-%
-%
-%A biblioteca \textit{PCap}
-%\textit{TcpDump} com parametro n de \textit{dns} para obter os nomes de dominios sempre que possivel
-%
-%\paragraph{Captura especificando tamanho máximo de 65535 para pacotes}
-%
-%MTU de 1500 ethernet
-
 
 \subsection{Optimizações na Estrutura de Rede}
 \label{sub:napi}
