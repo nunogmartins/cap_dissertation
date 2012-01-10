@@ -205,9 +205,6 @@ Caso seja, é duplicado e, a cópia continua o seu percurso, pelo sistema de mon
 Na versão actual do núcleo \textit{Linux} (2.6.39), o \textit{socket} \textit{AF\_PACKET} pode utilizar um sistema de partilha de \textit{buffer} (\textit{MMAP}), com o espaço de utilizador.
 Neste caso, cabe à ferramenta monitora definir explicitamente que deseja utilizar este modo de captura e, de modo a atingir este objectivo, solicita ao núcleo uma região de memória partilhada, sendo esta, posteriormente, indicada como argumento na configuração do \textit{socket}.
 
-
-%O módulo \textit{AF\_PACKET} permite activar o modo promiscuo da interface a monitorizar, ou seja, permite a captura de pacotes que não são destinados à máquina utilizada.
-
 \subsection{Limitações e optimizações}
 Apesar da \textit{API} da biblioteca \textit{PCap} existir em diferentes plataformas, o desempenho desta pode variar para cada caso.
 Quando existe pouco tráfego de rede as diferenças são pouco notórias, mas logo que este se intensifica, estas acentuam-se bastante, como demonstra o estudo~\cite{Deri2004}.
@@ -217,21 +214,6 @@ Dependendo de cada implementação e das análises a serem efectuadas, pode ser 
 Assim, caso este modo esteja desligado, um menor número de pacotes serão processados e transferidos para o monitor, o que reduzirá significativamente a sobrecarga exercida.
 Outros mecanismos em especial para a implementação no \textit{Linux}, podem influenciar o desempenho deste sistema, como a seguir se apresenta.
  
-
-
-%De modo geral, para a avaliar o desempenho da monitorização de rede, é frequente utilizar-se uma métrica, que nos permita determinar a percentagem de pacotes que é possível capturar, sem que se verifiquem perdas.
-%Esta métrica é calculada sabendo o número de pacotes que atravessam uma determinada porta de um \textit{router ou switch}, e compará-lo com o número de pacotes capturados na interface.
-%Uma variante desta medida de desempenho é combiná-la com o máximo número de regras que é possível aplicar, sem que se assista à perda de pacotes.
-%É particularmente importante conhecer o número máximo de pacotes capturados ou regras aplicáveis aos filtros, afim de determinar a velocidade máxima expectável de captura.
-%Quanto mais eficiente for a filtragem, menor o número de pacotes transferidos para as aplicações, o que se traduz numa menor sobrecarga para o sistema, aumentando o seu desempenho.
-
-%\paragraph{Captura de pacotes com \textit{TimeStamp}}
-% como etiquetar os pacotes 
-%Um dos pontos que pode influenciar negativamente o desempenho da obtenção de pacotes, é a necessidade de colocar nestes, uma estampilha temporal, com o tempo da sua chegada ao sistema.
-%A biblioteca \textit{PCap} pode obter a estampilha de duas formas distintas.
-%Assim, se a interface de rede fornecer a estampilha temporal associada ao pacote, a biblioteca pode utilizar este valor, caso contrário, será necessário obter a estampilha temporal da chegada do pacote ao sistema.
-%A forma de obtenção da estampilha pela biblioteca \textit{PCap}, processa-se através da função \textit{gettimeofday}, o que incorre numa maior sobrecarga do sistema face à solução anterior.
-
 \paragraph*{PACKET\_MMAP}
 
 Para diminuir o número de cópias de dados, entre o núcleo e o processo monitor em nível utilizador, foi utilizada a técnica de partilha de um espaço em memória.
