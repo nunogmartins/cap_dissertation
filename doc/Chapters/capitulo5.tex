@@ -1,14 +1,8 @@
 \chapter{Implementação do sistema proposto}
 \label{cap:Implementacao}
 
-% falta falar sobre filesystem vfs e como chegar ao socket file private\_data para alem da parte de interrupts, tasklets e bottomhalfs bem como sobre os contextos de execucao
-%Falta falar sobre os motivos e a estrutura desejada para esta implementação
-
-
-
 O principal objectivo desta dissertação consiste no desenvolvimento de um módulo do núcleo que consiga estender as funcionalidades do \textit{LSF}, de forma a introduzir a funcionalidade de monitorização do tráfego realizado por um processo, tirando partido da instrumentação de código do núcleo.
 O facto desta instrumentação ser efectuada no núcleo permite que qualquer aplicação possa ser monitorizada, sem que o seu código tenha de ser alterado.
-%Como se pode compreender, esta instrumentação é não intrusiva para as aplicações, havendo, deste modo a necessidade de criar uma método de verificação que identifique o processo que irá cada função instrumentada.
 Esta extensão ao \textit{LSF} também pode ser utilizada por qualquer ferramenta de monitorização baseada no \textit{LSF}.
 As modificações ao código original do núcleo do sistema, necessárias à extensão das funcionalidades do \textit{LSF} no núcleo estão confinadas ao ficheiro \textit{filter.c}, presente no directório \textit{net/core} do código do \textit{Linux}.
 
@@ -24,15 +18,12 @@ No capítulo \ref{cap:trabrelacionado} apresentaram-se, a título exemplificativ
 O \textit{MRoP}, embora utilize o sistema de instrumentação do núcleo \textit{KProbes}, apenas o aplica para instrumentar as interacções com o sistema de rede, diferenciando-se das soluções apresentadas na secção \ref{sect:outras_abordagens}, o que lhe permite encontrar-se totalmente implementado no núcleo, com reduzida utilização de memória e perturbação do sistema.
 
 Assim quando uma aplicação efectua uma chamada ao sistema (\textit{connect}, \textit{accept}, \textit{bind}, \textit{sendto}, \textit{recvfrom}), o \textit{handler} da função instrumentada é executado.
-Na execução deste \textit{handler}, é obtido o identicador do processo que efectuou a chamada ao sistema e comparado com os identificadores, \textit{pid}, \textit{ppid} e \textit{tgid} internos ao \textit{MRoP}, caso um destes seja igual, é obtido o canal (através dos parâmetros passados à chamada ao sistema) e adquiridos os dados sobre o \textit{socket} (porto, endereço e protocolo), para serem adicionados ao repositório.
+Na execução deste \textit{handler}, é obtido o identificador do processo que efectuou a chamada ao sistema e comparado com os identificadores, \textit{pid}, \textit{ppid} e \textit{tgid} internos ao \textit{MRoP}, caso um destes seja igual, é obtido o canal (através dos parâmetros passados à chamada ao sistema) e adquiridos os dados sobre o \textit{socket} (porto, endereço e protocolo), para serem adicionados ao repositório.
 Deste modo quando executar o novo sistema de filtragem irá verificar se os metadados do pacote (endereço, porto, protocolo), recebido ou enviado, existem no repositório \textit{Estado do processo} e, caso existam, indica à função de filtragem do \textit{LSF} para avaliar os filtros normais e, eventualmente capturar o pacote, sendo posteriormente passado para o monitor em nível utilizador.
 
 No carregamento do módulo dinâmico \textit{MRoP} no núcleo são invocadas as rotinas de inicialização dos componentes (ver figura \ref{fig:general_architecture}), de modo a registá-los nos respectivos subsistemas, bem como inicializar o repositório \textit{Estado do processo} e efectuar a ligação ao \textit{hook}.
 
 Aquando da remoção do módulo \textit{MRoP} no núcleo, são invocadas rotinas de modo a repor os subsistemas no estado em que estavam antes da inclusão do \textit{MRoP} no núcleo.
-%Por cada pacote ter de atravessar toda a arquitectura de rede incluida no \textit{vfs} seria demasiado pesado para o sistema.
-
-%------- apresentar as diversas seccoes ao leitor ----------------
 
 Nas subsecções seguintes, irão apresentar-se os quatro componentes do \textit{MRoP} conforme figura \ref{fig:general_architecture}.
 
@@ -47,38 +38,8 @@ Nas subsecções seguintes, irão apresentar-se os quatro componentes do \textit
 
 \section{Instrumentação de funções do núcleo}
 
-%----------------------------------------------------------------------------------------------------------
-
-%Como foi anteriormente descrito em \ref{subsection:network} sobre as chamadas aos sistema para utilizar as funcionalidades de rede
-
-%Foi necessário conhecer a \textit{ABI}\ref{ABI}\cite{ABI} referente às arquitecturas suportadas, \textit{x86} e \textit{x86\_64}, para a passagem de parâmetros das chamadas aos sistema.
-
-%O sistema de \textit{KProbes} permite consultar os registos do processador onde foi efectuada a chamada à função (neste caso a chamada ao sistema).
-% Por isso foram definidos 6 \textit{KRetProbes} referentes às chamadas \textit{connect}, \textit{bind}, \textit{accept}, \textit{sendto}, \textit{recvfrom} e
-%\textit{close}.
-% Para esta última \textit{close} devido à elevada utilização desta chamada ao sistema por diferentes aplicações no sistema, foi utilizada a função \textit{qqq coisa ...  ????}
-
-%Para efectuar a monitorização das interacções de rede de um processo foi necessário recorrer à instrumentação de funções do núcleo.
-
-%Através da instrumentação de funções do núcleo foi possível manter o contexto da execução do processo.
-
-%Como apresentado e concluído na secção \ref{}, o sistema de monitorização que melhor se adequa ao problema exposto é o \textit{KProbes}.
-% Deste sistema utilizou-se o \textit{KRetProbe}, de forma a instrumentar a entrada e retorno de funções.
-% Obter os parâmetros de entrada das funções, principalmente o \textit{file descriptor}, tornou-se essencial.
-% Para garantir que o repositório do estado do processo está coerente com o estado do núcleo, foi necessário obter o valor de retorno das funções.
-% Por estas razões e porque as chamadas ao sistema têm ciclos de modificação da bastante lentos, o que evidência elevada estabilidade e consistência do núcleo, e por ser ponto de entrada do processo no núcleo foram as funções instrumentadas.
-
-%As subsecções \ref{} .... \ref{} apresentam as funções do núcleo que foram instrumentadas.
-
-%
-% faltam as subsecoes ... 
-%
-
-%----------------------------------------------------------------------------------------------------------
-
 A metodologia aplicada à resolução do problema de desempenho, baseia-se no desenvolvimento de uma componente para efectuar uma análise aos canais de comunicação de rede, utilizados por um processo, que insira a informação necessária no repositório.
 Assim, logo que um pacote chega ao sistema de monitorização, o \textit{LSF} tira partido do repositório para decidir a captura do pacote.
-
 
 De entre os sistemas analisados, o \textit{KProbes} foi aquele que permitiu obter menor sobrecarga, apesar do seu carácter dinâmico.
 Os restantes sistemas contêm componentes de registo que, para a realização deste mecanismo, apresentam uma sobrecarga desnecessária, afectando negativamente o desempenho.
@@ -86,7 +47,7 @@ Os restantes sistemas contêm componentes de registo que, para a realização de
 Para além do sistema de instrumentação utilizado, foi igualmente considerado o número de funções a instrumentar.
 A sobrecarga total exercida pela instrumentação de funções do núcleo, tem em consideração não só o número de funções que são instrumentadas, como também o número de vezes que estas são executadas.
 
-O conhecimento adquirido com a análise efectuada, referida no capítulo \ref{cap:Estrutura}, sobre a \textit{Arquitectura de rede em Linux}, permitu identificar as funções a instrumentar.
+O conhecimento adquirido com a análise efectuada, referida no capítulo \ref{cap:Estrutura}, sobre a \textit{Arquitectura de rede em Linux}, permitiu identificar as funções a instrumentar.
 
 O \textit{MRoP}, foi desenvolvido para monitorizar a utilização de canais da familia \textit{INET}, tendo como particularidade, a utilização de canais baseados nos protocolos \textit{TCP} e \textit{UDP}, e instrumentar um número reduzido de funções do núcleo, pertencentes ao subsistema de rede.
 
@@ -98,35 +59,10 @@ As análises inicialmente efectuadas demonstraram que apenas a chamada ao sistem
 Esta situação radica no facto da chamada ao sistema \textit{close}, ser utilizada extensivamente para fechar canais, independentemente destes serem ficheiros, \textit{sockets}, \textit{pipes}, etc.
 Para contornar esta dificuldade, foi necessário encontrar uma função que lidasse exclusivamente com o fecho de \textit{sockets}, de modo a reduzir a sobrecarga imposta pela instrumentação.
 
-
-% Falta explicar o pq do recvfrom e do sendto entre outros ...
-
 \subsection{Filtro de processos}
-
-%------------------------------------------------------------------------------------------------
-
-%A filtragem dos processos que efectuam as chamadas ao sistema de rede impôs um novo desafio.
-% Se apenas filtrar as chamadas de um processo/pid seria apenas verificar se o pid é igual ao que se pretende é trivial e com baixa sobrecarga.
-% Para um utilizador que queria analisar um processo, e não saiba qual dos fluxos do processo é responsável pela comunicação de rede, tornou-se complicado.
-
-%Com esta abordagem ainda existe a possibilidade de não se obter todas as \textit{task} do processo, caso este tenha um àrvore com mais de 3 níveis, mas a sobrecarga sobre o sistema é inferior à situação de monitorização da criação de processos no sistema.
-% Estes três identificadores foram escolhidos pois permitem identificar até 3 níveis da árvore de um processo.
-
-%Seria bom colocar uma imagem de uma àrvore de processo .... 
-
-%Os identificadores têm de ser escritos para os ficheiros respectivos no \textit{DebugFs}, que serão explicados na secção \ref{}.
-
-%-----------------------------------------------------------------------------------------------------
 
 O \textit{KProbes}, é um sistema de instrumentação do núcleo que não distingue entre que funções, não \textit{inline}, está a efectuar a instrumentação.
 Não existindo suporte no \textit{KProbes} para filtrar o processo, que efectuou a chamada ao sistema, foi necessário desenvolver um modo que permitisse reduzir a sobrecarga, quando a chamada é de um processo, que não o desejado.
-
-%-------------------------
-
-%Os objectivos referidos principais continuam a ser reduzida sobrecarga e actualização permanente do(s) processo(s) a monitorizar.
-%Tendo estas caracteristicas como base algumas possibilidades foram tidas em consideração, onde o principal desafio foi conseguir manter a informação actualizada.
-
-%--------------------------------------
 
 No intuito de ultrapassar esta dificuldade, poder-se-ia ter recorrido à criação de um repositório com a informação sobre os identificadores dos processos a monitorizar, sendo necessário, uma vez mais, uma estrutura de suporte a este repositório, bem como funcionalidades de adição, remoção, actualização e consulta.
 Este repositório teria de conter a estrutura genealógica do processo a monitorizar, assim como uma componente que actualizasse essa informação.
@@ -136,10 +72,6 @@ Esta possibilidade, ao contemplar a remoção de dados do repositório, necessit
 Considerando que a actualização dinâmica deste repositório, sem aplicar alterações no código do núcleo, afectaria negativamente o desempenho do sistema na sua totalidade, optou-se por excluir esta alternativa.
 Face a esta situação, decidiu-se efectuar uma análise aos campos da estrutura (\textit{task\_struct}), o que permitiu compreender o modo como os identificadores dos processos se relacionam com os identificadores dos membros da árvore genealógica do processo.
 Desta análise concluiu-se que, os identificadores \textit{pid}, \textit{tid} e \textit{ppid} permitem, na generalidade das aplicações, identificar toda a árvore genealógica.
-
-
-
-
 
 \section{Estado dos \textit{sockets} do processo}
 
@@ -155,26 +87,13 @@ A estrutura de dados necessária para suportar o \textit{Estado dos sockets do p
 
 Assim, as estruturas de dados com suporte no núcleo, que permitem a criação de um repositório de dados, como o requerido, são:
 
-%\subsection{Com suporte no núcleo}
-%outro titulo alternativas disponíveis
-
 \begin{description}
 
 \item[BitMap - ]
-%\subsubsection{Bitmap}
 
 O núcleo do sistema possui suporte para o tratamento de mapas de \textit{bits}, permitindo representar cada porto usado pela aplicação por um \textit{bit}.
 O recurso a um mapa de \textit{bits} permite, de um modo bastante rápido e com uma reduzida utilização de memória, determinar se um porto está em utilização.
 Embora este processo seja extremamente rápido, carece de modularidade, na medida em que apenas controla os portos, não dispondo de suporte para protocolos ou múltiplos endereços de rede.
-
- 
-%----------------------------------------------------------------------------------------------------------
-
-%Uma solução seria agrupar os diferentes mapas de bits sob a terminologia de um endereço, mas e se fosse udp ou tcp ?
-%E quando um processo efectua um bind sob todas as interfaces do sistema ? 
-%E quando é utilizada mais uma interface virtual sob uma real ? .....
-
-%----------------------------------------------------------------------------------------------------------
 
 \item[Listas - ]
 
@@ -183,14 +102,6 @@ No núcleo existe uma implementação bastante eficiente da estrutura de dados \
 Embora não seja necessário definir uma lista com o número máximo de portos, dado que estes podem ser adicionados dinamicamente, a complexidade temporal de pesquisa, no pior caso, é de \textit{O(n)} (traduzindo-se num mau indicador de desempenho para o estudo pretendido nesta dissertação).
 No entanto, quando o número de elementos não é elevado, a utilização de uma lista apresenta-se como uma possível solução.
 
-%\subsubsection{Listas duplamente ligadas}
-%\subsubsection{Árvores}
-
-%\item[Árvores Binária - ]
-%\todo{ver}
-%Apesar de não ser necessário percorrer os elementos ou obter os indíces de forma ordenada. 
-
-%\paragraph{Arvores Balanceadas}
 \item[Árvore Balanceada - ] \textit{Red-black Tree} 
 
 No núcleo existe uma implementação parcial de uma árvore \textit{Red-black} genérica, a fim de permitir o acesso aos dados através de chaves, ou seja, trata-se de uma estrutura associativa.
@@ -204,27 +115,14 @@ De referir igualmente que, para o objecto deste estudo, o número do porto dos p
 Tendo em conta o número máximo de portos possíveis nos protocolos (\textit{TCP} e \textit{UDP}), a árvore poderá conter 65535 elementos, com uma altura máxima de 16, ou seja, para pesquisar um dos elementos nos extremos (máximo ou mínimo) é necessário efectuar sobre ela, 16 iterações.
 Embora não constitua um requisito, é possível obter de forma ordenada todas as chaves, bem como os valores que lhe estão associados.
 
-%-----------------------------------------------------------------------------------------------------------
-
-%Complexidade de inserção, pesquisa e remoção é O(log n), sendo n o número de elementos da árvore.
-
-%Pode existir uma penalização no desempenho, devido à necessidade de balancear a àrvore.
-%Os ganhos provenientes deste balanceamento, face às àrvores não balanceadas, permite manter a complexidade média de acesso aos dados em O(log(n)), ao invés de um possível decremento até O(n), ou seja a árvore degenerar numa lista.
-
-%-----------------------------------------------------------------------------------------------------------
-
-%\item[Radix Tree - ]
-%talvez falar sobre esta arvore ....
-
-%\subsubsection{Tabela de dispersão}
 \item[Tabela de Dispersão - ]
 No núcleo existe uma implementação de tabelas de dispersão, que efectuam a dispersão e o controlo sobre as suas chaves.
-O controlo sobre as chaves e a forma de dispersão é efectuada pela implementação, ou seja, não existe controlo do programador sobre as chaves nem sobre a forma de dispersa-las.
+O controlo sobre as chaves e a forma de dispersão é efectuada pela implementação, ou seja, não existe controlo do programador sobre as chaves nem sobre a forma de dispersá-las.
 
 No núcleo existem subsistemas que implementaram outras tabelas de dispersão, com base em \textit{arrays} e listas, permitindo deste modo utilizar as vantagens desta estrutura de dados.
-Estas implementações tiram partido do conhecimento do dominio do problema que resolvem, pelo que, os \textit{arrays} são criados com dimensões fixas, dado que não necessitam efectuar redispersão dos elementos nela contidos.
+Estas implementações tiram partido do conhecimento do domínio do problema que resolvem, pelo que, os \textit{arrays} são criados com dimensões fixas, dado que não necessitam efectuar redispersão dos elementos nela contidos.
 
-Como existe a necessidade de uma estrutura que se adapte ao comportamento dinâmico das interacções das aplicações com as interfaces de rede, é necessário um estudo aprofundado sobre estatísticas do número de portos utilizados pelas aplicações e, caso este estudo seja realizado é necessário continuar a efectuar uma redispersão dos elementos, a não ser que, seja utilizado um \textit{array} com 65535 posições, valor este que representa o valor máximo de portos possíveis através dos protocolos \textit{TCP} e \textit{UDP}, desaproveitando assim memória do sistema.
+Como existe a necessidade de uma estrutura, que se adapte ao comportamento dinâmico das interacções das aplicações com as interfaces de rede, é necessário um estudo aprofundado sobre estatísticas do número de portos, utilizados pelas aplicações e, caso este estudo seja realizado é necessário continuar a efectuar uma redispersão dos elementos, a não ser que, seja utilizado um \textit{array} com 65535 posições, valor este que representa o valor máximo de portos possíveis através dos protocolos \textit{TCP} e \textit{UDP}, desaproveitando assim memória do sistema.
 
 
 \end{description}
@@ -237,12 +135,7 @@ Relativamente à estrutura \textit{lista}, a análise dos portos no pior caso, a
 Esta situação pode ser minimizada se a lista tiver os elementos ordenados pelo número do porto, o que obriga a inserções ordenadas.
 A \textit{tabela de dispersão} apresentar-se-ia como a melhor escolha, se existisse o controlo das chaves por parte do programador.
 Verificando-se essa impossibilidade e, como a opção de implementação de uma tabela de dispersão, obrigaria a uma verificação da correcção e desempenho, esta opção foi rejeitada.  
-Deste modo a árvore balanceada \textit{Red-black}, mostra-se a melhor opção entre as disponíveis no núcleo pois, a procura no pior caso apresenta não só um custo inferior ao da \textit{lista} como também uma reduzida utilização de memória, dispondo ainda da possibilidade de extensão dos seus elementos.
-
-%\todo{nao esta no sitio} Apesar dos processos monitorizados apresentarem elevado dinamismo nas interacções das comunicações, o maior número de operações sobre o repositório concentra-se ao nível da consulta.
-%As restantes operações (inserção e remoção) repartem entre si igual número.
-%Assim, é esperado que para cada inserção exista uma remoção.
-%No final da monitorização de um processo, a componente \textit{Estado dos Sockets} deverá apresentar um número de elementos idêntico ao que antecedeu a monitorização.
+Deste modo a árvore balanceada \textit{Red-black}, mostra-se a melhor opção entre as disponíveis no núcleo, pois a procura no pior caso apresenta não só um custo inferior ao da \textit{lista} como também uma reduzida utilização de memória, dispondo ainda da possibilidade de extensão dos seus elementos.
 
 Assim, o ciclo de desenvolvimento do \textit{MRoP} foi efectuado mais rapidamente, tendo em consideração a confiança que merece a validação da estrutura de dados \textit{Red-black tree}, em utilização no núcleo do sistema \textit{Linux} e sujeita a uma análise extensiva ao longo dos anos.
  
