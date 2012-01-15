@@ -571,7 +571,7 @@ NetLink & Sem & Elevado \\
 \section{Captura de tráfego de um processo específico}
 \label{sect:outras_abordagens}
 
-A captura do tráfego, respeitante a um processo genérico, foi alvo de estudo em \cite{1688981} e em \cite{duarte10,Farruca:2009}, esta última, uma dissertação de mestrado.
+A captura do tráfego, respeitante a um processo genérico, foi alvo de estudo em \cite{1688981} e em \cite{duarte10,Farruca:2009}.
 
 No primeiro trabalho, foi desenvolvido um sistema de captura de pacotes de um determinado processo, utilizando um módulo no núcleo de sistema que intercepta e captura os pacotes do processo.
 
@@ -592,7 +592,7 @@ Se esse porto não estiver a ser monitorizado, essa informação é passada a ou
 Analisando a arquitectura de monitorização de tráfego representada na figura~\ref{fig:paper_capture_kprobes}, o ACAP\_Collector e o ACAP\_Capturer, estão em nível utilizador, de onde se infere que o desempenho desta ferramenta sofre com as trocas de contexto e alterações da captura efectuada no \textit{PCap}.
 
 Relativamente ao segundo trabalho, foram implementadas duas abordagens: uma com monitorização da aplicação e outra através de informações pertencentes ao núcleo do sistema de operação.
-No que à primeira diz respeito, a monitorização efectuada processou-se através da interceptação das chamadas à bibiloteca \textit{LibC}, para a utilização de \textit{sockets}, criando uma bibiloteca partilhada com a mesma sintaxe das chamadas que são utilizadas.
+No que à primeira diz respeito, a monitorização efectuada processou-se através da intercepção das chamadas à biblioteca \textit{LibC}, para a utilização de \textit{sockets}, criando uma biblioteca partilhada com a mesma sintaxe das chamadas que são utilizadas.
 A opção pela utilização deste método, implica definir a variável de ambiente \textit{LD\_PRELOAD}, de forma a operar esta intercepção.
 Como esta biblioteca está em nível utilizador, mostra-se necessário capturar todos os pacotes e apenas em nível utilizador visualizar o tráfego respeitante ao processo.
 Esta obrigatoriedade, de capturar todos os pacotes, pode constituir uma tarefa com elevado grau de perturbação do sistema.
@@ -623,35 +623,17 @@ Na alteração do filtro, foi verificado que existe um certo padrão, que consis
 Esta forma de monitorização é muito específica, pelo que é imprescindível reconhecer todo o protocolo interno de comunicação.
 Assim, para cada novo protocolo a monitorizar, é necessário acrescentar um novo módulo com a interpretação desse protocolo.
 
-% \paragraph*{\textit{Fairly Fast Packet Filter} (FFPF)}
-
 \paragraph*{\textit{Swift} - }
-É uma ferramenta de criação de filtros, cujo principal objectivo é a melhorar o desempenho da utilização destes, na captura do tráfego de rede.
+É uma ferramenta de criação de filtros, cujo principal objectivo é melhorar o desempenho da utilização destes, na captura do tráfego de rede.
 Nesta ferramenta, foi avaliado o tempo necessário para a alteração dos filtros utilizando o \textit{Linux Socket Filtering}, pois estes são os filtros de referência no sistema de operação \textit{Linux}.
 A aplicação destes filtros a partir da biblioteca \textit{PCap} compreende três fases: cópia do filtro definido em nível utilizador para o núcleo de sistema, verificação de segurança, e aplicação do filtro.
 De forma a diminuir a latência de actualização dos filtros, foi criada uma especificação de modo a que estes não necessitassem de ser analisados relativamente à segurança, visto que a própria linguagem garante as propriedades de segurança necessárias.
 Com este novo \textit{instruction set} e, sem necessidade de verificação, foi reduzida a latência de actualização dos filtros, o que conduziu a um aumento de desempenho na utilização de filtros dinâmicos.
-
-
-%\section{Conclusão}
-
-
-
-
-
-%\section{Filtragem de pacotes de um processo através do \textit{Netfilter}}
-
-%O \textit{NetFilter} é o sistema de filtragem de pacotes do núcleo do \textit{Linux} que irá ser apresentado na secção \ref{}.
-%Foi implementado um módulo no núcleo utilizando o \textit{NetFilter} que filtra os pacotes pertencentes a um processo ou utilizador.
-%Este sistema, verifica relativamente a cada pacote que é recebido ou enviado, se este faz parte do processo ou processos pertencentes a um utilizador, verificando canal a canal se o identificador do canal do pacote é igual ao canal do processo.
-
-
-%Falta falar do ipt\_owner do iptables entre outros ....
 
 \section{Conclusão}
 \label{sec:segundo:conclusion}
 Como se pode observar neste capítulo, existe a possibilidade de melhorar a monitorização de rede do \textit{Linux}.
 O mecanismo de instrumentação genérico do \textit{Linux}, \textit{KProbes}, permite que se efectuem análises no núcleo de modo generalista, o que para obter as interacções dos processos com as interfaces de rede sem que se assista à instrumentação do código dos processos e com baixa sobrecarga será um mecanismo de instrumentação dinâmico a ter em conta para o desenvolvimento de um mecanismo de monitorização genérico de rede de um processo.
 
-Por forma evitar a sobrecarga da transferência de dados irrelevantes para nível utilizador, pretende-se estender a captura com filtros do \textit{LSF}, para que passe a ter em conta os estado do processo alvo obtido pela instrumentação anterior.
+De forma a evitar a sobrecarga da transferência de dados irrelevantes para nível utilizador, pretende-se estender a captura com filtros do \textit{LSF}, para que passe a ter em conta o estado do processo alvo obtido pela instrumentação anterior.
 Ao efectuar este processamento no núcleo, não se incorre na reinicialização de todo o mecanismo de captura do \textit{PCap}, salvaguardando a perda de pacotes relevantes e diminuindo a sobrecarga introduzida.
