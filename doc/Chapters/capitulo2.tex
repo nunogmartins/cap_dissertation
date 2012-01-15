@@ -356,11 +356,14 @@ Deste modo, é possível explorar o desempenho através de funcionalidades espec
 
 O \textit{KProbes} utiliza a técnica do trampolim~\cite{Hollingsworth94dynamicprogram}, combinada com funções de \textit{handler} que efectuam as análises definidas pelo administrador.
 
+Para utilizar o \textit{KProbes} é necessário criar um módulo para o núcleo do sistema de operação, com informações relativas às rotinas a instrumentar.
+Para além destas, o módulo tem de conter igualmente os \textit{handlers} de análise, assim como outros parâmetros necessários à realização da instrumentação.
+
 Utilizando o \textit{KProbes} são possíveis três tipos de instrumentação: o \textit{KProbe}, o \textit{JProbe} e o \textit{KRetProbe}.
 Cada um destes três tipos é específico de uma determinada funcionalidade.
 
 \begin{itemize}
- \item \textbf{KProbe - } Utilizando o \textit{KProbe} pode detectar-se a execução de uma instrução, sendo esta indicada pela distância relativamente ao inicio de uma função instrumentada.
+ \item \textbf{KProbe - } Utilizando o \textit{KProbe} pode detectar-se a execução de uma instrução, sendo esta indicada pela distância relativamente ao início de uma função instrumentada.
 A indicação da função a instrumentar, pode ser definida recorrendo ao seu nome, ou ao seu endereço de memória.
 
 \item \textbf{JProbe - } Um \textit{JProbe} destina-se a analisar os parâmetros, da função a instrumentar.
@@ -384,15 +387,19 @@ Quando é declarado um \textit{JProbe}, a função de \textit{handler} dessa cha
 	\label{fig:kprobe_execution}
 \end{figure}
 
-Para se obterem informações sobre as funções ou instruções que estão a ser monitorizadas, o \textit{KProbes} disponibiliza-as através de um ficheiro no \textit{DebugFs}.
-Para utilizar o \textit{KProbes} é necessário criar um módulo para o núcleo do sistema de operação, com informações relativas às rotinas a instrumentar.
-Para além destas, o módulo tem de conter igualmente os \textit{handlers} de análise, assim como outros parâmetros necessários à realização da instrumentação.
+%Para utilizar o \textit{KProbes} é necessário criar um módulo para o núcleo do sistema de operação, com informações relativas às rotinas a instrumentar.
+%Para além destas, o módulo tem de conter igualmente os \textit{handlers} de análise, assim como outros parâmetros necessários à realização da instrumentação.
 
 Quando o módulo é inserido no núcleo de sistema, o registo dos \textit{handlers} das funções a serem instrumentadas é efectuado de forma atómica.
 A execução do \textit{KProbes} não utiliza nenhum \textit{mutex} ou outra forma de controlo de concorrência, apenas funciona com a preempção desligada.
 Dependendo do contexto, os \textit{handlers} podem ser executados com as interrupções desligadas.
 
-A instrumentação, pode processar-se copiando a instrução que se quer analisar para uma zona de memória, e substituindo essa instrução no código por uma interrupção (\textit{int3}).
+A instrumentação, pode processar-se copiando a instrução instrumentada para uma zona de memória, e substituindo-a no código por uma interrupção (\textit{int3}).
+
+Quando a execução da função instrumentada detecta a instrução \textit{int3}, o controlo é passado à função \textit{do\_int3} (como se pode verificar na figura \ref{fig:kprobe_execution}).
+Esta função notifica o \textit{KProbes} que verifica se este ponto existe na lista de pontos de instrumentação que gere.
+Em caso afirmativo executa o \textit{pre-handler} seguido da instrução a analisar.
+Após a execução da instrução instrumentada, caso exista o \textit{post-handler} este é executado, sendo posteriormente remotado o normal controlo da execução da função instrumentada.
 
 Quando possível, o \textit{KProbes} utiliza instruções do processador, especializadas na depuração, de modo a minimizar o grau de perturbação.
 A utilização da instrução \textit{int3} tem problemas de desempenho associados, por isso foi desenvolvido um modo alternativo para efectuar a instrumentação.
@@ -404,6 +411,8 @@ Quando o compilador realiza substituição de funções por código \textit{inli
 Assim sendo, a função deixa de existir, impossibilitando a instrumentação destas funções.
 Não existe a possibilidade de instrumentar recursivamente uma função, ou seja, se uma função está a ser instrumentada e nas funções de \textit{handler} essa função é chamada, o \textit{KProbes} detecta que já está em execução e não permite que seja novamente interrompido, incrementando uma variável que indica que existiu um \textit{miss}.
 
+Para se obterem informações sobre as funções ou instruções que estão a ser monitorizadas, o \textit{KProbes} disponibiliza-as através de um ficheiro no \textit{DebugFs}.
+
 Como anteriormente referido, este mecanismo de instrumentação do núcleo é utilizado por diversas ferramentas, de modo a instrumentar dinamicamente o código pertencente ao núcleo.
 Duas das ferramentas que tiram partido deste mecanismo são o \textit{DProbes} e o \textit{SystemTap}.
 
@@ -414,11 +423,10 @@ Como a criação de pontos de análise são descrito em linguagem C ou \textit{a
 Após se obterem os dados, estes podem ser transferidos para um ficheiro, para o \textit{daemon de logging} do núcleo de sistema, ou para uma porta série.
 Existe, igualmente, a opção de interoperabilidade com o \textit{Linux Trace Toolkit}\cite{DProbes}.
 
-%\subsubsection{SystemTap}\label{cap:Systemtap_overview}
 \subsubsection{SystemTap}
 O \textit{SystemTap} é uma ferramenta que possibilita o desenvolvimento mais fácil de módulos para o \textit{KProbes}, utilizando uma linguagem específica, de forma a ser segura e fácil de trabalhar.
 Uma vez que os dados gerados estão no espaço de endereçamento de memória do núcleo, e o programa que os analisará se situa no espaço de endereçamento do utilizador, é necessário efectuar uma transferência de dados de um espaço para o outro.
-O \textit{SystemTap} efectua esta transferência, recorrendo à utilização do sistema de ficheiros \textit{ReplayFs}, onde é possível escrever de forma rápida, sem comprometer a segurança do sistema\cite{Donovan2007,Jones2009}.
+O \textit{SystemTap} efectua esta transferência, recorrendo à utilização do sistema de ficheiros \textit{RelayFs}, onde é possível escrever de forma rápida, sem comprometer a segurança do sistema\cite{Donovan2007,Jones2009}.
 
 Apesar de no conjunto de aplicações desta ferramenta, existir um visualizador gráfico de dados recolhidos pelo \textit{SystemTap}, este só consegue analisar os \textit{TapSets} pré-definidos no \textit{SystemTap}.
 Para ultrapassar esta limitação, novas ferramentas foram desenvolvidas.
@@ -426,31 +434,15 @@ Uma destas ferramentas designada por \textit{bootlimn}, está actualmente a ser 
 Os dados recolhidos, permitem visualizações gráficas do processo de inicialização do sistema, bem como da utilização de disco e \textit{CPU}.
 Outro projecto conhecido como \textit{Systemtap GUI}, engloba o \textit{System Tap Editor Plug-in} para a ferramenta \textit{Eclipse}, sendo um ambiente onde podem ser analisados e visualizados os dados recolhidos pelo \textit{SystemTap} a partir do \textit{Eclipse}.
 
-%O \textit{SystemTap} actualmente está a ser desenvolvido por empresas de reconhecido mérito internacional, nomeadamente a \textit{Red Hat}, a \textit{IBM}, a \textit{Hitachi} e a \textit{Oracle}.
-
-
-
-
-%\subsubsection{DProbes}\label{cap:Dprobe_overview}
-
 \subsubsection{Linux Kernel State Tracer}
-% Linux Kernel State Tracer(LKST) records information as trace data about events in the Linux Kernel. It records various events like process context switch, send signal, exception, memory allocation, send packet, and so on. 
 
 O \textit{Linux Kernel State Tracer(LKST)} obtém informações referentes ao núcleo de sistema, de forma a criar um traço de execução, e consegue capturar diferentes eventos como trocas de contexto, envio de sinais, alocação de memória, transmissão de pacotes, etc.
 
-% a\subparagraph{DJProbe}
-\label{cap:djprobe}
-  % Este sistema é mais leve devido à forma como é feito o ``trap'' pois não usa o int 3
-% Duvidas na forma como é controlado o sistema na presença de processadores maquinas com multiplos processadores.
-% Não utiliza o int 3 para fazer o trap por isso segundo o artigo fica mais leve que o KProbe e o JProbe.
-% DJProbe  quer dizer Direct Jump Probe faz um jmp e não usa o int 3.
-Actualmente, está a ser desenvolvido um subprojecto do \textit{Linux Kernel Stace Tracer} designado por \textit{Direct Jump Probe}.
+Actualmente, está a ser desenvolvido um subprojecto do \textit{Linux Kernel State Tracer} designado por \textit{Direct Jump Probe}.
 O \textit{Direct Jump Probe} é uma optimização à utilização do \textit{trap int3}, presente em alguns processadores, e que pode trabalhar em conjunto com o \textit{KProbes}.
 Esta optimização pode ser verificada no relatório\cite{Hiramatsu2005}.
 
-
 \subsection{Comparação entre os diferentes sistemas de instrumentação dinâmicos}
-% \todo{completar esta tabela}
 \begin{table}[h!]
 \begin{center}
 \caption{Tabela Comparativa dos sistemas de instrumentação}
@@ -472,12 +464,8 @@ OProfile & Amostragem & Não permite & Necessita \\
 \end{center}
 \end{table}
 
-%Da observação da tabela \ref{tab:inst_compare} pode inferir-se que: ToDo
-
 A tabela \ref{tab:inst_compare} permite fazer uma comparação entre algumas das caracteristicas destes sistemas de instrumentação presentes no núcleo de sistema do \textit{Linux}, segundo os seguintes critérios: metodologia da captura (por traço ou por amostragem), análise dos parâmetros das funções instrumentadas e a necessidade de ter um \textit{deamon} para a recolha de dados provenientes do sistema de monitorização.
 Se a necessidade de ter um \textit{deamon} a executar de forma a coligir e organizar os dados, pode penalizar o desempenho do sistema, a possibilidade de analisar os parâmetros das funções instrumentadas é um ponto a favor dos sistemas \textit{KProbes} e do \textit{LKST}.
-
-
 
 \section{Transferência de dados}
 \label{sect:kernel_user_comm}
@@ -490,10 +478,6 @@ No intuíto de melhorar a partilha de recursos externos, o controlo dá-se ao n�
 Não sendo apenas exclusivo dos recursos externos, recursos que sejam partilhados por mais que um processo, em geral são partilhados e controlados através do núcleo.
 Desta forma é necessário existirem modos de comunicação / transferência de dados dentro do núcleo e, entre este e os processos.
 
-%Incluir por aqui a informação de mmaps, ring buffers e afins ....
-% colocar a parte interna e verificar o mmap que tb faz parte do utilizador
-% verificar o mmap da parte de utilizador
-%texto explicativo de interno e externo 
 \subsection{Técnicas de transferência de dados}
 
 Devido há necessidade de transferir informações entre diferentes \textit{buffers} dentro do núcleo de sistema, foram desenvolvidas técnicas tendo sempre como referência a minimização da sobrecarga.
@@ -517,17 +501,10 @@ Os \textit{Ring Buffers} são utilizados tendo presente a relação custo / bene
 
 
 \subsection{Interface do sistema com os processos}
-% {\color{red}
-% \paragraph*{}
-% INDICAR QUAIS OS SISTEMAS QUE OS UTILIZAM
-% 
-% DISTINÇÂO ENTRE OS DIFERENTES SISTEMAS
-% }
 
 Devido à necessidade de análise de estruturas e dados do núcleo de sistema, e de oferecer uma interface familiar baseada nos sistemas de ficheiros, foram criados diferentes subsistemas com vista à sua satisfação.
 Um destes subsistemas é o \textit{ProcFs}, que existe no núcleo de sistema do \textit{Linux} desde as primeiras versões.
 Outros como o \textit{DebugFs} ou o \textit{RelayFs} são mais recentes e com novas abordagens.
-%diferentes abordagens e o pq de ter de existirem estas formas
 
 \paragraph*{}
 De forma a obter informações relativas a estruturas dentro do núcleo de sistema, foram referenciados os seguintes sistemas de comunicação entre o utilizador e o núcleo:
@@ -560,19 +537,14 @@ O \textit{RelayFs} responde a esta exigência, fazendo uso de novas primitivas o
 \paragraph*{NetLink - }\label{cap:NetLink_overview}
 O \textit{NetLink} utiliza um método de comunicação baseado em \textit{sockets}, para estabelecer a comunicação entre o núcleo de sistema e os processos, em nível utilizador. 
  Tendo como abstracção os \textit{sockets}, este sistema tem igualmente a possibilidade de enviar dados para múltiplos processos, devido à utilização das primitivas de envio colectivo (\textit{Multicast}).
-% \todo{Explicar melhor o NetLink}
- É com base no \textit{NetLink}, que a comunicação entre processos dentro da mesma máquina (\textit{IPC}) é implementada.
-%Isto ja e novo
- A comunicação com diferentes partes do subsistema de rede é efectuada recorrendo a este sistema de \textit{sockets}.
-
+É com base no \textit{NetLink}, que a comunicação entre processos dentro da mesma máquina (\textit{IPC}) é implementada.
+A comunicação com diferentes partes do subsistema de rede é efectuada recorrendo a este sistema de \textit{sockets}.
 
 \subsection{Comparação entre sistemas de transferência de dados}
 
 \paragraph*{}
 Como se pode verificar através da tabela \ref{tab:transf_compare}, que compara a estruturação dos dados de cada Sistema, com o volume de dados que é possível com facilidade transferir, o \textit{RelayFs} e o \textit{NetLink} são os dois sistemas de comunicação que, não tendo estruturação fixa dos dados, conseguem transferir um volume superior de dados, comparativamente com os restantes objecto da análise.
-%Se limitarmos a análise comparativa aos sistemas \textit{RelayFs} e \textit{NetLink}, constatamos que o volume de dados que é possível transferir pelo primeiro é superior ao verificado no \textit{NetLink}.
 
-% \todo{Corrigir esta tabela}
 \begin{table}[!htbp]
 \begin{center}
 \caption{Tabela Comparativa de transferência de dados entre processos e núcleo de sistema}
