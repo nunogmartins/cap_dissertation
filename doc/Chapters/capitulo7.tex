@@ -18,7 +18,7 @@ Foi possível constatar a correcção dos protocolos e verificar que apenas as i
 Para além desta análise funcional, foi efectuada uma outra, onde se compararam os desempenhos do \textit{PCap}, com e sem esta nova extensão, a fim de determinar qual a sobrecarga introduzida pelo \textit{MRoP} na monitorização já existente.
 Os resultados apurados evidenciam que a sobrecarga é praticamente inexistente nos piores casos, trazendo vantagens na monitorização quando estivermos perante vários fluxos de dados irrelevantes para a análise.
 
-Nas secções seguintes são apresentados as principais conclusões da realização desta dissertação, assim como as possíveis evoluções e extensões ao \textit{MRoP}.
+Nas secções seguintes são apresentadas as principais conclusões da realização desta dissertação, assim como as possíveis evoluções e extensões ao \textit{MRoP}.
 
 \section{Conclusões}
 \label{sec:conclusoes}
@@ -45,7 +45,7 @@ As vantagens do sistema criado assumem maior notoriedade, quando a máquina se e
 Como trabalho futuro existe a possiblidade de expandir e melhorar o suporte para multiplos processos a serem monitorizados.
 Acresce ainda a possibilidade de verificar problemas de concorrência na presença de multiplos \textit{cores}/\textit{cpus}, e garantir a impossibilidade de ocorrência de \textit{race conditions}.
 
-Considerando que o sistema implementado se limita a monitorizar protocolos acentes em \textit{TCP} e \textit{UDP}, poderia ver a sua contribuição alargada se abrangesse outros protocolos como \textit{icmp, arp, stp}, etc.
+Considerando que o sistema implementado se limita a monitorizar protocolos assentes em \textit{TCP} e \textit{UDP}, poderia ver a sua contribuição alargada se abrangesse outros protocolos como \textit{icmp, arp, stp}, etc.
 
 Outra possibilidade será procurar optimizar a instrumentação, evitando a instrumentação das funções \textit{sendto} e \textit{recvfrom}, restringindo a sua aplicação a funções internas específicas dos protocolos monitorizados.
 
