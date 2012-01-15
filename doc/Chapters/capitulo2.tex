@@ -283,30 +283,21 @@ Ao efectuar a monitorização no núcleo, a sobrecarga imposta ao sistema pode s
 
 Neste documento constam apenas mecanismos e ferramentas de monitorização dinâmicas, pois apenas estas são as desejadas para a criação de um mecanismo de monitorização de rede orientada ao processo.
 De entre os mecanismos e ferramentas de monitorização dinâmica analisadas é possível agrupá-las em duas categorias: com base em eventos pré-definidos e com base em instrumentação dinâmica.
-Na categoria instrumentação dinâmica existem dois mecanismos relevantes: o \textit{KProbes} e o \textit{Linux Kernel Stace Tracer}, enquanto que para os eventos pré-definidos foram verificados o \textit{Linux Trace Toolkit} e o \textit{OProfile}.
+Na categoria instrumentação dinâmica existem dois mecanismos relevantes: o \textit{KProbes} e o \textit{Linux Kernel State Tracer}, enquanto que para os eventos pré-definidos foram verificados o \textit{Linux Trace Toolkit} e o \textit{OProfile}.
 Estas quatro ferramentas são apresentados em seguida considerando as suas categorias:
 
 \subsection{Eventos pré-definidos}
 
 Nesta categoria encontram-se duas ferramentas o \textit{Linux Trace Toolkit} e o \textit{OProfile}.
 Em cada uma destas ferramentas a monitorização é efectuada sobre pontos previamente definidos, não permitindo a adição de novos pontos de monitorização.
-Cada um destas ferramentas analisa todo o sistema, sendo a filtragem extra dos eventos efectuada em nível utilizador.
-%\todo{ver}
-%Como os eventos detectados através destas ferramentas geram um mapa de execução, a utilização de apenas alguns eventos pré-definidos não é limitativa de uma ferramenta.
+Cada uma destas ferramentas analisa todo o sistema, sendo a filtragem extra dos eventos efectuada em nível utilizador.
 
 \subsubsection{Linux Trace ToolKit}\label{cap:linux_trace_toolkit_overview}
 
-% O Linux Trace Toolkit é uma ferramenta de ``tracing''
-% Utiliza o Klog com repositorio da informação obtida do kernel.
-% Nesta versão a comunicação entre o kernel e aplicação em user space é efectuada utilizando o relayfs.
-% O RelayFs é um sistema de ficheiros para comunicação entre o código dentro e fora do núcleo de operação.
-%A utilização desta ferramenta em sistemas de tempo real é um bom indicador da sua performance.
-
 O \textit{Linux Trace ToolKit} (\textit{LTT}) é uma das ferramentas mais utilizadas para efectuar traços de execução do núcleo \textit{Linux}.
-Esta ferramenta foi criada no final da década de 1990, sendo posteriormente substituida em 2005 pelo \textit{Linux Trace ToolKit new generation}, (\textit{LTTng}), projecto derivado do \textit{LTT}.
+Esta ferramenta foi criada no final da década de 1990, sendo posteriormente substituída em 2005 pelo \textit{Linux Trace ToolKit new generation}, (\textit{LTTng}), projecto derivado do \textit{LTT}.
 O \textit{LTT} é constituído por quatro componentes: o \textit{Kernel Patch}, o \textit{Kernel Module} o \textit{Trace Daemon} e o \textit{Data Decoder} conforme consta na figura \ref{fig:ltt_arch}.
 É através do \textit{Trace Daemon} que o utilizador pode comunicar com o sistema de monitorização.
-%Os dados recolhidos têm diversos valores tais como o nome da função, o tempo, e o identificador do processador, pelo menos estes atributos de modo a conseguir construir os traço de execução.
 O \textit{LTT} e o \textit{LTTng} são ferramentas de monitorização dinâmica que efectuam um traço de execução.
 O \textit{Linux Trace Toolkit New Generation}, utiliza os mecanismos \textit{Tracepoints}\cite{Mathieu2009} e \textit{Linux Kernel Markers}\cite{Mathieu2009} para efectuar as suas monitorizações.
 O \textit{Tracepoints} e o \textit{Linux Kernel Markers} fazem parte da instrumentação estática do núcleo \textit{Linux}, mas permitem a sua activação e desactivação dinamicamente pelas ferramentas em nível utilizador.
@@ -322,7 +313,6 @@ Para além do \textit{daemon} em nível utilizador, existem outras ferramentas d
 	\label{fig:ltt_arch}
 \end{figure}
 
-%\subparagraph{Linux Trace Toolkit Viewer - }\label{cap:lttv_overview}
 O \textit{Linux Trace Toolkit Viewer (LTTV)} é um projecto desenvolvido em paralelo com o \textit{LTT} e \textit{LTTng}, de modo a criar uma análise visual dos dados recolhidos por estas aplicações.
 Esta ferramenta possibilita igualmente visualizar o traço de execução, uma vez que os dados recolhidos contêm uma estampilha temporal, do momento em que foram obtidos.
 
@@ -331,8 +321,6 @@ O \textit{OProfile} é uma ferramenta de monitorização, que efectua um perfil 
 Assim, o \textit{OProfile}, em vez de a cada evento utilizar uma função para obter os dados, apenas a utiliza decorridos um certo número de eventos.
 O recurso a este critério permite ao \textit{OProfile} ser menos perturbador, uma vez que nem sempre é necessário o universo dos eventos que as ferramentas de monitorização capturam, mas tão somente uma amostra.
 Deste modo ao utilizar a amostragem, o \textit{OProfile}, introduz um menor grau de perturbação no sistema\cite{Will:TuninProgrOProf}.
-% ser menos perturbador do sistema.
-% it uses data sampling ... the others don't
 
 Esta ferramenta é composta por três componentes principais: o módulo no núcleo (\textit{oprofile driver}), o \textit{daemon}/processo em nível utilizador que recolhe os dados obtidos da monitorização pelo módulo do núcleo (\textit{opcontrol}) e o \textit{opreport} e \textit{opannotate} que permitem criar relatórios, tal como se pode constatar na figura \ref{fig:oprofile_arch}.
 
@@ -347,17 +335,13 @@ O \textit{OProfile} não permite apenas efectuar o perfil de execução do núcl
 Este perfil é criado com o auxílio do sistema de ficheiros virtual \textit{ProcFs}, que indica quais os processos em execução e respectivas zonas de memória utilizadas por estes.
 O \textit{OProfile} regista os valores do \textit{program counter} (registo do processador que contém a próxima instrução a executar) e o instante em que este foi actualizado, assim com estes dados e conhecendo as zonas de memória, consegue identificar o processo em execução a cada amostragem.
 
-%Para além de utilizar a técnica de amostragem, utiliza também \textit{buffers} especificos aos processadores, de modo a reduzir a sobrecarga exercida no sistema.
-
-% outra abordagem 
-
 \subsection{Suporte à monitorização}
 
 Nas subsecções anteriores foram apresentadas ferramentas de monitorização e os seus mecanismos para efectuar a monitorização.
 As ferramentas são importantes para efectuar análises aos dados obtidos.
 Nas ferramentas, os diversos componentes que as constituem estão muito interligados, dificultando por vezes, o seu reaproveitamento e integração com outros componentes ou ferramentas.
 Por outro lado, os mecanismos devem ser genéricos e independentes das ferramentas, para que estas possam ser desenvolvidas e os possam utilizar.
-Como suporte à monitorização destacam-se o mecanismo \textit{KProbes} e a ferramenta \textit{Linux Kernel Stace Tracer}.
+Como suporte à monitorização destacam-se o mecanismo \textit{KProbes} e a ferramenta \textit{Linux Kernel State Tracer}.
 Em ambos é possível definir novos pontos, funções ou eventos a serem monitorizados, para além das funcionalidades já existentes nestas ferramentas.
 
 \subsubsection{KProbes}\label{sect:KProbes_overview}
@@ -365,6 +349,10 @@ Em ambos é possível definir novos pontos, funções ou eventos a serem monitor
 O \textit{KProbes} é um mecanismo de instrumentação dinâmica do núcleo do \textit{Linux}.
 A \textit{API} permite que ferramentas, como o \textit{DProbes} ou o \textit{SystemTap} possam aceder às suas funcionalidades.
 Esta encontra-se na versão principal do núcleo do sistema \textit{Linux}, desde a versão 2.6.9, o que indica tratar-se de um mecanismo bastante estável~\cite{kernel_debug_printk_on_fly,KProbesSite}.
+
+O \textit{KProbes} foi desenvolvido utilizando uma arquitectura modular, de modo a permitir a sua extensão a outras arquitecturas computacionais.
+Assim, como se pode visualizar na figura \ref{fig:kprobes_arch}, o \textit{KProbes Manager} através da camada independente da arquitectura, efectua a gestão do registo, da activação e destruição de pontos de análise.
+Deste modo, é possível explorar o desempenho através de funcionalidades específicas dos processadores, pois a camada de gestão assenta numa outra específica, da arquitectura do processador em execução.
 
 O \textit{KProbes} utiliza a técnica do trampolim~\cite{Hollingsworth94dynamicprogram}, combinada com funções de \textit{handler} que efectuam as análises definidas pelo administrador.
 
