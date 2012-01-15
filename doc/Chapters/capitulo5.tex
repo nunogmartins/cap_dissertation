@@ -171,16 +171,21 @@ Os elementos do repositório, correspondem a instâncias da estrutura \textit{Po
 \label{fig:repo_example}
 \end{figure}
 
+A lista de endereços apresentada na figura \ref{fig:local_address_list}, irá conter no máximo o número de endereços \textit{IP} existentes nas diversas interfaces de rede, que a máquina em questão apresente.
+No exemplo da figura \ref{fig:repo_example}, a máquina em execução apresentava duas interfaces de rede com os endereços \textit{IPv4 127.0.0.1} e \textit{192.168.0.1}.
 
 \subsection{\textit{API} de comunicação interna do MRoP}
 \label{sub:repo_api}
 
 Com o objectivo de efectuar inserções, consultas e remoções dos dados do repositório, foi desenvolvida uma \textit{API} interna ao \textit{MRoP}, que permite validar os parâmetros passados às funções do repositório de dados.
+
 Através desta \textit{API} foi possível realizar a separação das componentes do \textit{MRoP} beneficiando, deste modo, a modularidade do código.
-Esta \textit{API} permite aos \textit{handlers} das funções instrumentadas, efectuar as operações de inserção e remoção sobre a componente \textit{Estado dos Sockets}.
+Como se pode visualizar na figura \ref{fig:api_connect}, a \textit{API} criada, permite a comunicação entre os diversos componentes constituintes do \textit{MRoP}.
+Assim, o administrador pode controlar todos os componentes do \textit{MRoP}, dado que a interface disponibilizada no componente \textit{Análise e Controlo} está directamente conectada a esta \textit{API}.
+Para além deste controlo, a \textit{API} permite aos \textit{handlers} das funções instrumentadas, efectuar as operações de inserção e remoção sobre a componente \textit{Estado dos Sockets}.
 Relativamente à operação de consulta, esta é particularmente importante, na medida em que é usada na filtragem de pacotes das interfaces de rede.
 
-A \textit{API}, não obstante reduzir o desempenho, devido à necessidade de chamar os métodos específicos ao repositório, permite a substituição deste, sem que se verifique alterações do código.
+A \textit{API}, não obstante reduzir o desempenho, devido à necessidade de chamar os métodos específicos ao repositório, permite a substituição deste, sem que se verifiquem alterações do código.
 
 \begin{figure}[!htbp]
 \centering
@@ -188,13 +193,6 @@ A \textit{API}, não obstante reduzir o desempenho, devido à necessidade de cha
 \caption{API interna do MRoP}
 \label{fig:api_connect}
 \end{figure}
-
-\todo{falar sobre imagem}
-
-
-%\subsubsection{Identificadores}
-
-%No núcleo do \textit{Linux} quando um processo é criado os identificadores, \textit{pid} e \textit{tgid} são iguais.
 
 \section{Filtro de pacotes, extensão ao \textit{LSF}}
 
@@ -221,10 +219,6 @@ Esta função será invocada quando o filtro estático for avaliado para captura
 Além da definição de um \textit{hook} para activação e desactivação deste novo sistema, foi efectuada uma alteração ao código do \textit{Linux} na função \textit{sk\_run\_filter}, que se traduziu no retorno da decisão conjunta do filtro estático com o dinâmico, ambas realizadas no ficheiro \textit{filter.c}.
 Esta alteração permitiu adicionar uma nova funcionalidade, com uma sobrecarga mínima no sistema de monitorização, independentemente da mesma estar ou não activa.
 
-%Para se poder definir uma nova instrução no \textit{Instruction Set}, é necessário alterar o ficheiro \textit{grammar.y}, na entrada correspondente à posição que deverá ocupar na \textit{AST (Abstract Sintax Tree)}, e modificar as funções de criação do novo filtro, quer em modo utilizador quer dentro do núcleo de sistema.
-%Este desenvolvimento tem de ser realizado par-a-par, pois a ser efectuado apenas de um lado, o outro tornar-se-á incompatível.
-
-
 \section{Informação de análise e controlo}
 
 O \textit{MRoP} foi desenhado e implementado de modo a ser relativamente autónomo, apenas necessitando da configuração de alguns parâmetros, essenciais ao seu funcionamento.
@@ -237,7 +231,7 @@ Assim, no que se refere à componente \textit{Informação de análise e control
 Os ficheiros de controlo criados foram: \textit{pid}, \textit{ppid}, \textit{tgid} e \textit{option}.
 Estes ficheiros, à excepção do último, podem ser lidos e escritos pelo administrador.
 Porem se já tiverem sofrido uma escrita, contêm o identificador referente ao processo ou processos a monitorizar.
-Caso não tenham sido sujeitos a qualquer alteração, os ficheiro conterão os valores por omissão, neste caso zero (0).
+Caso não tenham sido sujeitos a qualquer alteração, os ficheiros conterão os valores por omissão, neste caso zero (0).
 O ficheiro \textit{option}, tem apenas a permissão de escrita e, dependendo do valor escrito, pode activar a procura de portos no processo indicado em \textit{pid}, apagar todos os dados do repositório e activar, ou desactivar, o filtro dinâmico.
 
 \subsection{Informação de análise}
@@ -249,59 +243,4 @@ Relativamente à componente de filtragem dinâmica, os contadores declarados con
 No que se refere à monitorização do processo, existe também um ficheiro que devolve, em relação a cada uma das funções instrumentadas, o número de execuções do \textit{handler} e, quantas destas pertenciam ao processo alvo.
 No que respeita ao repositório de dados, foi também criado um ficheiro com estatísticas, que incidiram sobre o número de portos em utilização e, para cada porto, a indicação de estar em utilização, através do protocolo \textit{TCP}, \textit{UDP} ou em ambos, e por qual ou quais endereço(s) de rede.
 
-Estes valores serviram para a depuração do sistema e para aferir que os pressupostos que levaram à implementação apresentada se verificavam.
-
-%\begin{figure}[ht]
-%\centering
-%\includegraphics{Ipv4_table.pdf}
-%\caption{Protocolo IPv4}
-%\label{fig:ipv4_proto}
-%\end{figure}
-
-
-%\begin{figure}[ht]
-%\centering
-%\includegraphics{tcp_table.pdf}
-%\caption{Protocolo TCP em IPv4}
-%\label{fig:ipv4_tcp_proto}
-%\end{figure}
-
-%\begin{figure}[ht]
-%\centering
-%\includegraphics{udp_table.pdf}
-%\caption{Protocolo UDP em IPv4}
-%\label{fig:ipv4_udp_proto}
-%\end{figure}
-
-
-%\begin{figure}[ht]
-%\centering
-%url = http://upload.wikimedia.org/wikipedia/commons/3/3b/UDP_encapsulation.svg
-%\includegraphics[scale=0.7]{UDP_encapsulation.pdf}
-%\caption{Execução de filtragem de pacotes}
-%\label{fig:run_filter}
-%\end{figure}
-
-%Quando o módulo da ferramenta é executado os indicadores de \textit{pid}, \textit{ppid} e \textit{tgid} são inicializados com o valor -1.
-
-%Esta ferramenta de monitorização só irá passar a analisar os dados das chamadas ao sistema quando estes valores estiverem definidos e identificarem o processo que efectuou a chamada.
-
-%\subsubsection{Sistema de Ficheiros}
-
-%Dentro do sistema de ficheiros onde os \textit{sockets} estão incorporados, como apenas estamos interessados em analisar os sockets construidos para a familia \textit{AF\_INET} todos os sockets que não pertencerem a esta familia e não forem do tipo \textit{TCP} ou \textit{UDP} não serão mais analisados.
-% Os \textit{sockets} que pertencem é então inicializado uma estrutura do tipo \textit{não me lembro ??? ver código} onde estão definidos o porto, o endereço e se são do tipo \textit{UDP} ou \textit{TCP}.
-
-%Dependendo da chamada ao sistema realizada entre a função definida na entrada e a definida no retorno do \textit{KRetProbe}, são passados parâmetros que irão ser utilizados na função de retorno.
-
-
-%\subsection{DebugFs}
-%Criação de alguns ficheiros no sistema virtual \textit{configFs} para poder observar o comportamento da monitorização e dos pacotes que chegaram ao sistema de filtragem.
-%A forte restrição de apenas um valor por ficheiro do \textit{SysFs} obriga a que para obter diferentes valores do sistema tenha de abrir diferentes ficheiros.
-% Como o sistema de ficheiros \textit{proc} se sitia principalmente para os processos seria um bom candidado para a colocação de informação sobre 
-
-
-%\section{Dificuldades}
-% As chamadas ao sistema para o protocolo \textit{UDP} podem ser dificeis de analisar pois apesar de para o \textit{sendto} poder user utilizada a mesma técnica que foi utilizada para o \textit{connect}, para o \textit{recvfrom} pode ser mais dificil pois pode receber pacotes de multiplas fontes
-
-%\section{Conclusão}
-%\label{sec:implement_conclusion}
+Estes valores serviram para a depuração do sistema, e para aferir que os pressupostos que levaram à implementação apresentada, se verificavam.
