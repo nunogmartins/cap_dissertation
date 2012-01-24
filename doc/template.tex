@@ -1,45 +1,53 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Template for writing dissertations with ThesisDIFCTUNL
-%%  Versão 20100313 (March 2010)
+%%
+%% Version 20121110 (Nov 2011)
 %% Departamento de Informática
 %% Faculdade de Ciências e Tecnologia
 %% Universidade Nova de Lisboa
 %%
 %% Project web page at: http://code.google.com/p/thesisdifctunl/
 %%
-%% BUGS and SUGGESTIONS: please use the "Issue" feature in the project web page
+%% BUGS and SUGGESTIONS: please submit an issue at the project web page
 %%
 %% Contributors:
 %%     - Adriano Lopes (Adriano.Lopes@di.fct.unl.pt)
 %%     - João Lourenço (Joao.Lourenco@di.fct.unl.pt)
-%%     - João Seco (Joao.Seco@di.fct.unl.pt)
-%%     - Luís Russo (Luis.Russo@di.fct.unl.pt)
 %%     - Ricardo Dias (rjfd@di.fct.unl.pt)
-%%     - Vitor Duarte (Vitor.Duarte@di.fct.unl.pt)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Main options (please read the manual for further details)
 %% Options marked with (*) are the values by default
+%% See also file "defaults.tex"
+%%
 %% - Languages
-%%           pt   - português
-%%           (*)en   - english
+%%           pt			- português
+%%           (*)en		- english
 %% - Class of text
-%%           bsc     - BSc graduation report
-%%           (*)prepmsc - Preparation of MSc dissertation
-%%           msc     - MSc dissertation
-%%           propphd - Proposal of PhD thesis
-%%           prepphd  - Preparation of PhD thesis
-%%           phd     - PhD thesis
+%%           bsc		- BSc graduation report
+%%           prepmsc	- Preparation of MSc dissertation
+%%           (*)msc		- MSc dissertation
+%%           propphd	- Proposal of PhD thesis
+%%           prepphd 	- Preparation of PhD thesis
+%%           phd		- PhD thesis
 %% - Single/double sided printing
-%%           oneside - single sided printing
-%%           (*)twoside - double sided printing
+%%           oneside	- single sided printing
+%%           (*)twoside	- double sided printing
 %% - Font size
-%%           11pt - Use font size 11
-%%           (*)12pt - Use font size 12
+%%           (*)11pt		- Use font size 11
+%%           12pt	- Use font size 12
+%% - Text encoding
+%%           latin1		- Windows
+%%           (*)utf8	- other systems (Linux, Mac)
+%%
+%% DON'T MIX TEXT ENCODINGS. All the files are saved using UTF8. 
+%% If you want to use latin1, you should first re-save all the text
+%% files (*.tex, *.cls, *.bst,  ...) using latin1 encoding first
+%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\documentclass[pt,msc,twoside,12pt]{thesisdifctunl}
+\documentclass[msc,pt,twoside,11pt,utf8,a4paper]{thesisdifctunl}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -47,28 +55,41 @@
 %%  BEGINING OF USER COSTUMIZATION
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 %====================================================================
 % Additional package syou may ant to use (comment those not needed)
 %====================================================================
 
-\usepackage{paralist}	% Nice lists / enumerates / ...
-\usepackage{booktabs}	% Nice tables
-%\usepackage{colortbl}	% Colors in tables
-%\usepackage[sort]{cite}	% Sort citations if using "plain" style
-\usepackage{listings}	% Nice fontifying for code listings
-\usepackage{subfigure}	% To aggregate multiple figures in a single one with subfigures
-\usepackage{pdfsync}	% For sychronization with PDF viewer (if possible, use synctex instead)
-\usepackage{todonotes}	% To register TODOs in text
-\usepackage{wrapfig}	% To have text wrapping figures
-\usepackage{pdflscape}
+% To enable customizble enumerates
+\usepackage{paralist}
+
+% Beautiful simple tables
+\usepackage{booktabs}
+
+% Use colors in background of table cells
+%\usepackage{colortbl}
+
+% Sort citations - ONLY if using "plain" style, otherwise keep commented
+%\usepackage[sort]{cite}
+
+% Fontification of source code listings
+\usepackage{listings}
+
+% To aggregate multiple figures in a single one with subfigures
+\usepackage{subfigure}
+
+% To register TODO notes in the text
+\usepackage[textsize=footnotesize]{todonotes}
+\setlength{\marginparwidth}{1.5cm}
+
+% To have text wrapping figures
+% \usepackage{wrapfig}
 
 %====================================================================
 % Standard configuration for user included packages
 %====================================================================
 
 % Where to look for figures
-\graphicspath{{Logo/}{Chapters/Figures/}} 
+\graphicspath{{Logo/}{Figures/}{Chapters/Figures/}} 
 
 % Setup of listings, for more information check package manual
 \lstset{
@@ -88,14 +109,11 @@
 %% Identification: items prefixed with (*) are the default values, as defined in "defaults.tex"
 % (*)\university{Universidade Nova de Lisboa}
 % (*)\faculty{Faculdade de Ciências e Tecnologia}
-% (*)\department{Departamento de Informática}
-% (*)\program{Mestrado em Engenharia Informática}
 % (*)\majorfield{Engenharia Informática}
-% (*)\address{Lisboa}
 % (*)\universitylogo{logounl}
-% (*)\universitylogowidth{2.2cm}
-% \universitylogo{logofctunl}  -- alternative (is it allowed?)
-% \universitylogowidth{3.7cm}  -- alternative
+% (*)\thesiscoverphd{cover-phd}
+% (*)\thesiscovermsc{cover-msc-round} -> there is an alternative with squre corners
+% (*)\thesiscoverplain{cover-plain}
 
 % Use double spacing (default is one-and-half spacing) is nice
 %     for supervisor to inert revision notes and comments.
@@ -105,20 +123,44 @@
 %%============================================================
 
 % Title of the dissertation/thesis
-\title{Captura de tráfego de rede de um processo com base no PCAP}
+% USe "\\" to break the title into two or more lines
+\title{Captura de Tráfego de rede de um processo com base no PCAP}
 
 % Autor
-\author{Nuno Miguel Galvão Martins} 
-\authornumber{29603}
+\author[m]{Nuno Miguel Galvão Martins} 
+\authordegree{Licenciatura}
 
-% Data 
-\date{2011}
+% Date
+\themonth{Dezembro}
+\theyear{2011}
 
-% Supervisor, use [f] for female and [m] for male supervisors
-\adviser[m]{Prof.\ Doutor Vítor Manuel Alves Duarte}
 
-% Co-supervisor, use [f] for female and [m] for male supervisors
-% \coadviser[m]{Prof.\ Doutor nome do co-orientador}
+% Supervisors (maximum of 9)
+% use [f] for female and [m] for male
+\adviser[m]{Vítor Manuel Alves Duarte}{Prof.\ Auxiliar}{\\&Universidade Nova de Lisboa}
+%\adviser[m]{[Nome do orientadoror 2]}{[Prof.\ Catedrático]}{[Universidade Nova de Lisboa]}
+% A trick to force the University to go to the next line :)
+% \adviser[m]{João M. S. Lourenço}{Prof.\ Auxiliar}{\\&Universidade Nova de Lisboa}
+
+% Co-supervisors (maximum of 9)
+% use [f] for female and [m] for male
+% \coadviser[f]{[Nome da co-orientadora 1]}{[Cargo]}{[Instituição]}
+% \coadviser[f]{[Nome da co-orientadora 2]}{[Profª.\ Auxiliar]}{[Universidade Nova de Lisboa]}
+
+% Jury (maximum of 9 elements)
+% Use [p] for president, [a] for referees, [v] or nothing for others
+% President of the jury
+\jury[p]{[Nome do presidente do júri]}
+% Main referees
+\jury[a]{[Nome do primeiro arguente]}
+\jury[a]{[Nome do segundo arguente]}
+% Other members of the jury - include the supervisor in this list
+\jury[v]{[Nome do primeiro vogal]}
+\jury[v]{[Nome do segundo vogal]}
+\jury[v]{[Nome do terceiro vogal]}
+\jury[v]{[Nome do quarto vogal]}
+% \jury{[Nome do quinto vogal]}
+% \jury{[Nome do sexto vogal]}
 
 %%------------------------------------------------------------
 %% All the names inside braces below sould correspond to a file
@@ -126,11 +168,14 @@
 %%------------------------------------------------------------
 % Dedicatory text. Will only be considered for final documents,
 % i.e., "bsc", "msc" and "phd", otherwise, it will be silently ignored
-\dedicatoryfile{dedicatory} 
+%\dedicatoryfile{dedicatory} 
 
 % Acknowledgments text. Will only be considered for final documents,
 % i.e., "bsc", "msc" and "phd", otherwise, it will be silently ignored
-\acknowledgementsfile{acknowledgements}
+%\acknowledgementsfile{acknowledgements}
+
+% Quote
+% \quotefile{quote}
 
 % Resume/summary text in Portuguese
 \ptabstractfile{resumo}
@@ -148,30 +193,27 @@
 \printlistoftables 
 
 % The List of Code Listings. Comment to omit.
-% \printlistoflistings 
+\printlistoflistings 
 
 
 % Text chapters
-% sintax: \chapterfile[chapternumber]{file}
-% \chapterfile[1]{chapter1} 
-% \chapterfile[2]{chapter2} 
-% \chapterfile[3]{chapter3}
-
-\chapterfile[1]{capitulo1.tex}
-\chapterfile[2]{capitulo2.tex}
+% syntax: \chapterfile{file}
+\chapterfile{capitulo1.tex}
+\chapterfile{capitulo2.tex}
 %\chapterfile[3]{capitulo3.tex}
-\chapterfile[3]{capitulo4.tex}
-\chapterfile[4]{capitulo5.tex}
-\chapterfile[5]{capitulo6.tex}
-\chapterfile[6]{capitulo7.tex}
-%\chapterfile[7]{capitulo8.tex}
+\chapterfile{capitulo4.tex}
+\chapterfile{capitulo5.tex}
+\chapterfile{capitulo6.tex}
+\chapterfile{capitulo7.tex}
+
 % Text appendixes
-% sintax: \appendixfile[appendixnumber]{file}
-%\appendixfile[1]{appendix1}
+% sintax: \appendixfile{file}
+% Comment if not needed
+%\appendixfile{appendix1}
 
 % BibTeX bibiography files. Can be a comma separated list of files
-% \bibliographyfile{bibliography}
 \bibliographyfile{mybib}
+
 %%============================================================
 %%
 %%  END OF USER COSTUMIZAITON
@@ -190,14 +232,17 @@
 % The first front page
 \frontpage
 
-% The second front page
-\presentationpage
+% Print the copyright page for final versions	
+\printcopyright
 
 % Dedicatory will only be printed if adequate for the document type
-%\printdedicatory
+\printdedicatory
 
 % Acknowledgments will only be printed if adequate for the document type
-%\printacknowledgements
+\printacknowledgements
+
+% Print the quote if file exists
+\printquote
 
 % Abstracts/resumes/summaries in two languages. The first abstract will
 % use the document main language and second the foreign language
@@ -213,7 +258,7 @@
 % Print other lists of contents according to instructions given above
 %%------------------------------------------------------------
 % Print document chapters
-\printchapters
+\printchapthers
 
 %%------------------------------------------------------------
 % Print the bibliography
